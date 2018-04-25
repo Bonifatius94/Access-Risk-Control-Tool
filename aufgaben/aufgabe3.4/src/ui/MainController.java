@@ -4,7 +4,6 @@ import excel.WhitelistImportHelper;
 import excel.WhitelistUser;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
@@ -33,7 +32,7 @@ public class MainController {
         FileChooser dlg = new FileChooser();
         File file = dlg.showOpenDialog(parent);
 
-        if (file.exists()) {
+        if (file != null && file.exists()) {
 
             // get whitelist data from excel file with helper class
             List<WhitelistUser> newUsers = new WhitelistImportHelper().importWhitelist(file.getPath());

@@ -11,7 +11,7 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("all") // remove annotation lateron
+//@SuppressWarnings("all") // remove annotation lateron
 public class WhitelistImportHelper {
 
     public List<WhitelistUser> importWhitelist(String filePath) throws Exception {
@@ -38,6 +38,10 @@ public class WhitelistImportHelper {
             // create new user and add it to list
             list.add(new WhitelistUser(userID, userName));
         }
+
+        // dispose file handle
+        workbook.close();
+        excelFile.close();
 
         return list;
     }
