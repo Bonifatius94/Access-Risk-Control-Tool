@@ -6,6 +6,7 @@
 <VBox fx:controller="ui.MainController" xmlns:fx="http://javafx.com/fxml" spacing="10">
     <MenuBar>
         <Menu text="File">
+            <MenuItem text="Import Config ..." onAction="#importConfig" />
             <MenuItem text="Import Whitelist ..." onAction="#importWhitelist" />
         </Menu>
     </MenuBar>

@@ -1,5 +1,7 @@
 package ui;
 
+import excel.AuthorizationPattern;
+import excel.AuthorizationPatternImportHelper;
 import excel.WhitelistImportHelper;
 import excel.WhitelistUser;
 import javafx.collections.FXCollections;
@@ -23,6 +25,28 @@ public class MainController {
     public void initialize() {
 
         tblWhitelist.setItems(users);
+    }
+
+    @FXML
+    private void importConfig() throws Exception {
+
+        Window parent = tblWhitelist.getScene().getWindow();
+        FileChooser dlg = new FileChooser();
+        File file = dlg.showOpenDialog(parent);
+
+        if (file != null && file.exists()) {
+
+            // get whitelist data from excel file with helper class
+            List<AuthorizationPattern> newPatterns = new AuthorizationPatternImportHelper().importAccessPattern(file.getPath());
+
+            for (AuthorizationPattern pattern : newPatterns) {
+                System.out.println(pattern);
+            }
+
+            //// load whitelist data into table view (list is cleared before adding items)
+            //this.users.clear();
+            //this.users.addAll(newUsers);
+        }
     }
 
     @FXML
