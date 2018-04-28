@@ -11,27 +11,11 @@
         </Menu>
     </MenuBar>
 
-    <VBox spacing="10">
-        <padding>
-            <Insets left="10" right="10" />
-        </padding>
-
-        <Label text="Whitelist users:" />
-        <TableView fx:id="tblWhitelist">
-            <columns>
-                <TableColumn text="User ID" prefWidth="200">
-                <cellValueFactory>
-                    <PropertyValueFactory property="UserID" />
-                </cellValueFactory>
-                </TableColumn>
-                <TableColumn text="Username" prefWidth="200">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="Username" />
-                    </cellValueFactory>
-                </TableColumn>
-            </columns>
-        </TableView>
-    </VBox>
+    <TabPane>
+        <Tab text="Whitelist" closable="false">
+            <fx:include source="WhitelistEditorView.fxml" fx:id="vwWhitelist" />
+        </Tab>
+    </TabPane>
 </VBox>
 
 <!--<GridPane fx:id="gpMainView" fx:controller="ui.MainController" xmlns:fx="http://javafx.com/fxml">

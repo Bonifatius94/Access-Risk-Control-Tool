@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.SapConnectionsController"
+      prefHeight="400.0" prefWidth="600.0" spacing="10">
+    <TableView>
+        <columns>
+            <TableColumn text="Server" prefWidth="200">
+                <cellValueFactory>
+                    <PropertyValueFactory property="UserID" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Username" prefWidth="200">
+                <cellValueFactory>
+                    <PropertyValueFactory property="UserID" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Password" prefWidth="200">
+                <cellValueFactory>
+                    <PropertyValueFactory property="Username" />
+                </cellValueFactory>
+            </TableColumn>
+            <!-- TODO: add missing columns -->
+        </columns>
+    </TableView>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Add ..." />
+        <Button text="Delete" />
+    </HBox>
+</VBox>

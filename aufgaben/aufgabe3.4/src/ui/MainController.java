@@ -7,6 +7,7 @@ import excel.WhitelistUser;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
 import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
@@ -17,20 +18,21 @@ import java.util.List;
 public class MainController {
 
     @FXML
-    private TableView tblWhitelist;
+    private Parent vwWhitelist;
 
-    private final ObservableList<WhitelistUser> users = FXCollections.observableArrayList();
+    @FXML
+    private WhitelistEditorController vwWhitelistController;
 
     @SuppressWarnings("all")
     public void initialize() {
 
-        tblWhitelist.setItems(users);
+        // nothing to do here ...
     }
 
     @FXML
     private void importConfig() throws Exception {
 
-        Window parent = tblWhitelist.getScene().getWindow();
+        Window parent = vwWhitelist.getScene().getWindow();
         FileChooser dlg = new FileChooser();
         File file = dlg.showOpenDialog(parent);
 
@@ -43,7 +45,8 @@ public class MainController {
                 System.out.println(pattern);
             }
 
-            //// load whitelist data into table view (list is cleared before adding items)
+            // TODO: implement logic
+            //// load config data into table view (list is cleared before adding items)
             //this.users.clear();
             //this.users.addAll(newUsers);
         }
@@ -52,7 +55,7 @@ public class MainController {
     @FXML
     private void importWhitelist() throws Exception {
 
-        Window parent = tblWhitelist.getScene().getWindow();
+        Window parent = vwWhitelist.getScene().getWindow();
         FileChooser dlg = new FileChooser();
         File file = dlg.showOpenDialog(parent);
 
@@ -61,9 +64,8 @@ public class MainController {
             // get whitelist data from excel file with helper class
             List<WhitelistUser> newUsers = new WhitelistImportHelper().importWhitelist(file.getPath());
 
-            // load whitelist data into table view (list is cleared before adding items)
-            this.users.clear();
-            this.users.addAll(newUsers);
+            // load whitelist data into whitelist editor view (list is cleared before adding items)
+            vwWhitelistController.setUsers(newUsers);
         }
     }
 
