@@ -4,21 +4,21 @@ public abstract class AuthorizationPattern {
 
     public AuthorizationPattern() { }
 
-    public AuthorizationPattern(String name, String description) {
+    public AuthorizationPattern(String usecaseID, String description) {
 
-        setName(name);
+        setUsecaseID(usecaseID);
         setDescription(description);
     }
 
-    private String name;
+    private String usecaseID;
     private String description;
 
-    public String getName() {
-        return name;
+    public String getUsecaseID() {
+        return usecaseID;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsecaseID(String usecaseID) {
+        this.usecaseID = usecaseID;
     }
 
     public String getDescription() {
@@ -31,7 +31,7 @@ public abstract class AuthorizationPattern {
 
     @Override
     public String toString() {
-        return "name='" + getName() + "', description='" + getDescription() + "'";
+        return "usecaseID='" + getUsecaseID() + "', description='" + getDescription() + "'";
     }
 
 }

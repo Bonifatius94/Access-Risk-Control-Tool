@@ -31,7 +31,7 @@ public class ConfigEditorController {
         detailViewResources.put(DetailViewType.SimpleProfile, "");
         detailViewResources.put(DetailViewType.SimplePattern, "");
         detailViewResources.put(DetailViewType.ComplexPattern, "");
-    };
+    }
 
     private final ObservableList<AuthorizationPattern> patterns = FXCollections.observableArrayList();
 
