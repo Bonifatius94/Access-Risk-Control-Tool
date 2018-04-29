@@ -7,13 +7,13 @@ package excel;
 @SuppressWarnings("all") // remove this annotation lateron
 public class WhitelistUser {
 
-    public WhitelistUser(String userID, String username) {
+    public WhitelistUser(String usecaseID, String username) {
 
-        setUserID(userID);
+        setUsecaseID(usecaseID);
         setUsername(username);
     }
 
-    private String UserID;
+    private String UsecaseID;
     private String Username;
 
     public String getUsername() {
@@ -24,16 +24,16 @@ public class WhitelistUser {
         Username = username;
     }
 
-    public String getUserID() {
-        return UserID;
+    public String getUsecaseID() {
+        return UsecaseID;
     }
 
-    public void setUserID(String userID) {
-        UserID = userID;
+    public void setUsecaseID(String usecaseID) {
+        UsecaseID = usecaseID;
     }
 
     @Override
     public String toString() {
-        return "UserID='" + getUserID() + "', Username='" + getUsername() + "'";
+        return "UsecaseID='" + getUsecaseID() + "', Username='" + getUsername() + "'";
     }
 }

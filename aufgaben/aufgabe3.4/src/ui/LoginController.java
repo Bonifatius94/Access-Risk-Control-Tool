@@ -13,24 +13,21 @@ public class LoginController {
 
     @FXML
     private TextField tfLoginUsername;
+    private StringProperty loginUsername = new SimpleStringProperty("");
 
     @FXML
     private PasswordField tfLoginPassword;
-
-    private StringProperty loginUsername = new SimpleStringProperty("");
     private StringProperty loginPassword = new SimpleStringProperty("");
 
     public void initialize() {
 
+        // init text field bindings
         tfLoginUsername.textProperty().bindBidirectional(loginUsername);
         tfLoginPassword.textProperty().bindBidirectional(loginPassword);
     }
 
     @FXML
     protected void btnOkClicked(ActionEvent e) {
-
-        // send login request
-        sendLoginRequest(loginUsername.getValue(), loginPassword.getValue());
 
         // close window
         Button button = (Button)e.getSource();
@@ -47,11 +44,12 @@ public class LoginController {
         stage.close();
     }
 
-    // TODO: remove this suppress annotation
-    @SuppressWarnings("unused")
-    private void sendLoginRequest(String username, String password) {
+    public String getUsername() {
+        return loginUsername.get();
+    }
 
-        // TODO: implement logic
+    public String getPassword() {
+        return loginPassword.get();
     }
 
 }

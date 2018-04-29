@@ -5,13 +5,32 @@
 <?import javafx.geometry.Insets?>
 <VBox fx:controller="ui.MainController" xmlns:fx="http://javafx.com/fxml" spacing="10">
     <MenuBar>
-        <Menu text="File">
-            <MenuItem text="Import Config ..." onAction="#importConfig" />
-            <MenuItem text="Import Whitelist ..." onAction="#importWhitelist" />
+        <!--<menus>-->
+        <Menu text="%menubarMenuFile">
+            <!--<items>-->
+            <MenuItem text="%menubarMenuFileSubmenuImportConfig" onAction="#importConfig" />
+            <MenuItem text="%menubarMenuFileSubmenuExportConfig" onAction="#exportConfig" />
+            <MenuItem text="%menubarMenuFileSubmenuImportConfig" onAction="#importConfig" />
+            <MenuItem text="%menubarMenuFileSubmenuExportWhitelist" onAction="#exportWhitelist" />
+            <MenuItem text="%menubarMenuFileSubmenuExportResults" onAction="#exportResults" />
+            <!--<SeparatorMenuItem  />-->
+            <!--<MenuItem text="Exit" onAction="#menuExitApp" />-->
+            <!--</items>-->
         </Menu>
+        <Menu text="%menubarMenuSettings">
+            <!--<items>-->
+            <MenuItem text="%menubarMenuSettingsSubmenuSapSettings" onAction="#showSapConnectionsDlg" />
+            <MenuItem text="%menubarMenuSettingsSubmenuUserSettings" onAction="#showUserSettingsDlg" />
+            <!--</items>-->
+        </Menu>
+        <Menu text="%menubarMenuAbout" onAction="#showAboutDlg" />
+        <!--</menus>-->
     </MenuBar>
 
     <TabPane>
+        <Tab text="Configs" closable="false">
+            <fx:include source="ConfigEditorView.fxml" fx:id="vwConfigs" />
+        </Tab>
         <Tab text="Whitelist" closable="false">
             <fx:include source="WhitelistEditorView.fxml" fx:id="vwWhitelist" />
         </Tab>

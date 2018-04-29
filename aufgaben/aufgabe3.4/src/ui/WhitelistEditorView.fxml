@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.control.skin.*?>
 <?import javafx.scene.layout.*?>
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.WhitelistEditorController"
@@ -14,14 +13,15 @@
 
     <TitledPane text="Whitelist User Details">
         <GridPane vgap="10" hgap="10">
-            <Label text="User ID:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-            <TextField fx:id="tfUserID" prefWidth="300" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+            <Label text="Usecase ID:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+            <TextField fx:id="tfUsecaseID" prefWidth="300" GridPane.rowIndex="0" GridPane.columnIndex="1" />
 
             <Label text="Username:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
             <TextField fx:id="tfUsername" prefWidth="300" GridPane.rowIndex="1" GridPane.columnIndex="1" />
 
             <HBox spacing="10" GridPane.columnSpan="2" GridPane.rowIndex="2" alignment="CENTER_RIGHT">
-                <Button text="Save" />
+                <Button text="Update" />
+                <Button text="New Entry" />
                 <Button text="Delete" />
             </HBox>
         </GridPane>

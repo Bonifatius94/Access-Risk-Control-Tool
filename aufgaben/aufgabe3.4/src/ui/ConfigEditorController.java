@@ -49,21 +49,18 @@ public class ConfigEditorController {
 
     private void onSelectionChanged(ObservableValue<Object> observableValue, Object oldSelection, Object newSelection) {
 
-        if (newSelection != null) {
-            tblConfigs.getSelectionModel().clearSelection();
-        }
-
         Object selectedItem = tblConfigs.getSelectionModel().getSelectedItem();
 
         if (selectedItem != null) {
-            updateSelectedDetailView(selectedItem);
+
+            AuthorizationPattern pattern = (AuthorizationPattern) selectedItem;
+            updateSelectedDetailView(pattern);
         }
     }
 
-    private void updateSelectedDetailView(Object selectedItem) {
+    private void updateSelectedDetailView(AuthorizationPattern pattern) {
 
-
-         //selectedItem;
+        // TODO:
     }
 
 }

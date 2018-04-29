@@ -21,13 +21,20 @@ public class MainController {
     private Parent vwWhitelist;
 
     @FXML
+    private Parent vwConfigs;
+
+    @FXML
     private WhitelistEditorController vwWhitelistController;
 
     @SuppressWarnings("all")
     public void initialize() {
 
-        // nothing to do here ...
+        // TODO: lock user interface and show login dialog
     }
+
+    // =============================================
+    //               import logic
+    // =============================================
 
     @FXML
     private void importConfig() throws Exception {
@@ -67,6 +74,54 @@ public class MainController {
             // load whitelist data into whitelist editor view (list is cleared before adding items)
             vwWhitelistController.setUsers(newUsers);
         }
+    }
+
+    // =============================================
+    //               export logic
+    // =============================================
+
+    @FXML
+    private void exportConfig() {
+
+        // TODO: implemnt logic
+    }
+
+    @FXML
+    private void exportWhitelist() {
+
+        // TODO: implemnt logic
+    }
+
+    @FXML
+    private void exportResults() {
+
+        // TODO: implemnt logic
+    }
+
+    // =============================================
+    //                 settings
+    // =============================================
+
+    @FXML
+    private void showSapConnectionsDlg() {
+
+        // TODO: implemnt logic
+    }
+
+    @FXML
+    private void showUserSettingsDlg() {
+
+        // TODO: implemnt logic
+    }
+
+    // =============================================
+    //                   about
+    // =============================================
+
+    @FXML
+    private void showAboutDlg() {
+
+        // TODO: implemnt logic
     }
 
 }

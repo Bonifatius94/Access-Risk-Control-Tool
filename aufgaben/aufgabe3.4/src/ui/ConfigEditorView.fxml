@@ -9,8 +9,23 @@
 <AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.ConfigEditorController"
             prefHeight="400.0" prefWidth="600.0">
     <VBox spacing="10">
-        <TitledPane text="Config Details" fx:id="tpConfigDetails" />
+        <TitledPane text="Config Details" fx:id="tpConfigDetails">
+            <TabPane>
+                <!-- TODO: create separate views for each tab -->
 
+                <Tab text="Auth Pattern" closable="false">
+                    <!-- authentication pattern -->
+                    <fx:include source="ComplexConfigDetailView.fxml" />
+                </Tab>
+
+                <Tab text="Profile Auth" closable="false">
+                    <!-- profile authentication -->
+                    <fx:include source="ProfileAuthConfigDetailView.fxml" />
+                </Tab>
+            </TabPane>
+        </TitledPane>
+
+        <!-- TODO: implement table -->
         <TableView fx:id="tblConfigs">
             <columns>
                 <TableColumn text="">

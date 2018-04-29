@@ -6,7 +6,34 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.ComplexConfigDetailController"
-      spacing="10">
+<GridPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.ComplexConfigDetailController"
+          vgap="10" hgap="10">
+    <Label text="Usecase ID" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+    <TextField fx:id="tfUsecaseID" GridPane.rowIndex="0" GridPane.columnIndex="1" />
 
-</VBox>
+    <Label text="Description" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+    <TextArea fx:id="taDescription" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+    <Label text="Authentication Object" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+    <TextField fx:id="tfAuthObject" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+    <Label text="Authentication Object Parameter" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+    <TextField fx:id="tfAuthObjectParameter" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+    <Label text="Values" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+    <GridPane vgap="10" hgap="10" GridPane.rowIndex="4" GridPane.columnIndex="1">
+        <Label text="(" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+        <TextField fx:id="tfValue1" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+        <Label text="OR" GridPane.rowIndex="0" GridPane.columnIndex="2" alignment="CENTER" />
+        <TextField fx:id="tfValue2" GridPane.rowIndex="0" GridPane.columnIndex="3" />
+        <Label text=")" GridPane.rowIndex="0" GridPane.columnIndex="4" />
+
+        <Label text="AND" GridPane.rowIndex="1" GridPane.columnIndex="2" alignment="CENTER" />
+
+        <Label text="(" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+        <TextField fx:id="tfValue3" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+        <Label text="OR" GridPane.rowIndex="2" GridPane.columnIndex="2" alignment="CENTER" />
+        <TextField fx:id="tfValue4" GridPane.rowIndex="2" GridPane.columnIndex="3" />
+        <Label text=")" GridPane.rowIndex="2" GridPane.columnIndex="4" />
+    </GridPane>
+</GridPane>
