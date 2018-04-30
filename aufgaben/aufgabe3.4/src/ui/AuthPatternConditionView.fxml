@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.AuthPatternConditionController"
+    spacing="10">
+    <TitledPane text="Auth Patter Property Details">
+        <VBox spacing="10">
+            <GridPane vgap="10" hgap="10">
+                <Label text="Authorization Object" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                <TextField fx:id="tfAuthObject" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+                <Label text="Authorization Object Parameter" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                <TextField fx:id="tfAuthObjectParameter" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+                <Label text="Values" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                <GridPane vgap="10" hgap="10" GridPane.rowIndex="4" GridPane.columnIndex="1">
+                    <Label text="(" alignment="CENTER" GridPane.rowIndex="0" GridPane.columnIndex="0">
+                        <font>
+                            <Font name="default" size="22.0" />
+                        </font>
+                    </Label>
+                    <TextField fx:id="tfValue1" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                    <Label text=" OR" GridPane.rowIndex="0" GridPane.columnIndex="2" alignment="CENTER" />
+                    <TextField fx:id="tfValue2" GridPane.rowIndex="0" GridPane.columnIndex="3" />
+                    <Label text=")" GridPane.rowIndex="0" GridPane.columnIndex="4">
+                        <font>
+                            <Font name="default" size="22.0" />
+                        </font>
+                    </Label>
+
+                    <Label text="AND" GridPane.rowIndex="1" GridPane.columnIndex="2" alignment="CENTER" />
+
+                    <Label text="(" GridPane.rowIndex="2" GridPane.columnIndex="0">
+                        <font>
+                            <Font name="default" size="22.0" />
+                        </font>
+                    </Label>
+                    <TextField fx:id="tfValue3" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                    <Label text=" OR" GridPane.rowIndex="2" GridPane.columnIndex="2" alignment="CENTER" />
+                    <TextField fx:id="tfValue4" GridPane.rowIndex="2" GridPane.columnIndex="3" />
+                    <Label text=")" GridPane.rowIndex="2" GridPane.columnIndex="4">
+                        <font>
+                            <Font name="default" size="22.0" />
+                        </font>
+                    </Label>
+                </GridPane>
+            </GridPane>
+
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button text="Update" />
+                <Button text="New Entry" />
+                <Button text="Delete" />
+            </HBox>
+        </VBox>
+    </TitledPane>
+
+    <TableView fx:id="tblConditionProperties" GridPane.rowIndex="5" GridPane.columnSpan="2">
+        <columns>
+            <TableColumn text="Auth Object">
+                <cellValueFactory>
+                    <PropertyValueFactory property="AuthObject" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Auth Object Parameter">
+                <cellValueFactory>
+                    <PropertyValueFactory property="AuthObjectParameter" />
+                </cellValueFactory>
+            </TableColumn>
+            <!-- TODO: display values as (... OR ...) AND (... OR ...) with only one column -->
+            <TableColumn text="Value 1">
+                <cellValueFactory>
+                    <PropertyValueFactory property="Value1" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Value 2">
+                <cellValueFactory>
+                    <PropertyValueFactory property="Value2" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Value 3">
+                <cellValueFactory>
+                    <PropertyValueFactory property="Value3" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Value 4">
+                <cellValueFactory>
+                    <PropertyValueFactory property="Value4" />
+                </cellValueFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+</VBox>

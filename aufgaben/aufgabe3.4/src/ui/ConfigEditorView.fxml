@@ -9,16 +9,26 @@
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.ConfigEditorController"
       spacing="10">
     <TitledPane text="Config Details" fx:id="tpConfigDetails">
-        <TabPane>
-            <Tab text="Auth Pattern" closable="false">
-                <!-- authentication pattern -->
-                <fx:include source="AuthPatternConfigDetailView.fxml" />
-            </Tab>
-            <Tab text="Profile Auth" closable="false">
-                <!-- profile authentication -->
-                <fx:include source="ProfileAuthConfigDetailView.fxml" />
-            </Tab>
-        </TabPane>
+        <VBox spacing="10">
+            <GridPane vgap="10" hgap="10">
+                <Label text="Usecase ID" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="tfUsecaseID" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <Label text="Description" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <TextArea fx:id="taDescription" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            </GridPane>
+
+            <TabPane>
+                <Tab text="Auth Pattern" closable="false">
+                    <!-- authentication pattern -->
+                    <fx:include source="AuthPatternConditionView.fxml" />
+                </Tab>
+                <Tab text="Profile Auth" closable="false">
+                    <!-- profile authentication -->
+                    <fx:include source="ProfileAuthConfigDetailView.fxml" />
+                </Tab>
+            </TabPane>
+        </VBox>
     </TitledPane>
 
     <!-- TODO: implement table -->

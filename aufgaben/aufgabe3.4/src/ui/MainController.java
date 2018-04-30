@@ -23,8 +23,13 @@ public class MainController {
     @FXML
     private Parent vwConfigs;
 
+    @SuppressWarnings("unused")
     @FXML
     private WhitelistEditorController vwWhitelistController;
+
+    @SuppressWarnings("unused")
+    @FXML
+    private ConfigEditorController vwConfigController;
 
     @SuppressWarnings("all")
     public void initialize() {
@@ -39,7 +44,7 @@ public class MainController {
     @FXML
     private void importConfig() throws Exception {
 
-        Window parent = vwWhitelist.getScene().getWindow();
+        Window parent = vwConfigs.getScene().getWindow();
         FileChooser dlg = new FileChooser();
         File file = dlg.showOpenDialog(parent);
 
@@ -48,14 +53,8 @@ public class MainController {
             // get whitelist data from excel file with helper class
             List<AuthorizationPattern> newPatterns = new AuthorizationPatternImportHelper().importAccessPattern(file.getPath());
 
-            for (AuthorizationPattern pattern : newPatterns) {
-                System.out.println(pattern);
-            }
-
-            // TODO: implement logic
-            //// load config data into table view (list is cleared before adding items)
-            //this.users.clear();
-            //this.users.addAll(newUsers);
+            // load config data into config editor view (list is cleared before adding items)
+            vwConfigController.loadConfig(newPatterns);
         }
     }
 

@@ -74,7 +74,7 @@ public class AuthorizationPatternImportHelper {
         }
 
         // set name and description
-        pattern.setName(patternName);
+        pattern.setUsecaseID(patternName);
         pattern.setDescription(patternDescription);
 
         return pattern;

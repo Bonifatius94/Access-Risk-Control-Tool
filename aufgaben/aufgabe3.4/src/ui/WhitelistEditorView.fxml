@@ -30,9 +30,9 @@
     <TitledPane text="Whitelist Users">
         <TableView fx:id="tblWhitelist">
             <columns>
-                <TableColumn text="User ID" prefWidth="200">
+                <TableColumn text="Usecase ID" prefWidth="200">
                     <cellValueFactory>
-                        <PropertyValueFactory property="UserID" />
+                        <PropertyValueFactory property="UsecaseID" />
                     </cellValueFactory>
                 </TableColumn>
                 <TableColumn text="Username" prefWidth="200">

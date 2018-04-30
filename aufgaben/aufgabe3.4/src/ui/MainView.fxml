@@ -10,7 +10,7 @@
             <!--<items>-->
             <MenuItem text="%menubarMenuFileSubmenuImportConfig" onAction="#importConfig" />
             <MenuItem text="%menubarMenuFileSubmenuExportConfig" onAction="#exportConfig" />
-            <MenuItem text="%menubarMenuFileSubmenuImportConfig" onAction="#importConfig" />
+            <MenuItem text="%menubarMenuFileSubmenuImportWhitelist" onAction="#importWhitelist" />
             <MenuItem text="%menubarMenuFileSubmenuExportWhitelist" onAction="#exportWhitelist" />
             <MenuItem text="%menubarMenuFileSubmenuExportResults" onAction="#exportResults" />
             <!--<SeparatorMenuItem  />-->

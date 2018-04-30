@@ -1,6 +1,6 @@
 package ui;
 
-import excel.AuthorizationPattern;
+import excel.AuthorizationPatternCondition;
 import excel.AuthorizationPatternConditionProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -8,18 +8,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
-public class AuthPatternConfigDetailController {
-
-    @FXML
-    private TextField tfUsecaseID;
-    private StringProperty usecaseID = new SimpleStringProperty("");
-
-    @FXML
-    private TextArea taDescription;
-    private StringProperty description = new SimpleStringProperty("");
+public class AuthPatternConditionController {
 
     @FXML
     private TextField tfAuthObject;
@@ -49,11 +40,12 @@ public class AuthPatternConfigDetailController {
     private TableView tblConditionProperties;
     private ObservableList<AuthorizationPatternConditionProperty> properties = FXCollections.observableArrayList();
 
+    @SuppressWarnings("unchecked")
     public void initialize() {
 
         // init text field bindings
-        tfUsecaseID.textProperty().bindBidirectional(usecaseID);
-        taDescription.textProperty().bindBidirectional(description);
+        /*tfUsecaseID.textProperty().bindBidirectional(usecaseID);
+        taDescription.textProperty().bindBidirectional(description);*/
         tfAuthObject.textProperty().bindBidirectional(authObject);
         tfAuthObjectParameter.textProperty().bindBidirectional(authObjectParameter);
         tfValue1.textProperty().bindBidirectional(value1);
@@ -77,11 +69,14 @@ public class AuthPatternConfigDetailController {
     //   o condition
     //   o property
 
-    public void loadAuthPattern(AuthorizationPattern pattern) {
+    public void loadAuthPatternCondition(AuthorizationPatternCondition condition) {
 
-        usecaseID.setValue(pattern.getUsecaseID());
-        description.setValue(pattern.getDescription());
+        // init table view with property list
+        properties.clear();
+        properties.addAll(condition.getProperties());
 
+        // select first record (loads detail data automatically)
+        tblConditionProperties.getSelectionModel().select(0);
     }
 
     private void onSelectionChanged(/*ObservableValue<Object> observableValue, Object oldValue,*/ Object newValue) {
