@@ -1,5 +1,5 @@
 
-package excel;
+package excel.whitelist;
 
 /**
  * this is a data object class for a user specified in whitelist

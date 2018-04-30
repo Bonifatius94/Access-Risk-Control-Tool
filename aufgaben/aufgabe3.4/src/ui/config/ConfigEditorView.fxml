@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.config.ConfigEditorController"
+      spacing="10">
+    <TitledPane text="Search Pattern Details">
+        <VBox spacing="10">
+            <GridPane vgap="10" hgap="10">
+                <Label text="Usecase ID" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="tfUsecaseID" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <Label text="Description" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <TextArea fx:id="taDescription" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            </GridPane>
+
+            <!--<VBox>
+                <fx:define>
+                    <ToggleGroup fx:id="tgComplexMode" />
+                </fx:define>
+
+                <RadioButton text="Simple Mode" toggleGroup="$tgComplexMode" />
+                <RadioButton text="Complex Mode" toggleGroup="$tgComplexMode" />
+            </VBox>-->
+
+            <TitledPane text="Conditions">
+                <VBox spacing="10">
+                    <GridPane vgap="10" hgap="10" alignment="CENTER_LEFT">
+                        <Label text="New Condition" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                        <ChoiceBox fx:id="chConditionToAdd" prefWidth="200" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                        <Button text="Add Condition" onKeyPressed="#addCondition" GridPane.rowIndex="0" GridPane.columnIndex="2" />
+
+                        <Label text="Linkage" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                        <ChoiceBox fx:id="chLinkage" prefWidth="70" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                    </GridPane>
+                    <TableView>
+                        <columns>
+                            <TableColumn text="">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="foo" />
+                                </cellValueFactory>
+                            </TableColumn>
+                        </columns>
+                    </TableView>
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Button text="Delete Condition" />
+                    </HBox>
+                </VBox>
+            </TitledPane>
+
+            <!--<TabPane>
+                <Tab text="Auth Pattern" closable="false">
+                    <fx:include source="AuthPatternConditionView.fxml" />
+                </Tab>
+                <Tab text="Profile Auth" closable="false">
+                    <fx:include source="ProfileAuthConditionView.fxml" />
+                </Tab>
+            </TabPane>-->
+        </VBox>
+    </TitledPane>
+
+    <TitledPane text="Search Patterns">
+        <VBox spacing="10">
+            <!-- TODO: implement table -->
+            <TableView fx:id="tblConfigs">
+                <columns>
+                    <TableColumn text="Search Pattern">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="" />
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn text="Description">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="" />
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn text="Pattern Type">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="" />
+                        </cellValueFactory>
+                    </TableColumn>
+                </columns>
+            </TableView>
+        </VBox>
+    </TitledPane>
+</VBox>

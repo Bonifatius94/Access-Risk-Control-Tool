@@ -1,6 +1,6 @@
-package ui;
+package ui.whitelist;
 
-import excel.WhitelistUser;
+import excel.whitelist.WhitelistUser;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;

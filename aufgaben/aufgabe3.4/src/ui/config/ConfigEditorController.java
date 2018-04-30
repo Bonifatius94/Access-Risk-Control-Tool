@@ -1,18 +1,16 @@
-package ui;
+package ui.config;
 
-import excel.AuthorizationPattern;
+import excel.config.AuthorizationPattern;
+import excel.config.ConditionLinkage;
+import excel.config.ICondition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class ConfigEditorController {
@@ -26,34 +24,35 @@ public class ConfigEditorController {
     private StringProperty description = new SimpleStringProperty("");
 
     @FXML
-    private TitledPane tpConfigDetails;
-
-    @FXML
     private TableView tblConfigs;
     private ObservableList<AuthorizationPattern> patterns = FXCollections.observableArrayList();
 
-    private enum DetailViewType {
-        ComplexPattern,
-        SimplePattern,
-        SimpleProfile
-    }
+    @FXML
+    private ChoiceBox chConditionToAdd;
+    // TODO: add synchronization with conditions editor
+    private ObservableList<ICondition> conditions = FXCollections.observableArrayList();
 
-    private static final HashMap<DetailViewType, String> detailViewResources = new HashMap<>();
-    static
-    {
-        // init hash map
-        detailViewResources.put(DetailViewType.SimpleProfile, "");
-        detailViewResources.put(DetailViewType.SimplePattern, "");
-        detailViewResources.put(DetailViewType.ComplexPattern, "");
-    }
+    @FXML
+    private ChoiceBox chLinkage;
+    private ObservableList<ConditionLinkage> linkages = FXCollections.observableArrayList();
 
     @SuppressWarnings("unchecked")
-    private void initialize() {
+    public void initialize() {
 
-        // TODO: set default detail view
+        // init text field bindings
+        tfUsecaseID.textProperty().bindBidirectional(usecaseID);
+        taDescription.textProperty().bindBidirectional(description);
 
-        // init table view elements
+        // init table view items
         tblConfigs.setItems(patterns);
+
+        // init conditions choice box items
+        chConditionToAdd.setItems(conditions);
+
+        // init linkages choice box items
+        linkages.addAll(ConditionLinkage.None, ConditionLinkage.And, ConditionLinkage.Or);
+        chLinkage.setItems(linkages);
+        chLinkage.getSelectionModel().select(0);
 
         // bind selection changed listener
         tblConfigs.getSelectionModel().selectedItemProperty().addListener(this::onSelectionChanged);
@@ -84,5 +83,22 @@ public class ConfigEditorController {
 
         // TODO:
     }
+
+    @FXML
+    private void addCondition() {
+
+        // TODO: implement logic
+    }
+
+    // TODO: implement update mechanism that calls this method (e.g. using observable pattern)
+    public void onConditionsChanged(List<ICondition> conditions) {
+
+        this.conditions.clear();
+        this.conditions.addAll(conditions);
+
+        // TODO: handle selection
+    }
+
+    // TODO: implement validation logic
 
 }

@@ -1,16 +1,15 @@
-package ui;
+package ui.main;
 
-import excel.AuthorizationPattern;
-import excel.AuthorizationPatternImportHelper;
-import excel.WhitelistImportHelper;
-import excel.WhitelistUser;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import excel.config.AuthorizationPattern;
+import excel.config.AuthorizationPatternImportHelper;
+import excel.whitelist.WhitelistImportHelper;
+import excel.whitelist.WhitelistUser;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
-import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import ui.whitelist.WhitelistEditorController;
+import ui.config.ConfigEditorController;
 
 import java.io.File;
 import java.util.List;
@@ -23,13 +22,20 @@ public class MainController {
     @FXML
     private Parent vwConfigs;
 
+    @FXML
+    private Parent vwConditions;
+
     @SuppressWarnings("unused")
     @FXML
     private WhitelistEditorController vwWhitelistController;
 
     @SuppressWarnings("unused")
     @FXML
-    private ConfigEditorController vwConfigController;
+    private ConfigEditorController vwConfigsController;
+
+//    @SuppressWarnings("unused")
+//    @FXML
+//    private ConfigEditorController vwConditionsController;
 
     @SuppressWarnings("all")
     public void initialize() {
@@ -54,7 +60,7 @@ public class MainController {
             List<AuthorizationPattern> newPatterns = new AuthorizationPatternImportHelper().importAccessPattern(file.getPath());
 
             // load config data into config editor view (list is cleared before adding items)
-            vwConfigController.loadConfig(newPatterns);
+            vwConfigsController.loadConfig(newPatterns);
         }
     }
 

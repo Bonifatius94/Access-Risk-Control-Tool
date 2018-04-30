@@ -1,11 +1,11 @@
-package excel;
+package excel.config;
 
 public class AuthorizationPatternConditionProperty {
 
-    public AuthorizationPatternConditionProperty(String authObject, String propertyName, String value1, String value2, String value3, String value4) {
+    public AuthorizationPatternConditionProperty(String authObject, String authObjectProperty, String value1, String value2, String value3, String value4) {
 
         setAuthObject(authObject);
-        setPropertyName(propertyName);
+        setAuthObjectProperty(authObjectProperty);
         setValue1(value1);
         setValue2(value2);
         setValue3(value3);
@@ -13,7 +13,7 @@ public class AuthorizationPatternConditionProperty {
     }
 
     private String authObject;
-    private String propertyName;
+    private String authObjectProperty;
     private String value1;
     private String value2;
     private String value3;
@@ -27,12 +27,12 @@ public class AuthorizationPatternConditionProperty {
         this.authObject = authObject;
     }
 
-    public String getPropertyName() {
-        return propertyName;
+    public String getAuthObjectProperty() {
+        return authObjectProperty;
     }
 
-    public void setPropertyName(String propertyName) {
-        this.propertyName = propertyName;
+    public void setAuthObjectProperty(String authObjectProperty) {
+        this.authObjectProperty = authObjectProperty;
     }
 
     public String getValue1() {
@@ -71,7 +71,7 @@ public class AuthorizationPatternConditionProperty {
     public String toString() {
         return
                 "authObject='" + getAuthObject()
-                + "', property='" + getPropertyName()
+                + "', property='" + getAuthObjectProperty()
                 + "', value1='" + getValue1()
                 + "', value2='" + getValue2()
                 + "', value3='" + getValue3()

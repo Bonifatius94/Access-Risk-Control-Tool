@@ -3,7 +3,7 @@
 <?import javafx.scene.control.cell.*?>
 
 <?import javafx.geometry.Insets?>
-<VBox fx:controller="ui.MainController" xmlns:fx="http://javafx.com/fxml" spacing="10">
+<VBox fx:controller="ui.main.MainController" xmlns:fx="http://javafx.com/fxml" spacing="10">
     <MenuBar>
         <!--<menus>-->
         <Menu text="%menubarMenuFile">
@@ -29,10 +29,13 @@
 
     <TabPane>
         <Tab text="Configs" closable="false">
-            <fx:include source="ConfigEditorView.fxml" fx:id="vwConfigs" />
+            <fx:include source="../config/ConfigEditorView.fxml" fx:id="vwConfigs" />
+        </Tab>
+        <Tab text="Conditions" closable="false">
+            <fx:include source="../condition/ConditionEditorView.fxml" fx:id="vwConditions" />
         </Tab>
         <Tab text="Whitelist" closable="false">
-            <fx:include source="WhitelistEditorView.fxml" fx:id="vwWhitelist" />
+            <fx:include source="../whitelist/WhitelistEditorView.fxml" fx:id="vwWhitelist" />
         </Tab>
     </TabPane>
 </VBox>

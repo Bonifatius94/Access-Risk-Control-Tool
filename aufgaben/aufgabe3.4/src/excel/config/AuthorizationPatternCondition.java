@@ -1,4 +1,4 @@
-package excel;
+package excel.config;
 
 import java.util.List;
 
@@ -9,6 +9,7 @@ public class AuthorizationPatternCondition implements ICondition {
         setProperties(properties);
     }
 
+    private String conditionName;
     private List<AuthorizationPatternConditionProperty> properties;
 
     public List<AuthorizationPatternConditionProperty> getProperties() {
@@ -17,6 +18,21 @@ public class AuthorizationPatternCondition implements ICondition {
 
     public void setProperties(List<AuthorizationPatternConditionProperty> properties) {
         this.properties = properties;
+    }
+
+    @Override
+    public String getConditionName() {
+        return conditionName;
+    }
+
+    @Override
+    public void setConditionName(String conditionName) {
+        this.conditionName = conditionName;
+    }
+
+    @Override
+    public String getConditionType() {
+        return "Auth Pattern";
     }
 
     @Override

@@ -1,4 +1,4 @@
-package excel;
+package excel.config;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -80,16 +80,16 @@ public class AuthorizationPatternImportHelper {
         return pattern;
     }
 
-    private SimpleAuthorizationPattern getSimpleAuthorizationPattern(List<Row> rows) {
+    private AuthorizationPattern getSimpleAuthorizationPattern(List<Row> rows) {
 
         ICondition condition = getCondition(rows.subList(1, rows.size()), false);
-        return new SimpleAuthorizationPattern(condition);
+        return new AuthorizationPattern(condition);
     }
 
-    private ComplexAuthorizationPattern getComplexAuthorizationPattern(List<Row> rows) {
+    private AuthorizationPattern getComplexAuthorizationPattern(List<Row> rows) {
 
         List<Row> tempRows = new ArrayList<>();
-        List<ICondition> subPatterns = new ArrayList<>();
+        List<ICondition> conditions = new ArrayList<>();
 
         String linkageAsString = rows.get(1).getCell(1).getStringCellValue();
         ConditionLinkage linkage = linkageAsString.toUpperCase().equals("OR") ? ConditionLinkage.Or : ConditionLinkage.And;
@@ -108,7 +108,7 @@ public class AuthorizationPatternImportHelper {
             if (!isFirstRow && (condIndicator != null && condIndicator.toUpperCase().equals("COND"))) {
 
                 // parse pattern from rows before and add pattern to list
-                subPatterns.add(getCondition(tempRows, true));
+                conditions.add(getCondition(tempRows, true));
                 tempRows = new ArrayList<>();
                 counter++;
             }
@@ -118,9 +118,9 @@ public class AuthorizationPatternImportHelper {
         }
 
         // parse remaining rows
-        if (tempRows.size() > 0) { subPatterns.add(getCondition(tempRows, true)); }
+        if (tempRows.size() > 0) { conditions.add(getCondition(tempRows, true)); }
 
-        return new ComplexAuthorizationPattern(subPatterns, linkage);
+        return new AuthorizationPattern(conditions, linkage);
     }
 
     private ICondition getCondition(List<Row> rows, boolean isComplex) {
@@ -131,7 +131,7 @@ public class AuthorizationPatternImportHelper {
         if (temp != null && temp.getStringCellValue() != null && !temp.getStringCellValue().isEmpty()) {
             // case: profile condition
             String profile = temp.getStringCellValue();
-            condition = new ProfileCondition(profile);
+            condition = new AuthorizationProfileCondition(profile);
         }
         else {
             // case: auth pattern condition
