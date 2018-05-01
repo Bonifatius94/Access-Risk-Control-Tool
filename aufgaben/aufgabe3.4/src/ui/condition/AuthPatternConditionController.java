@@ -40,6 +40,8 @@ public class AuthPatternConditionController {
     private TableView tblConditionProperties;
     private ObservableList<AuthorizationPatternConditionProperty> properties = FXCollections.observableArrayList();
 
+    private AuthorizationPatternCondition condition;
+
     @SuppressWarnings("unchecked")
     public void initialize() {
 
@@ -60,23 +62,23 @@ public class AuthPatternConditionController {
         tblConditionProperties.getSelectionModel().selectedItemProperty().addListener(this::onSelectionChanged);
     }
 
-    // TODO: differentiate between rules (single or complex), conditions (auth pattern or profile) and properties (auth pattern condition)
-    // Goal: make it easy for users to define conditions separately and then combine them to rules
-
-    // 3 Layers:
-    // =========
-    //   o rule
-    //   o condition
-    //   o property
-
     public void loadAuthPatternCondition(AuthorizationPatternCondition condition) {
 
-        // init table view with property list
-        properties.clear();
-        properties.addAll(condition.getProperties());
+        this.condition = condition;
 
-        // select first record (loads detail data automatically)
-        tblConditionProperties.getSelectionModel().select(0);
+        if (condition != null) {
+
+            // init table view with property list
+            properties.clear();
+            properties.addAll(condition.getProperties());
+
+            // select first record (loads detail data automatically)
+            tblConditionProperties.getSelectionModel().select(0);
+        }
+    }
+
+    public AuthorizationPatternCondition getCondition() {
+        return condition;
     }
 
     private void onSelectionChanged(/*ObservableValue<Object> observableValue, Object oldValue,*/ Object newValue) {

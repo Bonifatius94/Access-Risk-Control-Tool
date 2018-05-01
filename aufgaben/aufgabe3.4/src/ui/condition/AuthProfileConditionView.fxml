@@ -6,7 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.condition.ProfileAuthConditionController"
+<GridPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.condition.AuthProfileConditionController"
           vgap="10" hgap="10">
 
     <Label text="Condition Name" GridPane.rowIndex="0" GridPane.columnIndex="0" />

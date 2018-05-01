@@ -51,9 +51,7 @@ public class App extends Application {
 
     private void unhandledExceptionOccurred(Thread thread, Throwable e) {
 
-        // write thread id and exception to console log
-        System.out.println("Thread ID: " + thread.getId());
-        System.out.println("Stack Trace:");
+        // write thread id and exception to log
         TraceOut.writeException(e);
     }
 

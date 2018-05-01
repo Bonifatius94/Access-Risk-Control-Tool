@@ -21,7 +21,7 @@
             <ChoiceBox fx:id="chEncryptionType" prefWidth="200" GridPane.rowIndex="2" GridPane.columnIndex="1" />
 
             <HBox GridPane.rowIndex="3" GridPane.columnSpan="2" alignment="CENTER_RIGHT">
-                <Button text="Connect ..." onKeyPressed="#connect" />
+                <Button text="Connect ..." onAction="#connect" />
             </HBox>
         </GridPane>
     </TitledPane>

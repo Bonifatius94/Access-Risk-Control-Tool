@@ -24,7 +24,7 @@
         </columns>
     </TableView>
     <HBox spacing="10" alignment="CENTER_RIGHT">
-        <Button text="New Auth Pattern ..." onKeyPressed="#newAuthPatternCondition" />
-        <Button text="New Profile ..." onKeyPressed="#newAuthProfileCondition" />
+        <Button text="New Auth Pattern ..." onAction="#newAuthPatternCondition" />
+        <Button text="New Auth Profile ..." onAction="#newAuthProfileCondition" />
     </HBox>
 </VBox>

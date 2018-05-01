@@ -7,7 +7,7 @@ import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
-public class ProfileAuthConditionController {
+public class AuthProfileConditionController {
 
     @FXML
     private TextField tfConditionName;
@@ -30,8 +30,12 @@ public class ProfileAuthConditionController {
 
         // load condition properties into text fields
         this.condition = condition;
-        conditionName.setValue(condition.getConditionName());
-        profile.setValue(condition.getAuthorizationProfile());
+
+        if (condition != null) {
+
+            conditionName.setValue(condition.getConditionName());
+            profile.setValue(condition.getAuthorizationProfile());
+        }
     }
 
     public AuthorizationProfileCondition getCondition() {

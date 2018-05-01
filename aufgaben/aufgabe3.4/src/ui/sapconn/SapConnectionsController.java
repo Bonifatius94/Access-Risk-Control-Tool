@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -11,12 +12,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.login.LoginController;
 
-import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
 
 public class SapConnectionsController {
 
@@ -56,26 +56,32 @@ public class SapConnectionsController {
 
         // init choice box items
         chEncryptionType.setItems(encryptionTypes);
+        chEncryptionType.getSelectionModel().select(0);
     }
 
     @FXML
-    private void connect(KeyEvent e) throws Exception {
+    private void connect() throws Exception {
 
+        // load view and init controller
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../login/LoginView.fxml"), ResourceBundle.getBundle("lang"));
+        Parent root = loader.load();
+        LoginController login = loader.getController();
+
+        // init stage
         Stage stage = new Stage();
-        FXMLLoader loader = new FXMLLoader();
-        Parent root = loader.load(getClass().getResource("LoginView.fxml"));
         stage.setScene(new Scene(root));
         stage.setTitle("Login");
         stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(((Node)e.getSource()).getScene().getWindow());
-        LoginController login = loader.getController();
+        stage.initOwner(tfServerHostname.getScene().getWindow());
+
+        // show view as modal dialog and wait for exit
         stage.showAndWait();
 
         // evaluate dialog results
         String username = login.getUsername();
         String password = login.getPassword();
 
-        // TODO: send login request to sapconn server
+        // TODO: send login request to sap server
     }
 
 }

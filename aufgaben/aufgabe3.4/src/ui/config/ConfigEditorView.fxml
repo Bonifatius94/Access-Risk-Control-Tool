@@ -58,7 +58,7 @@
                     <fx:include source="AuthPatternConditionView.fxml" />
                 </Tab>
                 <Tab text="Profile Auth" closable="false">
-                    <fx:include source="ProfileAuthConditionView.fxml" />
+                    <fx:include source="AuthProfileConditionView.fxml" />
                 </Tab>
             </TabPane>-->
         </VBox>
