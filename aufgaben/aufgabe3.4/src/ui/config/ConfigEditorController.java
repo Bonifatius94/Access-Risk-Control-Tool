@@ -25,12 +25,16 @@ public class ConfigEditorController {
 
     @FXML
     private TableView tblConfigs;
-    private ObservableList<AuthorizationPattern> patterns = FXCollections.observableArrayList();
+    private ObservableList<AuthorizationPattern> configs = FXCollections.observableArrayList();
+
+    @FXML
+    private TableView tblConditions;
+    private ObservableList<ICondition> conditionsOfConfig = FXCollections.observableArrayList();
 
     @FXML
     private ChoiceBox chConditionToAdd;
     // TODO: add synchronization with conditions editor
-    private ObservableList<ICondition> conditions = FXCollections.observableArrayList();
+    private ObservableList<ICondition> allConditions = FXCollections.observableArrayList();
 
     @FXML
     private ChoiceBox chLinkage;
@@ -43,11 +47,14 @@ public class ConfigEditorController {
         tfUsecaseID.textProperty().bindBidirectional(usecaseID);
         taDescription.textProperty().bindBidirectional(description);
 
-        // init table view items
-        tblConfigs.setItems(patterns);
+        // init config table view items
+        tblConfigs.setItems(configs);
 
-        // init conditions choice box items
-        chConditionToAdd.setItems(conditions);
+        // init allConditions table view items
+        tblConditions.setItems(conditionsOfConfig);
+
+        // init allConditions choice box items
+        chConditionToAdd.setItems(allConditions);
 
         // init linkages choice box items
         linkages.addAll(ConditionLinkage.None, ConditionLinkage.And, ConditionLinkage.Or);
@@ -61,13 +68,14 @@ public class ConfigEditorController {
     public void loadConfig(List<AuthorizationPattern> patterns) {
 
         // load items into table view
-        this.patterns.clear();
-        this.patterns.addAll(patterns);
+        this.configs.clear();
+        this.configs.addAll(patterns);
 
         // select first record => init detail view with first record
         tblConfigs.getSelectionModel().select(0);
     }
 
+    @SuppressWarnings("unused")
     private void onSelectionChanged(ObservableValue<Object> observableValue, Object oldSelection, Object newSelection) {
 
         Object selectedItem = tblConfigs.getSelectionModel().getSelectedItem();
@@ -79,9 +87,19 @@ public class ConfigEditorController {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void updateSelectedDetailView(AuthorizationPattern pattern) {
 
-        // TODO:
+        // set conditions table view
+        conditionsOfConfig.clear();
+        conditionsOfConfig.addAll(pattern.getConditions());
+
+        // set linkage choice box
+        chLinkage.getSelectionModel().select(pattern.getLinkage());
+
+        // set text fields
+        usecaseID.setValue(pattern.getUsecaseID());
+        description.setValue(pattern.getDescription());
     }
 
     @FXML
@@ -93,8 +111,8 @@ public class ConfigEditorController {
     // TODO: implement update mechanism that calls this method (e.g. using observable pattern)
     public void onConditionsChanged(List<ICondition> conditions) {
 
-        this.conditions.clear();
-        this.conditions.addAll(conditions);
+        this.allConditions.clear();
+        this.allConditions.addAll(conditions);
 
         // TODO: handle selection
     }

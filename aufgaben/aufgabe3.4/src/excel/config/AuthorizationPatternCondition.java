@@ -9,7 +9,7 @@ public class AuthorizationPatternCondition implements ICondition {
         setProperties(properties);
     }
 
-    private String conditionName;
+    private String conditionName = "<name missing>";
     private List<AuthorizationPatternConditionProperty> properties;
 
     public List<AuthorizationPatternConditionProperty> getProperties() {

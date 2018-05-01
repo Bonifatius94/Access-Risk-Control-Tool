@@ -19,15 +19,6 @@
                 <TextArea fx:id="taDescription" GridPane.rowIndex="1" GridPane.columnIndex="1" />
             </GridPane>
 
-            <!--<VBox>
-                <fx:define>
-                    <ToggleGroup fx:id="tgComplexMode" />
-                </fx:define>
-
-                <RadioButton text="Simple Mode" toggleGroup="$tgComplexMode" />
-                <RadioButton text="Complex Mode" toggleGroup="$tgComplexMode" />
-            </VBox>-->
-
             <TitledPane text="Conditions">
                 <VBox spacing="10">
                     <GridPane vgap="10" hgap="10" alignment="CENTER_LEFT">
@@ -38,11 +29,16 @@
                         <Label text="Linkage" GridPane.rowIndex="1" GridPane.columnIndex="0" />
                         <ChoiceBox fx:id="chLinkage" prefWidth="70" GridPane.rowIndex="1" GridPane.columnIndex="1" />
                     </GridPane>
-                    <TableView>
+                    <TableView fx:id="tblConditions">
                         <columns>
-                            <TableColumn text="">
+                            <TableColumn text="Condition">
                                 <cellValueFactory>
-                                    <PropertyValueFactory property="foo" />
+                                    <PropertyValueFactory property="ConditionName" />
+                                </cellValueFactory>
+                            </TableColumn>
+                            <TableColumn text="Type">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="ConditionType" />
                                 </cellValueFactory>
                             </TableColumn>
                         </columns>
@@ -52,15 +48,11 @@
                     </HBox>
                 </VBox>
             </TitledPane>
-
-            <!--<TabPane>
-                <Tab text="Auth Pattern" closable="false">
-                    <fx:include source="AuthPatternConditionView.fxml" />
-                </Tab>
-                <Tab text="Profile Auth" closable="false">
-                    <fx:include source="AuthProfileConditionView.fxml" />
-                </Tab>
-            </TabPane>-->
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button text="Update" />
+                <Button text="New Entry" />
+                <Button text="Delete" />
+            </HBox>
         </VBox>
     </TitledPane>
 
@@ -69,19 +61,19 @@
             <!-- TODO: implement table -->
             <TableView fx:id="tblConfigs">
                 <columns>
-                    <TableColumn text="Search Pattern">
+                    <TableColumn text="Usecase ID">
                         <cellValueFactory>
-                            <PropertyValueFactory property="" />
+                            <PropertyValueFactory property="UsecaseID" />
                         </cellValueFactory>
                     </TableColumn>
                     <TableColumn text="Description">
                         <cellValueFactory>
-                            <PropertyValueFactory property="" />
+                            <PropertyValueFactory property="Description" />
                         </cellValueFactory>
                     </TableColumn>
-                    <TableColumn text="Pattern Type">
+                    <TableColumn text="Linkage">
                         <cellValueFactory>
-                            <PropertyValueFactory property="" />
+                            <PropertyValueFactory property="Linkage" />
                         </cellValueFactory>
                     </TableColumn>
                 </columns>

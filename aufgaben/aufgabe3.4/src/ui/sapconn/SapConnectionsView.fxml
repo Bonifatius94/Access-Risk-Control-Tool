@@ -30,22 +30,22 @@
         <VBox spacing="10">
             <TableView>
                 <columns>
-                    <TableColumn text="Server" prefWidth="200">
+                    <TableColumn text="Hostname" prefWidth="200">
                         <cellValueFactory>
                             <!-- TODO: implement binding -->
-                            <PropertyValueFactory property="UserID" />
+                            <PropertyValueFactory property="ServerHostname" />
                         </cellValueFactory>
                     </TableColumn>
-                    <TableColumn text="Username" prefWidth="200">
+                    <TableColumn text="Port" prefWidth="200">
                         <cellValueFactory>
                             <!-- TODO: implement binding -->
-                            <PropertyValueFactory property="UserID" />
+                            <PropertyValueFactory property="ServerPort" />
                         </cellValueFactory>
                     </TableColumn>
-                    <TableColumn text="Password" prefWidth="200">
+                    <TableColumn text="Encryption" prefWidth="200">
                         <cellValueFactory>
                             <!-- TODO: implement binding -->
-                            <PropertyValueFactory property="Username" />
+                            <PropertyValueFactory property="EncryptionType" />
                         </cellValueFactory>
                     </TableColumn>
                     <TableColumn>
