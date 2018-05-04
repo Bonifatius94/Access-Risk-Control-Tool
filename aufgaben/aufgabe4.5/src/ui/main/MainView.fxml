@@ -1,0 +1,58 @@
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox fx:id="vwMain" fx:controller="ui.main.MainController" xmlns:fx="http://javafx.com/fxml" spacing="10">
+    <MenuBar>
+        <!--<menus>-->
+        <Menu text="%menubarMenuFile">
+            <!--<items>-->
+            <MenuItem text="%menubarMenuFileSubmenuImportConfig" onAction="#importConfig" />
+            <MenuItem text="%menubarMenuFileSubmenuExportConfig" onAction="#exportConfig" />
+            <MenuItem text="%menubarMenuFileSubmenuImportWhitelist" onAction="#importWhitelist" />
+            <MenuItem text="%menubarMenuFileSubmenuExportWhitelist" onAction="#exportWhitelist" />
+            <MenuItem text="%menubarMenuFileSubmenuExportResults" onAction="#exportResults" />
+            <!--<SeparatorMenuItem  />-->
+            <!--<MenuItem text="Exit" onAction="#menuExitApp" />-->
+            <!--</items>-->
+        </Menu>
+        <Menu text="%menubarMenuSettings">
+            <!--<items>-->
+            <MenuItem text="%menubarMenuSettingsSubmenuSapSettings" onAction="#showSapConnectionsDlg" />
+            <MenuItem text="%menubarMenuSettingsSubmenuUserSettings" onAction="#showUserSettingsDlg" />
+            <!--</items>-->
+        </Menu>
+        <Menu text="%menubarMenuAbout" onAction="#showAboutDlg" />
+        <!--</menus>-->
+    </MenuBar>
+
+    <TabPane>
+        <Tab text="Configs" closable="false">
+            <fx:include source="../config/ConfigEditorView.fxml" fx:id="vwConfigs" />
+        </Tab>
+        <Tab text="Conditions" closable="false">
+            <fx:include source="../condition/ConditionEditorView.fxml" fx:id="vwConditions" />
+        </Tab>
+        <Tab text="Whitelist" closable="false">
+            <fx:include source="../whitelist/WhitelistEditorView.fxml" fx:id="vwWhitelist" />
+        </Tab>
+    </TabPane>
+</VBox>
+
+<!--<GridPane fx:id="gpMainView" fx:controller="ui.MainController" xmlns:fx="http://javafx.com/fxml">
+    <MenuBar GridPane.rowIndex="0" GridPane.columnSpan="2">
+        <Menu text="File">
+            <MenuItem text="Import Whitelist ..." onAction="#importWhitelist" />
+        </Menu>
+    </MenuBar>
+
+    <Label text="Whitelist users:" GridPane.rowIndex="1" GridPane.columnSpan="2" />
+    <TableView fx:id="tblWhitelist" GridPane.rowIndex="2" GridPane.columnIndex="0">
+        <columns>
+            <TableColumn text="Last Name" prefWidth="100">
+                <cellValueFactory>
+                    <PropertyValueFactory property="lastName" />
+                </cellValueFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+</GridPane>-->
