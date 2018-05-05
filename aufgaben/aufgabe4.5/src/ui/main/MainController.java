@@ -7,7 +7,6 @@ import excel.whitelist.WhitelistUser;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
@@ -15,7 +14,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import ui.sapconn.SapConnectionsController;
 import ui.whitelist.WhitelistEditorController;
 import ui.config.ConfigEditorController;
 
@@ -69,7 +67,7 @@ public class MainController {
         if (file != null && file.exists()) {
 
             // get whitelist data from excel file with helper class
-            List<AuthorizationPattern> newPatterns = new AuthorizationPatternImportHelper().importAccessPattern(file.getPath());
+            List<AuthorizationPattern> newPatterns = new AuthorizationPatternImportHelper().importAuthorizationPattern(file.getPath());
 
             // load config data into config editor view (list is cleared before adding items)
             vwConfigsController.loadConfig(newPatterns);

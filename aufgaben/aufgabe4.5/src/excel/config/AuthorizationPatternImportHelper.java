@@ -13,7 +13,7 @@ import java.util.List;
 
 public class AuthorizationPatternImportHelper {
 
-    public List<AuthorizationPattern> importAccessPattern(String filePath) throws Exception {
+    public List<AuthorizationPattern> importAuthorizationPattern(String filePath) throws Exception {
 
         // open excel file
         FileInputStream excelFile = new FileInputStream(new File(filePath));
