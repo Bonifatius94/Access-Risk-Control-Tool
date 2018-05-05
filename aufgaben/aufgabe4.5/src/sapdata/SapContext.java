@@ -10,7 +10,7 @@ import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoTable;
 import com.sap.conn.jco.ext.DestinationDataProvider;
 
-@SuppressWarnings("all")
+@SuppressWarnings("WeakerAccess")
 public class SapContext {
 
     public static void main(String[] args) {
@@ -72,6 +72,9 @@ public class SapContext {
         return ret;
     }
 
+    // ===================================
+    //              QUERY LOGIC
+    // ===================================
     private void querySapData(String serverDestination) throws Exception {
 
         JCoDestination destination = JCoDestinationManager.getDestination(serverDestination);
@@ -80,7 +83,7 @@ public class SapContext {
         if (function != null) {
 
             // set query parameters
-            setQueryParamters(function);
+            setQueryParameters(function);
 
             // run query
             function.execute(destination);
@@ -96,7 +99,7 @@ public class SapContext {
                 String name2 = users.getString("NAME2");
 
                 // write data to console
-                System.out.println("BNAME=" + bname + ", CLASS=" + classname + "NAME2=" + name2);
+                System.out.println("BNAME=" + bname + ", CLASS=" + classname + ", NAME2=" + name2);
 
                 // go to next row
                 users.nextRow();
@@ -104,7 +107,7 @@ public class SapContext {
         }
     }
 
-    private void setQueryParamters(JCoFunction function) {
+    private void setQueryParameters(JCoFunction function) {
 
         JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");
         inputTable.appendRow();
