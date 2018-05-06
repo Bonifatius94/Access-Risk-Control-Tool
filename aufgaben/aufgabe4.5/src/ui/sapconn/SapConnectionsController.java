@@ -18,6 +18,12 @@ import ui.login.LoginController;
 
 import java.util.ResourceBundle;
 
+/**
+ * This class contains the user interface business logic for the sap connections view
+ * that is bound to an instance of this class.
+ *
+ * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+ */
 public class SapConnectionsController {
 
     @FXML
@@ -47,6 +53,16 @@ public class SapConnectionsController {
         encryptionTypes.addAll(EncryptionType.DiffieHellman, EncryptionType.AES128, EncryptionType.AES256);
     }
 
+    /**
+     * This method is automatically called when the according view is loaded. It initializes the logic behind the controls:
+     * <ul>
+     *     <li>an observable lists is attached to each table view / choice box</li>
+     *     <li>a string property is attached to each text field / text area</li>
+     *     <li>an event listener is attached to each event</li>
+     * </ul>
+     *
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     @SuppressWarnings("unchecked")
     public void initialize() {
 
@@ -59,6 +75,17 @@ public class SapConnectionsController {
         chEncryptionType.getSelectionModel().select(0);
     }
 
+    /**
+     * This method handles the button clicked event of the connect button.
+     *
+     * <p>
+     *     It opens a dialog for entering login credentials for authentication at the selected sap server.
+     *     If the login is successful, the user will be asked if he wants to download data from sap server.
+     * </p>
+     *
+     * @throws Exception fxml resource file not found exception or sap exception caused by login failing
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     @FXML
     private void connect() throws Exception {
 
@@ -82,6 +109,8 @@ public class SapConnectionsController {
         String password = login.getPassword();
 
         // TODO: send login request to sap server
+
+        // TODO: if login was successful => ask user if he wants to download data from sap server
     }
 
 }

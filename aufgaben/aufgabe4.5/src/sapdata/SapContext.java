@@ -13,12 +13,23 @@ import com.sap.conn.jco.ext.DestinationDataProvider;
 @SuppressWarnings("WeakerAccess")
 public class SapContext {
 
+    /**
+     * This method is a test program for testing the connection to a sap server
+     *
+     * @param args empty args (never used)
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     public static void main(String[] args) {
 
         SapContext context = new SapContext();
         context.runTest();
     }
 
+    /**
+     * This method runs the test sequence.
+     *
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     public void runTest() {
 
         final String serverDestination = "ec2-54-209-137-85.compute-1.amazonaws.com";
@@ -35,6 +46,13 @@ public class SapContext {
         }
     }
 
+    /**
+     * This method creates a new sap server destination file.
+     *
+     * @param filePath file path of the new sap server destination file
+     * @throws Exception caused by file stream operations
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     private void createServerDestinationFile(String filePath) throws Exception {
 
         // set config properties
@@ -56,6 +74,13 @@ public class SapContext {
         }
     }
 
+    /**
+     * This method pings the sap server specified in the sap server destination file.
+     *
+     * @param serverDestination file path of the sap server destination file
+     * @return a boolean value that indicates whether the ping was successful
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     private boolean canPingServer(String serverDestination) {
 
         boolean ret;
@@ -75,6 +100,14 @@ public class SapContext {
     // ===================================
     //              QUERY LOGIC
     // ===================================
+
+    /**
+     * This method queries sap data using the overloaded sap server destination file path
+     *
+     * @param serverDestination the file path of the sap server destination file used for the query
+     * @throws Exception caused by errors during the sap query
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     private void querySapData(String serverDestination) throws Exception {
 
         JCoDestination destination = JCoDestinationManager.getDestination(serverDestination);
@@ -107,6 +140,12 @@ public class SapContext {
         }
     }
 
+    /**
+     * This method initializes the query parameters for the test sap query
+     *
+     * @param function the sap function that gets attached by query parameters
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     private void setQueryParameters(JCoFunction function) {
 
         JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");

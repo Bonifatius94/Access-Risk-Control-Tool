@@ -59,7 +59,7 @@
     <TitledPane text="Search Patterns">
         <VBox spacing="10">
             <!-- TODO: implement table -->
-            <TableView fx:id="tblConfigs">
+            <TableView fx:id="tblAuthPatterns">
                 <columns>
                     <TableColumn text="Usecase ID">
                         <cellValueFactory>

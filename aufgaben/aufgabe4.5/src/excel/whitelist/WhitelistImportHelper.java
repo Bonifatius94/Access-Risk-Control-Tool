@@ -11,10 +11,21 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-//@SuppressWarnings("all") // remove annotation lateron
+/**
+ * This class helps importing whitelist data from a MS Excel file.
+ *
+ * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+ */
 public class WhitelistImportHelper {
 
-    public List<WhitelistUser> importWhitelist(String filePath) throws Exception {
+    /**
+     * This method imports a whitelist from a MS Excel file (data is only taken from the first data sheet).
+     *
+     * @param filePath file path of the MS Excel input file
+     * @throws Exception caused by file stream errors or errors during MS Excel export
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
+    public List<WhitelistEntry> importWhitelist(String filePath) throws Exception {
 
         // open excel file
         FileInputStream excelFile = new FileInputStream(new File(filePath));
@@ -22,7 +33,7 @@ public class WhitelistImportHelper {
         Sheet sheet = workbook.getSheetAt(0);
 
         // init empty list and row index counter
-        List<WhitelistUser> list = new ArrayList<WhitelistUser>();
+        List<WhitelistEntry> list = new ArrayList<WhitelistEntry>();
         int rowIndex = 0;
 
         // go through excel rows
@@ -36,7 +47,7 @@ public class WhitelistImportHelper {
             String userName = row.getCell(1).getStringCellValue();
 
             // create new user and add it to list
-            list.add(new WhitelistUser(userID, userName));
+            list.add(new WhitelistEntry(userID, userName));
         }
 
         // dispose file handle

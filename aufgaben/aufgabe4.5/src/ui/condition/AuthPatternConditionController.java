@@ -10,6 +10,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
+/**
+ * This class contains the user interface business logic for the auth pattern condition view
+ * that is bound to an instance of this class.
+ *
+ * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+ */
 public class AuthPatternConditionController {
 
     @FXML
@@ -42,6 +48,16 @@ public class AuthPatternConditionController {
 
     private AuthorizationPatternCondition condition;
 
+    /**
+     * This method is automatically called when the according view is loaded. It initializes the logic behind the controls:
+     * <ul>
+     *     <li>an observable lists is attached to each table view / choice box</li>
+     *     <li>a string property is attached to each text field / text area</li>
+     *     <li>an event listener is attached to each event</li>
+     * </ul>
+     *
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     @SuppressWarnings("unchecked")
     public void initialize() {
 
@@ -62,6 +78,12 @@ public class AuthPatternConditionController {
         tblConditionProperties.getSelectionModel().selectedItemProperty().addListener(this::onSelectionChanged);
     }
 
+    /**
+     * This method loads an auth pattern condition into this view.
+     *
+     * @param condition an auth pattern condition
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     public void loadAuthPatternCondition(AuthorizationPatternCondition condition) {
 
         this.condition = condition;
@@ -77,10 +99,23 @@ public class AuthPatternConditionController {
         }
     }
 
+    /**
+     * This method gets the auth pattern condition previously passed to this view by load method.
+     * If a new condition was created this method passes the new condition.
+     *
+     * @return the condition loaded into this view
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     public AuthorizationPatternCondition getCondition() {
         return condition;
     }
 
+    /**
+     * This method handles the selection changed event of condition properties table view.
+     *
+     * @param newValue the new selected value
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     private void onSelectionChanged(/*ObservableValue<Object> observableValue, Object oldValue,*/ Object newValue) {
 
         if (newValue instanceof AuthorizationPatternConditionProperty) {
@@ -96,5 +131,7 @@ public class AuthPatternConditionController {
             value4.setValue(property.getValue4());
         }
     }
+
+    // TODO: add Save / Cancel buttons and event handlers similar to auth profile condition view
 
 }

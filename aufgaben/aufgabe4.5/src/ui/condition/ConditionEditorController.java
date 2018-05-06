@@ -17,12 +17,28 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * This class contains the user interface business logic for the conditions editor view
+ * that is bound to an instance of this class.
+ *
+ * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+ */
 public class ConditionEditorController {
 
     @FXML
     private TableView tblConditions;
     private ObservableList<ICondition> conditions = FXCollections.observableArrayList();
 
+    /**
+     * This method is automatically called when the according view is loaded. It initializes the logic behind the controls:
+     * <ul>
+     *     <li>an observable lists is attached to each table view / choice box</li>
+     *     <li>a string property is attached to each text field / text area</li>
+     *     <li>an event listener is attached to each event</li>
+     * </ul>
+     *
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     @SuppressWarnings("unchecked")
     public void initialize() {
 
@@ -33,6 +49,12 @@ public class ConditionEditorController {
         tblConditions.setOnMouseClicked(this::onConditionClicked);
     }
 
+    /**
+     * This method sets the conditions shown in this view.
+     *
+     * @param conditions a list of conditions
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     public void loadConditions(List<ICondition> conditions) {
 
         // load items into table view
@@ -40,6 +62,13 @@ public class ConditionEditorController {
         this.conditions.addAll(conditions);
     }
 
+    /**
+     * This method handles the table view row clicked event. The main logic is only triggered on a double click.
+     * It shows the auth pattern condition / auth profile condition dialog of an existing condition.
+     *
+     * @param click a click event handle
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     private void onConditionClicked(MouseEvent click) {
 
         try {
@@ -67,18 +96,41 @@ public class ConditionEditorController {
         }
     }
 
+    /**
+     * This method handles the button clicked event of the new auth pattern button.
+     * It shows the auth pattern condition dialog as a modal dialog.
+     *
+     * @throws Exception an error when showing the dialog
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     @FXML
     private void newAuthPatternCondition() throws Exception {
 
         showAuthPatternConditionDialog(null);
+
+        // TODO: reload the list if changes were made
     }
 
+    /**
+     * This method handles the button clicked event of the new auth profile button.
+     * It shows the auth pattern condition dialog as a modal dialog.
+     *
+     * @throws Exception an error when showing the dialog
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     @FXML
     private void newAuthProfileCondition() throws Exception {
 
         showProfileConditionDialog(null);
     }
 
+    /**
+     * This method shows an auth pattern condition dialog as a modal dialog and loads the overloaded auth pattern condition into it.
+     *
+     * @param condition an auth pattern condition that is loaded into the dialog
+     * @throws Exception caused by auth pattern condition view resource not found
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     private void showAuthPatternConditionDialog(AuthorizationPatternCondition condition) throws Exception{
 
         // load view and init controller
@@ -100,6 +152,13 @@ public class ConditionEditorController {
         // TODO: implement logic
     }
 
+    /**
+     * This method shows an auth profile condition dialog as a modal dialog and loads the overloaded auth profile condition into it.
+     *
+     * @param condition an auth profile condition that is loaded into the dialog
+     * @throws Exception caused by auth pattern condition view resource not found
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     private void showProfileConditionDialog(AuthorizationProfileCondition condition) throws Exception {
 
         // load view and init controller
