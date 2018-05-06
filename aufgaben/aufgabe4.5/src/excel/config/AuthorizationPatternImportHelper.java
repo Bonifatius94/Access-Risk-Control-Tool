@@ -11,8 +11,21 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class helps to import config data from MS Excel files.
+ *
+ * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+ */
 public class AuthorizationPatternImportHelper {
 
+    /**
+     * This method imports config data from a MS Excel file (data is only taken from first datasheet).
+     *
+     * @param filePath the file path of the MS Excel file that contains the config data
+     * @return a list of auth patterns (config)
+     * @throws Exception caused by file stream error or parsing error due to invalid data formats
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     public List<AuthorizationPattern> importAuthorizationPattern(String filePath) throws Exception {
 
         // open excel file
@@ -56,6 +69,16 @@ public class AuthorizationPatternImportHelper {
         return list;
     }
 
+    /**
+     * This method parses the auth pattern from the overloaded rows.
+     * It therefore finds out whether the auth pattern is of simple or complex type
+     * and then calls a method to parse the specific pattern data. It also parses
+     * the pattern name and description.
+     *
+     * @param rows the rows containing auth pattern data
+     * @return the auth pattern parsed from the overloaded rows
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     private AuthorizationPattern getAuthorizationPattern(List<Row> rows) {
 
         AuthorizationPattern pattern;
@@ -80,12 +103,28 @@ public class AuthorizationPatternImportHelper {
         return pattern;
     }
 
+    /**
+     * This method parses a simple auth pattern from the rows overloaded. It therefore parses
+     * the only condition and applies it to a new instance of an auth pattern.
+     *
+     * @param rows the rows containing auth pattern data
+     * @return an auth pattern of simple type
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     private AuthorizationPattern getSimpleAuthorizationPattern(List<Row> rows) {
 
         ICondition condition = getCondition(rows.subList(1, rows.size()), false);
         return new AuthorizationPattern(condition);
     }
 
+    /**
+     * This method parses a complex auth pattern from the rows overloaded. It therefore parses
+     * the condition linkage and all condition.
+     *
+     * @param rows the rows containing auth pattern data
+     * @return an auth pattern of complex type
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     private AuthorizationPattern getComplexAuthorizationPattern(List<Row> rows) {
 
         List<Row> tempRows = new ArrayList<>();
@@ -123,6 +162,15 @@ public class AuthorizationPatternImportHelper {
         return new AuthorizationPattern(conditions, linkage);
     }
 
+    /**
+     * This method parses a condition from the rows overloaded. It therefore determines the condition type
+     * and then parses the condition data accordingly.
+     *
+     * @param rows the rows containing condition data
+     * @param isComplex a boolean value that indicates where the COND markup starts
+     * @return a condition that is either an instance of an auth profile condition or an auth pattern condition
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
     private ICondition getCondition(List<Row> rows, boolean isComplex) {
 
         ICondition condition;
