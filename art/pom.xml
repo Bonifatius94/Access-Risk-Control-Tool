@@ -8,11 +8,43 @@
     <artifactId>art</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <!-- set java version used -->
+    <properties>
+        <maven.compiler.source>10</maven.compiler.source>
+        <maven.compiler.target>10</maven.compiler.target>
+    </properties>
+
+
+    <!-- all dependencies we need for the project-->
     <dependencies>
+        <!-- checkstyle plugin -->
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-checkstyle-plugin</artifactId>
             <version>3.0.0</version>
+        </dependency>
+
+        <!-- use newer maven compiler to handle java 8 features (JavaFX, Lambda, ...) -->
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.7.0</version>
+        </dependency>
+
+        <!-- apache poi tools (Open-Source MS Office Tool) -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.17</version>
+        </dependency>
+
+        <!-- sap jco connector lib (linked as local jar file in /lib folder) -->
+        <dependency>
+            <groupId>com.sap.conn</groupId>
+            <artifactId>jco</artifactId>
+            <version>3</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/sapjco3.jar</systemPath>
         </dependency>
     </dependencies>
 
