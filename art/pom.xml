@@ -17,13 +17,6 @@
 
     <!-- all dependencies we need for the project-->
     <dependencies>
-        <!-- checkstyle plugin -->
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-
         <!-- use newer maven compiler to handle java 8 features (JavaFX, Lambda, ...) -->
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
@@ -54,6 +47,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.0.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>8.10</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>validate</id>
