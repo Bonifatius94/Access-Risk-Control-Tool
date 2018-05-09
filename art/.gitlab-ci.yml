@@ -1,4 +1,4 @@
-image: maven:latest
+image: maven:3.5.3-jdk-10
 
 variables:
   MAVEN_CLI_OPTS: "-s art/.m2/settings.xml -f art/pom.xml --batch-mode"
