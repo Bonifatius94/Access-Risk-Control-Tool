@@ -7,7 +7,7 @@ variables:
 cache:
   paths:
     - art/.m2/repository/
-    - target/
+    - art/target/
 
 build:
   stage: build
