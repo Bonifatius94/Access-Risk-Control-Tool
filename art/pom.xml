@@ -39,6 +39,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/sapjco3.jar</systemPath>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.5</version>
+        </dependency>
+
     </dependencies>
 
     <build>
