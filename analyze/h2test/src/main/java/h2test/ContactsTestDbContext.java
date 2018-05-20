@@ -1,5 +1,6 @@
 package h2test;
 
+import h2test.entities.Company;
 import h2test.entities.Contact;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ public class ContactsTestDbContext extends H2ContextBase {
 
         List<Class> list = new ArrayList<>();
         list.add(Contact.class);
+        list.add(Company.class);
 
         return list;
     }

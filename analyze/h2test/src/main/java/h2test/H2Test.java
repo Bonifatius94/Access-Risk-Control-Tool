@@ -2,6 +2,7 @@ package h2test;
 
 import java.util.List;
 
+import h2test.entities.Company;
 import h2test.entities.Contact;
 
 public class H2Test {
@@ -12,8 +13,10 @@ public class H2Test {
         try (ContactsTestDbContext context = new ContactsTestDbContext("", "")) {
 
             // create new records and insert them into database
-            Contact contact1 = new Contact("Max Mustermann", "max.mustermann@email.com");
-            Contact contact2 = new Contact("John Doe", "john.doe@email.com");
+            Company company = new Company("Contoso Inc.");
+            Contact contact1 = new Contact("Max Mustermann", "max.mustermann@email.com", company);
+            Contact contact2 = new Contact("John Doe", "john.doe@email.com", company);
+            context.insertRecord(company);
             context.insertRecord(contact1);
             context.insertRecord(contact2);
 
@@ -36,6 +39,7 @@ public class H2Test {
             // delete records (clean-up database)
             context.deleteRecord(contact1);
             context.deleteRecord(contact2);
+            context.deleteRecord(company);
         }
         catch (Exception ex) {
             ex.printStackTrace();
