@@ -1,0 +1,45 @@
+package h2test;
+
+import java.util.List;
+
+import h2test.entities.Contact;
+
+public class H2Test {
+
+    public static void main(String[] args) {
+
+        // create db context
+        try (ContactsTestDbContext context = new ContactsTestDbContext("", "")) {
+
+            // create new records and insert them into database
+            Contact contact1 = new Contact("Max Mustermann", "max.mustermann@email.com");
+            Contact contact2 = new Contact("John Doe", "john.doe@email.com");
+            context.insertRecord(contact1);
+            context.insertRecord(contact2);
+
+            // query recently inserted records and print them to console
+            List<Contact> contactList = context.queryDataset("FROM Contact");
+            contactList.forEach(System.out::println);
+
+            // modify records
+            contact1.setName("Anna Mustermann");
+            contact1.setEmail("anna.mustermann@email.com");
+            contact2.setName("Jane Doe");
+            contact2.setEmail("jane.doe@email.com");
+            context.updateRecord(contact1);
+            context.updateRecord(contact2);
+
+            // query recently updated records and print them to console
+            contactList = context.queryDataset("FROM Contact");
+            contactList.forEach(System.out::println);
+
+            // delete records (clean-up database)
+            context.deleteRecord(contact1);
+            context.deleteRecord(contact2);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+}
