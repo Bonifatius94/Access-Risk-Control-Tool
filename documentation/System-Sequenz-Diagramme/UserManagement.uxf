@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>10</x>
+      <y>220</y>
+      <w>810</w>
+      <h>1030</h>
+    </coordinates>
+    <panel_attributes>User Management</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>190</x>
+      <y>250</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>U: User
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>650</x>
+      <y>250</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>S: System
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>230</x>
+      <y>310</y>
+      <w>20</w>
+      <h>900</h>
+    </coordinates>
+    <panel_attributes>
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>690</x>
+      <y>320</y>
+      <w>20</w>
+      <h>890</h>
+    </coordinates>
+    <panel_attributes>
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>230</x>
+      <y>270</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>690</x>
+      <y>270</y>
+      <w>30</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>310</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+startUserManagement(U.loginData)</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>40</x>
+      <y>350</y>
+      <w>730</w>
+      <h>840</h>
+    </coordinates>
+    <panel_attributes>halign=left
+alt
+--
+[wrongCredentials]
+
+
+--
+[accessDenied]
+
+
+
+--
+[else]
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>230</x>
+      <y>1200</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>690</x>
+      <y>1200</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>370</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+error("Falsche Benutzername/Passwort Kombination")</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>440</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+error("Zugriff aufgrund fehlender Berechtigung verweigert")</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>60</x>
+      <y>570</y>
+      <w>690</w>
+      <h>600</h>
+    </coordinates>
+    <panel_attributes>halign=left
+alt
+--
+[operation == newUser]
+
+
+
+
+
+
+
+
+
+
+
+
+--
+[operation == updateUser]
+
+
+
+
+
+
+
+
+
+
+
+
+
+--
+[operation == deleteUser]
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>850</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+updateUser(U.updatedUserData)</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>500</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+showUserList()</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>630</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+createUser(U.newUserData)</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>90</x>
+      <y>670</y>
+      <w>640</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>halign=left
+alt
+--
+[invalidUserData]
+
+--
+[else]
+
+
+
+--
+[else]
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>590</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+createUserDialog()</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>820</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+updateUserDialog(S.selectedUserData)</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>690</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+error("Nutzerdaten ungültig")</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>750</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+success("Nutzer erfolgreich angelegt")</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>90</x>
+      <y>890</y>
+      <w>640</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>halign=left
+alt
+--
+[invalidUserData]
+
+--
+[else]
+
+
+
+--
+[else]
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>530</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+takeAction(U.operation, [U.selectedUserID])</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>910</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+error("Nutzerdaten ungültig")</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>970</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+success("Nutzer erfolgreich editiert")</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>1050</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+showConfirmDialog()</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>1130</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+success("Nutzer erfolgreich gelöscht")</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>1090</y>
+      <w>470</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+confirm()</panel_attributes>
+    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+  </element>
+</diagram>
