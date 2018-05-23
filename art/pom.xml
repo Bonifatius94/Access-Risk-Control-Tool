@@ -39,6 +39,13 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-junit</artifactId>
+            <version>4.0.13-alpha</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- sap jco connector lib (linked as local jar file in /lib folder) -->
         <dependency>
             <groupId>com.sap.conn</groupId>
