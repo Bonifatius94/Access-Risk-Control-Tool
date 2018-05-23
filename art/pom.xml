@@ -31,6 +31,14 @@
             <version>3.17</version>
         </dependency>
 
+        <!-- Provides a testing framework for JavaFX Applications -->
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-core</artifactId>
+            <version>4.0.13-alpha</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- sap jco connector lib (linked as local jar file in /lib folder) -->
         <dependency>
             <groupId>com.sap.conn</groupId>
