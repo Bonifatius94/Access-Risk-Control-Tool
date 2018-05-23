@@ -7,13 +7,18 @@ import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoTable;
 import com.sap.conn.jco.ext.DestinationDataProvider;
 import data.entities.AuthorizationPattern;
+import data.entities.CriticalAccessEntry;
+import data.entities.Whitelist;
+import data.entities.WhitelistEntry;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 public class SapConnector {
@@ -97,11 +102,11 @@ public class SapConnector {
      * @return list of users that violate the patterns
      * @throws Exception caused by errors during the sap query
      */
-    public List<String> runSapQuery(List<AuthorizationPattern> patterns) throws Exception {
-        List<String> result = new ArrayList<>();
+    public List<CriticalAccessEntry> runSapQuery(List<AuthorizationPattern> patterns, Whitelist whitelist) throws Exception {
+        List<CriticalAccessEntry> result = new ArrayList<>();
 
         for (AuthorizationPattern pattern : patterns) {
-            result.addAll(runSapQuery(pattern));
+            result.addAll(runSapQuery(pattern, whitelist));
         }
 
         return result;
@@ -114,15 +119,20 @@ public class SapConnector {
      * @return list of users that violate the pattern
      * @throws Exception caused by errors during the sap query
      */
-    public List<String> runSapQuery(AuthorizationPattern pattern) throws Exception {
+    public List<CriticalAccessEntry> runSapQuery(AuthorizationPattern pattern, Whitelist whitelist) throws Exception {
         JCoTable result = this.querySapData(pattern);
-        ArrayList<String> userList = new ArrayList<>();
+        ArrayList<CriticalAccessEntry> userList = new ArrayList<>();
 
         for (int i = 0; i < result.getNumRows(); i++) {
 
             // get data from record
             String bname = result.getString("BNAME");
-            userList.add(bname);
+
+            CriticalAccessEntry temp = new CriticalAccessEntry();
+            temp.setAuthorizationPattern(pattern);
+            temp.setUserName(bname);
+
+            userList.add(temp);
 
             // write data to console
             // System.out.println("BNAME=" + bname + ", CLASS=" + classname + ", NAME2=" + name2);
@@ -131,7 +141,19 @@ public class SapConnector {
             result.nextRow();
         }
 
-        return userList;
+        return applyWhitelist(userList, whitelist);
+    }
+
+    /**
+     * Applies the whitelist to the given list of CriticalAccessEntries.
+     *
+     * @param entries   list of CriticalAccessEntries
+     * @param whitelist the whitelist to be applied
+     * @return the list after the whitelist was applied
+     */
+    private List<CriticalAccessEntry> applyWhitelist(List<CriticalAccessEntry> entries, Whitelist whitelist) {
+        return entries.stream().filter((entry) -> whitelist.getEntries().stream().anyMatch((whitelistEntry) -> entry.getUserName().equals(whitelistEntry.getUsername())
+            && entry.getAuthorizationPattern().getUsecaseId().equals(whitelistEntry.getUsecaseId()))).collect(Collectors.toList());
     }
 
     /**
