@@ -12,18 +12,18 @@ public class WhitelistEntry {
     /**
      * This constructor creates a new instance of a whitelist entry.
      *
-     * @param usecaseID the usecase id of the whitelist entry
+     * @param usecaseId the usecase id of the whitelist entry
      * @param username the username of the whitelist entry
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public WhitelistEntry(String usecaseID, String username) {
+    public WhitelistEntry(String usecaseId, String username) {
 
-        setUsecaseID(usecaseID);
+        setUsecaseId(usecaseId);
         setUsername(username);
     }
 
-    private String UsecaseID;
-    private String Username;
+    private String usecaseId;
+    private String username;
 
     /**
      * This method gets the username of this instance.
@@ -32,7 +32,7 @@ public class WhitelistEntry {
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     public String getUsername() {
-        return Username;
+        return username;
     }
 
     /**
@@ -42,7 +42,7 @@ public class WhitelistEntry {
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     public void setUsername(String username) {
-        Username = username;
+        this.username = username;
     }
 
     /**
@@ -51,18 +51,18 @@ public class WhitelistEntry {
      * @return usecase id of this instance
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public String getUsecaseID() {
-        return UsecaseID;
+    public String getUsecaseId() {
+        return usecaseId;
     }
 
     /**
      * This method sets the usecase id of this instance.
      *
-     * @param usecaseID new usecase id of this instance.
+     * @param usecaseId new usecase id of this instance.
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public void setUsecaseID(String usecaseID) {
-        UsecaseID = usecaseID;
+    public void setUsecaseId(String usecaseId) {
+        this.usecaseId = usecaseId;
     }
 
     /**
@@ -73,6 +73,6 @@ public class WhitelistEntry {
      */
     @Override
     public String toString() {
-        return "UsecaseID='" + getUsecaseID() + "', Username='" + getUsername() + "'";
+        return "usecaseId='" + getUsecaseId() + "', username='" + getUsername() + "'";
     }
 }

@@ -95,7 +95,7 @@ public class SapConnector {
      *
      * @param patterns the Authorization patterns
      * @return list of users that violate the patterns
-     * @throws Exception
+     * @throws Exception caused by errors during the sap query
      */
     public List<String> runSapQuery(List<AuthorizationPattern> patterns) throws Exception {
         List<String> result = new ArrayList<>();
@@ -112,7 +112,7 @@ public class SapConnector {
      *
      * @param pattern the Authorization pattern
      * @return list of users that violate the pattern
-     * @throws Exception
+     * @throws Exception caused by errors during the sap query
      */
     public List<String> runSapQuery(AuthorizationPattern pattern) throws Exception {
         JCoTable result = this.querySapData(pattern);

@@ -1,17 +1,18 @@
-
 package io.msoffice.excel;
 
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 
 /**
  * This class helps importing whitelist data from a MS Excel file.
@@ -47,11 +48,11 @@ public class WhitelistImportHelper {
             }
 
             // get value from columns A and B as string
-            String userID = row.getCell(0).getStringCellValue();
+            String userId = row.getCell(0).getStringCellValue();
             String userName = row.getCell(1).getStringCellValue();
 
             // create new user and add it to list
-            list.add(new WhitelistEntry(userID, userName));
+            list.add(new WhitelistEntry(userId, userName));
         }
 
         // dispose file handle

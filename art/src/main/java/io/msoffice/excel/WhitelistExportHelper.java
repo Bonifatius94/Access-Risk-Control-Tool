@@ -2,13 +2,14 @@ package io.msoffice.excel;
 
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
+
+import java.io.File;
+import java.io.FileOutputStream;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.List;
 
 /**
  * This class helps to export a whitelist to a MS Excel file.
@@ -18,9 +19,9 @@ import java.util.List;
 public class WhitelistExportHelper {
 
     /**
-     * This method exports a whitelist to a MS Excel file (file is always overwritten, data is in first data sheet)
+     * This method exports a whitelist to a MS Excel file (file is always overwritten, data is in first data sheet).
      *
-     * @param filePath file path of the MS Excel output file
+     * @param filePath  file path of the MS Excel output file
      * @param whitelist whitelist of users to be exported to MS Excel file
      * @throws Exception caused by file stream errors or errors during MS Excel export
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
@@ -36,7 +37,7 @@ public class WhitelistExportHelper {
         firstRow.createCell(0).setCellValue("Usecase ID");
         firstRow.createCell(1).setCellValue("Username");
 
-        int rowIndex= 1;
+        int rowIndex = 1;
 
         // write users to worksheet
         for (WhitelistEntry user : whitelist.getEntries()) {
@@ -45,7 +46,7 @@ public class WhitelistExportHelper {
             Row row = sheet.createRow(rowIndex);
 
             // write data to row
-            row.createCell(0).setCellValue(user.getUsecaseID());
+            row.createCell(0).setCellValue(user.getUsecaseId());
             row.createCell(1).setCellValue(user.getUsername());
 
             rowIndex++;
