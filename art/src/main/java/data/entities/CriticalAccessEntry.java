@@ -20,4 +20,8 @@ public class CriticalAccessEntry {
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
+    public String toString() {
+        return "ViolatedUseCaseID: " + authorizationPattern.getUsecaseId() + ", UserName: " + userName;
+    }
 }
