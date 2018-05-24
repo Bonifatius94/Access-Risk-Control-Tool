@@ -7,6 +7,11 @@ import java.util.List;
 
 public class H2Test {
 
+    /**
+     * This method runs a test program.
+     *
+     * @param args no args, will be ignored
+     */
     public static void main(String[] args) {
 
         // create db context
@@ -40,8 +45,8 @@ public class H2Test {
             context.deleteRecord(contact1);
             context.deleteRecord(contact2);
             context.deleteRecord(company);
-        }
-        catch (Exception ex) {
+
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
