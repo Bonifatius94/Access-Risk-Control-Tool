@@ -22,14 +22,18 @@ public class Contact implements IRecord, Serializable {
     // --------------------------------------
 
     /**
-     * Foobar 123.
+     * This is an empty constructor for a new contact.
      */
     public Contact() {
         // empty constructor, nothing to do here ...
     }
 
     /**
-     * Foobar 123.
+     * This constructor takes all properties of a contacts and sets them.
+     *
+     * @param name the name of the new contact
+     * @param email the email of the new contact
+     * @param company the company of the new contact
      */
     public Contact(String name, String email, Company company) {
 

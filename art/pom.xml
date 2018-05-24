@@ -14,7 +14,6 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
-
     <!-- all dependencies we need for the project-->
     <dependencies>
         <!-- use newer maven compiler to handle java 8 features (JavaFX, Lambda, ...) -->
@@ -86,7 +85,7 @@
                         <phase>validate</phase>
                         <configuration>
                             <!-- Changes made to google checks: 200 characters per line (instead of 100), indent set 4 instead of 2 -->
-                            <configLocation>res/custom_checks.xml</configLocation>
+                            <configLocation>custom_checks.xml</configLocation>
                             <encoding>UTF-8</encoding>
                             <consoleOutput>true</consoleOutput>
                             <failsOnError>true</failsOnError>
