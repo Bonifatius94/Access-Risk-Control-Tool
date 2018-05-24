@@ -1,7 +1,7 @@
-package data.local;
+package data.localdb;
 
-import data.local.entities.Company;
-import data.local.entities.Contact;
+import data.entities.Company;
+import data.entities.Contact;
 
 import java.util.List;
 

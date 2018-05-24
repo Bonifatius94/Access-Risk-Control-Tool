@@ -1,9 +1,10 @@
-package data.local;
+package data.localdb;
 
 import java.io.Closeable;
 
 import java.util.List;
 
+import data.entities.IRecord;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

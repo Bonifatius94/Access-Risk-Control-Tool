@@ -1,6 +1,4 @@
-package data.local.entities;
-
-import data.local.IRecord;
+package data.entities;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

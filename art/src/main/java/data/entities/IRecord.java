@@ -1,4 +1,4 @@
-package data.local;
+package data.entities;
 
 public interface IRecord {
 

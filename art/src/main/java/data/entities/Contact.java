@@ -1,6 +1,4 @@
-package data.local.entities;
-
-import data.local.IRecord;
+package data.entities;
 
 import java.io.Serializable;
 
