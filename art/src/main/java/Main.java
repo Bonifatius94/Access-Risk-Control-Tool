@@ -1,15 +1,23 @@
-import data.entities.*;
+import data.entities.AuthorizationPattern;
+import data.entities.CriticalAccessEntry;
+import data.entities.CriticalAccessList;
+import data.entities.Whitelist;
+import data.entities.WhitelistEntry;
+
 import io.msoffice.excel.AuthorizationPatternImportHelper;
 import io.msoffice.excel.WhitelistImportHelper;
-import sap.SapConfiguration;
-import sap.SapConnector;
 
 import java.util.List;
 
-public class Main {
-    public static void main(String... args) {
-        System.out.println("Hello world!");
+import sap.SapConfiguration;
+import sap.SapConnector;
 
+public class Main {
+
+    /**
+     * Test the main functionality.
+     */
+    public static void main(String... args) {
         SapConfiguration config = new SapConfiguration();
         config.setServerDestination("ec2-54-209-137-85.compute-1.amazonaws.com");
         config.setSysNr("00");

@@ -6,7 +6,17 @@ import com.sap.conn.jco.JCoException;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoTable;
 import com.sap.conn.jco.ext.DestinationDataProvider;
-import data.entities.*;
+
+import data.entities.AuthorizationPattern;
+import data.entities.AuthorizationPatternCondition;
+import data.entities.AuthorizationPatternConditionProperty;
+import data.entities.AuthorizationProfileCondition;
+import data.entities.ConditionLinkage;
+import data.entities.CriticalAccessEntry;
+import data.entities.CriticalAccessList;
+import data.entities.ICondition;
+import data.entities.Whitelist;
+import data.entities.WhitelistEntry;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+
 
 @SuppressWarnings("WeakerAccess")
 public class SapConnector {
@@ -42,17 +53,6 @@ public class SapConnector {
         settings.setProperty(DestinationDataProvider.JCO_PASSWD, config.getPassword());
         settings.setProperty(DestinationDataProvider.JCO_LANG, config.getLanguage());
         settings.setProperty(DestinationDataProvider.JCO_POOL_CAPACITY, config.getPoolCapacity());
-
-        /*
-        settings.setProperty(DestinationDataProvider.JCO_ASHOST, "ec2-54-209-137-85.compute-1.amazonaws.com");
-        settings.setProperty(DestinationDataProvider.JCO_SYSNR, "00");
-        settings.setProperty(DestinationDataProvider.JCO_CLIENT, "001");
-        settings.setProperty(DestinationDataProvider.JCO_USER, "GROUP_11");
-        settings.setProperty(DestinationDataProvider.JCO_PASSWD, "Wir sind das beste Team!");
-        settings.setProperty(DestinationDataProvider.JCO_LANG, "EN");
-        settings.setProperty(DestinationDataProvider.JCO_POOL_CAPACITY, "0");
-         */
-
 
         // create file handle of output config file
         File configFile = new File(config.getServerDestination() + ".jcoDestination");
@@ -89,46 +89,41 @@ public class SapConnector {
     //              QUERY LOGIC
     // ===================================
 
-
-    private CriticalAccessList applyWhitelist(CriticalAccessList accessList, Whitelist whitelist) {
-        Iterator<CriticalAccessEntry> iterator = accessList.getEntries().iterator();
-        while (iterator.hasNext()) {
-            CriticalAccessEntry entry = iterator.next();
-            if (whitelist.getEntries().contains(entry)) {
-                iterator.remove();
-            }
-        }
-        return accessList;
-    }
-
     /**
-     * This method queries sap data using the overloaded sap server destination file path.
+     * Runs the analysis with all given AuthorizationPatterns and a whitelist.
      *
-     * @throws Exception caused by errors during the sap query
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     * @param patterns  the given patterns to run the analysis on
+     * @param whitelist the given whitelist
+     * @return the resulting list of users after applying the whitelist
      */
-    private JCoTable sapQuerySingleCondition(JCoFunction function) throws Exception {
-        JCoDestination destination = JCoDestinationManager.getDestination(config.getServerDestination());
+    public CriticalAccessList runAnalysis(List<AuthorizationPattern> patterns, Whitelist whitelist) {
+        CriticalAccessList result = new CriticalAccessList();
 
-        if (canPingServer()) {
-            if (function != null) {
-                // run query
-                function.execute(destination);
+        for (AuthorizationPattern p : patterns) {
+            List<CriticalAccessList> sapResult = runSapQuery(p);
 
-                return function.getExportParameterList().getTable("ET_USERS");
+            boolean first = true;
+            for (CriticalAccessList list : sapResult) {
+                if (p.getLinkage() == ConditionLinkage.And) {
+                    if (first) {
+                        result.getEntries().addAll(list.getEntries());
+                    } else {
+                        result.getEntries().removeIf(entry -> !list.getEntries().contains(entry));
+                    }
+                    first = false;
+                } else if (p.getLinkage() == ConditionLinkage.Or || p.getLinkage() == ConditionLinkage.None) {
+                    result.getEntries().addAll(list.getEntries());
+                }
             }
-
-            throw new Exception("Function could not be initialized!");
-        } else {
-            throw new Exception("Can't connect to the server!");
         }
+        return applyWhitelist(result, whitelist);
     }
 
     /**
-     * This method initializes the query parameters for the sap query.
+     * Runs the SAP Query for a complete given pattern.
      *
-     * @param pattern the sap function that gets attached by query parameters
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     * @param pattern the pattern to run the query with
+     * @return the list of CriticalAccesses (users)
      */
     private List<CriticalAccessList> runSapQuery(AuthorizationPattern pattern) {
         try {
@@ -168,7 +163,7 @@ public class SapConnector {
                     }
                 }
                 JCoTable partOfResult = sapQuerySingleCondition(function);
-                result.add(convert(partOfResult, pattern));
+                result.add(convertJCoTableToCriticalAccessList(partOfResult, pattern));
                 inputTable.clear();
                 profileTable.clear();
             }
@@ -180,7 +175,59 @@ public class SapConnector {
         }
     }
 
-    private CriticalAccessList convert(JCoTable table, AuthorizationPattern pattern) {
+    /**
+     * Runs a single Condition query and return its result as a JCoTable.
+     *
+     * @param function the JCoFunction which has the correct parameters for the request
+     * @return the response of the SAP system
+     * @throws Exception No connection to SAP possible
+     */
+    private JCoTable sapQuerySingleCondition(JCoFunction function) throws Exception {
+        JCoDestination destination = JCoDestinationManager.getDestination(config.getServerDestination());
+
+        if (canPingServer()) {
+            if (function != null) {
+                // run query
+                function.execute(destination);
+
+                return function.getExportParameterList().getTable("ET_USERS");
+            }
+
+            throw new Exception("Function could not be initialized!");
+        } else {
+            throw new Exception("Can't connect to the server!");
+        }
+    }
+
+    /**
+     * Applies the whitelist to a given list of usernames.
+     *
+     * @param accessList list of usernames on which whitelist is applied
+     * @param whitelist  the whitelist of usernames
+     * @return the list of usernames after applying the whitelist
+     */
+    private CriticalAccessList applyWhitelist(CriticalAccessList accessList, Whitelist whitelist) {
+        Iterator<CriticalAccessEntry> iterator = accessList.getEntries().iterator();
+        while (iterator.hasNext()) {
+            CriticalAccessEntry accessEntry = iterator.next();
+            for (WhitelistEntry whitelistEntry : whitelist.getEntries()) {
+                if (accessEntry.getAuthorizationPattern().getUsecaseId().equals(whitelistEntry.getUsecaseId())
+                    && accessEntry.getUserName().equals(whitelistEntry.getUsername())) {
+                    iterator.remove();
+                }
+            }
+        }
+        return accessList;
+    }
+
+    /**
+     * Converts a JCoTable into a CriticalAccessList. Needs the AuthorizationPattern to correctly annotate the data inside the new list.
+     *
+     * @param table   the table that needs to be converted as a JCoTable
+     * @param pattern the pattern of the JCoTable
+     * @return a converted list of CriticalAccesses
+     */
+    private CriticalAccessList convertJCoTableToCriticalAccessList(JCoTable table, AuthorizationPattern pattern) {
         CriticalAccessList userList = new CriticalAccessList();
 
         for (int i = 0; i < table.getNumRows(); i++) {
@@ -203,129 +250,4 @@ public class SapConnector {
         return userList;
     }
 
-
-    public CriticalAccessList runAnalysis(List<AuthorizationPattern> patterns, Whitelist whitelist) {
-        CriticalAccessList result = new CriticalAccessList();
-
-        for (AuthorizationPattern p : patterns) {
-            List<CriticalAccessList> sapResult = runSapQuery(p);
-
-            boolean first = true;
-            for (CriticalAccessList list : sapResult) {
-                if (p.getLinkage() == ConditionLinkage.And) {
-                    if (first) {
-                        result.getEntries().addAll(list.getEntries());
-                    } else {
-                        Iterator<CriticalAccessEntry> iterator = result.getEntries().iterator();
-                        while (iterator.hasNext()) {
-                            CriticalAccessEntry entry = iterator.next();
-                            if (!list.getEntries().contains(entry)) {
-                                iterator.remove();
-                            }
-                        }
-                    }
-                    first = false;
-                } else if (p.getLinkage() == ConditionLinkage.Or || p.getLinkage() == ConditionLinkage.None) {
-                    result.getEntries().addAll(list.getEntries());
-                }
-            }
-        }
-
-//        return applyWhitelist(result, whitelist);
-        return result;
-    }
-
-    /**
-     * This method initializes the query parameters for the sap query.
-     *
-     * @param function the sap function that gets attached by query parameters
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
-     */
-    /*private void setQueryParameters(AuthorizationPattern pattern, JCoFunction function) {
-        try {
-            JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");
-            List<AuthorizationPatternConditionProperty> allPatternProps = new ArrayList<>();
-            List<String> allProfiles = new ArrayList<>();
-
-
-            boolean first = true;
-            for (ICondition ic : pattern.getConditions()) {
-                if (ic instanceof AuthorizationProfileCondition) {
-                    AuthorizationProfileCondition condition = (AuthorizationProfileCondition) ic;
-                    allProfiles.add(condition.getAuthorizationProfile());
-                } else if (ic instanceof AuthorizationPatternCondition) {
-                    AuthorizationPatternCondition condition = (AuthorizationPatternCondition) ic;
-                    if (pattern.getLinkage() == ConditionLinkage.And) {
-                        for (AuthorizationPatternConditionProperty property : condition.getProperties()) {
-                            if (first) {
-                                allPatternProps.add(property);
-                            } else {
-                                if (allPatternProps.contains(property)) {
-                                    allPatternProps.remove(property);
-                                } else {
-                                    allPatternProps.add(property);
-                                }
-                            }
-                        }
-                        first = false;
-                    } else if (pattern.getLinkage() == ConditionLinkage.Or) {
-                        allPatternProps.addAll(condition.getProperties());
-                    }
-                }
-            }
-
-            for (AuthorizationPatternConditionProperty property : allPatternProps) {
-                inputTable.appendRow();
-                inputTable.setValue("OBJCT", property.getAuthObject());
-                inputTable.setValue("FIELD", property.getAuthObjectProperty());
-                if (property.getValue1() != null) inputTable.setValue("VAL1", property.getValue1());
-                if (property.getValue2() != null) inputTable.setValue("VAL2", property.getValue2());
-                if (property.getValue3() != null) inputTable.setValue("VAL3", property.getValue3());
-                if (property.getValue4() != null) inputTable.setValue("VAL4", property.getValue4());
-            }
-
-            JCoTable profileTable = function.getImportParameterList().getTable("IT_PROF1");
-            for (String profile: allProfiles) {
-                profileTable.appendRow();
-                profileTable.setValue("SIGN", "I");
-                profileTable.setValue("LOW", "EQ");
-                profileTable.setValue("LOW", profile);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }*/
-
-/**
- * This method initializes the query parameters for the sap query.
- *
- * @param function the sap function that gets attached by query parameters
- * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
- */
-    /*
-    private void setQueryParameters(AuthorizationPattern pattern, JCoFunction function) {
-        try {
-            JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");
-
-            inputTable.appendRow();
-            inputTable.setValue("OBJCT", "S_TCODE");
-            inputTable.setValue("FIELD", "");
-            inputTable.setValue("VAL1", "SU01");
-
-            inputTable.appendRow();
-            inputTable.setValue("OBJCT", "S_USER_GRP");
-            inputTable.setValue("FIELD", "CLASS");
-            inputTable.setValue("VAL1", "SUPER");
-
-            inputTable.appendRow();
-            inputTable.setValue("OBJCT", "S_USER_GRP");
-            inputTable.setValue("FIELD", "ACTVT");
-            inputTable.setValue("VAL1", "01");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-    */
 }
