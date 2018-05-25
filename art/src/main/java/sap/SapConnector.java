@@ -175,7 +175,7 @@ public class SapConnector {
      * @param inputTable   the inputTable for patterns
      * @param profileTable the inputTable for profiles
      */
-    public void applyConditionToTables(AccessCondition condition, JCoTable inputTable, JCoTable profileTable) {
+    private void applyConditionToTables(AccessCondition condition, JCoTable inputTable, JCoTable profileTable) {
         if (condition.getType() == AccessConditionType.ProfileCondition) {
 
             profileTable.appendRow();
