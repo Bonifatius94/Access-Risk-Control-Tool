@@ -14,7 +14,6 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
-
     <!-- all dependencies we need for the project-->
     <dependencies>
         <!-- use newer maven compiler to handle java 8 features (JavaFX, Lambda, ...) -->
@@ -39,6 +38,32 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/sapjco3.jar</systemPath>
         </dependency>
+
+        <!-- hibernate ORM -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>5.2.10.Final</version>
+        </dependency>
+
+        <!-- H2 JDBC driver and hibernate H2 tools -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.193</version>
+        </dependency>
+
+        <!-- xml libs required for hibernate -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -60,7 +85,7 @@
                         <phase>validate</phase>
                         <configuration>
                             <!-- Changes made to google checks: 200 characters per line (instead of 100), indent set 4 instead of 2 -->
-                            <configLocation>res/custom_checks.xml</configLocation>
+                            <configLocation>custom_checks.xml</configLocation>
                             <encoding>UTF-8</encoding>
                             <consoleOutput>true</consoleOutput>
                             <failsOnError>true</failsOnError>

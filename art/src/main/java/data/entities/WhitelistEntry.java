@@ -1,12 +1,23 @@
 
 package data.entities;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
  * This is a data object class for an entry specified in a whitelist.
  * It contains properties like usecase id or username.
  *
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
+@Entity
+@Table(name = "art.WhitelistEntries")
 public class WhitelistEntry {
 
     /**
@@ -22,47 +33,45 @@ public class WhitelistEntry {
         setUsername(username);
     }
 
+    private Integer id;
     private String usecaseId;
     private String username;
+    private Whitelist whitelist;
 
-    /**
-     * This method gets the username of this instance.
-     *
-     * @return username of this instance
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
-     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     public String getUsername() {
         return username;
     }
 
-    /**
-     * This method sets the username of this instance.
-     *
-     * @param username new username of this instance.
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
-     */
     public void setUsername(String username) {
         this.username = username;
     }
 
-    /**
-     * This method gets the usecase id of this instance.
-     *
-     * @return usecase id of this instance
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
-     */
     public String getUsecaseId() {
         return usecaseId;
     }
 
-    /**
-     * This method sets the usecase id of this instance.
-     *
-     * @param usecaseId new usecase id of this instance.
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
-     */
     public void setUsecaseId(String usecaseId) {
         this.usecaseId = usecaseId;
+    }
+
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinColumn(name = "WhitelistId")
+    public Whitelist getWhitelist() {
+        return whitelist;
+    }
+
+    public void setWhitelist(Whitelist whitelist) {
+        this.whitelist = whitelist;
     }
 
     /**

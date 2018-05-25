@@ -16,6 +16,12 @@ public enum ConditionLinkage {
      */
     @Override
     public String toString() {
-        return (this == And) ? "AND" : (this == Or) ? "OR" : "NONE";
+
+        switch (this) {
+            case And:  return "AND";
+            case Or:   return "OR";
+            case None: return "NONE";
+            default:   throw new IllegalArgumentException("Unknown ConditionLinkage type!");
+        }
     }
 }
