@@ -30,6 +30,13 @@ public class SapConnector {
 
     private SapConfiguration config;
 
+
+    /**
+     * Creates a new SapConnector with the given configuration.
+     *
+     * @param config the configuration
+     * @throws Exception lol
+     */
     public SapConnector(SapConfiguration config) throws Exception {
 
         // init this instance with sap config
@@ -151,38 +158,7 @@ public class SapConnector {
 
             for (AuthCondition condition : pattern.getConditions()) {
 
-                if (condition.getType() == AuthConditionType.ProfileCondition) {
-
-                    profileTable.appendRow();
-                    profileTable.setValue("SIGN", "I");
-                    profileTable.setValue("OPTION", "EQ");
-                    profileTable.setValue("LOW", condition.getProfileCondition().getProfile());
-
-                } else if (condition.getType() == AuthConditionType.PatternCondition) {
-
-                    for (AuthPatternConditionProperty property : condition.getPatternCondition().getProperties()) {
-
-                        inputTable.appendRow();
-                        inputTable.setValue("OBJCT", property.getAuthObject());
-                        inputTable.setValue("FIELD", property.getAuthObjectProperty());
-
-                        if (property.getValue1() != null) {
-                            inputTable.setValue("VAL1", property.getValue1());
-                        }
-
-                        if (property.getValue2() != null) {
-                            inputTable.setValue("VAL2", property.getValue2());
-                        }
-
-                        if (property.getValue3() != null) {
-                            inputTable.setValue("VAL3", property.getValue3());
-                        }
-
-                        if (property.getValue4() != null) {
-                            inputTable.setValue("VAL4", property.getValue4());
-                        }
-                    }
-                }
+                applyConditionToTables(condition, inputTable, profileTable);
 
                 JCoTable partOfResult = sapQuerySingleCondition(function);
                 result.add(convertJCoTableToCriticalAccessList(partOfResult, pattern));
@@ -194,6 +170,47 @@ public class SapConnector {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * Applies the condition to the inputParameterTables.
+     * @param condition the condition that is applied
+     * @param inputTable the inputTable for patterns
+     * @param profileTable the inputTable for profiles
+     */
+    public void applyConditionToTables(AuthCondition condition, JCoTable inputTable, JCoTable profileTable) {
+        if (condition.getType() == AuthConditionType.ProfileCondition) {
+
+            profileTable.appendRow();
+            profileTable.setValue("SIGN", "I");
+            profileTable.setValue("OPTION", "EQ");
+            profileTable.setValue("LOW", condition.getProfileCondition().getProfile());
+
+        } else if (condition.getType() == AuthConditionType.PatternCondition) {
+
+            for (AuthPatternConditionProperty property : condition.getPatternCondition().getProperties()) {
+
+                inputTable.appendRow();
+                inputTable.setValue("OBJCT", property.getAuthObject());
+                inputTable.setValue("FIELD", property.getAuthObjectProperty());
+
+                if (property.getValue1() != null) {
+                    inputTable.setValue("VAL1", property.getValue1());
+                }
+
+                if (property.getValue2() != null) {
+                    inputTable.setValue("VAL2", property.getValue2());
+                }
+
+                if (property.getValue3() != null) {
+                    inputTable.setValue("VAL3", property.getValue3());
+                }
+
+                if (property.getValue4() != null) {
+                    inputTable.setValue("VAL4", property.getValue4());
+                }
+            }
         }
     }
 

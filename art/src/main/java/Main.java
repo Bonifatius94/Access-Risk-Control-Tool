@@ -1,4 +1,4 @@
-import data.entities.AuthorizationPattern;
+import data.entities.AuthPattern;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessList;
 import data.entities.Whitelist;
@@ -28,9 +28,9 @@ public class Main {
         config.setPoolCapacity("0");
 
         try {
-            List<AuthorizationPattern> patterns = new AuthorizationPatternImportHelper().importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
+            List<AuthPattern> patterns = new AuthorizationPatternImportHelper().importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
 
-            for (AuthorizationPattern p : patterns) {
+            for (AuthPattern p : patterns) {
                 System.out.println(p);
             }
 
