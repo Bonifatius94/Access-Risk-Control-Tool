@@ -1,4 +1,4 @@
-image: maven:3.5.3-jdk-8
+image: kaiwinter/docker-java8-maven
 
 variables:
   MAVEN_CLI_OPTS: "-s art/.m2/settings.xml -f art/pom.xml --batch-mode"
