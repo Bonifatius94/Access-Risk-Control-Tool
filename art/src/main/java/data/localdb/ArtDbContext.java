@@ -1,13 +1,13 @@
 package data.localdb;
 
-import data.entities.AuthCondition;
-import data.entities.AuthPattern;
-import data.entities.AuthPatternCondition;
-import data.entities.AuthPatternConditionProperty;
-import data.entities.AuthPatternXAuthConditionMap;
-import data.entities.AuthProfileCondition;
+import data.entities.AccessCondition;
+import data.entities.AccessPattern;
+import data.entities.AccessPatternCondition;
+import data.entities.AccessPatternConditionProperty;
+import data.entities.AccessPatternXAccessConditionMap;
+import data.entities.AccessProfileCondition;
 import data.entities.Configuration;
-import data.entities.ConfigurationXAuthPatternMap;
+import data.entities.ConfigurationXAccessPatternMap;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 
@@ -27,13 +27,13 @@ public class ArtDbContext extends H2ContextBase {
 
         // configs
         list.add(Configuration.class);
-        list.add(ConfigurationXAuthPatternMap.class);
-        list.add(AuthPattern.class);
-        list.add(AuthPatternXAuthConditionMap.class);
-        list.add(AuthCondition.class);
-        list.add(AuthProfileCondition.class);
-        list.add(AuthPatternCondition.class);
-        list.add(AuthPatternConditionProperty.class);
+        list.add(ConfigurationXAccessPatternMap.class);
+        list.add(AccessPattern.class);
+        list.add(AccessPatternXAccessConditionMap.class);
+        list.add(AccessCondition.class);
+        list.add(AccessProfileCondition.class);
+        list.add(AccessPatternCondition.class);
+        list.add(AccessPatternConditionProperty.class);
 
         // whitelists
         list.add(Whitelist.class);

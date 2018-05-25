@@ -11,10 +11,10 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "art.nm_Configuration_AuthPattern")
-public class ConfigurationXAuthPatternMap {
+public class ConfigurationXAccessPatternMap {
 
     private Integer id;
-    private AuthPattern pattern;
+    private AccessPattern pattern;
     private Configuration config;
 
     @Id
@@ -29,11 +29,11 @@ public class ConfigurationXAuthPatternMap {
 
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinColumn(name = "AuthPatternId")
-    public AuthPattern getPattern() {
+    public AccessPattern getPattern() {
         return pattern;
     }
 
-    public void setPattern(AuthPattern pattern) {
+    public void setPattern(AccessPattern pattern) {
         this.pattern = pattern;
     }
 

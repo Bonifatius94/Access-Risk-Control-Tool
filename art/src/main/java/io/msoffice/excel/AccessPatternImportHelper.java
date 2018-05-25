@@ -1,10 +1,10 @@
 package io.msoffice.excel;
 
-import data.entities.AuthCondition;
-import data.entities.AuthPattern;
-import data.entities.AuthPatternCondition;
-import data.entities.AuthPatternConditionProperty;
-import data.entities.AuthProfileCondition;
+import data.entities.AccessCondition;
+import data.entities.AccessPattern;
+import data.entities.AccessPatternCondition;
+import data.entities.AccessPatternConditionProperty;
+import data.entities.AccessProfileCondition;
 import data.entities.ConditionLinkage;
 
 import java.io.File;
@@ -24,7 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  *
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
-public class AuthorizationPatternImportHelper {
+public class AccessPatternImportHelper {
 
     /**
      * This method imports config data from a MS Excel file (data is only taken from first datasheet).
@@ -34,7 +34,7 @@ public class AuthorizationPatternImportHelper {
      * @throws Exception caused by file stream error or parsing error due to invalid data formats
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public List<AuthPattern> importAuthorizationPattern(String filePath) throws Exception {
+    public List<AccessPattern> importAuthorizationPattern(String filePath) throws Exception {
 
         // open excel file
         FileInputStream excelFile = new FileInputStream(new File(filePath));
@@ -42,7 +42,7 @@ public class AuthorizationPatternImportHelper {
         Sheet sheet = workbook.getSheetAt(0);
 
         // init empty list and row index counter
-        List<AuthPattern> list = new ArrayList<>();
+        List<AccessPattern> list = new ArrayList<>();
         List<Row> tempRows = new ArrayList<>();
         boolean isFirstRow = true;
 
@@ -89,9 +89,9 @@ public class AuthorizationPatternImportHelper {
      * @return the auth pattern parsed from the overloaded rows
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    private AuthPattern getAuthPattern(List<Row> rows) {
+    private AccessPattern getAuthPattern(List<Row> rows) {
 
-        AuthPattern pattern;
+        AccessPattern pattern;
         String patternName = rows.get(0).getCell(0).getStringCellValue();
         String patternDescription = rows.get(0).getCell(3).getStringCellValue();
         String patternTypeIndicator = rows.get(1).getCell(1).getStringCellValue();
@@ -119,10 +119,10 @@ public class AuthorizationPatternImportHelper {
      * @return an auth pattern of simple type
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    private AuthPattern getSimpleAuthPattern(List<Row> rows) {
+    private AccessPattern getSimpleAuthPattern(List<Row> rows) {
 
-        AuthCondition condition = getCondition(rows.subList(1, rows.size()), false);
-        return new AuthPattern(condition);
+        AccessCondition condition = getCondition(rows.subList(1, rows.size()), false);
+        return new AccessPattern(condition);
     }
 
     /**
@@ -133,10 +133,10 @@ public class AuthorizationPatternImportHelper {
      * @return an auth pattern of complex type
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    private AuthPattern getComplexAuthPattern(List<Row> rows) {
+    private AccessPattern getComplexAuthPattern(List<Row> rows) {
 
         List<Row> tempRows = new ArrayList<>();
-        List<AuthCondition> conditions = new ArrayList<>();
+        List<AccessCondition> conditions = new ArrayList<>();
 
         String linkageAsString = rows.get(1).getCell(1).getStringCellValue();
         ConditionLinkage linkage = linkageAsString.toUpperCase().equals("OR") ? ConditionLinkage.Or : ConditionLinkage.And;
@@ -171,7 +171,7 @@ public class AuthorizationPatternImportHelper {
             conditions.add(getCondition(tempRows, true));
         }
 
-        return new AuthPattern(conditions, linkage);
+        return new AccessPattern(conditions, linkage);
     }
 
     /**
@@ -183,22 +183,22 @@ public class AuthorizationPatternImportHelper {
      * @return a condition that is either an instance of an auth profile condition or an auth pattern condition
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    private AuthCondition getCondition(List<Row> rows, boolean isComplex) {
+    private AccessCondition getCondition(List<Row> rows, boolean isComplex) {
 
-        AuthCondition condition = new AuthCondition();
+        AccessCondition condition = new AccessCondition();
         Cell temp = rows.get(0).getCell(isComplex ? 9 : 8);
 
         if (temp != null && temp.getStringCellValue() != null && !temp.getStringCellValue().isEmpty()) {
 
             // case: profile condition
             String profile = temp.getStringCellValue();
-            condition.setProfileCondition(new AuthProfileCondition(profile));
+            condition.setProfileCondition(new AccessProfileCondition(profile));
 
         } else {
 
             // case: auth pattern condition
             int startIndex = isComplex ? 3 : 2;
-            List<AuthPatternConditionProperty> properties = new ArrayList<>();
+            List<AccessPatternConditionProperty> properties = new ArrayList<>();
 
             for (Row row : rows) {
                 // parse auth object and property name
@@ -216,10 +216,10 @@ public class AuthorizationPatternImportHelper {
                 temp = row.getCell(++index);
                 final String value4 = (temp != null) ? temp.getStringCellValue() : null;
 
-                properties.add(new AuthPatternConditionProperty(authorizationObject, propertyName, value1, value2, value3, value4));
+                properties.add(new AccessPatternConditionProperty(authorizationObject, propertyName, value1, value2, value3, value4));
             }
 
-            condition.setPatternCondition(new AuthPatternCondition(properties));
+            condition.setPatternCondition(new AccessPatternCondition(properties));
         }
 
         return condition;

@@ -2,14 +2,14 @@ package data.entities;
 
 public class CriticalAccessEntry {
 
-    private AuthPattern authorizationPattern;
+    private AccessPattern authorizationPattern;
     private String userName;
 
-    public AuthPattern getAuthorizationPattern() {
+    public AccessPattern getAuthorizationPattern() {
         return authorizationPattern;
     }
 
-    public void setAuthorizationPattern(AuthPattern authorizationPattern) {
+    public void setAuthorizationPattern(AccessPattern authorizationPattern) {
         this.authorizationPattern = authorizationPattern;
     }
 

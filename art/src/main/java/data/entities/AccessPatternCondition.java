@@ -21,20 +21,20 @@ import javax.persistence.Transient;
  */
 @Entity
 @Table(name = "art.AuthPatternConditions")
-public class AuthPatternCondition {
+public class AccessPatternCondition {
 
-    public AuthPatternCondition() {
+    public AccessPatternCondition() {
         // nothing to do here ...
     }
 
-    public AuthPatternCondition(List<AuthPatternConditionProperty> properties) {
+    public AccessPatternCondition(List<AccessPatternConditionProperty> properties) {
         setProperties(new HashSet<>(properties));
     }
 
     private Integer id;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AuthPatternConditionProperty> properties;
+    private Set<AccessPatternConditionProperty> properties;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -47,11 +47,11 @@ public class AuthPatternCondition {
     }
 
     @Transient
-    public Set<AuthPatternConditionProperty> getProperties() {
+    public Set<AccessPatternConditionProperty> getProperties() {
         return properties;
     }
 
-    public void setProperties(Set<AuthPatternConditionProperty> properties) {
+    public void setProperties(Set<AccessPatternConditionProperty> properties) {
         this.properties = properties;
     }
 

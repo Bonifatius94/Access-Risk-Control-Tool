@@ -1,11 +1,11 @@
 package io.msoffice.excel;
 
-import data.entities.AuthCondition;
-import data.entities.AuthConditionType;
-import data.entities.AuthPattern;
-import data.entities.AuthPatternCondition;
-import data.entities.AuthPatternConditionProperty;
-import data.entities.AuthProfileCondition;
+import data.entities.AccessCondition;
+import data.entities.AccessConditionType;
+import data.entities.AccessPattern;
+import data.entities.AccessPatternCondition;
+import data.entities.AccessPatternConditionProperty;
+import data.entities.AccessProfileCondition;
 import data.entities.ConditionLinkage;
 
 import java.io.File;
@@ -23,7 +23,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  *
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
-public class AuthorizationPatternExportHelper {
+public class AccessPatternExportHelper {
 
     /**
      * This method exports config data to a MS Excel file (file is always overwritten, data is in first data sheet).
@@ -33,7 +33,7 @@ public class AuthorizationPatternExportHelper {
      * @throws Exception caused by a file stream error or a data error due to invalid config data
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public void exportAuthorizationPattern(String filePath, List<AuthPattern> patterns) throws Exception {
+    public void exportAuthorizationPattern(String filePath, List<AccessPattern> patterns) throws Exception {
 
         // create new workbook and worksheet
         XSSFWorkbook workbook = new XSSFWorkbook();
@@ -60,7 +60,7 @@ public class AuthorizationPatternExportHelper {
      * @param pattern the auth pattern that is written to the specified MS Excel data sheet
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    private void writeAuthPattern(Sheet sheet, AuthPattern pattern) {
+    private void writeAuthPattern(Sheet sheet, AccessPattern pattern) {
 
         int startIndex = sheet.getPhysicalNumberOfRows();
 
@@ -72,7 +72,7 @@ public class AuthorizationPatternExportHelper {
         if (pattern.getLinkage() == ConditionLinkage.None && pattern.getConditions().size() == 1) {
 
             // write simple condition
-            AuthCondition condition = new ArrayList<>(pattern.getConditions()).get(0);
+            AccessCondition condition = new ArrayList<>(pattern.getConditions()).get(0);
             writeCondition(sheet, condition, false);
 
         } else if (pattern.getConditions().size() > 1) {
@@ -82,7 +82,7 @@ public class AuthorizationPatternExportHelper {
             row.createCell(1).setCellValue(pattern.getLinkage().toString());
 
             // write complex conditions
-            for (AuthCondition condition : pattern.getConditions()) {
+            for (AccessCondition condition : pattern.getConditions()) {
                 writeCondition(sheet, condition, true);
             }
 
@@ -103,14 +103,14 @@ public class AuthorizationPatternExportHelper {
      * @param isComplex a boolean value that indicates whether the specified condition is part of a simple or complex auth pattern
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    private void writeCondition(Sheet sheet, AuthCondition condition, boolean isComplex) {
+    private void writeCondition(Sheet sheet, AccessCondition condition, boolean isComplex) {
 
-        if (condition.getType() == AuthConditionType.ProfileCondition) {
+        if (condition.getType() == AccessConditionType.ProfileCondition) {
 
             // write auth profile condition
             writeAuthProfileCondition(sheet, condition.getProfileCondition(), isComplex);
 
-        } else if (condition.getType() == AuthConditionType.PatternCondition) {
+        } else if (condition.getType() == AccessConditionType.PatternCondition) {
 
             // write auth profile condition
             writeAuthPatternCondition(sheet, condition.getPatternCondition(), isComplex);
@@ -130,7 +130,7 @@ public class AuthorizationPatternExportHelper {
      * @param isComplex a boolean value that indicates whether the specified condition is part of a simple or complex auth pattern
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    private void writeAuthProfileCondition(Sheet sheet, AuthProfileCondition condition, boolean isComplex) {
+    private void writeAuthProfileCondition(Sheet sheet, AccessProfileCondition condition, boolean isComplex) {
 
         // create new row
         int startIndex = sheet.getPhysicalNumberOfRows();
@@ -151,12 +151,12 @@ public class AuthorizationPatternExportHelper {
      * @param isComplex a boolean value that indicates whether the specified condition is part of a simple or complex auth pattern
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    private void writeAuthPatternCondition(Sheet sheet, AuthPatternCondition condition, boolean isComplex) {
+    private void writeAuthPatternCondition(Sheet sheet, AccessPatternCondition condition, boolean isComplex) {
 
         int startRowIndex = sheet.getPhysicalNumberOfRows();
         int rowIndex = startRowIndex;
 
-        for (AuthPatternConditionProperty property : condition.getProperties()) {
+        for (AccessPatternConditionProperty property : condition.getProperties()) {
 
             // create new row
             int columnIndex = isComplex ? 3 : 2;

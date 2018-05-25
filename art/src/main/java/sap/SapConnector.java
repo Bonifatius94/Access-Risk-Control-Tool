@@ -7,10 +7,10 @@ import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoTable;
 import com.sap.conn.jco.ext.DestinationDataProvider;
 
-import data.entities.AuthCondition;
-import data.entities.AuthConditionType;
-import data.entities.AuthPattern;
-import data.entities.AuthPatternConditionProperty;
+import data.entities.AccessCondition;
+import data.entities.AccessConditionType;
+import data.entities.AccessPattern;
+import data.entities.AccessPatternConditionProperty;
 import data.entities.ConditionLinkage;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessList;
@@ -110,11 +110,11 @@ public class SapConnector {
      * @param whitelist the given whitelist
      * @return the resulting list of users after applying the whitelist
      */
-    public CriticalAccessList runAnalysis(List<AuthPattern> patterns, Whitelist whitelist) throws Exception {
+    public CriticalAccessList runAnalysis(List<AccessPattern> patterns, Whitelist whitelist) throws Exception {
 
         CriticalAccessList result = new CriticalAccessList();
 
-        for (AuthPattern p : patterns) {
+        for (AccessPattern p : patterns) {
 
             List<CriticalAccessList> sapResult = runSapQuery(p);
             boolean first = true;
@@ -146,7 +146,7 @@ public class SapConnector {
      * @param pattern the pattern to run the query with
      * @return the list of CriticalAccesses (users)
      */
-    private List<CriticalAccessList> runSapQuery(AuthPattern pattern) throws Exception {
+    private List<CriticalAccessList> runSapQuery(AccessPattern pattern) throws Exception {
         JCoDestination destination = JCoDestinationManager.getDestination(config.getServerDestination());
         JCoFunction function = destination.getRepository().getFunction("SUSR_SUIM_API_RSUSR002");
 
@@ -155,7 +155,7 @@ public class SapConnector {
 
         List<CriticalAccessList> result = new ArrayList<>();
 
-        for (AuthCondition condition : pattern.getConditions()) {
+        for (AccessCondition condition : pattern.getConditions()) {
 
             applyConditionToTables(condition, inputTable, profileTable);
 
@@ -175,17 +175,17 @@ public class SapConnector {
      * @param inputTable   the inputTable for patterns
      * @param profileTable the inputTable for profiles
      */
-    public void applyConditionToTables(AuthCondition condition, JCoTable inputTable, JCoTable profileTable) {
-        if (condition.getType() == AuthConditionType.ProfileCondition) {
+    public void applyConditionToTables(AccessCondition condition, JCoTable inputTable, JCoTable profileTable) {
+        if (condition.getType() == AccessConditionType.ProfileCondition) {
 
             profileTable.appendRow();
             profileTable.setValue("SIGN", "I");
             profileTable.setValue("OPTION", "EQ");
             profileTable.setValue("LOW", condition.getProfileCondition().getProfile());
 
-        } else if (condition.getType() == AuthConditionType.PatternCondition) {
+        } else if (condition.getType() == AccessConditionType.PatternCondition) {
 
-            for (AuthPatternConditionProperty property : condition.getPatternCondition().getProperties()) {
+            for (AccessPatternConditionProperty property : condition.getPatternCondition().getProperties()) {
 
                 inputTable.appendRow();
                 inputTable.setValue("OBJCT", property.getAuthObject());
@@ -269,7 +269,7 @@ public class SapConnector {
      * @param pattern the pattern of the JCoTable
      * @return a converted list of CriticalAccesses
      */
-    private CriticalAccessList convertJCoTableToCriticalAccessList(JCoTable table, AuthPattern pattern) {
+    private CriticalAccessList convertJCoTableToCriticalAccessList(JCoTable table, AccessPattern pattern) {
 
         CriticalAccessList list = new CriticalAccessList();
 

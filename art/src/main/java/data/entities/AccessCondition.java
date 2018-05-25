@@ -14,12 +14,12 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "art.AuthConditions")
-public class AuthCondition {
+public class AccessCondition {
 
     private Integer id;
-    private AuthConditionType type;
-    private AuthProfileCondition profileCondition;
-    private AuthPatternCondition patternCondition;
+    private AccessConditionType type;
+    private AccessProfileCondition profileCondition;
+    private AccessPatternCondition patternCondition;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,34 +33,34 @@ public class AuthCondition {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 7)
-    public AuthConditionType getType() {
+    public AccessConditionType getType() {
         return type;
     }
 
-    public void setType(AuthConditionType type) {
+    public void setType(AccessConditionType type) {
         this.type = type;
     }
 
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinColumn(name = "ProfileConditionId")
-    public AuthProfileCondition getProfileCondition() {
+    public AccessProfileCondition getProfileCondition() {
         return profileCondition;
     }
 
-    public void setProfileCondition(AuthProfileCondition profileCondition) {
+    public void setProfileCondition(AccessProfileCondition profileCondition) {
         this.profileCondition = profileCondition;
-        this.type = AuthConditionType.ProfileCondition;
+        this.type = AccessConditionType.ProfileCondition;
     }
 
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinColumn(name = "PatternConditionId")
-    public AuthPatternCondition getPatternCondition() {
+    public AccessPatternCondition getPatternCondition() {
         return patternCondition;
     }
 
-    public void setPatternCondition(AuthPatternCondition patternCondition) {
+    public void setPatternCondition(AccessPatternCondition patternCondition) {
         this.patternCondition = patternCondition;
-        this.type = AuthConditionType.PatternCondition;
+        this.type = AccessConditionType.PatternCondition;
     }
 
 }

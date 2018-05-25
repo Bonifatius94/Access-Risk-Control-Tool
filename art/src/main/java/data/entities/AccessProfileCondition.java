@@ -14,13 +14,13 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "art.AuthProfileConditions")
-public class AuthProfileCondition {
+public class AccessProfileCondition {
 
-    public AuthProfileCondition() {
+    public AccessProfileCondition() {
         // nothing to do here ...
     }
 
-    public AuthProfileCondition(String profile) {
+    public AccessProfileCondition(String profile) {
 
         setProfile(profile);
     }

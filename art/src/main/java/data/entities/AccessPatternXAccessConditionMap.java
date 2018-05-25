@@ -11,11 +11,11 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "art.nm_AuthPattern_AuthCondition")
-public class AuthPatternXAuthConditionMap {
+public class AccessPatternXAccessConditionMap {
 
     private Integer id;
-    private AuthPattern pattern;
-    private AuthPatternCondition condition;
+    private AccessPattern pattern;
+    private AccessPatternCondition condition;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,21 +29,21 @@ public class AuthPatternXAuthConditionMap {
 
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinColumn(name = "AuthPatternId")
-    public AuthPattern getPattern() {
+    public AccessPattern getPattern() {
         return pattern;
     }
 
-    public void setPattern(AuthPattern pattern) {
+    public void setPattern(AccessPattern pattern) {
         this.pattern = pattern;
     }
 
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinColumn(name = "ConditionId")
-    public AuthPatternCondition getCondition() {
+    public AccessPatternCondition getCondition() {
         return condition;
     }
 
-    public void setCondition(AuthPatternCondition condition) {
+    public void setCondition(AccessPatternCondition condition) {
         this.condition = condition;
     }
 

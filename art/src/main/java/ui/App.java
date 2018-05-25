@@ -1,11 +1,11 @@
 package ui;
 
-import data.entities.AuthPattern;
+import data.entities.AccessPattern;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessList;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
-import io.msoffice.excel.AuthorizationPatternImportHelper;
+import io.msoffice.excel.AccessPatternImportHelper;
 import io.msoffice.excel.WhitelistImportHelper;
 import java.util.List;
 import javafx.application.Application;
@@ -51,9 +51,9 @@ public class App extends Application {
         config.setPoolCapacity("0");
 
         try {
-            List<AuthPattern> patterns = new AuthorizationPatternImportHelper().importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
+            List<AccessPattern> patterns = new AccessPatternImportHelper().importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
 
-            for (AuthPattern p : patterns) {
+            for (AccessPattern p : patterns) {
                 System.out.println(p);
             }
 

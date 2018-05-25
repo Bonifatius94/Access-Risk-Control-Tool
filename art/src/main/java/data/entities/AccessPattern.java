@@ -24,13 +24,13 @@ import javax.persistence.Transient;
  */
 @Entity
 @Table(name = "art.AuthPatterns")
-public class AuthPattern {
+public class AccessPattern {
 
     // =============================
     //      empty constructor
     // =============================
 
-    public AuthPattern() {
+    public AccessPattern() {
         // nothing to do here ...
     }
 
@@ -45,7 +45,7 @@ public class AuthPattern {
      * @param linkage    the linkage applied to this auth pattern (not none)
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public AuthPattern(List<AuthCondition> conditions, ConditionLinkage linkage) {
+    public AccessPattern(List<AccessCondition> conditions, ConditionLinkage linkage) {
 
         if (linkage == ConditionLinkage.None) {
             throw new IllegalArgumentException("Linkage of a complex auth pattern must not be none.");
@@ -64,7 +64,7 @@ public class AuthPattern {
      * @param linkage     the linkage applied to this auth pattern (not none)
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public AuthPattern(String usecaseId, String description, List<AuthCondition> conditions, ConditionLinkage linkage) {
+    public AccessPattern(String usecaseId, String description, List<AccessCondition> conditions, ConditionLinkage linkage) {
 
         if (linkage == ConditionLinkage.None) {
             throw new IllegalArgumentException("Linkage of a complex auth pattern must not be none.");
@@ -86,7 +86,7 @@ public class AuthPattern {
      * @param condition the condition applied to this auth pattern
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public AuthPattern(AuthCondition condition) {
+    public AccessPattern(AccessCondition condition) {
 
         setConditions(new HashSet<>(Collections.singletonList(condition)));
         setLinkage(ConditionLinkage.None);
@@ -100,7 +100,7 @@ public class AuthPattern {
      * @param condition   the condition applied to this auth pattern
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public AuthPattern(String usecaseId, String description, AuthCondition condition) {
+    public AccessPattern(String usecaseId, String description, AccessCondition condition) {
 
         setUsecaseId(usecaseId);
         setDescription(description);
@@ -118,7 +118,7 @@ public class AuthPattern {
     private ConditionLinkage linkage = ConditionLinkage.None;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AuthCondition> conditions;
+    private Set<AccessCondition> conditions;
 
     // =============================
     //        getter / setter
@@ -151,11 +151,11 @@ public class AuthPattern {
     }
 
     @Transient
-    public Set<AuthCondition> getConditions() {
+    public Set<AccessCondition> getConditions() {
         return conditions;
     }
 
-    public void setConditions(Set<AuthCondition> conditions) {
+    public void setConditions(Set<AccessCondition> conditions) {
         this.conditions = conditions;
     }
 

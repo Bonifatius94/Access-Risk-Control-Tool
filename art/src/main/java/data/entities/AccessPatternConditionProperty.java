@@ -16,9 +16,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "art.AuthPatternConditionProperties")
-public class AuthPatternConditionProperty {
+public class AccessPatternConditionProperty {
 
-    public AuthPatternConditionProperty() {
+    public AccessPatternConditionProperty() {
         // nothing to do here ...
     }
 
@@ -33,7 +33,7 @@ public class AuthPatternConditionProperty {
      * @param value4             the new fourth value of this instance
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public AuthPatternConditionProperty(String authObject, String authObjectProperty, String value1, String value2, String value3, String value4) {
+    public AccessPatternConditionProperty(String authObject, String authObjectProperty, String value1, String value2, String value3, String value4) {
 
         setAuthObject(authObject);
         setAuthObjectProperty(authObjectProperty);
@@ -44,7 +44,7 @@ public class AuthPatternConditionProperty {
     }
 
     private Integer id;
-    private AuthPatternCondition condition;
+    private AccessPatternCondition condition;
     private String authObject;
     private String authObjectProperty;
     private String value1;
@@ -64,11 +64,11 @@ public class AuthPatternConditionProperty {
 
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinColumn(name = "ConditionId")
-    public AuthPatternCondition getCondition() {
+    public AccessPatternCondition getCondition() {
         return condition;
     }
 
-    public void setCondition(AuthPatternCondition condition) {
+    public void setCondition(AccessPatternCondition condition) {
         this.condition = condition;
     }
 

@@ -22,7 +22,7 @@ public class Configuration {
     private String description;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ConfigurationXAuthPatternMap> patterns;
+    private Set<ConfigurationXAccessPatternMap> patterns;
     private Whitelist whitelist;
 
     @Id
@@ -52,11 +52,11 @@ public class Configuration {
     }
 
     @Transient
-    public Set<ConfigurationXAuthPatternMap> getPatterns() {
+    public Set<ConfigurationXAccessPatternMap> getPatterns() {
         return patterns;
     }
 
-    public void setPatterns(Set<ConfigurationXAuthPatternMap> patterns) {
+    public void setPatterns(Set<ConfigurationXAccessPatternMap> patterns) {
         this.patterns = patterns;
     }
 

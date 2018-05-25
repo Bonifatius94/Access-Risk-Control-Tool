@@ -1,6 +1,6 @@
 package data.entities;
 
-public enum AuthConditionType {
+public enum AccessConditionType {
 
     ProfileCondition, PatternCondition;
 
