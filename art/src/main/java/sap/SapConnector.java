@@ -68,6 +68,8 @@ public class SapConnector {
         // write settings to config file
         try (FileOutputStream fos = new FileOutputStream(configFile, false)) {
             settings.store(fos, "for tests only !");
+        } catch (Exception e) {
+            throw new Exception("Could not store the settings!");
         }
     }
 
@@ -108,7 +110,7 @@ public class SapConnector {
      * @param whitelist the given whitelist
      * @return the resulting list of users after applying the whitelist
      */
-    public CriticalAccessList runAnalysis(List<AuthPattern> patterns, Whitelist whitelist) {
+    public CriticalAccessList runAnalysis(List<AuthPattern> patterns, Whitelist whitelist) throws Exception {
 
         CriticalAccessList result = new CriticalAccessList();
 
@@ -144,39 +146,33 @@ public class SapConnector {
      * @param pattern the pattern to run the query with
      * @return the list of CriticalAccesses (users)
      */
-    private List<CriticalAccessList> runSapQuery(AuthPattern pattern) {
+    private List<CriticalAccessList> runSapQuery(AuthPattern pattern) throws Exception {
+        JCoDestination destination = JCoDestinationManager.getDestination(config.getServerDestination());
+        JCoFunction function = destination.getRepository().getFunction("SUSR_SUIM_API_RSUSR002");
 
-        try {
+        JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");
+        JCoTable profileTable = function.getImportParameterList().getTable("IT_PROF1");
 
-            JCoDestination destination = JCoDestinationManager.getDestination(config.getServerDestination());
-            JCoFunction function = destination.getRepository().getFunction("SUSR_SUIM_API_RSUSR002");
+        List<CriticalAccessList> result = new ArrayList<>();
 
-            JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");
-            JCoTable profileTable = function.getImportParameterList().getTable("IT_PROF1");
+        for (AuthCondition condition : pattern.getConditions()) {
 
-            List<CriticalAccessList> result = new ArrayList<>();
+            applyConditionToTables(condition, inputTable, profileTable);
 
-            for (AuthCondition condition : pattern.getConditions()) {
-
-                applyConditionToTables(condition, inputTable, profileTable);
-
-                JCoTable partOfResult = sapQuerySingleCondition(function);
-                result.add(convertJCoTableToCriticalAccessList(partOfResult, pattern));
-                inputTable.clear();
-                profileTable.clear();
-            }
-
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            JCoTable partOfResult = sapQuerySingleCondition(function);
+            result.add(convertJCoTableToCriticalAccessList(partOfResult, pattern));
+            inputTable.clear();
+            profileTable.clear();
         }
+
+        return result;
     }
 
     /**
      * Applies the condition to the inputParameterTables.
-     * @param condition the condition that is applied
-     * @param inputTable the inputTable for patterns
+     *
+     * @param condition    the condition that is applied
+     * @param inputTable   the inputTable for patterns
      * @param profileTable the inputTable for profiles
      */
     public void applyConditionToTables(AuthCondition condition, JCoTable inputTable, JCoTable profileTable) {

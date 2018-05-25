@@ -1,23 +1,46 @@
+package ui;
+
 import data.entities.AuthPattern;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessList;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
-
 import io.msoffice.excel.AuthorizationPatternImportHelper;
 import io.msoffice.excel.WhitelistImportHelper;
-
 import java.util.List;
-
+import javafx.application.Application;
+import javafx.stage.Stage;
 import sap.SapConfiguration;
 import sap.SapConnector;
 
-public class Main {
+
+public class App extends Application {
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        // init global exception handling
+        Thread.currentThread().setUncaughtExceptionHandler(this::unhandledExceptionOccurred);
+
+        // test sap queries
+        testSapStuff();
+    }
+
+    private void unhandledExceptionOccurred(Thread thread, Throwable e) {
+
+        // write thread id and exception to console log
+        System.out.println("Thread ID: " + thread.getId());
+        System.out.println("Stack Trace:");
+        System.out.println(e.getMessage());
+    }
 
     /**
-     * Test the main functionality.
+     * Testing Sap Stuff.
      */
-    public static void main(String... args) {
+    public void testSapStuff() {
         SapConfiguration config = new SapConfiguration();
         config.setServerDestination("ec2-54-209-137-85.compute-1.amazonaws.com");
         config.setSysNr("00");
