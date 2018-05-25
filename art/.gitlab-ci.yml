@@ -1,4 +1,4 @@
-image: kaiwinter/docker-java8-maven
+image: platpus/javafx
 
 variables:
   MAVEN_CLI_OPTS: "-s art/.m2/settings.xml -f art/pom.xml --batch-mode"
