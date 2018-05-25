@@ -6,6 +6,7 @@ import data.entities.WhitelistEntry;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Row;
@@ -60,7 +61,7 @@ public class WhitelistImportHelper {
         excelFile.close();
 
         Whitelist result = new Whitelist();
-        result.setEntries(list);
+        result.setEntries(new HashSet<>(list));
 
         return result;
     }
