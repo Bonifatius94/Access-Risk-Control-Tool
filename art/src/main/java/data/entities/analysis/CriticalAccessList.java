@@ -5,6 +5,9 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -24,11 +27,23 @@ public class CriticalAccessList {
         this.entries = list;
     }
 
+    private Integer id;
+
     // TODO: add reference to the whitelist used for the query
     // TODO: add reference to the config used for the query
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CriticalAccessEntry> entries = new HashSet<>();
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     @Transient
     public Set<CriticalAccessEntry> getEntries() {

@@ -40,6 +40,8 @@ public class AccessConditionHistory {
         setPatternCondition((condition.getPatternCondition() != null) ? new AccessPatternConditionHistory(condition.getPatternCondition()) : null);
     }
 
+    // TODO: try to use @ManyToMany annotation for n-m relation (see: http://www.baeldung.com/hibernate-many-to-many)
+
     private Integer id;
     private AccessConditionType type;
     private AccessProfileConditionHistory profileCondition;

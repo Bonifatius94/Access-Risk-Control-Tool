@@ -29,6 +29,8 @@ public class AccessPatternXAccessConditionMapHistory {
         // TODO: implement logic
     }
 
+    // TODO: try to use @ManyToMany annotation for n-m relation (see: http://www.baeldung.com/hibernate-many-to-many)
+
     private Integer id;
     private AccessPatternHistory pattern;
     private AccessPatternConditionHistory condition;

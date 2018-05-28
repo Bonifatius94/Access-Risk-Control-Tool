@@ -47,6 +47,7 @@ public class AccessPatternConditionHistory {
     public AccessPatternConditionHistory(AccessPatternCondition condition) {
 
         setProperties(condition.getProperties().stream().map(x -> new AccessPatternConditionPropertyHistory(x)).collect(Collectors.toSet()));
+        getProperties().forEach(x -> x.setCondition(this));
     }
 
     private Integer id;

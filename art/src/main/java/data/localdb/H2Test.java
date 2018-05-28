@@ -13,11 +13,11 @@ public class H2Test {
         // this automatically creates a new database file with the database schema (code-first-approach)
         try (ArtDbContext context = new ArtDbContext("", "")) {
 
-            System.out.println("database schema created");
+            System.out.println("database schema creation successful");
 
         } catch (Exception ex) {
 
-            System.out.println("program encountered an error during database schema creation");
+            System.out.println("database schema creation failed");
             ex.printStackTrace();
         }
     }

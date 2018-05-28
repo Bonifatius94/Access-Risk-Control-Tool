@@ -1,12 +1,14 @@
 package data.entities.analysis;
 
 import data.entities.ConditionLinkage;
+import data.entities.config.AccessCondition;
 import data.entities.config.AccessPattern;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -112,14 +114,23 @@ public class AccessPatternHistory {
         setLinkage(ConditionLinkage.None);
     }
 
+    /**
+     * This constructor converts an access pattern to an access pattern history.
+     *
+     * @param pattern the original pattern
+     */
     public AccessPatternHistory(AccessPattern pattern) {
 
-        // TODO: implement logic
+        // TODO: implement n-m mapping
+        setConditions(pattern.getConditions().stream().map(x -> new AccessConditionHistory(x)).collect(Collectors.toSet()));
+        //getConditions().forEach(x -> x.set);
     }
 
     // =============================
     //           properties
     // =============================
+
+    // TODO: try to use @ManyToMany annotation for n-m relation (see: http://www.baeldung.com/hibernate-many-to-many)
 
     private Integer id;
     private String usecaseId;
