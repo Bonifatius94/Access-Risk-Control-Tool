@@ -1,4 +1,6 @@
-package data.entities;
+package data.entities.config;
+
+import data.entities.AccessConditionType;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,7 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "art.AuthConditions")
+@Table(name = "config.AccessConditions")
 public class AccessCondition {
 
     private Integer id;

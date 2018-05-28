@@ -1,6 +1,8 @@
-package data.entities;
+package data.entities.config;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -14,7 +16,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name = "art.Configurations")
+@Table(name = "config.Configurations")
 public class Configuration {
 
     private Integer id;
@@ -58,6 +60,16 @@ public class Configuration {
 
     public void setPatterns(Set<ConfigurationXAccessPatternMap> patterns) {
         this.patterns = patterns;
+    }
+
+    /**
+     * This setter allows to overload access patterns instead of map entries.
+     *
+     * @param patterns the patters to be set to this instance
+     */
+    public void setPatterns(List<AccessPattern> patterns) {
+
+        setPatterns(patterns.stream().map(x -> new ConfigurationXAccessPatternMap(this, x)).collect(Collectors.toSet()));
     }
 
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })

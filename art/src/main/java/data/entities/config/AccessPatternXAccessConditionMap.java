@@ -1,4 +1,4 @@
-package data.entities;
+package data.entities.config;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "art.nm_AuthPattern_AuthCondition")
+@Table(name = "config.nm_AccessPattern_AccessCondition")
 public class AccessPatternXAccessConditionMap {
 
     private Integer id;

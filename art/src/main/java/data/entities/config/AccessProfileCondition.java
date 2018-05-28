@@ -1,5 +1,6 @@
-package data.entities;
+package data.entities.config;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,7 +14,7 @@ import javax.persistence.Table;
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
-@Table(name = "art.AuthProfileConditions")
+@Table(name = "config.AccessProfileConditions")
 public class AccessProfileCondition {
 
     public AccessProfileCondition() {

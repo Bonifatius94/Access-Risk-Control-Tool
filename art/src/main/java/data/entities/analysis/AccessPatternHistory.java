@@ -1,4 +1,7 @@
-package data.entities;
+package data.entities.analysis;
+
+import data.entities.ConditionLinkage;
+import data.entities.config.AccessPattern;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -17,20 +20,21 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+// TODO: check if inheriting from the base class can make most of this implementation obsolete
+
 /**
  * This class represents an auth pattern (simple or complex).
  *
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
-@Table(name = "art.AuthPatterns")
-public class AccessPattern {
+@Table(name = "analysis.AccessPatterns_History")
+public class AccessPatternHistory {
 
-    // =============================
-    //      empty constructor
-    // =============================
-
-    public AccessPattern() {
+    /**
+     * Empty constructor reuqired by hibernate.
+     */
+    public AccessPatternHistory() {
         // nothing to do here ...
     }
 
@@ -45,7 +49,7 @@ public class AccessPattern {
      * @param linkage    the linkage applied to this auth pattern (not none)
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public AccessPattern(List<AccessCondition> conditions, ConditionLinkage linkage) {
+    public AccessPatternHistory(List<AccessConditionHistory> conditions, ConditionLinkage linkage) {
 
         if (linkage == ConditionLinkage.None) {
             throw new IllegalArgumentException("Linkage of a complex auth pattern must not be none.");
@@ -64,7 +68,7 @@ public class AccessPattern {
      * @param linkage     the linkage applied to this auth pattern (not none)
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public AccessPattern(String usecaseId, String description, List<AccessCondition> conditions, ConditionLinkage linkage) {
+    public AccessPatternHistory(String usecaseId, String description, List<AccessConditionHistory> conditions, ConditionLinkage linkage) {
 
         if (linkage == ConditionLinkage.None) {
             throw new IllegalArgumentException("Linkage of a complex auth pattern must not be none.");
@@ -86,7 +90,7 @@ public class AccessPattern {
      * @param condition the condition applied to this auth pattern
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public AccessPattern(AccessCondition condition) {
+    public AccessPatternHistory(AccessConditionHistory condition) {
 
         setConditions(new HashSet<>(Collections.singletonList(condition)));
         setLinkage(ConditionLinkage.None);
@@ -100,12 +104,17 @@ public class AccessPattern {
      * @param condition   the condition applied to this auth pattern
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public AccessPattern(String usecaseId, String description, AccessCondition condition) {
+    public AccessPatternHistory(String usecaseId, String description, AccessConditionHistory condition) {
 
         setUsecaseId(usecaseId);
         setDescription(description);
         setConditions(new HashSet<>(Collections.singletonList(condition)));
         setLinkage(ConditionLinkage.None);
+    }
+
+    public AccessPatternHistory(AccessPattern pattern) {
+
+        // TODO: implement logic
     }
 
     // =============================
@@ -118,7 +127,7 @@ public class AccessPattern {
     private ConditionLinkage linkage = ConditionLinkage.None;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AccessCondition> conditions;
+    private Set<AccessConditionHistory> conditions;
 
     // =============================
     //        getter / setter
@@ -151,11 +160,11 @@ public class AccessPattern {
     }
 
     @Transient
-    public Set<AccessCondition> getConditions() {
+    public Set<AccessConditionHistory> getConditions() {
         return conditions;
     }
 
-    public void setConditions(Set<AccessCondition> conditions) {
+    public void setConditions(Set<AccessConditionHistory> conditions) {
         this.conditions = conditions;
     }
 

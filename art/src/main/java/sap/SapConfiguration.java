@@ -66,6 +66,7 @@ public class SapConfiguration {
         this.poolCapacity = poolCapacity;
     }
 
+    // TODO: remove explicit empty constructor
     public SapConfiguration() {
     }
 }
