@@ -1,11 +1,11 @@
 package io.msoffice.excel;
 
+import data.entities.AccessCondition;
+import data.entities.AccessPattern;
+import data.entities.AccessPatternCondition;
+import data.entities.AccessPatternConditionProperty;
+import data.entities.AccessProfileCondition;
 import data.entities.ConditionLinkage;
-import data.entities.config.AccessCondition;
-import data.entities.config.AccessPattern;
-import data.entities.config.AccessPatternCondition;
-import data.entities.config.AccessPatternConditionProperty;
-import data.entities.config.AccessProfileCondition;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,6 +25,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 public class AccessPatternImportHelper {
+
+    // TODO: throw an exception if a profile condition is part of a complex pattern
 
     /**
      * This method imports config data from a MS Excel file (data is only taken from first datasheet).

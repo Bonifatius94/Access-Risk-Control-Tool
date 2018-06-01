@@ -1,4 +1,4 @@
-package data.entities.config;
+package data.entities;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -15,7 +15,7 @@ import javax.persistence.Table;
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
-@Table(name = "config.AccessPatternConditionProperties")
+@Table(name = "AccessPatternConditionProperties")
 public class AccessPatternConditionProperty {
 
     public AccessPatternConditionProperty() {

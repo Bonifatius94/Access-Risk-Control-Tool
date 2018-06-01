@@ -1,4 +1,4 @@
-package data.entities.analysis;
+package data.entities;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -10,11 +10,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "analysis.CriticalAccessEntries")
+@Table(name = "CriticalAccessEntries")
 public class CriticalAccessEntry {
 
     private Integer id;
-    private AccessPatternHistory accessPattern;
+    private AccessPattern accessPattern;
     private String username;
 
     @Id
@@ -29,11 +29,11 @@ public class CriticalAccessEntry {
 
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinColumn(name = "ViolatedPatternId")
-    public AccessPatternHistory getAccessPattern() {
+    public AccessPattern getAccessPattern() {
         return accessPattern;
     }
 
-    public void setAccessPattern(AccessPatternHistory accessPattern) {
+    public void setAccessPattern(AccessPattern accessPattern) {
         this.accessPattern = accessPattern;
     }
 

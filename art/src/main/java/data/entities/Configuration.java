@@ -1,4 +1,4 @@
-package data.entities.config;
+package data.entities;
 
 import java.util.List;
 import java.util.Set;
@@ -16,7 +16,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name = "config.Configurations")
+@Table(name = "Configurations")
 public class Configuration {
 
     private Integer id;
@@ -26,6 +26,8 @@ public class Configuration {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ConfigurationXAccessPatternMap> patterns;
     private Whitelist whitelist;
+
+    private boolean isArchived;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -54,8 +56,8 @@ public class Configuration {
     }
 
     @Transient
-    public Set<ConfigurationXAccessPatternMap> getPatterns() {
-        return patterns;
+    public Set<AccessPattern> getPatterns() {
+        return patterns.stream().map(x -> x.getPattern()).collect(Collectors.toSet());
     }
 
     public void setPatterns(Set<ConfigurationXAccessPatternMap> patterns) {
@@ -82,4 +84,11 @@ public class Configuration {
         this.whitelist = whitelist;
     }
 
+    public boolean isArchived() {
+        return isArchived;
+    }
+
+    public void setArchived(boolean archived) {
+        isArchived = archived;
+    }
 }

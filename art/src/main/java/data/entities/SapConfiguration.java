@@ -1,0 +1,100 @@
+package data.entities;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "SapConfigurations")
+public class SapConfiguration {
+
+    private Integer id;
+    private String serverDestination;
+    private String sysNr;
+    private String client;
+
+    //private String user;
+    //private String password;
+
+    private String language;
+    private String poolCapacity;
+
+    private boolean isArchived;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getServerDestination() {
+        return serverDestination;
+    }
+
+    public void setServerDestination(String serverDestination) {
+        this.serverDestination = serverDestination;
+    }
+
+    public String getSysNr() {
+        return sysNr;
+    }
+
+    public void setSysNr(String sysNr) {
+        this.sysNr = sysNr;
+    }
+
+    public String getClient() {
+        return client;
+    }
+
+    public void setClient(String client) {
+        this.client = client;
+    }
+
+    //public String getUser() {
+    //    return user;
+    //}
+
+    //public void setUser(String user) {
+    //    this.user = user;
+    //}
+
+    //public String getPassword() {
+    //    return password;
+    //}
+
+    //public void setPassword(String password) {
+    //    this.password = password;
+    //}
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getPoolCapacity() {
+        return poolCapacity;
+    }
+
+    public void setPoolCapacity(String poolCapacity) {
+        this.poolCapacity = poolCapacity;
+    }
+
+    public boolean isArchived() {
+        return isArchived;
+    }
+
+    public void setArchived(boolean archived) {
+        isArchived = archived;
+    }
+
+}

@@ -1,10 +1,10 @@
 package ui;
 
-import data.entities.analysis.ConfigurationHistory;
-import data.entities.analysis.CriticalAccessList;
-import data.entities.config.AccessPattern;
-import data.entities.config.Configuration;
-import data.entities.config.Whitelist;
+import data.entities.AccessPattern;
+import data.entities.Configuration;
+import data.entities.CriticalAccessQuery;
+import data.entities.SapConfiguration;
+import data.entities.Whitelist;
 
 import io.msoffice.excel.AccessPatternImportHelper;
 import io.msoffice.excel.WhitelistImportHelper;
@@ -14,9 +14,7 @@ import java.util.List;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-import sap.SapConfiguration;
 import sap.SapConnector;
-
 
 public class App extends Application {
 
@@ -46,12 +44,15 @@ public class App extends Application {
      */
     public void testSapStuff() {
 
+        // init user credentials
+        String username = "GROUP_11";
+        String password = "Wir sind das beste Team!";
+
+        // init sap settings (here: test server data)
         SapConfiguration sapConfig = new SapConfiguration();
         sapConfig.setServerDestination("ec2-54-209-137-85.compute-1.amazonaws.com");
         sapConfig.setSysNr("00");
         sapConfig.setClient("001");
-        sapConfig.setUser("GROUP_11");
-        sapConfig.setPassword("Wir sind das beste Team!");
         sapConfig.setLanguage("EN");
         sapConfig.setPoolCapacity("0");
 
@@ -68,11 +69,8 @@ public class App extends Application {
             config.setWhitelist(whitelist);
             config.setPatterns(patterns);
 
-            // convert config to config history
-            ConfigurationHistory configHistory = new ConfigurationHistory(config);
-
-            SapConnector connector = new SapConnector(sapConfig);
-            CriticalAccessList result = connector.runAnalysis(configHistory);
+            SapConnector connector = new SapConnector(sapConfig, username, password);
+            CriticalAccessQuery result = connector.runAnalysis(config);
             result.getEntries().forEach(x -> System.out.println(x));
 
         } catch (Exception e) {

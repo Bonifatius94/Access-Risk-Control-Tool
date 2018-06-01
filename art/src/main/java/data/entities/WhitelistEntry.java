@@ -1,7 +1,5 @@
 
-package data.entities.analysis;
-
-import data.entities.config.WhitelistEntry;
+package data.entities;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -12,8 +10,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-// TODO: check if inheriting from the base class can make most of this implementation obsolete
-
 /**
  * This is a data object class for an entry specified in a whitelist.
  * It contains properties like usecase id or username.
@@ -21,15 +17,8 @@ import javax.persistence.Table;
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
-@Table(name = "analysis.WhitelistEntries_History")
-public class WhitelistEntryHistory {
-
-    /**
-     * Empty constructor required by hibernate.
-     */
-    public WhitelistEntryHistory() {
-        // nothing to do here ...
-    }
+@Table(name = "WhitelistEntries")
+public class WhitelistEntry {
 
     /**
      * This constructor creates a new instance of a whitelist entry.
@@ -38,27 +27,16 @@ public class WhitelistEntryHistory {
      * @param username the username of the whitelist entry
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public WhitelistEntryHistory(String usecaseId, String username) {
+    public WhitelistEntry(String usecaseId, String username) {
 
         setUsecaseId(usecaseId);
         setUsername(username);
     }
 
-    /**
-     * This constructor converts a whitelist entry to a whitelist entry history.
-     *
-     * @param entry the original whitelist entry
-     */
-    public WhitelistEntryHistory(WhitelistEntry entry) {
-
-        setUsecaseId(entry.getUsecaseId());
-        setUsername(entry.getUsername());
-    }
-
     private Integer id;
     private String usecaseId;
     private String username;
-    private WhitelistHistory whitelist;
+    private Whitelist whitelist;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -88,11 +66,11 @@ public class WhitelistEntryHistory {
 
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinColumn(name = "WhitelistId")
-    public WhitelistHistory getWhitelist() {
+    public Whitelist getWhitelist() {
         return whitelist;
     }
 
-    public void setWhitelist(WhitelistHistory whitelist) {
+    public void setWhitelist(Whitelist whitelist) {
         this.whitelist = whitelist;
     }
 

@@ -1,4 +1,4 @@
-package data.entities.config;
+package data.entities;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "config.nm_Configuration_AccessPattern")
+@Table(name = "nm_Configuration_AccessPattern")
 public class ConfigurationXAccessPatternMap {
 
     /**

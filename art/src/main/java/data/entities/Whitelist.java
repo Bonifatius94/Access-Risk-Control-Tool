@@ -1,4 +1,4 @@
-package data.entities.config;
+package data.entities;
 
 import java.util.Set;
 
@@ -12,11 +12,13 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name = "config.Whitelists")
+@Table(name = "Whitelists")
 public class Whitelist {
 
     private Integer id;
     private String description;
+
+    private boolean isArchived;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<WhitelistEntry> entries;
@@ -47,4 +49,13 @@ public class Whitelist {
     public void setEntries(Set<WhitelistEntry> entries) {
         this.entries = entries;
     }
+
+    public boolean isArchived() {
+        return isArchived;
+    }
+
+    public void setArchived(boolean archived) {
+        isArchived = archived;
+    }
+
 }

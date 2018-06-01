@@ -1,12 +1,12 @@
 package io.msoffice.excel;
 
+import data.entities.AccessCondition;
 import data.entities.AccessConditionType;
+import data.entities.AccessPattern;
+import data.entities.AccessPatternCondition;
+import data.entities.AccessPatternConditionProperty;
+import data.entities.AccessProfileCondition;
 import data.entities.ConditionLinkage;
-import data.entities.config.AccessCondition;
-import data.entities.config.AccessPattern;
-import data.entities.config.AccessPatternCondition;
-import data.entities.config.AccessPatternConditionProperty;
-import data.entities.config.AccessProfileCondition;
 
 import java.io.File;
 import java.io.FileOutputStream;

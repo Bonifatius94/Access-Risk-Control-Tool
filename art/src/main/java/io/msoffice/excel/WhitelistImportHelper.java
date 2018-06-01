@@ -1,7 +1,7 @@
 package io.msoffice.excel;
 
-import data.entities.config.Whitelist;
-import data.entities.config.WhitelistEntry;
+import data.entities.Whitelist;
+import data.entities.WhitelistEntry;
 
 import java.io.File;
 import java.io.FileInputStream;

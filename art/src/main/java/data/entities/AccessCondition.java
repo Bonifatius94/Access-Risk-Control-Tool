@@ -1,6 +1,4 @@
-package data.entities.config;
-
-import data.entities.AccessConditionType;
+package data.entities;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,7 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "config.AccessConditions")
+@Table(name = "AccessConditions")
 public class AccessCondition {
 
     private Integer id;

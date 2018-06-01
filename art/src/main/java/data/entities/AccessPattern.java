@@ -1,11 +1,10 @@
-package data.entities.config;
-
-import data.entities.ConditionLinkage;
+package data.entities;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -25,7 +24,7 @@ import javax.persistence.Transient;
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
-@Table(name = "config.AccessPatterns")
+@Table(name = "AccessPatterns")
 public class AccessPattern {
 
     // =============================
@@ -122,6 +121,11 @@ public class AccessPattern {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<AccessCondition> conditions;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ConfigurationXAccessPatternMap> configurations;
+
+    private boolean isArchived;
+
     // =============================
     //        getter / setter
     // =============================
@@ -169,6 +173,23 @@ public class AccessPattern {
 
     public void setLinkage(ConditionLinkage linkage) {
         this.linkage = linkage;
+    }
+
+    @Transient
+    public Set<Configuration> getConfigurations() {
+        return configurations.stream().map(x -> x.getConfig()).collect(Collectors.toSet());
+    }
+
+    public void setConfigurations(Set<ConfigurationXAccessPatternMap> configurations) {
+        this.configurations = configurations;
+    }
+
+    public boolean isArchived() {
+        return isArchived;
+    }
+
+    public void setArchived(boolean archived) {
+        isArchived = archived;
     }
 
     // =============================

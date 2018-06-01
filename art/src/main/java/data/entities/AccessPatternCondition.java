@@ -1,11 +1,8 @@
-package data.entities.analysis;
-
-import data.entities.config.AccessPatternCondition;
+package data.entities;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -16,8 +13,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-// TODO: check if inheriting from the base class can make most of this implementation obsolete
-
 /**
  * This class represents an auth pattern condition.
  * It contains a list of auth pattern condition properties, a condition name and implements the ICondition interface.
@@ -25,35 +20,22 @@ import javax.persistence.Transient;
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
-@Table(name = "analysis.AccessPatternConditions_History")
-public class AccessPatternConditionHistory {
+@Table(name = "AccessPatternConditions")
+public class AccessPatternCondition {
 
-    /**
-     * This is an empty constructor required by hibernate.
-     */
-    public AccessPatternConditionHistory() {
+    // empty constructor is required for hibernate
+    public AccessPatternCondition() {
         // nothing to do here ...
     }
 
-    public AccessPatternConditionHistory(List<AccessPatternConditionPropertyHistory> properties) {
+    public AccessPatternCondition(List<AccessPatternConditionProperty> properties) {
         setProperties(new HashSet<>(properties));
-    }
-
-    /**
-     * This constructor converts an access pattern condition to an access pattern condition history.
-     *
-     * @param condition the original pattern condition
-     */
-    public AccessPatternConditionHistory(AccessPatternCondition condition) {
-
-        setProperties(condition.getProperties().stream().map(x -> new AccessPatternConditionPropertyHistory(x)).collect(Collectors.toSet()));
-        getProperties().forEach(x -> x.setCondition(this));
     }
 
     private Integer id;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AccessPatternConditionPropertyHistory> properties;
+    private Set<AccessPatternConditionProperty> properties;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -66,11 +48,11 @@ public class AccessPatternConditionHistory {
     }
 
     @Transient
-    public Set<AccessPatternConditionPropertyHistory> getProperties() {
+    public Set<AccessPatternConditionProperty> getProperties() {
         return properties;
     }
 
-    public void setProperties(Set<AccessPatternConditionPropertyHistory> properties) {
+    public void setProperties(Set<AccessPatternConditionProperty> properties) {
         this.properties = properties;
     }
 
