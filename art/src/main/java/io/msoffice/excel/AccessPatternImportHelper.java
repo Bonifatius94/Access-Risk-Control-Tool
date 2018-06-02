@@ -26,6 +26,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class AccessPatternImportHelper {
 
+    // TODO: throw an exception if a profile condition is part of a complex pattern
+
     /**
      * This method imports config data from a MS Excel file (data is only taken from first datasheet).
      *

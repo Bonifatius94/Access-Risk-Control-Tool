@@ -2,6 +2,7 @@ package data.entities;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -9,24 +10,39 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name = "Whitelists")
-public class Whitelist {
+@Table(name = "CriticalAccessQueries")
+public class CriticalAccessQuery {
+
+    ///**
+    // * empty constructor required by hibernate
+    // */
+    //public CriticalAccessQuery() {
+    //    // nothing to do here ...
+    //}
+
+    // TODO: remove this contructor because it is never used
+    //public CriticalAccessQuery(Set<CriticalAccessEntry> list) {
+    //    this.entries = list;
+    //}
 
     private Integer id;
-    private String description;
+    private Configuration config;
+    private SapConfiguration sapConfig;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<CriticalAccessEntry> entries = new HashSet<>();
 
     private boolean isArchived;
     private OffsetDateTime createdAt;
     private String createdBy;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<WhitelistEntry> entries;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -38,20 +54,32 @@ public class Whitelist {
         this.id = id;
     }
 
-    public String getDescription() {
-        return description;
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinColumn(name = "ConfigId")
+    public Configuration getConfig() {
+        return config;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setConfig(Configuration config) {
+        this.config = config;
+    }
+
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinColumn(name = "SapConfigId")
+    public SapConfiguration getSapConfig() {
+        return sapConfig;
+    }
+
+    public void setSapConfig(SapConfiguration sapConfig) {
+        this.sapConfig = sapConfig;
     }
 
     @Transient
-    public Set<WhitelistEntry> getEntries() {
+    public Set<CriticalAccessEntry> getEntries() {
         return entries;
     }
 
-    public void setEntries(Set<WhitelistEntry> entries) {
+    public void setEntries(Set<CriticalAccessEntry> entries) {
         this.entries = entries;
     }
 

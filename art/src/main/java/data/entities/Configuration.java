@@ -1,6 +1,10 @@
 package data.entities;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -10,11 +14,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name = "art.Configurations")
+@Table(name = "Configurations")
 public class Configuration {
 
     private Integer id;
@@ -24,6 +29,10 @@ public class Configuration {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ConfigurationXAccessPatternMap> patterns;
     private Whitelist whitelist;
+
+    private boolean isArchived;
+    private OffsetDateTime createdAt;
+    private String createdBy;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -52,12 +61,22 @@ public class Configuration {
     }
 
     @Transient
-    public Set<ConfigurationXAccessPatternMap> getPatterns() {
-        return patterns;
+    public Set<AccessPattern> getPatterns() {
+        return patterns.stream().map(x -> x.getPattern()).collect(Collectors.toSet());
     }
 
     public void setPatterns(Set<ConfigurationXAccessPatternMap> patterns) {
         this.patterns = patterns;
+    }
+
+    /**
+     * This setter allows to overload access patterns instead of map entries.
+     *
+     * @param patterns the patters to be set to this instance
+     */
+    public void setPatterns(List<AccessPattern> patterns) {
+
+        setPatterns(patterns.stream().map(x -> new ConfigurationXAccessPatternMap(this, x)).collect(Collectors.toSet()));
     }
 
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
@@ -68,6 +87,39 @@ public class Configuration {
 
     public void setWhitelist(Whitelist whitelist) {
         this.whitelist = whitelist;
+    }
+
+    public boolean isArchived() {
+        return isArchived;
+    }
+
+    public void setArchived(boolean archived) {
+        isArchived = archived;
+    }
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    // =============================
+    //      hibernate triggers
+    // =============================
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
 }

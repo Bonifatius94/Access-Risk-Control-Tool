@@ -12,8 +12,10 @@ import data.entities.AccessConditionType;
 import data.entities.AccessPattern;
 import data.entities.AccessPatternConditionProperty;
 import data.entities.ConditionLinkage;
+import data.entities.Configuration;
 import data.entities.CriticalAccessEntry;
-import data.entities.CriticalAccessList;
+import data.entities.CriticalAccessQuery;
+import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 
@@ -29,7 +31,8 @@ import java.util.Properties;
 public class SapConnector {
 
     private SapConfiguration config;
-
+    private String username;
+    private String password;
 
     /**
      * Creates a new SapConnector with the given configuration.
@@ -37,10 +40,13 @@ public class SapConnector {
      * @param config the configuration
      * @throws Exception lol
      */
-    public SapConnector(SapConfiguration config) throws Exception {
+    public SapConnector(SapConfiguration config, String username, String password) throws Exception {
 
         // init this instance with sap config
         this.config = config;
+        this.username = username;
+        this.password = password;
+
         this.createServerDestinationFile();
     }
 
@@ -57,8 +63,8 @@ public class SapConnector {
         settings.setProperty(DestinationDataProvider.JCO_ASHOST, config.getServerDestination());
         settings.setProperty(DestinationDataProvider.JCO_SYSNR, config.getSysNr());
         settings.setProperty(DestinationDataProvider.JCO_CLIENT, config.getClient());
-        settings.setProperty(DestinationDataProvider.JCO_USER, config.getUser());
-        settings.setProperty(DestinationDataProvider.JCO_PASSWD, config.getPassword());
+        settings.setProperty(DestinationDataProvider.JCO_USER, username);
+        settings.setProperty(DestinationDataProvider.JCO_PASSWD, password);
         settings.setProperty(DestinationDataProvider.JCO_LANG, config.getLanguage());
         settings.setProperty(DestinationDataProvider.JCO_POOL_CAPACITY, config.getPoolCapacity());
 
@@ -85,7 +91,7 @@ public class SapConnector {
 
         try {
 
-            // try to ping sap server (if
+            // try to ping the sap server (if the ping fails an exception is thrown -> program enters catch block and returns false)
             JCoDestination destination = JCoDestinationManager.getDestination(config.getServerDestination());
             destination.ping();
             ret = true;
@@ -106,22 +112,21 @@ public class SapConnector {
     /**
      * Runs the analysis with all given AuthorizationPatterns and a whitelist.
      *
-     * @param patterns  the given patterns to run the analysis on
-     * @param whitelist the given whitelist
+     * @param config the configuration used for the query (contains a whitelist and a set of access patterns)
      * @return the resulting list of users after applying the whitelist
      */
-    public CriticalAccessList runAnalysis(List<AccessPattern> patterns, Whitelist whitelist) throws Exception {
+    public CriticalAccessQuery runAnalysis(Configuration config) throws Exception {
 
-        CriticalAccessList result = new CriticalAccessList();
+        CriticalAccessQuery result = new CriticalAccessQuery();
 
-        for (AccessPattern p : patterns) {
+        for (AccessPattern pattern : config.getPatterns()) {
 
-            List<CriticalAccessList> sapResult = runSapQuery(p);
+            List<CriticalAccessQuery> sapResult = runSapQuery(pattern);
             boolean first = true;
 
-            for (CriticalAccessList list : sapResult) {
+            for (CriticalAccessQuery list : sapResult) {
 
-                if (p.getLinkage() == ConditionLinkage.And) {
+                if (pattern.getLinkage() == ConditionLinkage.And) {
 
                     if (first) {
                         result.getEntries().addAll(list.getEntries());
@@ -131,13 +136,13 @@ public class SapConnector {
 
                     first = false;
 
-                } else if (p.getLinkage() == ConditionLinkage.Or || p.getLinkage() == ConditionLinkage.None) {
+                } else if (pattern.getLinkage() == ConditionLinkage.Or || pattern.getLinkage() == ConditionLinkage.None) {
                     result.getEntries().addAll(list.getEntries());
                 }
             }
         }
 
-        return applyWhitelist(result, whitelist);
+        return applyWhitelist(result, config.getWhitelist());
     }
 
     /**
@@ -146,14 +151,15 @@ public class SapConnector {
      * @param pattern the pattern to run the query with
      * @return the list of CriticalAccesses (users)
      */
-    private List<CriticalAccessList> runSapQuery(AccessPattern pattern) throws Exception {
+    private List<CriticalAccessQuery> runSapQuery(AccessPattern pattern) throws Exception {
+
         JCoDestination destination = JCoDestinationManager.getDestination(config.getServerDestination());
         JCoFunction function = destination.getRepository().getFunction("SUSR_SUIM_API_RSUSR002");
 
         JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");
         JCoTable profileTable = function.getImportParameterList().getTable("IT_PROF1");
 
-        List<CriticalAccessList> result = new ArrayList<>();
+        List<CriticalAccessQuery> result = new ArrayList<>();
 
         for (AccessCondition condition : pattern.getConditions()) {
 
@@ -176,6 +182,7 @@ public class SapConnector {
      * @param profileTable the inputTable for profiles
      */
     private void applyConditionToTables(AccessCondition condition, JCoTable inputTable, JCoTable profileTable) {
+
         if (condition.getType() == AccessConditionType.ProfileCondition) {
 
             profileTable.appendRow();
@@ -190,6 +197,9 @@ public class SapConnector {
                 inputTable.appendRow();
                 inputTable.setValue("OBJCT", property.getAuthObject());
                 inputTable.setValue("FIELD", property.getAuthObjectProperty());
+
+                // TODO: how to handle empty strings? (this piece of code would not treat them like null -> wrong results?)
+                // => suggestion: if (property.getValue1() != null && !property.getValue1().isEmpty())
 
                 if (property.getValue1() != null) {
                     inputTable.setValue("VAL1", property.getValue1());
@@ -218,20 +228,26 @@ public class SapConnector {
      * @throws Exception No connection to SAP possible
      */
     private JCoTable sapQuerySingleCondition(JCoFunction function) throws Exception {
+
+        JCoTable table;
         JCoDestination destination = JCoDestinationManager.getDestination(config.getServerDestination());
 
         if (canPingServer()) {
-            if (function != null) {
-                // run query
-                function.execute(destination);
 
-                return function.getExportParameterList().getTable("ET_USERS");
+            // abort if query was not initialized
+            if (function == null) {
+                throw new Exception("Function could not be initialized!");
             }
 
-            throw new Exception("Function could not be initialized!");
+            // run query
+            function.execute(destination);
+            table = function.getExportParameterList().getTable("ET_USERS");
+
         } else {
             throw new Exception("Can't connect to the server!");
         }
+
+        return table;
     }
 
     /**
@@ -241,7 +257,9 @@ public class SapConnector {
      * @param whitelist  the whitelist of usernames
      * @return the list of usernames after applying the whitelist
      */
-    private CriticalAccessList applyWhitelist(CriticalAccessList accessList, Whitelist whitelist) {
+    private CriticalAccessQuery applyWhitelist(CriticalAccessQuery accessList, Whitelist whitelist) {
+
+        // TODO: use lambda expression to remove loops if possible
 
         Iterator<CriticalAccessEntry> iterator = accessList.getEntries().iterator();
 
@@ -251,8 +269,8 @@ public class SapConnector {
 
             for (WhitelistEntry whitelistEntry : whitelist.getEntries()) {
 
-                if (accessEntry.getAuthorizationPattern().getUsecaseId().equals(whitelistEntry.getUsecaseId())
-                    && accessEntry.getUserName().equals(whitelistEntry.getUsername())) {
+                if (accessEntry.getAccessPattern().getUsecaseId().equals(whitelistEntry.getUsecaseId())
+                    && accessEntry.getUsername().equals(whitelistEntry.getUsername())) {
 
                     iterator.remove();
                 }
@@ -263,15 +281,15 @@ public class SapConnector {
     }
 
     /**
-     * Converts a JCoTable into a CriticalAccessList. Needs the AuthorizationPattern to correctly annotate the data inside the new list.
+     * Converts a JCoTable into a CriticalAccessQuery. Needs the AuthorizationPattern to correctly annotate the data inside the new list.
      *
      * @param table   the table that needs to be converted as a JCoTable
      * @param pattern the pattern of the JCoTable
      * @return a converted list of CriticalAccesses
      */
-    private CriticalAccessList convertJCoTableToCriticalAccessList(JCoTable table, AccessPattern pattern) {
+    private CriticalAccessQuery convertJCoTableToCriticalAccessList(JCoTable table, AccessPattern pattern) {
 
-        CriticalAccessList list = new CriticalAccessList();
+        CriticalAccessQuery list = new CriticalAccessQuery();
 
         for (int i = 0; i < table.getNumRows(); i++) {
 
@@ -280,8 +298,8 @@ public class SapConnector {
 
             // create a new critical access entry and add it to the list
             CriticalAccessEntry temp = new CriticalAccessEntry();
-            temp.setAuthorizationPattern(pattern);
-            temp.setUserName(bname);
+            temp.setAccessPattern(pattern);
+            temp.setUsername(bname);
             list.getEntries().add(temp);
 
             // go to next row

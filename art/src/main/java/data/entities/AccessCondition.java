@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "art.AuthConditions")
+@Table(name = "AccessConditions")
 public class AccessCondition {
 
     private Integer id;

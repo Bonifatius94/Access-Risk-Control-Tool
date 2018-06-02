@@ -17,7 +17,7 @@ import javax.persistence.Table;
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
-@Table(name = "art.WhitelistEntries")
+@Table(name = "WhitelistEntries")
 public class WhitelistEntry {
 
     /**

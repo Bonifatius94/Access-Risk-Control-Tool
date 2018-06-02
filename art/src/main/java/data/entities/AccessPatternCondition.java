@@ -20,9 +20,10 @@ import javax.persistence.Transient;
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
-@Table(name = "art.AuthPatternConditions")
+@Table(name = "AccessPatternConditions")
 public class AccessPatternCondition {
 
+    // empty constructor is required for hibernate
     public AccessPatternCondition() {
         // nothing to do here ...
     }
