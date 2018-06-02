@@ -86,6 +86,13 @@
             <artifactId>jfoenix</artifactId>
             <version>8.0.4</version>
         </dependency>
+
+        <!-- Dependency for Icon Collections -->
+        <dependency>
+            <groupId>de.jensd</groupId>
+            <artifactId>fontawesomefx</artifactId>
+            <version>8.9</version>
+        </dependency>
     </dependencies>
 
     <build>
