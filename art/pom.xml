@@ -65,6 +65,13 @@
             <artifactId>jaxb-impl</artifactId>
             <version>2.3.0</version>
         </dependency>
+
+        <!-- JFoenix Material Design Library -->
+        <dependency>
+            <groupId>com.jfoenix</groupId>
+            <artifactId>jfoenix</artifactId>
+            <version>8.0.4</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -100,8 +107,8 @@
                 </executions>
             </plugin>
         </plugins>
-		
-		<!-- add *.fxml files to the build process (otherwise *.fxml files are not copied to the target folder and the program crashes) -->
+
+        <!-- add *.fxml files to the build process (otherwise *.fxml files are not copied to the target folder and the program crashes) -->
         <resources>
             <resource>
                 <directory>src/main/java</directory>
