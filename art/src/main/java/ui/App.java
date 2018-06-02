@@ -77,4 +77,40 @@ public class App extends Application {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Expected results:
+     * =================
+     * ViolatedUseCaseID: 1.A, UserName: ZT2112_F
+     * ViolatedUseCaseID: 1.A, UserName: ZT2113_1_P
+     * ViolatedUseCaseID: 1.A, UserName: ZT3222_1_P
+     * ViolatedUseCaseID: 1.A, UserName: ZT3223_1_P
+     * ViolatedUseCaseID: 1.A, UserName: ZT3223_F
+     * ViolatedUseCaseID: 1.A, UserName: ZT3224_1_P
+     * ViolatedUseCaseID: 1.A, UserName: ZT3224_F
+     * ViolatedUseCaseID: 2.A, UserName: ZT1415_P
+     * ViolatedUseCaseID: 2.A, UserName: ZT2113_1_P
+     * ViolatedUseCaseID: 2.A, UserName: ZT2313_1_P
+     * ViolatedUseCaseID: 2.B, UserName: ZT2112_F
+     * ViolatedUseCaseID: 2.B, UserName: ZT2113_1_P
+     * ViolatedUseCaseID: 2.B, UserName: ZT2113_2_P
+     * ViolatedUseCaseID: 2.B, UserName: ZT2211_1_P
+     * ViolatedUseCaseID: 2.B, UserName: ZT2211_2_P
+     * ViolatedUseCaseID: 2.B, UserName: ZT4212_P
+     * ViolatedUseCaseID: 2.B, UserName: ZT2112_F
+     * ViolatedUseCaseID: 2.B, UserName: ZT2211_2_P
+     * ViolatedUseCaseID: 2.B, UserName: ZT4212_P
+     * ViolatedUseCaseID: 2.C, UserName: ZT2112_F
+     * ViolatedUseCaseID: 2.C, UserName: ZT2113_1_P
+     * ViolatedUseCaseID: 2.C, UserName: ZT2313_1_P
+     * ViolatedUseCaseID: 2.C, UserName: ZT2112_F
+     * ViolatedUseCaseID: 2.C, UserName: ZT2113_1_P
+     * ViolatedUseCaseID: 2.C, UserName: ZT2313_1_P
+     * ViolatedUseCaseID: 2.C, UserName: ZT2313_2_P
+     * ViolatedUseCaseID: 3.A, UserName: ZT2112_F
+     * ViolatedUseCaseID: 3.B, UserName: ZT2111_F
+     * ViolatedUseCaseID: 3.B, UserName: ZT2112_P
+     * ViolatedUseCaseID: 3.B, UserName: ZT2113_1_F
+     *
+     */
 }

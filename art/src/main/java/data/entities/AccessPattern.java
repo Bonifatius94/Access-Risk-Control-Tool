@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -57,7 +58,7 @@ public class AccessPattern {
             throw new IllegalArgumentException("Linkage of a complex auth pattern must not be none.");
         }
 
-        setConditions(new HashSet<>(conditions));
+        setConditions(conditions);
         setLinkage(linkage);
     }
 
@@ -78,7 +79,7 @@ public class AccessPattern {
 
         setUsecaseId(usecaseId);
         setDescription(description);
-        setConditions(new HashSet<>(conditions));
+        setConditions(conditions);
         setLinkage(linkage);
     }
 
@@ -94,7 +95,7 @@ public class AccessPattern {
      */
     public AccessPattern(AccessCondition condition) {
 
-        setConditions(new HashSet<>(Collections.singletonList(condition)));
+        setConditions(Collections.singletonList(condition));
         setLinkage(ConditionLinkage.None);
     }
 
@@ -110,7 +111,7 @@ public class AccessPattern {
 
         setUsecaseId(usecaseId);
         setDescription(description);
-        setConditions(new HashSet<>(Collections.singletonList(condition)));
+        setConditions(Collections.singletonList(condition));
         setLinkage(ConditionLinkage.None);
     }
 
@@ -124,10 +125,10 @@ public class AccessPattern {
     private ConditionLinkage linkage = ConditionLinkage.None;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AccessCondition> conditions;
+    private List<AccessCondition> conditions;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ConfigurationXAccessPatternMap> configurations;
+    private List<ConfigurationXAccessPatternMap> configurations;
 
     private boolean isArchived;
     private OffsetDateTime createdAt;
@@ -164,11 +165,11 @@ public class AccessPattern {
     }
 
     @Transient
-    public Set<AccessCondition> getConditions() {
+    public List<AccessCondition> getConditions() {
         return conditions;
     }
 
-    public void setConditions(Set<AccessCondition> conditions) {
+    public void setConditions(List<AccessCondition> conditions) {
         this.conditions = conditions;
     }
 
@@ -182,12 +183,26 @@ public class AccessPattern {
         this.linkage = linkage;
     }
 
+    /**
+     * Some comment TODO: write better comment.
+     *
+     * @return foo
+     */
     @Transient
-    public Set<Configuration> getConfigurations() {
-        return configurations.stream().map(x -> x.getConfig()).collect(Collectors.toSet());
+    public List<Configuration> getConfigurations() {
+
+        List<Configuration> set = new ArrayList<>();
+
+        for (ConfigurationXAccessPatternMap x : configurations) {
+
+            Configuration config = x.getConfig();
+            set.add(config);
+        }
+
+        return set;
     }
 
-    public void setConfigurations(Set<ConfigurationXAccessPatternMap> configurations) {
+    public void setConfigurations(List<ConfigurationXAccessPatternMap> configurations) {
         this.configurations = configurations;
     }
 

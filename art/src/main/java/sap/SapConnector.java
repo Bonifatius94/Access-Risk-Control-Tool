@@ -121,6 +121,8 @@ public class SapConnector {
 
         for (AccessPattern pattern : config.getPatterns()) {
 
+            System.out.println("executing query for pattern: " + pattern.toString());
+
             List<CriticalAccessQuery> sapResult = runSapQuery(pattern);
             boolean first = true;
 
@@ -137,7 +139,14 @@ public class SapConnector {
                     first = false;
 
                 } else if (pattern.getLinkage() == ConditionLinkage.Or || pattern.getLinkage() == ConditionLinkage.None) {
-                    result.getEntries().addAll(list.getEntries());
+
+                    // avoid duplicates
+                    for (CriticalAccessEntry entry : list.getEntries()) {
+
+                        if (!result.getEntries().contains(entry)) {
+                            result.getEntries().add(entry);
+                        }
+                    }
                 }
             }
         }
@@ -229,25 +238,20 @@ public class SapConnector {
      */
     private JCoTable sapQuerySingleCondition(JCoFunction function) throws Exception {
 
-        JCoTable table;
         JCoDestination destination = JCoDestinationManager.getDestination(config.getServerDestination());
 
         if (canPingServer()) {
+            if (function != null) {
+                // run query
+                function.execute(destination);
 
-            // abort if query was not initialized
-            if (function == null) {
-                throw new Exception("Function could not be initialized!");
+                return function.getExportParameterList().getTable("ET_USERS");
             }
 
-            // run query
-            function.execute(destination);
-            table = function.getExportParameterList().getTable("ET_USERS");
-
+            throw new Exception("Function could not be initialized!");
         } else {
             throw new Exception("Can't connect to the server!");
         }
-
-        return table;
     }
 
     /**

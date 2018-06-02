@@ -48,4 +48,22 @@ public class CriticalAccessEntry {
     public String toString() {
         return "ViolatedUseCaseID: " + accessPattern.getUsecaseId() + ", Username: " + username;
     }
+
+    /**
+     * Compares an entry to another entry using userName and useCaseID.
+     * @param other the object to compare with
+     * @return whether they are equal
+     */
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof CriticalAccessEntry)) {
+            return false;
+        }
+        return (username.equals(((CriticalAccessEntry) other).username) && accessPattern.getUsecaseId().equals(((CriticalAccessEntry) other).getAccessPattern().getUsecaseId()));
+    }
 }

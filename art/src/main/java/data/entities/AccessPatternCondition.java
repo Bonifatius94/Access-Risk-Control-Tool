@@ -1,5 +1,6 @@
 package data.entities;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,13 +30,13 @@ public class AccessPatternCondition {
     }
 
     public AccessPatternCondition(List<AccessPatternConditionProperty> properties) {
-        setProperties(new HashSet<>(properties));
+        setProperties(new ArrayList<>(properties));
     }
 
     private Integer id;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AccessPatternConditionProperty> properties;
+    private List<AccessPatternConditionProperty> properties;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,11 +49,11 @@ public class AccessPatternCondition {
     }
 
     @Transient
-    public Set<AccessPatternConditionProperty> getProperties() {
+    public List<AccessPatternConditionProperty> getProperties() {
         return properties;
     }
 
-    public void setProperties(Set<AccessPatternConditionProperty> properties) {
+    public void setProperties(List<AccessPatternConditionProperty> properties) {
         this.properties = properties;
     }
 
