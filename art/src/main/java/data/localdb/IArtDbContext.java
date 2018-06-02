@@ -188,7 +188,7 @@ public interface IArtDbContext {
      */
     void deleteSapConfig(SapConfiguration config) throws Exception;
 
-    // TODO: add methods for archiving old queries
+    // TODO: add methods for archiving old sap queries
 
     // ============================================
     //          U S E R   A C C O U N T S

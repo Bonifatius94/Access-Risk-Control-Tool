@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
 import tools.tracing.TraceOut;
 
 public class LoginController {
@@ -21,6 +22,9 @@ public class LoginController {
     private StringProperty loginUsername = new SimpleStringProperty("");
     private StringProperty loginPassword = new SimpleStringProperty("");
 
+    /**
+     * This method initializes the data bindings and event handlers.
+     */
     public void initialize() {
 
         TraceOut.enter();

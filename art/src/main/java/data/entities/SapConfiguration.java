@@ -128,4 +128,14 @@ public class SapConfiguration {
         createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
+    // =============================
+    //          overrides
+    // =============================
+
+    @Override
+    public String toString() {
+        return "Server Destination = " + getServerDestination() + ", SysNr = " + getSysNr() + ", Client = " + getClient()
+            + ", Language = " + getLanguage() + ", Pool Capacity = " + getPoolCapacity();
+    }
+
 }

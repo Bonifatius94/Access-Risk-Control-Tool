@@ -89,4 +89,20 @@ public class Whitelist {
         createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
+    /**
+     * This is a new implementation of toString method for writing this instance to console in JSON-like style.
+     *
+     * @return JSON-like data representation of this instance as a string
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("Description = ").append(getDescription()).append(", Entries:");
+        getEntries().forEach(x -> builder.append("\r\n").append(x));
+
+        return builder.toString();
+    }
+
 }

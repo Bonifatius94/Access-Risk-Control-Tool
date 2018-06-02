@@ -121,7 +121,7 @@ public class SapConnector {
 
         for (AccessPattern pattern : config.getPatterns()) {
 
-            System.out.println("executing query for pattern: " + pattern.toString());
+            System.out.println("executing sap query for pattern " + pattern.getUsecaseId());
 
             List<CriticalAccessQuery> sapResult = runSapQuery(pattern);
             boolean first = true;
@@ -139,6 +139,8 @@ public class SapConnector {
                     first = false;
 
                 } else if (pattern.getLinkage() == ConditionLinkage.Or || pattern.getLinkage() == ConditionLinkage.None) {
+
+                    // TODO: use lambda expression for this if possible
 
                     // avoid duplicates
                     for (CriticalAccessEntry entry : list.getEntries()) {
@@ -241,6 +243,7 @@ public class SapConnector {
         JCoDestination destination = JCoDestinationManager.getDestination(config.getServerDestination());
 
         if (canPingServer()) {
+
             if (function != null) {
                 // run query
                 function.execute(destination);
@@ -249,6 +252,7 @@ public class SapConnector {
             }
 
             throw new Exception("Function could not be initialized!");
+
         } else {
             throw new Exception("Can't connect to the server!");
         }

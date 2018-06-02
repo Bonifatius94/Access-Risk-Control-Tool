@@ -2,11 +2,13 @@ package tools.tracing;
 
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.lang.management.ManagementFactory;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+@SuppressWarnings("unused")
 public class TraceOut {
 
     private static PrintStream out;
@@ -16,7 +18,14 @@ public class TraceOut {
     private static String traceFilePath;
     private static LocalDate date = LocalDate.now();
 
-    @SuppressWarnings("unused")
+    /**
+     * This method enables the logging tool.
+     *
+     * @param filePath the file path of the log file
+     * @param mode the log file mode (file per day, append, overwrite)
+     * @param level the level of log detail (All > Verbose > Info > Error). Usually test with all / verbose and release with info / error.
+     * @throws Exception caused by file writing issues, TODO: remove this exception to avoid crashes
+     */
     public static void enable(String filePath, TraceMode mode, TraceLevel level) throws Exception {
 
         // init trace level and mode
@@ -41,20 +50,33 @@ public class TraceOut {
         TraceOut.out = new PrintStream(new FileOutputStream(filePath, append));
     }
 
-    @SuppressWarnings("unused")
+    /**
+     * This methods gets the output stream of the current log file.
+     *
+     * @return the output stream of the current log file
+     */
     public static PrintStream getOutputStream() {
 
         return TraceOut.out;
     }
 
-    @SuppressWarnings("unused")
+    /**
+     * This method writes an enter method entry to log file. Class and method name are retrieved from call stack.
+     * The default and also highly recommended trace level is 'verbose'.
+     */
     public static void enter() {
 
         // write enter with default trace level 'verbose'
         enter(TraceLevel.Verbose);
     }
 
-    @SuppressWarnings({"unused", "WeakerAccess"})
+    /**
+     * This method writes an enter method entry to log file. Class and method name are retrieved from call stack.
+     * The default and also highly recommended trace level is 'verbose'.
+     *
+     * @param level the trace level of the log entry to write
+     */
+    @SuppressWarnings({"WeakerAccess"})
     public static void enter(TraceLevel level) {
 
         if (TraceOut.level.ordinal() >= level.ordinal()) {
@@ -72,14 +94,23 @@ public class TraceOut {
         }
     }
 
-    @SuppressWarnings("unused")
+    /**
+     * This method writes a leave method entry to log file. Class and method name are retrieved from call stack.
+     * The default and also highly recommended trace level is 'verbose'.
+     */
     public static void leave() {
 
         // write leave with default trace level 'verbose'
         leave(TraceLevel.Verbose);
     }
 
-    @SuppressWarnings({"unused", "WeakerAccess"})
+    /**
+     * This method writes a leave method entry to log file. Class and method name are retrieved from call stack.
+     * The default and also highly recommended trace level is 'verbose'.
+     *
+     * @param level the trace level of the log entry to write
+     */
+    @SuppressWarnings({"WeakerAccess"})
     public static void leave(TraceLevel level) {
 
         if (TraceOut.level.ordinal() >= level.ordinal()) {
@@ -97,14 +128,26 @@ public class TraceOut {
         }
     }
 
-    @SuppressWarnings("unused")
+    /**
+     * This method writes an information entry with the given text to the log file.
+     * The default and also highly recommended trace level is 'info'.
+     *
+     * @param text the text to be written to the log file
+     */
     public static void writeInfo(String text) {
 
         // write info with default trace level 'Info'
         writeInfo(text, TraceLevel.Info);
     }
 
-    @SuppressWarnings({"unused", "WeakerAccess"})
+    /**
+     * This method writes an information entry with the given text to the log file.
+     * The default and also highly recommended trace level is 'info'.
+     *
+     * @param text the text to be written to the log file
+     * @param level the trace level of the log entry to write
+     */
+    @SuppressWarnings({"WeakerAccess"})
     public static void writeInfo(String text, TraceLevel level) {
 
         if (TraceOut.level.ordinal() >= level.ordinal()) {
@@ -112,14 +155,26 @@ public class TraceOut {
         }
     }
 
-    @SuppressWarnings("unused")
+    /**
+     * This method writes an error entry with the given exception to the log file.
+     * The default and also highly recommended trace level is 'error'.
+     *
+     * @param throwable the exception to be written to the log file
+     */
     public static void writeException(Throwable throwable) {
 
         // write exception with default trace level 'error'
         writeException(throwable, TraceLevel.Error);
     }
 
-    @SuppressWarnings({"unused", "WeakerAccess"})
+    /**
+     * This method writes an error entry with the given exception to the log file.
+     * The default and also highly recommended trace level is 'error'.
+     *
+     * @param throwable the exception to be written to the log file
+     * @param level the trace level of the log entry to write
+     */
+    @SuppressWarnings({"WeakerAccess"})
     public static void writeException(Throwable throwable, TraceLevel level) {
 
         if (TraceOut.level.ordinal() >= level.ordinal()) {
@@ -127,21 +182,26 @@ public class TraceOut {
         }
     }
 
-    @SuppressWarnings({"unused", "EmptyCatchBlock"})
+    @SuppressWarnings({"EmptyCatchBlock"})
     private static void writeToTrace(String messageType, String text) {
 
         if (TraceOut.mode == TraceMode.FilePerDay && date.isEqual(LocalDate.now())) {
 
             try {
                 initOutputStream(TraceOut.traceFilePath);
-            } catch (Exception ex) { }
+            } catch (Exception ex) {
+                // nothing to do here ...
+            }
         }
 
         // get UTC timestamp
         String timestamp = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
         // get process id
-        long processId = ProcessHandle.current().pid();
+        String processId = ManagementFactory.getRuntimeMXBean().getName();
+
+        // this code is better but requires Java 9
+        //long processId = ProcessHandle.current().pid();
 
         // write message to trace
         out.println(timestamp + "\t\t" + processId + "\t" + messageType + "\t" + text);
