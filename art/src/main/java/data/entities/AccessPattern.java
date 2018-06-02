@@ -1,5 +1,9 @@
 package data.entities;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +19,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -125,6 +130,8 @@ public class AccessPattern {
     private Set<ConfigurationXAccessPatternMap> configurations;
 
     private boolean isArchived;
+    private OffsetDateTime createdAt;
+    private String createdBy;
 
     // =============================
     //        getter / setter
@@ -190,6 +197,31 @@ public class AccessPattern {
 
     public void setArchived(boolean archived) {
         isArchived = archived;
+    }
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    // =============================
+    //      hibernate triggers
+    // =============================
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
     // =============================

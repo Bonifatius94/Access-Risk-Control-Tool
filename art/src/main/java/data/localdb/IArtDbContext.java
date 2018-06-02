@@ -3,6 +3,7 @@ package data.localdb;
 import data.entities.AccessPattern;
 import data.entities.Configuration;
 import data.entities.CriticalAccessQuery;
+import data.entities.DbUserRole;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 
@@ -100,6 +101,14 @@ public interface IArtDbContext {
      */
     List<SapConfiguration> getSapConfigs() throws Exception;
 
+    /**
+     * This method selects all user names of existing local database accounts and their privileges.
+     *
+     * @return a list of local database users
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    List<String> getDatabaseUsers() throws Exception;
+
     // TODO: add some userful views for more complicated queries
 
     // ============================================
@@ -186,31 +195,6 @@ public interface IArtDbContext {
     // ============================================
 
     /**
-     * This is an enumeration of the user roles.
-     */
-    enum UserRole {
-
-        // define the three user roles
-        Admin, DataAnalyst, Viewer;
-
-        /**
-         * This is an implementation of toString for displaying user roles as text.
-         *
-         * @return a representation of the user role as String
-         */
-        @Override
-        public String toString() {
-
-            switch (this) {
-                case Admin: return "Admin";
-                case DataAnalyst: return "Data Analyst";
-                case Viewer: return "Viewer";
-                default: throw new IllegalArgumentException("Unknown user role");
-            }
-        }
-    }
-
-    /**
      * This method adds a new database user with rights according to the given role.
      *
      * @param username the name of the new database user
@@ -218,7 +202,7 @@ public interface IArtDbContext {
      * @param role the role of the new database user
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    void createDatabaseUser(String username, String password, UserRole role) throws Exception;
+    void createDatabaseUser(String username, String password, DbUserRole role) throws Exception;
 
     /**
      * This method changes the role of an existing user.
@@ -227,7 +211,7 @@ public interface IArtDbContext {
      * @param role the new role of the user
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    void changeUserRole(String username, UserRole role) throws Exception;
+    void changeUserRole(String username, DbUserRole role) throws Exception;
 
     /**
      * This method deletes an existing database user.

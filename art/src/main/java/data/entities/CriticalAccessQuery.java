@@ -1,5 +1,7 @@
 package data.entities;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -38,6 +41,8 @@ public class CriticalAccessQuery {
     private Set<CriticalAccessEntry> entries = new HashSet<>();
 
     private boolean isArchived;
+    private OffsetDateTime createdAt;
+    private String createdBy;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -84,6 +89,31 @@ public class CriticalAccessQuery {
 
     public void setArchived(boolean archived) {
         isArchived = archived;
+    }
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    // =============================
+    //      hibernate triggers
+    // =============================
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
 }

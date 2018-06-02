@@ -11,7 +11,8 @@ public class H2Test {
 
         // create db context
         // this automatically creates a new database file with the database schema (code-first-approach)
-        try (ArtDbContext context = new ArtDbContext("", "")) {
+        // the first user becomes db admin
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             System.out.println("database schema creation successful");
 

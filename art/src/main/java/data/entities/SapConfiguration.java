@@ -1,9 +1,13 @@
 package data.entities;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 @Entity
@@ -22,6 +26,8 @@ public class SapConfiguration {
     private String poolCapacity;
 
     private boolean isArchived;
+    private OffsetDateTime createdAt;
+    private String createdBy;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -95,6 +101,31 @@ public class SapConfiguration {
 
     public void setArchived(boolean archived) {
         isArchived = archived;
+    }
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    // =============================
+    //      hibernate triggers
+    // =============================
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
 }

@@ -9,6 +9,7 @@ import data.entities.Configuration;
 import data.entities.ConfigurationXAccessPatternMap;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
+import data.entities.DbUser;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
@@ -48,6 +49,10 @@ public class ArtDbContext extends H2ContextBase {
 
         // sap config
         list.add(SapConfiguration.class);
+
+        // TODO: only add this entity during query, not here (see official hibernate guide chapter 16)
+        // database user accounts
+        //list.add(DbUser.class);
 
         return list;
     }
