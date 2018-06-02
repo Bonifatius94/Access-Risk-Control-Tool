@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "art.AuthConditions")
+@Table(name = "AccessConditions")
 public class AccessCondition {
 
     private Integer id;
@@ -61,6 +61,17 @@ public class AccessCondition {
     public void setPatternCondition(AccessPatternCondition patternCondition) {
         this.patternCondition = patternCondition;
         this.type = AccessConditionType.PatternCondition;
+    }
+
+    /**
+     * This is a new implementation of toString method for writing this instance to console in JSON-like style.
+     *
+     * @return JSON-like data representation of this instance as a string
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
+    @Override
+    public String toString() {
+        return (type == AccessConditionType.ProfileCondition) ? profileCondition.toString() : patternCondition.toString();
     }
 
 }

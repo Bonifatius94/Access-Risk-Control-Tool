@@ -15,7 +15,7 @@ import javax.persistence.Table;
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
-@Table(name = "art.AuthPatternConditionProperties")
+@Table(name = "AccessPatternConditionProperties")
 public class AccessPatternConditionProperty {
 
     public AccessPatternConditionProperty() {

@@ -1,9 +1,15 @@
 package data.entities;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,6 +20,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -23,7 +30,7 @@ import javax.persistence.Transient;
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
-@Table(name = "art.AuthPatterns")
+@Table(name = "AccessPatterns")
 public class AccessPattern {
 
     // =============================
@@ -51,7 +58,7 @@ public class AccessPattern {
             throw new IllegalArgumentException("Linkage of a complex auth pattern must not be none.");
         }
 
-        setConditions(new HashSet<>(conditions));
+        setConditions(conditions);
         setLinkage(linkage);
     }
 
@@ -72,7 +79,7 @@ public class AccessPattern {
 
         setUsecaseId(usecaseId);
         setDescription(description);
-        setConditions(new HashSet<>(conditions));
+        setConditions(conditions);
         setLinkage(linkage);
     }
 
@@ -88,7 +95,7 @@ public class AccessPattern {
      */
     public AccessPattern(AccessCondition condition) {
 
-        setConditions(new HashSet<>(Collections.singletonList(condition)));
+        setConditions(Collections.singletonList(condition));
         setLinkage(ConditionLinkage.None);
     }
 
@@ -104,7 +111,7 @@ public class AccessPattern {
 
         setUsecaseId(usecaseId);
         setDescription(description);
-        setConditions(new HashSet<>(Collections.singletonList(condition)));
+        setConditions(Collections.singletonList(condition));
         setLinkage(ConditionLinkage.None);
     }
 
@@ -118,7 +125,14 @@ public class AccessPattern {
     private ConditionLinkage linkage = ConditionLinkage.None;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AccessCondition> conditions;
+    private List<AccessCondition> conditions;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ConfigurationXAccessPatternMap> configurations;
+
+    private boolean isArchived;
+    private OffsetDateTime createdAt;
+    private String createdBy;
 
     // =============================
     //        getter / setter
@@ -151,11 +165,11 @@ public class AccessPattern {
     }
 
     @Transient
-    public Set<AccessCondition> getConditions() {
+    public List<AccessCondition> getConditions() {
         return conditions;
     }
 
-    public void setConditions(Set<AccessCondition> conditions) {
+    public void setConditions(List<AccessCondition> conditions) {
         this.conditions = conditions;
     }
 
@@ -167,6 +181,62 @@ public class AccessPattern {
 
     public void setLinkage(ConditionLinkage linkage) {
         this.linkage = linkage;
+    }
+
+    /**
+     * Some comment TODO: write better comment.
+     *
+     * @return foo
+     */
+    @Transient
+    public List<Configuration> getConfigurations() {
+
+        List<Configuration> set = new ArrayList<>();
+
+        for (ConfigurationXAccessPatternMap x : configurations) {
+
+            Configuration config = x.getConfig();
+            set.add(config);
+        }
+
+        return set;
+    }
+
+    public void setConfigurations(List<ConfigurationXAccessPatternMap> configurations) {
+        this.configurations = configurations;
+    }
+
+    public boolean isArchived() {
+        return isArchived;
+    }
+
+    public void setArchived(boolean archived) {
+        isArchived = archived;
+    }
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    // =============================
+    //      hibernate triggers
+    // =============================
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
     // =============================

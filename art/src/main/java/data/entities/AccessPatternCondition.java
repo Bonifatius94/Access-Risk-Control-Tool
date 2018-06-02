@@ -1,5 +1,6 @@
 package data.entities;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,21 +21,22 @@ import javax.persistence.Transient;
  * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
-@Table(name = "art.AuthPatternConditions")
+@Table(name = "AccessPatternConditions")
 public class AccessPatternCondition {
 
+    // empty constructor is required for hibernate
     public AccessPatternCondition() {
         // nothing to do here ...
     }
 
     public AccessPatternCondition(List<AccessPatternConditionProperty> properties) {
-        setProperties(new HashSet<>(properties));
+        setProperties(new ArrayList<>(properties));
     }
 
     private Integer id;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AccessPatternConditionProperty> properties;
+    private List<AccessPatternConditionProperty> properties;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -47,11 +49,11 @@ public class AccessPatternCondition {
     }
 
     @Transient
-    public Set<AccessPatternConditionProperty> getProperties() {
+    public List<AccessPatternConditionProperty> getProperties() {
         return properties;
     }
 
-    public void setProperties(Set<AccessPatternConditionProperty> properties) {
+    public void setProperties(List<AccessPatternConditionProperty> properties) {
         this.properties = properties;
     }
 
