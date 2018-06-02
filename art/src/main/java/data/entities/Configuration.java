@@ -2,6 +2,8 @@ package data.entities;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,7 +29,7 @@ public class Configuration {
     private String description;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ConfigurationXAccessPatternMap> patterns;
+    private List<ConfigurationXAccessPatternMap> patterns;
     private Whitelist whitelist;
 
     private boolean isArchived;
@@ -60,14 +62,28 @@ public class Configuration {
         this.description = description;
     }
 
+    /**
+     * Some comment TODO: write better comment.
+     *
+     * @return foo
+     */
     @Transient
-    public Set<AccessPattern> getPatterns() {
-        return patterns.stream().map(x -> x.getPattern()).collect(Collectors.toSet());
+    public List<AccessPattern> getPatterns() {
+
+        List<AccessPattern> set = new ArrayList<>();
+
+        for (ConfigurationXAccessPatternMap x : patterns) {
+
+            AccessPattern pattern = x.getPattern();
+            set.add(pattern);
+        }
+
+        return set;
     }
 
-    public void setPatterns(Set<ConfigurationXAccessPatternMap> patterns) {
+    /*public void setPatterns(List<ConfigurationXAccessPatternMap> patterns) {
         this.patterns = patterns;
-    }
+    }*/
 
     /**
      * This setter allows to overload access patterns instead of map entries.
@@ -76,10 +92,18 @@ public class Configuration {
      */
     public void setPatterns(List<AccessPattern> patterns) {
 
-        setPatterns(patterns.stream().map(x -> new ConfigurationXAccessPatternMap(this, x)).collect(Collectors.toSet()));
+        List<ConfigurationXAccessPatternMap> set = new ArrayList<>();
+
+        for (AccessPattern x : patterns) {
+
+            ConfigurationXAccessPatternMap configurationXAccessPatternMap = new ConfigurationXAccessPatternMap(this, x);
+            set.add(configurationXAccessPatternMap);
+        }
+
+        this.patterns = set;
     }
 
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "WhitelistId")
     public Whitelist getWhitelist() {
         return whitelist;

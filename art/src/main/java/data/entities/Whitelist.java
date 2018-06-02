@@ -2,6 +2,7 @@ package data.entities;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -26,7 +27,7 @@ public class Whitelist {
     private String createdBy;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<WhitelistEntry> entries;
+    private List<WhitelistEntry> entries;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -47,11 +48,11 @@ public class Whitelist {
     }
 
     @Transient
-    public Set<WhitelistEntry> getEntries() {
+    public List<WhitelistEntry> getEntries() {
         return entries;
     }
 
-    public void setEntries(Set<WhitelistEntry> entries) {
+    public void setEntries(List<WhitelistEntry> entries) {
         this.entries = entries;
     }
 

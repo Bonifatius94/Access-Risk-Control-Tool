@@ -9,7 +9,6 @@ import data.entities.Configuration;
 import data.entities.ConfigurationXAccessPatternMap;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
-import data.entities.DbUser;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;

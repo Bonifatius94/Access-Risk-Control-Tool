@@ -63,4 +63,15 @@ public class AccessCondition {
         this.type = AccessConditionType.PatternCondition;
     }
 
+    /**
+     * This is a new implementation of toString method for writing this instance to console in JSON-like style.
+     *
+     * @return JSON-like data representation of this instance as a string
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
+    @Override
+    public String toString() {
+        return (type == AccessConditionType.ProfileCondition) ? profileCondition.toString() : patternCondition.toString();
+    }
+
 }
