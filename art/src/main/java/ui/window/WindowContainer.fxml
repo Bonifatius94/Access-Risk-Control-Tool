@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.window.WindowContainerController">
+    <top>
+        <HBox spacing="1">
+            <Region HBox.hgrow="ALWAYS"/>
+            <JFXButton mnemonicParsing="false" onAction="#btnMinimizeAppClicked" styleClass="windowButton"
+                       prefWidth="20">
+                <graphic>
+                    <MaterialDesignIconView glyphName="WINDOW_MINIMIZE"/>
+                </graphic>
+            </JFXButton>
+            <JFXButton mnemonicParsing="false" onAction="#btnCloseAppClicked"
+                       styleClass="windowButton, closeWindowButton" prefWidth="20">
+                <graphic>
+                    <MaterialDesignIconView glyphName="CLOSE"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
+    </top>
+    <center>
+        <fx:include source="../LoginView.fxml"></fx:include>
+    </center>
+</BorderPane>

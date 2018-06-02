@@ -11,12 +11,11 @@
  *	Apply google Roboto font to all UI components
  */
 
- .root {
+.root {
     -fx-font-family: "Roboto";
     -fx-font-smoothing-type: gray;
     -fx-background-color: -fx-background;
 }
-
 
 /*******************************************************************************
  *                                                                             *
@@ -28,15 +27,30 @@
     -fx-background-color: -fx-primary;
     -fx-text-fill: -fx-text;
     -fx-cursor: hand;
+    -jfx-disable-visual-focus: false;
 }
 
+.jfx-button:hover {
+    -fx-background-color: derive(-fx-primary, 30%)
+}
+
+/* Close App Button extra styling */
+.windowButton {
+    -fx-background-color: -fx-background;
+    -fx-text: white;
+    -jfx-disable-visual-focus: true;
+}
+
+.closeWindowButton:hover {
+    -fx-background-color: -fx-alert;
+}
 
 /*******************************************************************************
  *                                                                             *
  * Material TextField / PasswordField / TextArea                               *
  *                                                                             *
  ******************************************************************************/
- 
+
 .jfx-text-field, .jfx-password-field, .jfx-text-area {
     -jfx-focus-color: -fx-primary !important;
     -jfx-unfocus-color: -fx-light !important;
@@ -44,7 +58,6 @@
     -fx-text-fill: -fx-text !important;
     -jfx-label-float: true;
 }
-
 
 /*******************************************************************************
 *                                                                              *
@@ -56,14 +69,14 @@
     -fx-background-color: -fx-primary;
     -fx-cursor: hand;
 }
+
 .jfx-tab-pane .tab-header-background {
     -fx-background-color: fx-primary;
 }
 
-.jfx-tab-pane .tab-header-area .jfx-rippler{
+.jfx-tab-pane .tab-header-area .jfx-rippler {
     -jfx-rippler-fill: -fx-text;
 }
-
 
 /*******************************************************************************
  *                                                                             *
@@ -71,18 +84,17 @@
  *                                                                             *
  ******************************************************************************/
 
- .jfx-check-box {
+.jfx-check-box {
     -jfx-checked-color: -fx-primary;
     -jfx-unchecked-color: -fx-light;
     -fx-cursor: hand;
- }
+}
 
-
- /*******************************************************************************
- *                                                                             *
- * Material ComboBox                                                           *
- *                                                                             *
- ******************************************************************************/
+/*******************************************************************************
+*                                                                             *
+* Material ComboBox                                                           *
+*                                                                             *
+******************************************************************************/
 
 .jfx-combo-box {
     -jfx-focus-color: -fx-primary;
@@ -90,27 +102,35 @@
     -fx-cursor: hand;
 }
 
-.combo-box-popup .list-view {    
+.combo-box-popup .list-view {
     -fx-background-color: -fx-background !important;
     -fx-border-color: -fx-light !important;
 }
 
- /*******************************************************************************
- *                                                                             *
- * Material RadioButton                                                        *
- *                                                                             *
- ******************************************************************************/
+/*******************************************************************************
+*                                                                             *
+* Material RadioButton                                                        *
+*                                                                             *
+******************************************************************************/
 
- .jfx-radio-button {
+.jfx-radio-button {
     -jfx-checked-color: -fx-primary;
     -jfx-unchecked-color: -fx-light;
     -fx-cursor: hand;
- }
+}
 
- 
- /*******************************************************************************
+/*******************************************************************************
+*                                                                             *
+* Material TreeTableView                                                      *
+*                                                                             *
+******************************************************************************/
+
+/*******************************************************************************
  *                                                                             *
- * Material TreeTableView                                                      *
+ * Material Icons                                                              *
  *                                                                             *
  ******************************************************************************/
-
+.glyph-icon {
+    -fx-font-family: "Material Design Icons";
+    -fx-fill: -fx-text;
+}
