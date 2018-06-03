@@ -4,14 +4,14 @@ import java.util.ResourceBundle;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import javafx.stage.StageStyle;
 import tools.tracing.TraceLevel;
 import tools.tracing.TraceMode;
 import tools.tracing.TraceOut;
+
+import ui.custom.controls.CustomWindow;
 
 public class App extends Application {
 
@@ -52,15 +52,13 @@ public class App extends Application {
         TraceOut.enter();
 
         ResourceBundle bundle = ResourceBundle.getBundle("lang");
-        Parent root = FXMLLoader.load(getClass().getResource("window/WindowContainer.fxml"), bundle);
+        CustomWindow window = FXMLLoader.load(getClass().getResource("login/LoginView.fxml"), bundle);
 
-        Scene scene = new Scene(root, 300, 275);
+        window.initStage(primaryStage);
+        window.setTitle("Login");
+
+        Scene scene = new Scene(window, 400, 200);
         scene.getStylesheets().add("css/dark-theme.css");
-
-        // TODO: implement close button to exit application cleanly
-        // remove OS dependent window frame (with headline , nimize, maximize close buttons, etc.)
-        primaryStage.initStyle(StageStyle.UNDECORATED);
-        primaryStage.setTitle("Login");
 
         primaryStage.setScene(scene);
         primaryStage.show();
