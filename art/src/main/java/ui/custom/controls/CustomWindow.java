@@ -107,7 +107,6 @@ public class CustomWindow extends VBox {
         hbHeaderContainer = new HBox();
         hbHeaderContainer.getChildren().addAll(lblHeadline, regFiller, btnMinimize, btnMaximize, btnClose);
 
-        // TODO: fix resize issue without this padding cheat
         // add padding to window to fix resizing bug
         HBox pane = new HBox();
         pane.setPadding(new Insets(4));

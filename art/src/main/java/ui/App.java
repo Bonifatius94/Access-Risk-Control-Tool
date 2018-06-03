@@ -52,9 +52,9 @@ public class App extends Application {
         TraceOut.enter();
 
         ResourceBundle bundle = ResourceBundle.getBundle("lang");
-        CustomWindow window = FXMLLoader.load(getClass().getResource("login/LoginView.fxml"), bundle);
+        CustomWindow window = FXMLLoader.load(getClass().getResource("main/MainView.fxml"), bundle);
 
-        Scene scene = new Scene(window, 400, 200);
+        Scene scene = new Scene(window, 1000, 600);
         scene.getStylesheets().add("css/dark-theme.css");
         primaryStage.setScene(scene);
 
@@ -64,4 +64,5 @@ public class App extends Application {
 
         TraceOut.leave();
     }
+
 }
