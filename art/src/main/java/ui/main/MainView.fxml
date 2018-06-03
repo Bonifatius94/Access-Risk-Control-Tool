@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import ui.custom.controls.*?>
+
+<CustomWindow xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.MainController">
+    <JFXTabPane CustomWindow.vgrow="ALWAYS">
+        <TabItem>
+
+        </TabItem>
+    </JFXTabPane>
+</CustomWindow>

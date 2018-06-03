@@ -12,7 +12,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -49,6 +48,9 @@ public class CustomWindow extends VBox {
     //               constructor
     // ========================================
 
+    /**
+     * This constructor initializes the custom window controls and binds the required event handlers.
+     */
     public CustomWindow() {
 
         initCustomWindowHeader();
@@ -65,8 +67,8 @@ public class CustomWindow extends VBox {
     private JFXButton btnMaximize;
     private JFXButton btnClose;
 
-    private double xOffset = 0;
-    private double yOffset = 0;
+    private double horizontalOffset = 0;
+    private double verticalOffset = 0;
 
     // ========================================
     //             init controls
@@ -105,8 +107,15 @@ public class CustomWindow extends VBox {
         hbHeaderContainer = new HBox();
         hbHeaderContainer.getChildren().addAll(lblHeadline, regFiller, btnMinimize, btnMaximize, btnClose);
 
-        // apply container to the top region of the border pane
-        super.getChildren().addAll(hbHeaderContainer);
+        // TODO: fix resize issue without this padding cheat
+        // add padding to window to fix resizing bug
+        HBox pane = new HBox();
+        pane.setPadding(new Insets(4));
+        HBox.setHgrow(hbHeaderContainer, Priority.ALWAYS);
+        pane.getChildren().addAll(hbHeaderContainer);
+
+        // apply container to the vbox pane
+        super.getChildren().addAll(pane);
     }
 
     private void initEventHandlers() {
@@ -147,8 +156,8 @@ public class CustomWindow extends VBox {
 
                 // get the current stage and manage horizontal / vertical offset while dragging
                 Stage stage = (Stage) ((Parent) event.getSource()).getScene().getWindow();
-                xOffset = stage.getX() - event.getScreenX();
-                yOffset = stage.getY() - event.getScreenY();
+                horizontalOffset = stage.getX() - event.getScreenX();
+                verticalOffset = stage.getY() - event.getScreenY();
             }
         });
 
@@ -158,8 +167,8 @@ public class CustomWindow extends VBox {
 
                 // get the current stage and apply the new location (offset) to it
                 Stage stage = (Stage) ((Parent)  event.getSource()).getScene().getWindow();
-                stage.setX(event.getScreenX() + xOffset);
-                stage.setY(event.getScreenY() + yOffset);
+                stage.setX(event.getScreenX() + horizontalOffset);
+                stage.setY(event.getScreenY() + verticalOffset);
             }
         });
 
@@ -176,10 +185,23 @@ public class CustomWindow extends VBox {
         });
     }
 
+    /**
+     * <p>
+     * This method prepares the overloaded stage for the usage in combination with this undecorated window.
+     * </p>
+     * <p>
+     * Remark: The scene needs to be applied to the given stage before calling this method. Otherwise there will be a NullPointerException.
+     * </p>
+     *
+     * @param stage the stage to be prepared for the usage with this custom window
+     */
     public void initStage(Stage stage) {
 
         // remove OS dependent window frame
         stage.initStyle(StageStyle.UNDECORATED);
+
+        // allow stage to resize in undecorated mode
+        new ResizeHelper().addResizeListener(stage);
     }
 
     // ========================================

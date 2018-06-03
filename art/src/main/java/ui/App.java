@@ -54,13 +54,12 @@ public class App extends Application {
         ResourceBundle bundle = ResourceBundle.getBundle("lang");
         CustomWindow window = FXMLLoader.load(getClass().getResource("login/LoginView.fxml"), bundle);
 
-        window.initStage(primaryStage);
-        window.setTitle("Login");
-
         Scene scene = new Scene(window, 400, 200);
         scene.getStylesheets().add("css/dark-theme.css");
-
         primaryStage.setScene(scene);
+
+        window.initStage(primaryStage);
+        window.setTitle("Login");
         primaryStage.show();
 
         TraceOut.leave();
