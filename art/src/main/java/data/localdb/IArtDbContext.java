@@ -232,6 +232,6 @@ public interface IArtDbContext {
      * @param password the password of the new user
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    boolean switchUser(String username, String password) throws Exception;
+    void switchUser(String username, String password) throws Exception;
 
 }
