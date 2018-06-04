@@ -17,7 +17,7 @@
         <Tab text="SAP Settings">
             <fx:include source="sapsettings/SapSettingsView.fxml" />
         </Tab>
-        <Tab text="Configs">
+        <Tab text="Configurations">
             <fx:include source="configs/ConfigsView.fxml" />
         </Tab>
         <Tab text="Patterns">

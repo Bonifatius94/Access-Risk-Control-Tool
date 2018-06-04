@@ -12,10 +12,26 @@
     <!--<Label text="Recently Executed Queries:" />-->
 
     <JFXTreeTableView VBox.vgrow="ALWAYS">
+        <columnResizePolicy><JFXTreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
         <columns>
-            <JFXTreeTableColumn text="Condition">
+            <JFXTreeTableColumn text="Date">
                 <cellValueFactory>
-                    <PropertyValueFactory property="ConditionName" />
+                    <PropertyValueFactory property="Date" />
+                </cellValueFactory>
+            </JFXTreeTableColumn>
+            <JFXTreeTableColumn text="Configuration">
+                <cellValueFactory>
+                    <PropertyValueFactory property="Configuration" />
+                </cellValueFactory>
+            </JFXTreeTableColumn>
+            <JFXTreeTableColumn text="Whitelist">
+                <cellValueFactory>
+                    <PropertyValueFactory property="Whitelist" />
+                </cellValueFactory>
+            </JFXTreeTableColumn>
+            <JFXTreeTableColumn text="SAP Settings">
+                <cellValueFactory>
+                    <PropertyValueFactory property="SapSettings" />
                 </cellValueFactory>
             </JFXTreeTableColumn>
         </columns>
