@@ -158,3 +158,6 @@ $RECYCLE.BIN/
 /aufgaben/aufgabe4.5/config.xlsx
 /aufgaben/aufgabe4.5/whitelist.xlsx
 /art.iml
+
+# Tracer Log
+log.trc.txt
