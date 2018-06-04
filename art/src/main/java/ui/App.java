@@ -59,7 +59,7 @@ public class App extends Application {
         primaryStage.setScene(scene);
 
         window.initStage(primaryStage);
-        window.setTitle("Login");
+        window.setTitle("Access Risk Control Tool");
         primaryStage.show();
 
         TraceOut.leave();

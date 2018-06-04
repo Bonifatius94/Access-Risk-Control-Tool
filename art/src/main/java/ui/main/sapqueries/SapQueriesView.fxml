@@ -8,7 +8,7 @@
       spacing="10">
 
     <!-- TODO: change style of this label -->
-    <Label text="Recently Executed Queries:" />
+    <!--<Label text="Recently Executed Queries:" />-->
 
     <JFXTreeTableView VBox.vgrow="ALWAYS">
         <!-- TODO: implement columns here ... -->

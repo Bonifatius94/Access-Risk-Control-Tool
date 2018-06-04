@@ -65,13 +65,29 @@
 *                                                                              *
 *******************************************************************************/
 
+.jfx-tab-pane {
+    -fx-background-color: -fx-background;
+}
+
 .jfx-tab-pane .headers-region {
     -fx-background-color: -fx-primary;
     -fx-cursor: hand;
 }
 
+.jfx-tab-pane .headers-region .tab {
+    -fx-pref-width: 150;
+}
+
+.jfx-tab-pane .headers-region .tab:hover {
+    -fx-background-color: derive(-fx-primary, 30%)
+}
+
+.jfx-tab-pane .headers-region .tab:selected:top {
+    -fx-background-color: derive(-fx-primary, -30%)
+}
+
 .jfx-tab-pane .tab-header-background {
-    -fx-background-color: fx-primary;
+    -fx-background-color: -fx-primary;
 }
 
 .jfx-tab-pane .tab-header-area .jfx-rippler {
@@ -124,6 +140,10 @@
 * Material TreeTableView                                                      *
 *                                                                             *
 ******************************************************************************/
+
+.jfx-tree-table-view {
+    -fx-background-color: -fx-background;
+}
 
 /*******************************************************************************
  *                                                                             *
