@@ -1,0 +1,219 @@
+* {
+    -fx-primary: #0F9D58;
+    -fx-alert: #ff4081;
+    -fx-text: white;
+    -fx-alternatetext: #303030;
+    -fx-background: #484848;
+    -fx-light: #AAAAAA;
+    -fx-primary-darker: derive(-fx-primary, -30%);
+    -fx-primary-lighter: derive(-fx-primary, 30%);
+}
+
+/*
+ *	Apply google Roboto font to all UI components
+ */
+
+.root {
+    -fx-font-family: "Roboto";
+    -fx-font-smoothing-type: gray;
+    -fx-background-color: -fx-background;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Material Button                                                             *
+ *                                                                             *
+ ******************************************************************************/
+
+.jfx-button {
+    -fx-background-color: -fx-primary;
+    -fx-text-fill: -fx-text;
+    -fx-cursor: hand;
+    -jfx-disable-visual-focus: false;
+}
+
+.jfx-button:hover {
+    -fx-background-color: -fx-primary-lighter;
+}
+
+/* Close App Button extra styling */
+.windowButton {
+    -fx-background-color: -fx-background;
+    -fx-text: white;
+    -jfx-disable-visual-focus: true;
+}
+
+.closeWindowButton:hover {
+    -fx-background-color: -fx-alert;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Material TextField / PasswordField / TextArea                               *
+ *                                                                             *
+ ******************************************************************************/
+
+.jfx-text-field, .jfx-password-field, .jfx-text-area {
+    -jfx-focus-color: -fx-primary !important;
+    -jfx-unfocus-color: -fx-light !important;
+    -fx-prompt-text-fill: -fx-light !important;
+    -fx-text-fill: -fx-text !important;
+    -jfx-label-float: true;
+}
+
+/*******************************************************************************
+*                                                                              *
+* Material TabPane                                                             *
+*                                                                              *
+*******************************************************************************/
+
+.jfx-tab-pane {
+    -fx-background-color: -fx-background;
+}
+
+.jfx-tab-pane .headers-region {
+    -fx-background-color: -fx-primary;
+    -fx-cursor: hand;
+}
+
+.jfx-tab-pane .headers-region .tab {
+    -fx-pref-width: 150;
+}
+
+.jfx-tab-pane .headers-region .tab:hover {
+    -fx-background-color: -fx-primary-lighter;
+}
+
+.jfx-tab-pane .headers-region .tab:selected:top {
+    -fx-background-color: -fx-primary-darker;
+}
+
+.jfx-tab-pane .tab-header-background {
+    -fx-background-color: -fx-primary;
+}
+
+.jfx-tab-pane .tab-header-area .jfx-rippler {
+    -jfx-rippler-fill: -fx-text;
+}
+
+.jfx-tab-pane .tab-content-area {
+    -fx-padding: 15 5 5 5;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Material CheckBox                                                           *
+ *                                                                             *
+ ******************************************************************************/
+
+.jfx-check-box {
+    -jfx-checked-color: -fx-primary;
+    -jfx-unchecked-color: -fx-light;
+    -fx-cursor: hand;
+}
+
+/*******************************************************************************
+*                                                                             *
+* Material ComboBox                                                           *
+*                                                                             *
+******************************************************************************/
+
+.jfx-combo-box {
+    -jfx-focus-color: -fx-primary;
+    -jfx-unfocus-color: -fx-light;
+    -fx-cursor: hand;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: -fx-background !important;
+    -fx-border-color: -fx-light !important;
+}
+
+/*******************************************************************************
+*                                                                             *
+* Material RadioButton                                                        *
+*                                                                             *
+******************************************************************************/
+
+.jfx-radio-button {
+    -jfx-checked-color: -fx-primary;
+    -jfx-unchecked-color: -fx-light;
+    -fx-cursor: hand;
+}
+
+/*******************************************************************************
+*                                                                             *
+* Material TreeTableView                                                      *
+*                                                                             *
+******************************************************************************/
+
+.jfx-tree-table-view {
+    -fx-background-color: -fx-background;
+}
+
+.tree-table-view .jfx-rippler {
+    -jfx-rippler-fill: -fx-text;
+}
+
+.tree-table-view:focused .tree-table-row-cell:selected {
+    -fx-background-color: -fx-primary;
+    -fx-table-cell-border-color: -fx-tree-table-color;
+    -fx-text-fill: -fx-text;
+}
+
+.jfx-tree-table-view .column-header {
+    -fx-background-color: -fx-primary-darker;
+    -fx-border-color: -fx-text;
+    -fx-border-width: 0 1 0 0;
+}
+
+/* hack for making every separator in the header the same width */
+.tree-table-view .column-header:last-visible {
+    -fx-border-color: -fx-text;
+    -fx-border-width: 0 0 0 0;
+}
+
+/*
+alternative design with separators left and right of complete header bar
+
+.jfx-tree-table-view .column-header {
+    -fx-background-color: -fx-primary-darker;
+    -fx-border-color: -fx-text;
+    -fx-border-width: 0 0 0 1;
+}
+
+.tree-table-view .column-header:last-visible {
+    -fx-border-color: -fx-text;
+    -fx-border-width: 0 1 0 1;
+}
+*/
+
+.jfx-tree-table-view .column-header .label {
+    -fx-text-fill: -fx-text;
+    -fx-padding: 10 0 10 0;
+}
+
+.tree-table-view .column-overlay {
+    -fx-background-color: -fx-background;
+}
+
+.jfx-tree-table-view .table-row-cell {
+    -fx-border-color: -fx-text;
+    -fx-table-cell-border-color: -fx-text;
+}
+
+.jfx-tree-table-view .column-header-background {
+    -fx-border-width: 0 0 0 0;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Material Icons                                                              *
+ *                                                                             *
+ ******************************************************************************/
+
+.glyph-icon {
+    -fx-font-family: "Material Design Icons";
+    -fx-fill: -fx-text;
+}
