@@ -136,6 +136,7 @@ public class CustomWindow extends VBox {
                 // get the current stage and maximize / resize it
                 Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
                 stage.setMaximized(!stage.isMaximized());
+                updateMaximizeButton(stage);
             }
         });
 
@@ -201,6 +202,15 @@ public class CustomWindow extends VBox {
 
         // allow stage to resize in undecorated mode
         new ResizeHelper().addResizeListener(stage);
+
+        // choose maximize button icon according to stage.isMaximized()
+        updateMaximizeButton(stage);
+    }
+
+    private void updateMaximizeButton(Stage stage) {
+
+        MaterialDesignIcon icon = stage.isMaximized() ? MaterialDesignIcon.CHECKBOX_MULTIPLE_BLANK_OUTLINE : MaterialDesignIcon.WINDOW_MAXIMIZE;
+        btnMaximize.setGraphic(new MaterialDesignIconView(icon));
     }
 
     // ========================================

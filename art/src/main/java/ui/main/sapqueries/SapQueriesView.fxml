@@ -3,6 +3,7 @@
 <?import javafx.scene.layout.*?>
 <?import com.jfoenix.controls.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.sapqueries.SapQueriesController"
       spacing="10">
@@ -11,6 +12,14 @@
     <!--<Label text="Recently Executed Queries:" />-->
 
     <JFXTreeTableView VBox.vgrow="ALWAYS">
+        <columns>
+            <JFXTreeTableColumn text="Condition">
+                <cellValueFactory>
+                    <PropertyValueFactory property="ConditionName" />
+                </cellValueFactory>
+            </JFXTreeTableColumn>
+        </columns>
+
         <!-- TODO: implement columns here ... -->
     </JFXTreeTableView>
 
