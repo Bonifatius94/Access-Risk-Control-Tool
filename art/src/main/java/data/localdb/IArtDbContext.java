@@ -3,6 +3,7 @@ package data.localdb;
 import data.entities.AccessPattern;
 import data.entities.Configuration;
 import data.entities.CriticalAccessQuery;
+import data.entities.DbUser;
 import data.entities.DbUserRole;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
@@ -61,13 +62,13 @@ public interface IArtDbContext {
     // ============================================
 
     /**
-     * This method selects all already executed ART queries from the local database.
+     * This method selects all already executed sap queries from the local database.
      * TODO: add filter option (e.g. by time: today, last week, last month, last year, all)
      *
-     * @return a list of already executed ART queries
+     * @return a list of already executed sap queries
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<CriticalAccessQuery> getArtQueries() throws Exception;
+    List<CriticalAccessQuery> getSapQueries() throws Exception;
 
     /**
      * This method selects all configurations from the local database that are not archived with history flag.
@@ -107,7 +108,7 @@ public interface IArtDbContext {
      * @return a list of local database users
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<String> getDatabaseUsers() throws Exception;
+    List<DbUser> getDatabaseUsers() throws Exception;
 
     // TODO: add some userful views for more complicated queries
 

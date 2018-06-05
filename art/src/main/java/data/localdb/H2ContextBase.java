@@ -27,7 +27,7 @@ public abstract class H2ContextBase implements Closeable {
     // ++     Session Initiation    ++
     // +++++++++++++++++++++++++++++++
 
-    private SessionFactory sessionFactory;
+    protected SessionFactory sessionFactory;
 
     /**
      * This method initializes a new session factory with settings from hibernate.properties file and the overloaded login credentials.
@@ -65,7 +65,7 @@ public abstract class H2ContextBase implements Closeable {
      * @param username new username of the sessions created by the session factory
      * @param password new password of the sessions created by the session factory
      */
-    public void changeUser(String username, String password) {
+    protected void changeUser(String username, String password) {
 
         // close old session factory
         sessionFactory.close();

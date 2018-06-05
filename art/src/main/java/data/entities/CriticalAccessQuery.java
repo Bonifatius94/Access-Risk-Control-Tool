@@ -3,9 +3,7 @@ package data.entities;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -31,7 +29,7 @@ public class CriticalAccessQuery {
     //}
 
     // TODO: remove this contructor because it is never used
-    //public CriticalAccessQuery(Set<CriticalAccessEntry> list) {
+    //public CriticalAccessQuery(Set<CriticalAccessQueryEntry> list) {
     //    this.entries = list;
     //}
 
@@ -40,7 +38,7 @@ public class CriticalAccessQuery {
     private SapConfiguration sapConfig;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CriticalAccessEntry> entries = new ArrayList<>();
+    private List<CriticalAccessQueryEntry> entries = new ArrayList<>();
 
     private boolean isArchived;
     private OffsetDateTime createdAt;
@@ -77,11 +75,11 @@ public class CriticalAccessQuery {
     }
 
     @Transient
-    public List<CriticalAccessEntry> getEntries() {
+    public List<CriticalAccessQueryEntry> getEntries() {
         return entries;
     }
 
-    public void setEntries(List<CriticalAccessEntry> entries) {
+    public void setEntries(List<CriticalAccessQueryEntry> entries) {
         this.entries = entries;
     }
 

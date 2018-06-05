@@ -13,8 +13,8 @@ import data.entities.AccessPattern;
 import data.entities.AccessPatternConditionProperty;
 import data.entities.ConditionLinkage;
 import data.entities.Configuration;
-import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
+import data.entities.CriticalAccessQueryEntry;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
@@ -141,7 +141,7 @@ public class SapConnector {
                 } else if (pattern.getLinkage() == ConditionLinkage.Or || pattern.getLinkage() == ConditionLinkage.None) {
 
                     // avoid duplicates
-                    for (CriticalAccessEntry entry : list.getEntries()) {
+                    for (CriticalAccessQueryEntry entry : list.getEntries()) {
 
                         if (!result.getEntries().contains(entry)) {
                             result.getEntries().add(entry);
@@ -265,11 +265,11 @@ public class SapConnector {
 
         // TODO: use lambda expression to remove loops if possible
 
-        Iterator<CriticalAccessEntry> iterator = accessList.getEntries().iterator();
+        Iterator<CriticalAccessQueryEntry> iterator = accessList.getEntries().iterator();
 
         while (iterator.hasNext()) {
 
-            CriticalAccessEntry accessEntry = iterator.next();
+            CriticalAccessQueryEntry accessEntry = iterator.next();
 
             for (WhitelistEntry whitelistEntry : whitelist.getEntries()) {
 
@@ -301,7 +301,7 @@ public class SapConnector {
             String bname = table.getString("BNAME");
 
             // create a new critical access entry and add it to the list
-            CriticalAccessEntry temp = new CriticalAccessEntry();
+            CriticalAccessQueryEntry temp = new CriticalAccessQueryEntry();
             temp.setAccessPattern(pattern);
             temp.setUsername(bname);
             list.getEntries().add(temp);

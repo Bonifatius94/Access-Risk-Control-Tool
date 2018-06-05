@@ -7,21 +7,37 @@ import data.entities.AccessPatternConditionProperty;
 import data.entities.AccessProfileCondition;
 import data.entities.Configuration;
 import data.entities.ConfigurationXAccessPatternMap;
-import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
+import data.entities.CriticalAccessQueryEntry;
+import data.entities.DbUser;
 import data.entities.DbUserRole;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 
+import extensions.ArtException;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 
 public class ArtDbContext extends H2ContextBase implements IArtDbContext {
+
+    // ===================================
+    //             CONSTRUCTOR
+    // ===================================
 
     public ArtDbContext(String username, String password) {
         super(username, password);
     }
+
+    // ===================================
+    //         INIT DATA ENTITIES
+    // ===================================
 
     @Override
     protected List<Class> getAnnotatedClasses() {
@@ -45,7 +61,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         // sap query
         list.add(CriticalAccessQuery.class);
-        list.add(CriticalAccessEntry.class);
+        list.add(CriticalAccessQueryEntry.class);
 
         // sap config
         list.add(SapConfiguration.class);
@@ -56,6 +72,10 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         return list;
     }
+
+    // ===================================
+    //           HIBERNATE LOGIC
+    // ===================================
 
     /**
      * This method writes the results of an already executed sap query to the local database. All referenced table entries are also created.
@@ -118,14 +138,14 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     }
 
     /**
-     * This method selects all already executed ART queries from the local database.
+     * This method selects all already executed sap queries from the local database.
      * TODO: add filter option (e.g. by time: today, last week, last month, last year, all)
      *
-     * @return a list of already executed ART queries
+     * @return a list of already executed sap queries
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
     @Override
-    public List<CriticalAccessQuery> getArtQueries() throws Exception {
+    public List<CriticalAccessQuery> getSapQueries() throws Exception {
         // TODO: implement logic
         throw new Exception("Logic has not been implemented yet");
     }
@@ -185,9 +205,29 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
     @Override
-    public List<String> getDatabaseUsers() throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+    @SuppressWarnings("unchecked")
+    public List<DbUser> getDatabaseUsers() throws Exception {
+
+        List<DbUser> users = new ArrayList<>();
+
+        try (Session session = sessionFactory.openSession()) {
+
+            final String sql =
+                       "SELECT DISTINCT"
+                 + "\r\n    GRANTEE AS User,"
+                 + "\r\n    GRANTEDROLE AS Role"
+                 + "\r\nFROM INFORMATION_SCHEMA.Rights"
+                 + "\r\nWHERE GRANTEETYPE = 'USER';"
+            ;
+
+            List<Object[]> results = session.createNativeQuery(sql).getResultList();
+            users = results.stream().map(x -> new DbUser((String)x[0], DbUserRole.parseRole((String)x[1]))).collect(Collectors.toList());
+
+        } catch (Exception ex) {
+            throw new Exception("Unknown error while executing local database query. (see log file for more details)");
+        }
+
+        return users;
     }
 
     /**
@@ -301,8 +341,38 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void createDatabaseUser(String username, String password, DbUserRole role) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        Transaction transaction = null;
+
+        try (Session session = sessionFactory.openSession()) {
+
+            transaction = session.beginTransaction();
+
+            if (username.contains(" ")) {
+                // this also avoids sql injection
+                // TODO: implement this as custom exception
+                throw new Exception("Invalid username! No whitespaces allowed!");
+            }
+
+            // create a new database account
+            session.createNativeQuery("CREATE USER " + username + " PASSWORD :password " + ((role == DbUserRole.Admin) ? "ADMIN" : ""))
+                .setParameter("password", password)
+                .executeUpdate();
+
+            // grant privileges to account accordingly
+            session.createNativeQuery("GRANT " + role.toString() + " TO " + username)
+                .executeUpdate();
+
+            transaction.commit();
+
+        } catch (Exception ex) {
+
+            if (transaction != null) {
+                transaction.rollback();
+            }
+
+            throw ex;
+        }
     }
 
     /**
@@ -338,9 +408,22 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
     @Override
+    @SuppressWarnings("unchecked")
     public void switchUser(String username, String password) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        try (Session session = sessionFactory.openSession()) {
+
+            List<DbUser> registeredUsers = getDatabaseUsers();
+
+            if (registeredUsers.stream().anyMatch(x -> x.getUsername().equals(username))) {
+                super.changeUser(username, password);
+            } else {
+                throw new ArtException(ArtException.ErrorCode.UnregisteredLocalDatabaseUser, null);
+            }
+
+        } catch (Exception ex) {
+            throw new ArtException(ArtException.ErrorCode.WrongLocalDatabaseLoginCredentials, null);
+        }
     }
 
 }
