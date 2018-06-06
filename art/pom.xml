@@ -24,6 +24,7 @@
             <version>3.7.0</version>
         </dependency>
 
+
         <!-- apache poi tools (Open-Source MS Office Tool) -->
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -43,6 +44,12 @@
             <artifactId>testfx-junit</artifactId>
             <version>4.0.13-alpha</version>
             <scope>test</scope>
+        </dependency>
+        <!-- common csv export  -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.5</version>
         </dependency>
 
         <!-- sap jco connector lib (linked as local jar file in /lib folder) -->

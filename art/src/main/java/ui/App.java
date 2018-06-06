@@ -1,4 +1,8 @@
 package ui;
+//for testing
+import data.entities.CriticalAccessQuery;
+import io.csvexport.CSVExport;
+
 
 import java.util.ResourceBundle;
 
@@ -26,6 +30,9 @@ public class App extends Application {
         // init logging tool
         TraceOut.enable("log.trc.txt", TraceMode.Overwrite, TraceLevel.All);
         TraceOut.enter();
+
+        //TODO: entferne Csv export ist nur zum Testen da drinnen
+        CSVExport.StartCsvExport(new CriticalAccessQuery());
 
         // init global exception handling
         Thread.currentThread().setUncaughtExceptionHandler(this::unhandledExceptionOccurred);
