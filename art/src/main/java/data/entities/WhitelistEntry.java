@@ -3,6 +3,7 @@ package data.entities;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -19,6 +20,10 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "WhitelistEntries")
 public class WhitelistEntry {
+
+    public WhitelistEntry() {
+
+    }
 
     /**
      * This constructor creates a new instance of a whitelist entry.
@@ -64,7 +69,7 @@ public class WhitelistEntry {
         this.usecaseId = usecaseId;
     }
 
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "WhitelistId")
     public Whitelist getWhitelist() {
         return whitelist;

@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -36,8 +37,6 @@ public class CriticalAccessQuery {
     private Integer id;
     private Configuration config;
     private SapConfiguration sapConfig;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CriticalAccessQueryEntry> entries = new ArrayList<>();
 
     private boolean isArchived;
@@ -74,7 +73,7 @@ public class CriticalAccessQuery {
         this.sapConfig = sapConfig;
     }
 
-    @Transient
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "query", cascade = CascadeType.ALL)
     public List<CriticalAccessQueryEntry> getEntries() {
         return entries;
     }

@@ -2,6 +2,7 @@ package data.entities;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,6 +15,7 @@ import javax.persistence.Table;
 public class CriticalAccessQueryEntry {
 
     private Integer id;
+    private CriticalAccessQuery query;
     private AccessPattern accessPattern;
     private String username;
 
@@ -25,6 +27,16 @@ public class CriticalAccessQueryEntry {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "QueryId")
+    public CriticalAccessQuery getQuery() {
+        return query;
+    }
+
+    public void setQuery(CriticalAccessQuery query) {
+        this.query = query;
     }
 
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })

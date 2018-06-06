@@ -215,6 +215,15 @@ public interface IArtDbContext {
     void changeUserRole(String username, DbUserRole role) throws Exception;
 
     /**
+     * This method changes the password of an existing user.
+     *
+     * @param username the name of an existing database user
+     * @param password the new password of the user
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    void changePassword(String username, String password) throws Exception;
+
+    /**
      * This method deletes an existing database user.
      *
      * @param username the name of the user to delete
@@ -233,6 +242,7 @@ public interface IArtDbContext {
      * @param password the password of the new user
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
+    @Deprecated
     void switchUser(String username, String password) throws Exception;
 
 }

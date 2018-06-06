@@ -28,8 +28,7 @@ public class Configuration {
     private String name;
     private String description;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ConfigurationXAccessPatternMap> patterns;
+    private List<ConfigurationXAccessPatternMap> patterns = new ArrayList<>();
     private Whitelist whitelist;
 
     private boolean isArchived;
@@ -62,23 +61,10 @@ public class Configuration {
         this.description = description;
     }
 
-    /**
-     * Some comment TODO: write better comment.
-     *
-     * @return foo
-     */
     @Transient
     public List<AccessPattern> getPatterns() {
 
-        List<AccessPattern> set = new ArrayList<>();
-
-        for (ConfigurationXAccessPatternMap x : patterns) {
-
-            AccessPattern pattern = x.getPattern();
-            set.add(pattern);
-        }
-
-        return set;
+        return patterns.stream().map(x -> x.getPattern()).collect(Collectors.toList());
     }
 
     /*public void setPatterns(List<ConfigurationXAccessPatternMap> patterns) {

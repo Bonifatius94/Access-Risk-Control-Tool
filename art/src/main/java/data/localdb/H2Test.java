@@ -2,8 +2,9 @@ package data.localdb;
 
 import data.entities.DbUser;
 import data.entities.DbUserRole;
+import data.entities.Whitelist;
+import io.msoffice.excel.WhitelistImportHelper;
 
-import java.io.File;
 import java.util.List;
 
 public class H2Test {
@@ -28,6 +29,8 @@ public class H2Test {
             testDbAccountManagement();
             testPrivileges();
 
+            testCreateWhitelist();
+
         } catch (Exception ex) {
 
             System.out.println("database test failed");
@@ -36,8 +39,8 @@ public class H2Test {
         } finally {
 
             // delete test database
-            boolean success = new File("D:\\TEMP\\foo.h2.mv.db").delete();
-            System.out.println("Deletion of test database: " + (success ? "successful" : "failed"));
+            //boolean success = new File("D:\\TEMP\\foo.h2.mv.db").delete();
+            //System.out.println("Deletion of test database: " + (success ? "successful" : "failed"));
         }
     }
 
@@ -65,8 +68,44 @@ public class H2Test {
 
             // test db accounts query
             List<DbUser> users = context.getDatabaseUsers();
-            System.out.println("Db accounts test " + (users.size() == 3 ? "successful" : "failed"));
+            System.out.println("Db account creation test " + (users.size() == 3 ? "successful" : "failed"));
+            System.out.println();
             users.forEach(System.out::println);
+            System.out.println();
+
+            // test change role
+            context.createDatabaseUser("Foo", "foobar", DbUserRole.Viewer);
+
+            // check if an additional user was created
+            users = context.getDatabaseUsers();
+            boolean roleOk = users.stream().filter(x -> x.getUsername().toUpperCase().equals("FOO")).findFirst().orElse(null).getRole() == DbUserRole.Viewer;
+            System.out.println("creation of foo account " + ((users.size() == 4 && roleOk) ? "successful" : "failed"));
+            System.out.println();
+            users.forEach(System.out::println);
+            System.out.println();
+
+            context.changeUserRole("Foo", DbUserRole.DataAnalyst);
+
+            // check if the role was changed
+            users = context.getDatabaseUsers();
+            roleOk = users.stream().filter(x -> x.getUsername().toUpperCase().equals("FOO")).findFirst().orElse(null).getRole() == DbUserRole.DataAnalyst;
+            System.out.println("Db account role change test " + ((users.size() == 4 && roleOk) ? "successful" : "failed"));
+            System.out.println();
+            users.forEach(System.out::println);
+            System.out.println();
+
+            // test change password
+            // TODO: implement test
+
+            // test delete role
+            context.deleteDatabaseUser("Foo");
+
+            // check if user was deleted
+            users = context.getDatabaseUsers();
+            System.out.println("Db account deletion test " + (users.size() == 3 ? "successful" : "failed"));
+            System.out.println();
+            users.forEach(System.out::println);
+            System.out.println();
 
         } catch (Exception ex) {
 
@@ -118,6 +157,39 @@ public class H2Test {
         }
 
         // TODO: add test for each role X database query on ArtDbContext
+    }
+
+    private static void testCreateWhitelist() throws Exception {
+
+        Whitelist whitelist = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");
+        System.out.println(whitelist);
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query whitelists before insertion
+            List<Whitelist> whitelists = context.getWhitelists();
+            int countBefore = (whitelists != null) ? whitelists.size() : 0;
+            System.out.println("whitelists count before insertion: " + countBefore);
+            System.out.println();
+
+            // insert another whitelist
+            context.createWhitelist(whitelist);
+
+            // query whitelists after insertion
+            whitelists = context.getWhitelists();
+            int countAfter = (whitelists != null) ? whitelists.size() : 0;
+            System.out.println("whitelists count after insertion: " + countAfter);
+            System.out.println();
+            System.out.println(whitelists.get(0));
+
+            // compare counts
+            System.out.println("whitelist creation test " + (countBefore + 1 == countAfter ? "successful" : "failed"));
+
+        } catch (Exception ex) {
+
+            System.out.println("whitelist creation test failed");
+            ex.printStackTrace();
+        }
     }
 
 }

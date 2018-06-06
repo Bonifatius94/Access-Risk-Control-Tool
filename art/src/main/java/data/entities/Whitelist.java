@@ -2,11 +2,14 @@ package data.entities;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -19,23 +22,22 @@ import javax.persistence.Transient;
 @Table(name = "Whitelists")
 public class Whitelist {
 
-    private Integer id;
+    private int id;
     private String description;
 
     private boolean isArchived;
     private OffsetDateTime createdAt;
     private String createdBy;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WhitelistEntry> entries;
+    private List<WhitelistEntry> entries = new ArrayList<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -47,13 +49,14 @@ public class Whitelist {
         this.description = description;
     }
 
-    @Transient
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "whitelist", cascade = CascadeType.ALL)
     public List<WhitelistEntry> getEntries() {
         return entries;
     }
 
     public void setEntries(List<WhitelistEntry> entries) {
         this.entries = entries;
+        entries.forEach(x -> x.setWhitelist(this));
     }
 
     public boolean isArchived() {
@@ -87,6 +90,22 @@ public class Whitelist {
     @PrePersist
     protected void onCreate() {
         createdAt = OffsetDateTime.now(ZoneOffset.UTC);
+    }
+
+    /**
+     * This is a new implementation of toString method for writing this instance to console in JSON-like style.
+     *
+     * @return JSON-like data representation of this instance as a string
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("Description = ").append(getDescription()).append(", Entries:");
+        getEntries().forEach(x -> builder.append("\r\n").append(x));
+
+        return builder.toString();
     }
 
 }

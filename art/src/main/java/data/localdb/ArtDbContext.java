@@ -72,6 +72,15 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         return list;
     }
 
+    @Override
+    protected void setAdditionalProperties(org.hibernate.cfg.Configuration config) {
+
+        super.setAdditionalProperties(config);
+
+        // apply scripts that are executed after a new database file has been created by hibernate
+        config.setProperty("hibernate.hbm2ddl.import_files", "scripts/create_views.sql, scripts/create_roles.sql");
+    }
+
     // ===================================
     //           HIBERNATE LOGIC
     // ===================================
@@ -120,8 +129,15 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void createWhitelist(Whitelist whitelist) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // insert the whitelist
+        whitelist.getEntries().forEach(x -> x.setWhitelist(whitelist));
+        insertRecord(whitelist);
+
+        // update foreign key references
+
+        // insert the whitelist entries
+        //whitelist.getEntries().forEach(x -> insertRecord(x));
     }
 
     /**
@@ -181,8 +197,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public List<Whitelist> getWhitelists() throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        return queryDataset("FROM Whitelist");
     }
 
     /**
@@ -210,14 +226,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         List<DbUser> users = new ArrayList<>();
 
         try (Session session = sessionFactory.openSession()) {
-
-            //final String sql =
-            //           "SELECT DISTINCT"
-            //     + "\r\n    GRANTEE AS User,"
-            //     + "\r\n    GRANTEDROLE AS Role"
-            //     + "\r\nFROM INFORMATION_SCHEMA.Rights"
-            //     + "\r\nWHERE GRANTEETYPE = 'USER';"
-            //;
 
             List<Object[]> results = session.createNativeQuery("SELECT * FROM DbUsers").getResultList();
             users = results.stream().map(x -> new DbUser((String)x[0], DbUserRole.parseRole((String)x[1]))).collect(Collectors.toList());
@@ -262,8 +270,10 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void updateWhitelist(Whitelist whitelist) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // update whitelist cascading
+        whitelist.getEntries().forEach(x -> x.setWhitelist(whitelist));
+        updateRecord(whitelist);
     }
 
     /**
@@ -345,13 +355,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         try (Session session = sessionFactory.openSession()) {
 
-            transaction = session.beginTransaction();
-
             // avoid sql injection with username
             if (username.contains(" ")) {
                 // TODO: implement this as custom exception
                 throw new Exception("Invalid username! No whitespaces allowed!");
             }
+
+            transaction = session.beginTransaction();
 
             // create a new database account
             session.createNativeQuery("CREATE USER " + username + " PASSWORD :password " + ((role == DbUserRole.Admin) ? "ADMIN" : ""))
@@ -383,8 +393,82 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void changeUserRole(String username, DbUserRole role) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // get original database user and role
+        DbUser original =
+            getDatabaseUsers()
+            .stream().filter(x -> x.getUsername().toUpperCase().equals(username.toUpperCase()))
+            .findFirst().orElse(null);
+
+        if (original != null) {
+
+            Transaction transaction = null;
+
+            try (Session session = sessionFactory.openSession()) {
+
+                transaction = session.beginTransaction();
+
+                // remove old privileges from database account
+                session.createNativeQuery("REVOKE " + original.getRole().toString() + " FROM " + username)
+                    .executeUpdate();
+
+                // grant new privileges to database account
+                session.createNativeQuery("GRANT " + role.toString() + " TO " + username)
+                    .executeUpdate();
+
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
+            }
+
+        } else {
+            throw new Exception("User " + username + " does not exist.");
+        }
+    }
+
+    /**
+     * This method changes the password of an existing user.
+     *
+     * @param username the name of an existing database user
+     * @param password the new password of the user
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    @Override
+    public void changePassword(String username, String password) throws Exception {
+
+        Transaction transaction = null;
+
+        try (Session session = sessionFactory.openSession()) {
+
+            // avoid sql injection with username
+            if (username.contains(" ")) {
+                // TODO: implement this as custom exception
+                throw new Exception("Invalid username! No whitespaces allowed!");
+            }
+
+            transaction = session.beginTransaction();
+
+            // change password for database account
+            session.createNativeQuery("ALTER USER " + username + " SET PASSWORD :password")
+                .setParameter("password", password)
+                .executeUpdate();
+
+            transaction.commit();
+
+        } catch (Exception ex) {
+
+            if (transaction != null) {
+                transaction.rollback();
+            }
+
+            throw ex;
+        }
     }
 
     /**
@@ -395,8 +479,33 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void deleteDatabaseUser(String username) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        Transaction transaction = null;
+
+        try (Session session = sessionFactory.openSession()) {
+
+            // avoid sql injection with username
+            if (username.contains(" ")) {
+                // TODO: implement this as custom exception
+                throw new Exception("Invalid username! No whitespaces allowed!");
+            }
+
+            transaction = session.beginTransaction();
+
+            // delete database account
+            session.createNativeQuery("DROP USER " + username)
+                .executeUpdate();
+
+            transaction.commit();
+
+        } catch (Exception ex) {
+
+            if (transaction != null) {
+                transaction.rollback();
+            }
+
+            throw ex;
+        }
     }
 
     /**
@@ -408,21 +517,25 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     @SuppressWarnings("unchecked")
+    @Deprecated
     public void switchUser(String username, String password) throws Exception {
 
-        try (Session session = sessionFactory.openSession()) {
+        // TODO: remove this operation because it is obsolete. close application and login with other user after restart.
+        throw new Exception("Operation is obsolete. Please do not use it!");
 
-            List<DbUser> registeredUsers = getDatabaseUsers();
-
-            if (registeredUsers.stream().anyMatch(x -> x.getUsername().toUpperCase().equals(username.toUpperCase()))) {
-                super.changeUser(username, password);
-            } else {
-                throw new ArtException(ArtException.ErrorCode.UnregisteredLocalDatabaseUser, null);
-            }
-
-        } catch (Exception ex) {
-            throw new ArtException(ArtException.ErrorCode.WrongLocalDatabaseLoginCredentials, null);
-        }
+        //try (Session session = sessionFactory.openSession()) {
+        //
+        //    List<DbUser> registeredUsers = getDatabaseUsers();
+        //
+        //    if (registeredUsers.stream().anyMatch(x -> x.getUsername().toUpperCase().equals(username.toUpperCase()))) {
+        //        super.changeUser(username, password);
+        //    } else {
+        //        throw new ArtException(ArtException.ErrorCode.UnregisteredLocalDatabaseUser, null);
+        //    }
+        //
+        //} catch (Exception ex) {
+        //    throw new ArtException(ArtException.ErrorCode.WrongLocalDatabaseLoginCredentials, null);
+        //}
     }
 
 }

@@ -1,7 +1,5 @@
 package data.localdb;
 
-import data.entities.IRecord;
-
 import java.io.Closeable;
 
 import java.io.File;
@@ -55,16 +53,20 @@ public abstract class H2ContextBase implements Closeable {
         // set username and password
         config.setProperty("hibernate.connection.username", username);
         config.setProperty("hibernate.connection.password", password);
-
-        // set connection url, auto-create schema and startup scripts
         config.setProperty("hibernate.connection.url", "jdbc:h2:file:" + filePath);
-        config.setProperty("hibernate.hbm2ddl.import_files", "scripts/create_views.sql, scripts/create_roles.sql");
-        config.setProperty("hibernate.hbm2ddl.auto", new File(filePath + ".mv.db").exists() ? "update" : "create");
+
+        setAdditionalProperties(config);
 
         // init hibernate data entity classes
         getAnnotatedClasses().forEach(config::addAnnotatedClass);
 
         return config.buildSessionFactory();
+    }
+
+    protected void setAdditionalProperties(Configuration config) {
+
+        // set connection url, auto-create schema and startup scripts
+        config.setProperty("hibernate.hbm2ddl.auto", new File(filePath + ".mv.db").exists() ? "update" : "create");
     }
 
     /**
@@ -101,7 +103,7 @@ public abstract class H2ContextBase implements Closeable {
      * @return a list of DAO entity objects from the result set of the query (on error the list = null)
      */
     @SuppressWarnings({"unchecked"})
-    public <T extends IRecord>  List<T> queryDataset(String sql) {
+    public <T> List<T> queryDataset(String sql) {
 
         List<T> records;
 
@@ -119,7 +121,7 @@ public abstract class H2ContextBase implements Closeable {
      * @param record the DAO to be inserted into database
      * @param <T> the type of the DAO (implicitly set)
      */
-    public <T extends IRecord> void insertRecord(T record) {
+    public <T> void insertRecord(T record) {
 
         Transaction transaction = null;
 
@@ -146,7 +148,7 @@ public abstract class H2ContextBase implements Closeable {
      * @param record the DAO to be updated
      * @param <T> the type of the DAO (implicitly set)
      */
-    public <T extends IRecord> void updateRecord(T record) {
+    public <T> void updateRecord(T record) {
 
         Transaction transaction = null;
 
@@ -173,7 +175,7 @@ public abstract class H2ContextBase implements Closeable {
      * @param record the DAO to be deleted
      * @param <T> the type of the DAO (implicitly set)
      */
-    public <T extends IRecord> void deleteRecord(T record) {
+    public <T> void deleteRecord(T record) {
 
         Transaction transaction = null;
 
