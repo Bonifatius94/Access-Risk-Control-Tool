@@ -2,46 +2,39 @@ package io.csvexport;
 
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
-import javafx.stage.FileChooser;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Locale;
 
 
 public class CSVExport {
 
 
     /**
-     *
-     * @param criticalAccessQuery
-     * @throws IOException
+     * @param criticalAccessQuery is the result of an anlysis
+     * @throws IOException caused by wrong filename or
      */
     public static void StartCsvExport(CriticalAccessQuery criticalAccessQuery) throws IOException {
         //TODO: richtiger export implementierung bzw. wie kann mann das mit ner auswahl machen ???
 
         FileWriter csvWriter = new FileWriter("example.csv"/* TODO: woher kommt der File Name ???*/);
-        CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withHeader("CriticalUserID","CriticalUserName"));
+        CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withHeader("CriticalUserID", "CriticalUserName"));
         csvPrinter.printRecord("stuff", "stuff");
-
-
 
 
         //TODO: real print funktion Needs to be Tested
 
-        for(CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
+        for (CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
             csvPrinter.printRecord(criticalAccessEntry.getId(), criticalAccessEntry.getUsername());
         }
 
         csvPrinter.flush();
 
-
     }
 
     /**
-     *
      * @param criticalAccessQuery
      * @param whitelistID
      * @throws IOException
@@ -54,7 +47,7 @@ public class CSVExport {
 
         //TODO: real print funktion Needs to be Tested
 
-        for(CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
+        for (CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
             csvPrinter.printRecord(criticalAccessEntry.getId(), criticalAccessEntry.getUsername(), whitelistID);
         }
 
@@ -63,7 +56,6 @@ public class CSVExport {
     }
 
     /**
-     *
      * @param criticalAccessQuery
      * @param whitelistID
      * @param accessPatternID
@@ -78,7 +70,7 @@ public class CSVExport {
 
         //TODO: real print funktion Needs to be Tested
 
-        for(CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
+        for (CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
             csvPrinter.printRecord(criticalAccessEntry.getId(), criticalAccessEntry.getUsername(), whitelistID, accessPatternID);
         }
 
@@ -86,7 +78,6 @@ public class CSVExport {
     }
 
     /**
-     *
      * @param criticalAccessQuery
      * @param whitelistID
      * @param accessPatternID
@@ -97,11 +88,11 @@ public class CSVExport {
         //TODO: implement
 
         FileWriter csvWriter = new FileWriter("example.csv"/* TODO: woher kommt der File Name ???*/);
-        CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withHeader("CriticalUserID", "CriticalUserName", "WhitelistID","AccessPatternID", "ConfigurationID"));
+        CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withHeader("CriticalUserID", "CriticalUserName", "WhitelistID", "AccessPatternID", "ConfigurationID"));
 
         //TODO: real print funktion Needs to be Tested
 
-        for(CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
+        for (CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
             csvPrinter.printRecord(criticalAccessEntry.getId(), criticalAccessEntry.getUsername(), whitelistID, configurationID);
         }
 

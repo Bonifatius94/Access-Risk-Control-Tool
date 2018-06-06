@@ -1,5 +1,6 @@
 package ui;
 //for testing
+
 import data.entities.CriticalAccessQuery;
 import io.csvexport.CSVExport;
 
@@ -31,7 +32,7 @@ public class App extends Application {
         TraceOut.enable("log.trc.txt", TraceMode.Overwrite, TraceLevel.All);
         TraceOut.enter();
 
-        //TODO: entferne Csv export ist nur zum Testen da drinnen
+        //TODO: entferne Csv export ist nur zum Testen da
         CSVExport.StartCsvExport(new CriticalAccessQuery());
 
         // init global exception handling
