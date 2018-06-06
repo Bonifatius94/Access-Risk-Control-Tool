@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.sapqueries.SapQueriesController"
+      spacing="10">
+
+    <!-- TODO: change style of this label -->
+    <!--<Label text="Recently Executed Queries:" />-->
+
+    <JFXTreeTableView VBox.vgrow="ALWAYS">
+        <columnResizePolicy><JFXTreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+        <columns>
+            <JFXTreeTableColumn text="Date">
+                <cellValueFactory>
+                    <PropertyValueFactory property="Date" />
+                </cellValueFactory>
+            </JFXTreeTableColumn>
+            <JFXTreeTableColumn text="Configuration">
+                <cellValueFactory>
+                    <PropertyValueFactory property="Configuration" />
+                </cellValueFactory>
+            </JFXTreeTableColumn>
+            <JFXTreeTableColumn text="Whitelist">
+                <cellValueFactory>
+                    <PropertyValueFactory property="Whitelist" />
+                </cellValueFactory>
+            </JFXTreeTableColumn>
+            <JFXTreeTableColumn text="SAP Settings">
+                <cellValueFactory>
+                    <PropertyValueFactory property="SapSettings" />
+                </cellValueFactory>
+            </JFXTreeTableColumn>
+        </columns>
+
+        <!-- TODO: implement columns here ... -->
+    </JFXTreeTableView>
+
+    <HBox alignment="BOTTOM_RIGHT" spacing="10">
+        <JFXButton text="View Details ..." prefWidth="100" />
+        <JFXButton text="New Query ..."   prefWidth="100" />
+    </HBox>
+</VBox>

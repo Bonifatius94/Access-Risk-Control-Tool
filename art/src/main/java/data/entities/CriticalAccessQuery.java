@@ -115,4 +115,15 @@ public class CriticalAccessQuery {
         createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
+    // =============================
+    //          overrides
+    // =============================
+
+    @Override
+    public String toString() {
+
+        // TODO: implement logic
+        return super.toString();
+    }
+
 }

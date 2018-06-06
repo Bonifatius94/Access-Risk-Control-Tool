@@ -120,6 +120,10 @@ public class AccessPatternConditionProperty {
         this.value4 = value4;
     }
 
+    // =============================
+    //          overrides
+    // =============================
+
     /**
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *

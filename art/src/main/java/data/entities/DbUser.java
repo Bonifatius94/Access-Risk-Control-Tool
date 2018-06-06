@@ -45,6 +45,10 @@ public class DbUser {
         this.role = role;
     }
 
+    // =============================
+    //          overrides
+    // =============================
+
     @Override
     public String toString() {
         return "Username = " + getUsername() + ", Role = " + getRole().toString();

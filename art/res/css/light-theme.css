@@ -1,0 +1,116 @@
+* {
+    -fx-primary: #0F9D58;
+    -fx-alert: #ff4081;
+    -fx-text: #484848;
+    -fx-alternatetext: #303030;
+    -fx-background: white;
+    -fx-light: #AAAAAA;
+}
+
+/*
+ *	Apply google Roboto font to all UI components
+ */
+
+ .root {
+    -fx-font-family: "Roboto";
+    -fx-font-smoothing-type: gray;
+    -fx-background-color: -fx-background;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Material Button                                                             *
+ *                                                                             *
+ ******************************************************************************/
+
+.jfx-button {
+    -fx-background-color: -fx-primary;
+    -fx-text-fill: -fx-text;
+    -fx-cursor: hand;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Material TextField / PasswordField / TextArea                               *
+ *                                                                             *
+ ******************************************************************************/
+ 
+.jfx-text-field, .jfx-password-field, .jfx-text-area {
+    -jfx-focus-color: -fx-primary !important;
+    -jfx-unfocus-color: -fx-light !important;
+    -fx-prompt-text-fill: -fx-light !important;
+    -fx-text-fill: -fx-text !important;
+    -jfx-label-float: true;
+}
+
+
+/*******************************************************************************
+*                                                                              *
+* Material TabPane                                                             *
+*                                                                              *
+*******************************************************************************/
+
+.jfx-tab-pane .headers-region {
+    -fx-background-color: -fx-primary;
+    -fx-cursor: hand;
+}
+.jfx-tab-pane .tab-header-background {
+    -fx-background-color: fx-primary;
+}
+
+.jfx-tab-pane .tab-header-area .jfx-rippler{
+    -jfx-rippler-fill: -fx-text;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Material CheckBox                                                           *
+ *                                                                             *
+ ******************************************************************************/
+
+ .jfx-check-box {
+    -jfx-checked-color: -fx-primary;
+    -jfx-unchecked-color: -fx-light;
+    -fx-cursor: hand;
+ }
+
+
+ /*******************************************************************************
+ *                                                                             *
+ * Material ComboBox                                                           *
+ *                                                                             *
+ ******************************************************************************/
+
+.jfx-combo-box {
+    -jfx-focus-color: -fx-primary;
+    -jfx-unfocus-color: -fx-light;
+    -fx-cursor: hand;
+}
+
+.combo-box-popup .list-view {    
+    -fx-background-color: -fx-background !important;
+    -fx-border-color: -fx-light !important;
+}
+
+ /*******************************************************************************
+ *                                                                             *
+ * Material RadioButton                                                        *
+ *                                                                             *
+ ******************************************************************************/
+
+ .jfx-radio-button {
+    -jfx-checked-color: -fx-primary;
+    -jfx-unchecked-color: -fx-light;
+    -fx-cursor: hand;
+ }
+
+ 
+ /*******************************************************************************
+ *                                                                             *
+ * Material TreeTableView                                                      *
+ *                                                                             *
+ ******************************************************************************/
+

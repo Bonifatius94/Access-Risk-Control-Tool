@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import javafx.scene.control.*?>
+<?import ui.custom.controls.*?>
+<?import javafx.geometry.*?>
+
+<CustomWindow xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.MainController">
+    <JFXTabPane CustomWindow.vgrow="ALWAYS">
+        <padding>
+            <Insets topRightBottomLeft="10" />
+        </padding>
+
+        <Tab text="SAP Queries">
+            <fx:include source="sapqueries/SapQueriesView.fxml" />
+        </Tab>
+        <Tab text="SAP Settings">
+            <fx:include source="sapsettings/SapSettingsView.fxml" />
+        </Tab>
+        <Tab text="Configurations">
+            <fx:include source="configs/ConfigsView.fxml" />
+        </Tab>
+        <Tab text="Patterns">
+            <fx:include source="patterns/PatternsView.fxml" />
+        </Tab>
+        <Tab text="Whitelists">
+            <fx:include source="whitelists/WhitelistsView.fxml" />
+        </Tab>
+    </JFXTabPane>
+</CustomWindow>

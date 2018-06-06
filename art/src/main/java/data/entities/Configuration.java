@@ -27,7 +27,6 @@ public class Configuration {
     private Integer id;
     private String name;
     private String description;
-
     private List<ConfigurationXAccessPatternMap> patterns = new ArrayList<>();
     private Whitelist whitelist;
 
@@ -63,7 +62,7 @@ public class Configuration {
 
     @Transient
     public List<AccessPattern> getPatterns() {
-
+        // TODO: test if this code works fine with sap test
         return patterns.stream().map(x -> x.getPattern()).collect(Collectors.toList());
     }
 
@@ -77,16 +76,7 @@ public class Configuration {
      * @param patterns the patters to be set to this instance
      */
     public void setPatterns(List<AccessPattern> patterns) {
-
-        List<ConfigurationXAccessPatternMap> set = new ArrayList<>();
-
-        for (AccessPattern x : patterns) {
-
-            ConfigurationXAccessPatternMap configurationXAccessPatternMap = new ConfigurationXAccessPatternMap(this, x);
-            set.add(configurationXAccessPatternMap);
-        }
-
-        this.patterns = set;
+        this.patterns = patterns.stream().map(x -> new ConfigurationXAccessPatternMap(this, x)).collect(Collectors.toList());
     }
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -130,6 +120,30 @@ public class Configuration {
     @PrePersist
     protected void onCreate() {
         createdAt = OffsetDateTime.now(ZoneOffset.UTC);
+    }
+
+    // =============================
+    //          overrides
+    // =============================
+
+    /**
+     * This is a new implementation of toString method for writing this instance to console in JSON-like style.
+     *
+     * @return JSON-like data representation of this instance as a string
+     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
+     */
+    @Override
+    public String toString() {
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("Name = ").append(getName()).append(", Description = ").append(getDescription())
+            .append("\r\nWhitelist:\r\n").append(getWhitelist())
+            .append("\r\nPatterns:");
+
+        getPatterns().forEach(x -> builder.append("\r\n").append(x));
+
+        return builder.toString();
     }
 
 }

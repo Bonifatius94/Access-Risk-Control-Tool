@@ -183,23 +183,10 @@ public class AccessPattern {
         this.linkage = linkage;
     }
 
-    /**
-     * Some comment TODO: write better comment.
-     *
-     * @return foo
-     */
     @Transient
     public List<Configuration> getConfigurations() {
-
-        List<Configuration> set = new ArrayList<>();
-
-        for (ConfigurationXAccessPatternMap x : configurations) {
-
-            Configuration config = x.getConfig();
-            set.add(config);
-        }
-
-        return set;
+        // TODO: test if this code works fine with sap test
+        return configurations.stream().map(x -> x.getConfig()).collect(Collectors.toList());
     }
 
     public void setConfigurations(List<ConfigurationXAccessPatternMap> configurations) {
