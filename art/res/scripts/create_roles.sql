@@ -5,6 +5,8 @@ CREATE ROLE IF NOT EXISTS DataAnalyst;
 CREATE ROLE IF NOT EXISTS Viewer;
 
 -- grant privileges to admin role
+GRANT ALL ON DbUsers TO Admin;
+REVOKE ALL ON DbUsers FROM PUBLIC;
 
 -- the admin account should only manage database accounts, so he just needs to have the admin flag set
 -- therefore no more privileges are required

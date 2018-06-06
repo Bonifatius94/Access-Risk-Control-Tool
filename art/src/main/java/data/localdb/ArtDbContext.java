@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 
 public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
@@ -32,7 +31,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     // ===================================
 
     public ArtDbContext(String username, String password) {
-        super(username, password);
+        super("D:\\TEMP\\foo.h2", username, password);
     }
 
     // ===================================
@@ -212,15 +211,15 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         try (Session session = sessionFactory.openSession()) {
 
-            final String sql =
-                       "SELECT DISTINCT"
-                 + "\r\n    GRANTEE AS User,"
-                 + "\r\n    GRANTEDROLE AS Role"
-                 + "\r\nFROM INFORMATION_SCHEMA.Rights"
-                 + "\r\nWHERE GRANTEETYPE = 'USER';"
-            ;
+            //final String sql =
+            //           "SELECT DISTINCT"
+            //     + "\r\n    GRANTEE AS User,"
+            //     + "\r\n    GRANTEDROLE AS Role"
+            //     + "\r\nFROM INFORMATION_SCHEMA.Rights"
+            //     + "\r\nWHERE GRANTEETYPE = 'USER';"
+            //;
 
-            List<Object[]> results = session.createNativeQuery(sql).getResultList();
+            List<Object[]> results = session.createNativeQuery("SELECT * FROM DbUsers").getResultList();
             users = results.stream().map(x -> new DbUser((String)x[0], DbUserRole.parseRole((String)x[1]))).collect(Collectors.toList());
 
         } catch (Exception ex) {
@@ -348,8 +347,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
             transaction = session.beginTransaction();
 
+            // avoid sql injection with username
             if (username.contains(" ")) {
-                // this also avoids sql injection
                 // TODO: implement this as custom exception
                 throw new Exception("Invalid username! No whitespaces allowed!");
             }
@@ -415,7 +414,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
             List<DbUser> registeredUsers = getDatabaseUsers();
 
-            if (registeredUsers.stream().anyMatch(x -> x.getUsername().equals(username))) {
+            if (registeredUsers.stream().anyMatch(x -> x.getUsername().toUpperCase().equals(username.toUpperCase()))) {
                 super.changeUser(username, password);
             } else {
                 throw new ArtException(ArtException.ErrorCode.UnregisteredLocalDatabaseUser, null);

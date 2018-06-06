@@ -4,6 +4,7 @@ import data.entities.IRecord;
 
 import java.io.Closeable;
 
+import java.io.File;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -18,15 +19,24 @@ public abstract class H2ContextBase implements Closeable {
     // ++        Constructors       ++
     // +++++++++++++++++++++++++++++++
 
-    public H2ContextBase(String username, String password) {
+    /**
+     * This constructor initializes a new H2 database context to the given database file using to given login credentials.
+     *
+     * @param filePath the H2 database file path (file system automatically appends '.mv.db')
+     * @param username the username for login
+     * @param password the password for login
+     */
+    public H2ContextBase(String filePath, String username, String password) {
 
-        sessionFactory = initSessionFactory(username, password);
+        this.filePath = filePath;
+        sessionFactory = initSessionFactory(filePath, username, password);
     }
 
     // +++++++++++++++++++++++++++++++
     // ++     Session Initiation    ++
     // +++++++++++++++++++++++++++++++
 
+    protected String filePath;
     protected SessionFactory sessionFactory;
 
     /**
@@ -37,7 +47,7 @@ public abstract class H2ContextBase implements Closeable {
      * @return a new instance of session factory
      * @throws HibernateException caused by database error
      */
-    private SessionFactory initSessionFactory(String username, String password) throws HibernateException {
+    private SessionFactory initSessionFactory(String filePath, String username, String password) throws HibernateException {
 
         // init config with settings from hibernate.properties file
         Configuration config = new Configuration();
@@ -46,14 +56,19 @@ public abstract class H2ContextBase implements Closeable {
         config.setProperty("hibernate.connection.username", username);
         config.setProperty("hibernate.connection.password", password);
 
-        // init hibernate DAO classes
+        // set connection url, auto-create schema and startup scripts
+        config.setProperty("hibernate.connection.url", "jdbc:h2:file:" + filePath);
+        config.setProperty("hibernate.hbm2ddl.import_files", "scripts/create_views.sql, scripts/create_roles.sql");
+        config.setProperty("hibernate.hbm2ddl.auto", new File(filePath + ".mv.db").exists() ? "update" : "create");
+
+        // init hibernate data entity classes
         getAnnotatedClasses().forEach(config::addAnnotatedClass);
 
         return config.buildSessionFactory();
     }
 
     /**
-     * This method gets the DAO classes of the context that are applied to the session factory.
+     * This method gets the data entity classes of the context that are applied to the session factory.
      *
      * @return a list of classes that match a database table (marked by @Entity annotation)
      */
@@ -71,7 +86,7 @@ public abstract class H2ContextBase implements Closeable {
         sessionFactory.close();
 
         // create new session factory with given login credentials
-        sessionFactory = initSessionFactory(username, password);
+        sessionFactory = initSessionFactory(filePath, username, password);
     }
 
     // +++++++++++++++++++++++++++++++
