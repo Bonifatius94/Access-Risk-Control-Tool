@@ -5,11 +5,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -18,6 +20,7 @@ public class AccessCondition {
 
     private Integer id;
     private AccessConditionType type;
+    private AccessPattern pattern;
     private AccessProfileCondition profileCondition;
     private AccessPatternCondition patternCondition;
 
@@ -41,7 +44,17 @@ public class AccessCondition {
         this.type = type;
     }
 
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "PatternId")
+    public AccessPattern getPattern() {
+        return pattern;
+    }
+
+    public void setPattern(AccessPattern pattern) {
+        this.pattern = pattern;
+    }
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "ProfileConditionId")
     public AccessProfileCondition getProfileCondition() {
         return profileCondition;
@@ -52,7 +65,7 @@ public class AccessCondition {
         this.type = AccessConditionType.ProfileCondition;
     }
 
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "PatternConditionId")
     public AccessPatternCondition getPatternCondition() {
         return patternCondition;

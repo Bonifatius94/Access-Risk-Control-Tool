@@ -83,7 +83,10 @@ public class CriticalAccessQueryEntry {
             return true;
         }
 
-        if (!(other instanceof CriticalAccessQueryEntry)) {            return false;
+        if (!(other instanceof CriticalAccessQueryEntry)) {
+            return false;
         }
-        return (username.equals(((CriticalAccessQueryEntry) other).username) && accessPattern.getUsecaseId().equals(((CriticalAccessQueryEntry) other).getAccessPattern().getUsecaseId()));    }
+
+        return (username.equals(((CriticalAccessQueryEntry) other).username) && accessPattern.getUsecaseId().equals(((CriticalAccessQueryEntry) other).getAccessPattern().getUsecaseId()));
+    }
 }

@@ -5,6 +5,7 @@ import data.entities.DbUserRole;
 import data.entities.Whitelist;
 import io.msoffice.excel.WhitelistImportHelper;
 
+import java.io.File;
 import java.util.List;
 
 public class H2Test {
@@ -15,6 +16,13 @@ public class H2Test {
      * @param args no args, will be ignored
      */
     public static void main(String[] args) {
+
+        // delete database if it exists
+        File database = new File("D:\\TEMP\\foo.h2.mv.db");
+
+        if (database.exists()) {
+            database.delete();
+        }
 
         // create db context
         // this automatically creates a new database file with the database schema (code-first-approach)
@@ -35,12 +43,6 @@ public class H2Test {
 
             System.out.println("database test failed");
             ex.printStackTrace();
-
-        } finally {
-
-            // delete test database
-            //boolean success = new File("D:\\TEMP\\foo.h2.mv.db").delete();
-            //System.out.println("Deletion of test database: " + (success ? "successful" : "failed"));
         }
     }
 

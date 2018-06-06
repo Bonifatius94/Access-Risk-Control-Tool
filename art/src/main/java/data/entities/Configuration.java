@@ -3,9 +3,7 @@ package data.entities;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
@@ -14,11 +12,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "Configurations")
@@ -27,7 +28,7 @@ public class Configuration {
     private Integer id;
     private String name;
     private String description;
-    private List<ConfigurationXAccessPatternMap> patterns = new ArrayList<>();
+    private List<AccessPattern> patterns = new ArrayList<>();
     private Whitelist whitelist;
 
     private boolean isArchived;
@@ -60,23 +61,19 @@ public class Configuration {
         this.description = description;
     }
 
-    @Transient
+    @ManyToMany(cascade = { CascadeType.ALL })
+    @JoinTable(
+        name = "nm_Configuration_AccessPattern",
+        joinColumns = { @JoinColumn(name = "ConfigId") },
+        inverseJoinColumns = { @JoinColumn(name = "AccessPatternId") }
+    )
+    @Fetch(value = FetchMode.SUBSELECT)
     public List<AccessPattern> getPatterns() {
-        // TODO: test if this code works fine with sap test
-        return patterns.stream().map(x -> x.getPattern()).collect(Collectors.toList());
+        return patterns;
     }
 
-    /*public void setPatterns(List<ConfigurationXAccessPatternMap> patterns) {
-        this.patterns = patterns;
-    }*/
-
-    /**
-     * This setter allows to overload access patterns instead of map entries.
-     *
-     * @param patterns the patters to be set to this instance
-     */
     public void setPatterns(List<AccessPattern> patterns) {
-        this.patterns = patterns.stream().map(x -> new ConfigurationXAccessPatternMap(this, x)).collect(Collectors.toList());
+        this.patterns = patterns;
     }
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

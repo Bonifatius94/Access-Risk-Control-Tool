@@ -18,10 +18,6 @@ public class SapConfiguration {
     private String serverDestination;
     private String sysNr;
     private String client;
-
-    //private String user;
-    //private String password;
-
     private String language;
     private String poolCapacity;
 
@@ -62,22 +58,6 @@ public class SapConfiguration {
     public void setClient(String client) {
         this.client = client;
     }
-
-    //public String getUser() {
-    //    return user;
-    //}
-
-    //public void setUser(String user) {
-    //    this.user = user;
-    //}
-
-    //public String getPassword() {
-    //    return password;
-    //}
-
-    //public void setPassword(String password) {
-    //    this.password = password;
-    //}
 
     public String getLanguage() {
         return language;

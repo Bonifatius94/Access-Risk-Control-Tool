@@ -16,23 +16,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 @Table(name = "CriticalAccessQueries")
 public class CriticalAccessQuery {
-
-    ///**
-    // * empty constructor required by hibernate
-    // */
-    //public CriticalAccessQuery() {
-    //    // nothing to do here ...
-    //}
-
-    // TODO: remove this contructor because it is never used
-    //public CriticalAccessQuery(Set<CriticalAccessQueryEntry> list) {
-    //    this.entries = list;
-    //}
 
     private Integer id;
     private Configuration config;
@@ -74,6 +66,7 @@ public class CriticalAccessQuery {
     }
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "query", cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
     public List<CriticalAccessQueryEntry> getEntries() {
         return entries;
     }

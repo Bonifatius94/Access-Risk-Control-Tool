@@ -3,9 +3,7 @@ package data.entities;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -16,13 +14,15 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "Whitelists")
 public class Whitelist {
 
-    private int id;
+    private Integer id;
     private String description;
 
     private boolean isArchived;
@@ -33,11 +33,11 @@ public class Whitelist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -50,6 +50,7 @@ public class Whitelist {
     }
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "whitelist", cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
     public List<WhitelistEntry> getEntries() {
         return entries;
     }

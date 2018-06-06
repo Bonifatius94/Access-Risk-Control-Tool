@@ -1,28 +1,28 @@
 package data.entities;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
+
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 /**
  * This class represents an auth pattern (simple or complex).
@@ -124,11 +124,8 @@ public class AccessPattern {
     private String description;
     private ConditionLinkage linkage = ConditionLinkage.None;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AccessCondition> conditions;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ConfigurationXAccessPatternMap> configurations;
+    private List<Configuration> configurations;
 
     private boolean isArchived;
     private OffsetDateTime createdAt;
@@ -164,7 +161,8 @@ public class AccessPattern {
         this.description = description;
     }
 
-    @Transient
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "pattern", cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
     public List<AccessCondition> getConditions() {
         return conditions;
     }
@@ -183,13 +181,12 @@ public class AccessPattern {
         this.linkage = linkage;
     }
 
-    @Transient
+    @ManyToMany(mappedBy = "patterns")
     public List<Configuration> getConfigurations() {
-        // TODO: test if this code works fine with sap test
-        return configurations.stream().map(x -> x.getConfig()).collect(Collectors.toList());
+        return configurations;
     }
 
-    public void setConfigurations(List<ConfigurationXAccessPatternMap> configurations) {
+    public void setConfigurations(List<Configuration> configurations) {
         this.configurations = configurations;
     }
 
