@@ -60,9 +60,16 @@ public class AccessCondition {
         return profileCondition;
     }
 
+    /**
+     * This method applies a profile condition to this instance.
+     * It also makes sure that no pattern condition is applied and the type is set correctly.
+     *
+     * @param profileCondition the profile condition to be applied
+     */
     public void setProfileCondition(AccessProfileCondition profileCondition) {
         this.profileCondition = profileCondition;
         this.type = AccessConditionType.ProfileCondition;
+        this.patternCondition = null;
     }
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -71,9 +78,16 @@ public class AccessCondition {
         return patternCondition;
     }
 
+    /**
+     * This method applies a pattern condition to this instance.
+     * It also makes sure that no profile condition is applied and the type is set correctly.
+     *
+     * @param patternCondition the pattern condition to be applied
+     */
     public void setPatternCondition(AccessPatternCondition patternCondition) {
         this.patternCondition = patternCondition;
         this.type = AccessConditionType.PatternCondition;
+        this.profileCondition = null;
     }
 
     // =============================

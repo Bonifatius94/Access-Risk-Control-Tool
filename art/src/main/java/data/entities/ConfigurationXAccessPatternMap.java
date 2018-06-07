@@ -46,7 +46,7 @@ public class ConfigurationXAccessPatternMap {
         this.id = id;
     }
 
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToOne/*(cascade = { CascadeType.PERSIST, CascadeType.MERGE })*/
     @JoinColumn(name = "AccessPatternId")
     public AccessPattern getPattern() {
         return pattern;
@@ -56,7 +56,7 @@ public class ConfigurationXAccessPatternMap {
         this.pattern = pattern;
     }
 
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToOne/*(cascade = { CascadeType.PERSIST, CascadeType.MERGE })*/
     @JoinColumn(name = "ConfigId")
     public Configuration getConfig() {
         return config;

@@ -45,7 +45,7 @@ public class CriticalAccessQuery {
         this.id = id;
     }
 
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToOne/*(cascade = { CascadeType.PERSIST, CascadeType.MERGE })*/
     @JoinColumn(name = "ConfigId")
     public Configuration getConfig() {
         return config;
@@ -55,7 +55,7 @@ public class CriticalAccessQuery {
         this.config = config;
     }
 
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToOne/*(cascade = { CascadeType.PERSIST, CascadeType.MERGE })*/
     @JoinColumn(name = "SapConfigId")
     public SapConfiguration getSapConfig() {
         return sapConfig;
@@ -65,7 +65,7 @@ public class CriticalAccessQuery {
         this.sapConfig = sapConfig;
     }
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "query", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(value = FetchMode.SUBSELECT)
     public List<CriticalAccessQueryEntry> getEntries() {
         return entries;
@@ -73,6 +73,7 @@ public class CriticalAccessQuery {
 
     public void setEntries(List<CriticalAccessQueryEntry> entries) {
         this.entries = entries;
+        entries.forEach(x -> x.setQuery(this));
     }
 
     public boolean isArchived() {

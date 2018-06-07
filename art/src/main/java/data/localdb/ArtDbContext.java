@@ -65,10 +65,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // sap config
         list.add(SapConfiguration.class);
 
-        // TODO: only add this entity during query, not here (see official hibernate guide '17.3 entity queries')
-        // database user accounts
-        //list.add(DbUser.class);
-
         return list;
     }
 
@@ -130,14 +126,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void createWhitelist(Whitelist whitelist) throws Exception {
 
-        // insert the whitelist
-        whitelist.getEntries().forEach(x -> x.setWhitelist(whitelist));
-        insertRecord(whitelist);
-
         // update foreign key references
+        whitelist.getEntries().forEach(x -> x.setWhitelist(whitelist));
 
-        // insert the whitelist entries
-        //whitelist.getEntries().forEach(x -> insertRecord(x));
+        // insert the whitelist
+        insertRecord(whitelist);
     }
 
     /**
@@ -198,6 +191,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public List<Whitelist> getWhitelists() throws Exception {
 
+        // TODO: add order by clause
         return queryDataset("FROM Whitelist");
     }
 
@@ -271,6 +265,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void updateWhitelist(Whitelist whitelist) throws Exception {
 
+        // TODO: test this method
+
         // update whitelist cascading
         whitelist.getEntries().forEach(x -> x.setWhitelist(whitelist));
         updateRecord(whitelist);
@@ -323,8 +319,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void deleteWhitelist(Whitelist whitelist) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test this method
+
+        whitelist.getEntries().forEach(x -> x.setWhitelist(whitelist));
+        deleteRecord(whitelist);
     }
 
     /**
@@ -520,7 +519,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Deprecated
     public void switchUser(String username, String password) throws Exception {
 
-        // TODO: remove this operation because it is obsolete. close application and login with other user after restart.
+        // TODO: remove this operation because it is obsolete. close application and login with other user after restart instead.
         throw new Exception("Operation is obsolete. Please do not use it!");
 
         //try (Session session = sessionFactory.openSession()) {

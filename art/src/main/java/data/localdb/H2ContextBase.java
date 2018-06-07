@@ -65,7 +65,7 @@ public abstract class H2ContextBase implements Closeable {
 
     protected void setAdditionalProperties(Configuration config) {
 
-        // set connection url, auto-create schema and startup scripts
+        // make hibernate auto-create the database schema on first use
         config.setProperty("hibernate.hbm2ddl.auto", new File(filePath + ".mv.db").exists() ? "update" : "create");
     }
 

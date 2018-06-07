@@ -69,7 +69,7 @@ public class WhitelistEntry {
         this.usecaseId = usecaseId;
     }
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "WhitelistId")
     public Whitelist getWhitelist() {
         return whitelist;

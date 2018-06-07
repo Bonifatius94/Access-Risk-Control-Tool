@@ -17,26 +17,18 @@ public class H2Test {
      */
     public static void main(String[] args) {
 
-        // delete database if it exists
-        File database = new File("D:\\TEMP\\foo.h2.mv.db");
-
-        if (database.exists()) {
-            database.delete();
-        }
-
-        // create db context
-        // this automatically creates a new database file with the database schema (code-first-approach)
-        // the first user becomes db admin
+        // delete database to ensure a clean test environment
+        deleteFileIfExists("D:\\TEMP\\foo.h2.mv.db");
 
         try {
 
-            // create roles if they don't exist
-            // TODO: move this line to the handler that initializes a new h2 database
-
+            // create a new test database
             createDbSchema();
+
+            // TODO: move this code to JUnit tests
+            // run several tests
             testDbAccountManagement();
             testPrivileges();
-
             testCreateWhitelist();
 
         } catch (Exception ex) {
@@ -46,7 +38,22 @@ public class H2Test {
         }
     }
 
+    private static void deleteFileIfExists(String filePath) {
+
+        File database = new File(filePath);
+
+        if (database.exists()) {
+            database.delete();
+        }
+    }
+
     private static void createDbSchema() {
+
+        // TODO: move this code to the handler that initializes a new h2 database on first use
+
+        // create db context
+        // this automatically creates a new database file with the database schema (code-first-approach)
+        // the first user becomes db admin
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 

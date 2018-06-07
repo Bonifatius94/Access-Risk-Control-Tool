@@ -61,7 +61,9 @@ public class Configuration {
         this.description = description;
     }
 
-    @ManyToMany(cascade = { CascadeType.ALL })
+    // CAUTION: cascade types ALL or REMOVE lead to cascading deletions on both sides!!!
+    // this @ManyToMany setup should only write entries into the mapping table and not into the referenced table
+    @ManyToMany
     @JoinTable(
         name = "nm_Configuration_AccessPattern",
         joinColumns = { @JoinColumn(name = "ConfigId") },
@@ -117,6 +119,20 @@ public class Configuration {
     @PrePersist
     protected void onCreate() {
         createdAt = OffsetDateTime.now(ZoneOffset.UTC);
+    }
+
+    // =============================
+    //   helpers for foreign keys
+    // =============================
+
+    public void addPattern(AccessPattern pattern) {
+        patterns.add(pattern);
+        pattern.getConfigurations().add(this);
+    }
+
+    public void removePattern(AccessPattern pattern) {
+        patterns.remove(pattern);
+        pattern.getConfigurations().remove(this);
     }
 
     // =============================
