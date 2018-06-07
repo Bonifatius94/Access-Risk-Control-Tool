@@ -35,10 +35,11 @@ public class SapConnector {
     private String password;
 
     /**
-     * Creates a new SapConnector with the given configuration.
+     * Creates a new SapConnector with the given configuration, username and password.
      *
      * @param config the configuration
-     * @throws Exception lol
+     * @param username the username
+     * @param password the password
      */
     public SapConnector(SapConfiguration config, String username, String password) throws Exception {
 
@@ -47,36 +48,8 @@ public class SapConnector {
         this.username = username;
         this.password = password;
 
-        this.createServerDestinationFile();
-    }
-
-    /**
-     * This method creates a new sap server destination file.
-     *
-     * @throws Exception caused by file stream operations
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
-     */
-    private void createServerDestinationFile() throws Exception {
-
-        // set config properties
-        Properties settings = new Properties();
-        settings.setProperty(DestinationDataProvider.JCO_ASHOST, config.getServerDestination());
-        settings.setProperty(DestinationDataProvider.JCO_SYSNR, config.getSysNr());
-        settings.setProperty(DestinationDataProvider.JCO_CLIENT, config.getClient());
-        settings.setProperty(DestinationDataProvider.JCO_USER, username);
-        settings.setProperty(DestinationDataProvider.JCO_PASSWD, password);
-        settings.setProperty(DestinationDataProvider.JCO_LANG, config.getLanguage());
-        settings.setProperty(DestinationDataProvider.JCO_POOL_CAPACITY, config.getPoolCapacity());
-
-        // create file handle of output config file
-        File configFile = new File(config.getServerDestination() + ".jcoDestination");
-
-        // write settings to config file
-        try (FileOutputStream fos = new FileOutputStream(configFile, false)) {
-            settings.store(fos, "for tests only !");
-        } catch (Exception e) {
-            throw new Exception("Could not store the settings!");
-        }
+        // overwrite the JCo SAP DestinationDataProvider so we don't need to create a file
+        com.sap.conn.jco.ext.Environment.registerDestinationDataProvider(new CustomDestinationDataProvider(config, username, password));
     }
 
     /**
