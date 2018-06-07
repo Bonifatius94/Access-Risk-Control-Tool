@@ -113,6 +113,8 @@ public class CustomWindow extends VBox {
         HBox.setHgrow(hbHeaderContainer, Priority.ALWAYS);
         pane.getChildren().addAll(hbHeaderContainer);
 
+        pane.getStyleClass().add("custom-window-header");
+
         // apply container to the vbox pane
         super.getChildren().addAll(pane);
     }
