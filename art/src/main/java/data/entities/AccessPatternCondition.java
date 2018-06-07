@@ -25,7 +25,7 @@ import org.hibernate.annotations.FetchMode;
  */
 @Entity
 @Table(name = "AccessPatternConditions")
-public class AccessPatternCondition {
+public class AccessPatternCondition implements IReferenceAware {
 
     // empty constructor is required for hibernate
     public AccessPatternCondition() {
@@ -62,6 +62,16 @@ public class AccessPatternCondition {
     // =============================
     //          overrides
     // =============================
+
+    /**
+     * This method adjusts the foreign key references.
+     */
+    @Override
+    public void adjustReferences() {
+
+        // adjust properties
+        getProperties().forEach(x -> x.setCondition(this));
+    }
 
     /**
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.

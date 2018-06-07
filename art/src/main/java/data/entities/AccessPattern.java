@@ -31,7 +31,7 @@ import org.hibernate.annotations.FetchMode;
  */
 @Entity
 @Table(name = "AccessPatterns")
-public class AccessPattern {
+public class AccessPattern implements IReferenceAware {
 
     // =============================
     //      empty constructor
@@ -226,6 +226,23 @@ public class AccessPattern {
     // =============================
     //          overrides
     // =============================
+
+    /**
+     * This method adjusts the foreign key references.
+     */
+    @Override
+    public void adjustReferences() {
+
+        // adjust conditions
+        getConditions().forEach(x -> x.setPattern(this));
+
+        // adjust configurations
+        getConfigurations().forEach(x -> {
+            if (!x.getPatterns().contains(this)) {
+                x.getPatterns().add(this);
+            }
+        });
+    }
 
     /**
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.

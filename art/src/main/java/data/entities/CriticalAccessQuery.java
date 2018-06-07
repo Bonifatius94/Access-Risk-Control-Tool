@@ -24,7 +24,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 @Table(name = "CriticalAccessQueries")
-public class CriticalAccessQuery {
+public class CriticalAccessQuery implements IReferenceAware {
 
     private Integer id;
     private Configuration config;
@@ -112,6 +112,16 @@ public class CriticalAccessQuery {
     // =============================
     //          overrides
     // =============================
+
+    /**
+     * This method adjusts the foreign key references.
+     */
+    @Override
+    public void adjustReferences() {
+
+        // adjust entries
+        entries.forEach(x -> x.setQuery(this));
+    }
 
     @Override
     public String toString() {

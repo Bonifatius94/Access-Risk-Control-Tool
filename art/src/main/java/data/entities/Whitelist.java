@@ -20,7 +20,7 @@ import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "Whitelists")
-public class Whitelist {
+public class Whitelist implements IReferenceAware {
 
     private Integer id;
     private String description;
@@ -91,6 +91,20 @@ public class Whitelist {
     @PrePersist
     protected void onCreate() {
         createdAt = OffsetDateTime.now(ZoneOffset.UTC);
+    }
+
+    // =============================
+    //          overrides
+    // =============================
+
+    /**
+     * This method adjusts the foreign key references.
+     */
+    @Override
+    public void adjustReferences() {
+
+        // adjust entries
+        entries.forEach(x -> x.setWhitelist(this));
     }
 
     /**

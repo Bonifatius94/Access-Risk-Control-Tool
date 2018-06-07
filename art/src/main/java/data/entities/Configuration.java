@@ -23,7 +23,7 @@ import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "Configurations")
-public class Configuration {
+public class Configuration implements IReferenceAware {
 
     private Integer id;
     private String name;
@@ -138,6 +138,20 @@ public class Configuration {
     // =============================
     //          overrides
     // =============================
+
+    /**
+     * This method adjusts the foreign key references.
+     */
+    @Override
+    public void adjustReferences() {
+
+        // adjust patterns
+        getPatterns().forEach(x -> {
+            if (!x.getConfigurations().contains(this)) {
+                x.getConfigurations().add(this);
+            }
+        });
+    }
 
     /**
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.

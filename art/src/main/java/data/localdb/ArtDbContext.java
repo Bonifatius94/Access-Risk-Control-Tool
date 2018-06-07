@@ -15,8 +15,6 @@ import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 
-import extensions.ArtException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -89,8 +87,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void createSapQuery(CriticalAccessQuery query) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic
+
+        query.adjustReferences();
+        insertRecord(query);
     }
 
     /**
@@ -101,8 +102,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void createConfig(Configuration config) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic
+
+        config.adjustReferences();
+        insertRecord(config);
     }
 
     /**
@@ -113,8 +117,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void createPattern(AccessPattern pattern) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic
+
+        pattern.adjustReferences();
+        insertRecord(pattern);
     }
 
     /**
@@ -126,10 +133,9 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void createWhitelist(Whitelist whitelist) throws Exception {
 
-        // update foreign key references
-        whitelist.getEntries().forEach(x -> x.setWhitelist(whitelist));
+        // TODO: test logic
 
-        // insert the whitelist
+        whitelist.adjustReferences();
         insertRecord(whitelist);
     }
 
@@ -141,8 +147,9 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void createSapConfig(SapConfiguration config) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic
+        insertRecord(config);
     }
 
     /**
@@ -154,8 +161,9 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public List<CriticalAccessQuery> getSapQueries() throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic
+        return queryDataset("FROM CriticalAccessQuery");
     }
 
     /**
@@ -166,8 +174,9 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public List<Configuration> getConfigs() throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic
+        return queryDataset("FROM Configuration");
     }
 
     /**
@@ -178,8 +187,9 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public List<AccessPattern> getPatterns() throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic
+        return queryDataset("FROM AccessPattern");
     }
 
     /**
@@ -203,8 +213,9 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public List<SapConfiguration> getSapConfigs() throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic
+        return queryDataset("FROM SapConfiguration");
     }
 
     /**
@@ -240,8 +251,29 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void updateConfig(Configuration config) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic (especially foreign keys when archiving!!!)
+
+        config.adjustReferences();
+
+        // check if the config has already been used by a critical access query
+        boolean isConfigUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getConfig().equals(config));
+
+        if (isConfigUsedBySapQuery) {
+
+            // get the id of the original config
+            Integer originalId = config.getId();
+            Configuration original = getConfigs().stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
+
+            // set archived flag to original and update it
+            original.setArchived(true);
+            updateRecord(original);
+
+            // request new id for config to update
+            config.setId(null);
+        }
+
+        updateRecord(config);
     }
 
     /**
@@ -252,8 +284,29 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void updatePattern(AccessPattern pattern) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic (especially foreign keys when archiving!!!)
+
+        pattern.adjustReferences();
+
+        // check if the pattern has already been used by a critical access query
+        boolean isPatternUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getConfig().getPatterns().contains(pattern));
+
+        if (isPatternUsedBySapQuery) {
+
+            // get the id of the original pattern
+            Integer originalId = pattern.getId();
+            AccessPattern original = getPatterns().stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
+
+            // set archived flag to original and update it
+            original.setArchived(true);
+            updateRecord(original);
+
+            // request new id for pattern to update
+            pattern.setId(null);
+        }
+
+        updateRecord(pattern);
     }
 
     /**
@@ -265,10 +318,27 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void updateWhitelist(Whitelist whitelist) throws Exception {
 
-        // TODO: test this method
+        // TODO: test logic (especially foreign keys when archiving!!!)
 
-        // update whitelist cascading
-        whitelist.getEntries().forEach(x -> x.setWhitelist(whitelist));
+        whitelist.adjustReferences();
+
+        // check if the whitelist has already been used by a critical access query
+        boolean isWhitelistUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getConfig().getWhitelist().equals(whitelist));
+
+        if (isWhitelistUsedBySapQuery) {
+
+            // get the id of the original whitelist
+            Integer originalId = whitelist.getId();
+            Whitelist original = getWhitelists().stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
+
+            // set archived flag to original and update it
+            original.setArchived(true);
+            updateRecord(original);
+
+            // request new id for pattern to update
+            whitelist.setId(null);
+        }
+
         updateRecord(whitelist);
     }
 
@@ -280,8 +350,27 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void updateSapConfig(SapConfiguration config) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic (especially foreign keys when archiving!!!)
+
+        // check if the sap config has already been used by a critical access query
+        boolean isSapConfigUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getSapConfig().equals(config));
+
+        if (isSapConfigUsedBySapQuery) {
+
+            // get the id of the original whitelist
+            Integer originalId = config.getId();
+            SapConfiguration original = getSapConfigs().stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
+
+            // set archived flag to original and update it
+            original.setArchived(true);
+            updateRecord(original);
+
+            // request new id for pattern to update
+            config.setId(null);
+        }
+
+        updateRecord(config);
     }
 
     /**
@@ -293,8 +382,23 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void deleteConfig(Configuration config) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic (especially foreign keys when deleting!!!)
+
+        config.adjustReferences();
+
+        // check if the config has already been used by a critical access query
+        boolean isConfigUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getConfig().equals(config));
+
+        if (isConfigUsedBySapQuery) {
+
+            config.setArchived(true);
+            updateRecord(config);
+
+        } else {
+
+            deleteRecord(config);
+        }
     }
 
     /**
@@ -306,8 +410,23 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void deletePattern(AccessPattern pattern) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic (especially foreign keys when deleting!!!)
+
+        pattern.adjustReferences();
+
+        // check if the pattern has already been used by a critical access query
+        boolean isPatternUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getConfig().getPatterns().contains(pattern));
+
+        if (isPatternUsedBySapQuery) {
+
+            pattern.setArchived(true);
+            updateRecord(pattern);
+
+        } else {
+
+            deleteRecord(pattern);
+        }
     }
 
     /**
@@ -320,10 +439,22 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void deleteWhitelist(Whitelist whitelist) throws Exception {
 
-        // TODO: test this method
+        // TODO: test logic (especially foreign keys when deleting!!!)
 
-        whitelist.getEntries().forEach(x -> x.setWhitelist(whitelist));
-        deleteRecord(whitelist);
+        whitelist.adjustReferences();
+
+        // check if the whitelist has already been used by a critical access query
+        boolean isWhitelistUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getConfig().getWhitelist().equals(whitelist));
+
+        if (isWhitelistUsedBySapQuery) {
+
+            whitelist.setArchived(true);
+            updateRecord(whitelist);
+
+        } else {
+
+            deleteRecord(whitelist);
+        }
     }
 
     /**
@@ -335,8 +466,21 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void deleteSapConfig(SapConfiguration config) throws Exception {
-        // TODO: implement logic
-        throw new Exception("Logic has not been implemented yet");
+
+        // TODO: test logic (especially foreign keys when deleting!!!)
+
+        // check if the sap config has already been used by a critical access query
+        boolean isSapConfigUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getSapConfig().equals(config));
+
+        if (isSapConfigUsedBySapQuery) {
+
+            config.setArchived(true);
+            updateRecord(config);
+
+        } else {
+
+            deleteRecord(config);
+        }
     }
 
     /**
