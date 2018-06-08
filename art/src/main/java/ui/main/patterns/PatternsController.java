@@ -10,7 +10,6 @@ import io.msoffice.excel.AccessPatternImportHelper;
 
 import java.util.List;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -18,7 +17,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-import javafx.scene.layout.HBox;
 import ui.custom.controls.ButtonCell;
 
 
