@@ -89,4 +89,34 @@ public class WhitelistEntry {
     public String toString() {
         return "usecaseId='" + getUsecaseId() + "', username='" + getUsername() + "'";
     }
+
+    /**
+     * This is a custom implementation of equals method that checks for data equality.
+     *
+     * @param other the object to compare with
+     * @return whether they are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        boolean ret = (other == this);
+
+        if (other instanceof WhitelistEntry) {
+
+            WhitelistEntry elementToCompare = (WhitelistEntry) other;
+
+            ret = (this.username.equals(elementToCompare.getUsername())
+                && this.usecaseId.equals(elementToCompare.getUsecaseId())
+                && this.whitelist.equals(elementToCompare.getWhitelist())
+            );
+        }
+
+        return ret;
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null) ? id : 0;
+    }
+
 }

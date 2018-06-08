@@ -127,4 +127,34 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
         return builder.toString();
     }
 
+    /**
+     * This is a custom implementation of equals method that checks for data equality.
+     *
+     * @param other the object to compare with
+     * @return whether they are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        boolean ret = (other == this);
+
+        if (other instanceof Whitelist) {
+
+            Whitelist elementToCompare = (Whitelist) other;
+
+            ret = (this.description.equals(elementToCompare.getDescription())
+                && this.isArchived == elementToCompare.isArchived()
+                && this.createdAt.equals(elementToCompare.getCreatedAt())
+                && this.createdBy.equals(elementToCompare.getCreatedBy())
+            );
+        }
+
+        return ret;
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null) ? id : 0;
+    }
+
 }

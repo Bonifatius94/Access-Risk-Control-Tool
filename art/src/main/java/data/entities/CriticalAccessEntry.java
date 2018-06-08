@@ -67,7 +67,7 @@ public class CriticalAccessEntry {
     }
 
     /**
-     * Compares an entry to another entry using userName and useCaseID.
+     * This is a custom implementation of equals method that checks for data equality.
      *
      * @param other the object to compare with
      * @return whether they are equal
@@ -75,22 +75,17 @@ public class CriticalAccessEntry {
     @Override
     public boolean equals(Object other) {
 
-        if (other == null) {
-            return false;
+        boolean ret = (other == this);
+
+        if (other instanceof CriticalAccessEntry) {
+
+            CriticalAccessEntry elementToCompare = (CriticalAccessEntry) other;
+
+            ret = (this.username.equals(elementToCompare.getUsername())
+                && this.accessPattern.getUsecaseId().equals(elementToCompare.getAccessPattern().getUsecaseId()));
         }
 
-        if (other == this) {
-            return true;
-        }
-
-        if (!(other instanceof CriticalAccessEntry)) {
-            return false;
-        }
-
-        CriticalAccessEntry elementToCompare = (CriticalAccessEntry) other;
-
-        return (this.username.equals(elementToCompare.getUsername())
-            && this.accessPattern.getUsecaseId().equals(elementToCompare.getAccessPattern().getUsecaseId()));
+        return ret;
     }
 
     @Override
