@@ -75,6 +75,14 @@ public class CriticalAccessEntry {
             return false;
         }
 
-        return (username.equals(((CriticalAccessEntry) other).username) && accessPattern.getUsecaseId().equals(((CriticalAccessEntry) other).getAccessPattern().getUsecaseId()));
+        CriticalAccessEntry elementToCompare = (CriticalAccessEntry) other;
+
+        return (this.username.equals(elementToCompare.getUsername())
+            && this.accessPattern.getUsecaseId().equals(elementToCompare.getAccessPattern().getUsecaseId()));
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null) ? id : 0;
     }
 }

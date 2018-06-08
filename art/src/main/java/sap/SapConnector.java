@@ -5,7 +5,6 @@ import com.sap.conn.jco.JCoDestinationManager;
 import com.sap.conn.jco.JCoException;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoTable;
-import com.sap.conn.jco.ext.DestinationDataProvider;
 
 import data.entities.AccessCondition;
 import data.entities.AccessConditionType;
@@ -19,64 +18,38 @@ import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @SuppressWarnings("WeakerAccess")
 public class SapConnector {
 
-    private SapConfiguration config;
+    private SapConfiguration sapConfig;
     private String username;
     private String password;
 
     /**
-     * Creates a new SapConnector with the given configuration.
+     * Creates a new SapConnector with the given configuration, username and password.
      *
-     * @param config the configuration
-     * @throws Exception lol
+     * @param sapConfig the configuration
+     * @param username the username
+     * @param password the password
      */
-    public SapConnector(SapConfiguration config, String username, String password) throws Exception {
+    public SapConnector(SapConfiguration sapConfig, String username, String password) throws Exception {
 
-        // init this instance with sap config
-        this.config = config;
+        // init this instance with sap sapConfig
+        this.sapConfig = sapConfig;
         this.username = username;
         this.password = password;
 
-        this.createServerDestinationFile();
-    }
-
-    /**
-     * This method creates a new sap server destination file.
-     *
-     * @throws Exception caused by file stream operations
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
-     */
-    private void createServerDestinationFile() throws Exception {
-
-        // set config properties
-        Properties settings = new Properties();
-        settings.setProperty(DestinationDataProvider.JCO_ASHOST, config.getServerDestination());
-        settings.setProperty(DestinationDataProvider.JCO_SYSNR, config.getSysNr());
-        settings.setProperty(DestinationDataProvider.JCO_CLIENT, config.getClient());
-        settings.setProperty(DestinationDataProvider.JCO_USER, username);
-        settings.setProperty(DestinationDataProvider.JCO_PASSWD, password);
-        settings.setProperty(DestinationDataProvider.JCO_LANG, config.getLanguage());
-        settings.setProperty(DestinationDataProvider.JCO_POOL_CAPACITY, config.getPoolCapacity());
-
-        // create file handle of output config file
-        File configFile = new File(config.getServerDestination() + ".jcoDestination");
-
-        // write settings to config file
-        try (FileOutputStream fos = new FileOutputStream(configFile, false)) {
-            settings.store(fos, "for tests only !");
-        } catch (Exception e) {
-            throw new Exception("Could not store the settings!");
-        }
+        // overwrite the JCo SAP DestinationDataProvider so we don't need to create a file
+        com.sap.conn.jco.ext.Environment.registerDestinationDataProvider(new CustomDestinationDataProvider(sapConfig, username, password));
     }
 
     /**
@@ -92,7 +65,7 @@ public class SapConnector {
         try {
 
             // try to ping the sap server (if the ping fails an exception is thrown -> program enters catch block and returns false)
-            JCoDestination destination = JCoDestinationManager.getDestination(config.getServerDestination());
+            JCoDestination destination = JCoDestinationManager.getDestination(sapConfig.getServerDestination());
             destination.ping();
             ret = true;
 
@@ -117,43 +90,24 @@ public class SapConnector {
      */
     public CriticalAccessQuery runAnalysis(Configuration config) throws Exception {
 
-        CriticalAccessQuery result = new CriticalAccessQuery();
+        // run sap queries (use cases / conditions ...)
+        List<CriticalAccessEntry> entries = new ArrayList<>();
 
         for (AccessPattern pattern : config.getPatterns()) {
 
             System.out.println("executing sap query for pattern " + pattern.getUsecaseId());
-
-            List<CriticalAccessQuery> sapResult = runSapQuery(pattern);
-            boolean first = true;
-
-            for (CriticalAccessQuery list : sapResult) {
-
-                if (pattern.getLinkage() == ConditionLinkage.And) {
-
-                    if (first) {
-                        result.getEntries().addAll(list.getEntries());
-                    } else {
-                        result.getEntries().removeIf(entry -> !list.getEntries().contains(entry));
-                    }
-
-                    first = false;
-
-                } else if (pattern.getLinkage() == ConditionLinkage.Or || pattern.getLinkage() == ConditionLinkage.None) {
-
-                    // TODO: use lambda expression for this if possible
-
-                    // avoid duplicates
-                    for (CriticalAccessEntry entry : list.getEntries()) {
-
-                        if (!result.getEntries().contains(entry)) {
-                            result.getEntries().add(entry);
-                        }
-                    }
-                }
-            }
+            entries.addAll(runSapQuery(pattern));
         }
 
-        return applyWhitelist(result, config.getWhitelist());
+        entries = applyWhitelist(entries, config.getWhitelist());
+
+        // init query
+        CriticalAccessQuery query = new CriticalAccessQuery();
+        query.setEntries(entries);
+        query.setConfig(config);
+        query.setSapConfig(this.sapConfig);
+
+        return query;
     }
 
     /**
@@ -162,27 +116,58 @@ public class SapConnector {
      * @param pattern the pattern to run the query with
      * @return the list of CriticalAccesses (users)
      */
-    private List<CriticalAccessQuery> runSapQuery(AccessPattern pattern) throws Exception {
+    private List<CriticalAccessEntry> runSapQuery(AccessPattern pattern) throws Exception {
 
-        JCoDestination destination = JCoDestinationManager.getDestination(config.getServerDestination());
+        // Tupel<CriticalAccessQueryEntry, AccessPattern>
+
+        JCoDestination destination = JCoDestinationManager.getDestination(sapConfig.getServerDestination());
         JCoFunction function = destination.getRepository().getFunction("SUSR_SUIM_API_RSUSR002");
 
         JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");
         JCoTable profileTable = function.getImportParameterList().getTable("IT_PROF1");
 
-        List<CriticalAccessQuery> result = new ArrayList<>();
+        Set<CriticalAccessEntry> results = new HashSet<>();
+        boolean first = true;
 
         for (AccessCondition condition : pattern.getConditions()) {
 
+            // apply condition to sap query
             applyConditionToTables(condition, inputTable, profileTable);
 
             JCoTable partOfResult = sapQuerySingleCondition(function);
-            result.add(convertJCoTableToCriticalAccessList(partOfResult, pattern));
+            List<CriticalAccessEntry> conditionResults = convertJCoTableToCriticalAccessList(partOfResult, pattern);
+
+            if (pattern.getLinkage() == ConditionLinkage.And) {
+
+                // TODO: use intersect function of lambda if possible
+
+                if (first) {
+                    results.addAll(conditionResults);
+                } else {
+                    results = results.stream().filter(x -> conditionResults.contains(x)).collect(Collectors.toSet());
+                }
+
+                first = false;
+
+            } else if (pattern.getLinkage() == ConditionLinkage.Or || pattern.getLinkage() == ConditionLinkage.None) {
+
+                // TODO: test lambda
+                results.addAll(conditionResults);
+
+                // avoid duplicates
+                /*for (CriticalAccessEntry entry : conditionResults) {
+                    if (!results.contains(entry)) {
+                        results.add(entry);
+                    }
+                }*/
+            }
+
+            // clear sap input tables
             inputTable.clear();
             profileTable.clear();
         }
 
-        return result;
+        return new ArrayList<>(results);
     }
 
     /**
@@ -240,7 +225,7 @@ public class SapConnector {
      */
     private JCoTable sapQuerySingleCondition(JCoFunction function) throws Exception {
 
-        JCoDestination destination = JCoDestinationManager.getDestination(config.getServerDestination());
+        JCoDestination destination = JCoDestinationManager.getDestination(sapConfig.getServerDestination());
 
         if (canPingServer()) {
 
@@ -261,15 +246,15 @@ public class SapConnector {
     /**
      * Applies the whitelist to a given list of usernames.
      *
-     * @param accessList list of usernames on which whitelist is applied
+     * @param entries list of usernames on which whitelist is applied
      * @param whitelist  the whitelist of usernames
      * @return the list of usernames after applying the whitelist
      */
-    private CriticalAccessQuery applyWhitelist(CriticalAccessQuery accessList, Whitelist whitelist) {
+    private List<CriticalAccessEntry> applyWhitelist(List<CriticalAccessEntry> entries, Whitelist whitelist) {
 
         // TODO: use lambda expression to remove loops if possible
 
-        Iterator<CriticalAccessEntry> iterator = accessList.getEntries().iterator();
+        Iterator<CriticalAccessEntry> iterator = entries.iterator();
 
         while (iterator.hasNext()) {
 
@@ -285,7 +270,7 @@ public class SapConnector {
             }
         }
 
-        return accessList;
+        return entries;
     }
 
     /**
@@ -295,9 +280,9 @@ public class SapConnector {
      * @param pattern the pattern of the JCoTable
      * @return a converted list of CriticalAccesses
      */
-    private CriticalAccessQuery convertJCoTableToCriticalAccessList(JCoTable table, AccessPattern pattern) {
+    private List<CriticalAccessEntry> convertJCoTableToCriticalAccessList(JCoTable table, AccessPattern pattern) {
 
-        CriticalAccessQuery list = new CriticalAccessQuery();
+        List<CriticalAccessEntry> list = new ArrayList<>();
 
         for (int i = 0; i < table.getNumRows(); i++) {
 
@@ -308,7 +293,7 @@ public class SapConnector {
             CriticalAccessEntry temp = new CriticalAccessEntry();
             temp.setAccessPattern(pattern);
             temp.setUsername(bname);
-            list.getEntries().add(temp);
+            list.add(temp);
 
             // go to next row
             table.nextRow();
