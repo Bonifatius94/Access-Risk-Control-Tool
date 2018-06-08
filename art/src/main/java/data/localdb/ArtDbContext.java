@@ -7,15 +7,14 @@ import data.entities.AccessPatternConditionProperty;
 import data.entities.AccessProfileCondition;
 import data.entities.Configuration;
 import data.entities.ConfigurationXAccessPatternMap;
+import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
-import data.entities.CriticalAccessQueryEntry;
 import data.entities.DbUser;
 import data.entities.DbUserRole;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -61,7 +60,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         // sap query
         list.add(CriticalAccessQuery.class);
-        list.add(CriticalAccessQueryEntry.class);
+        list.add(CriticalAccessEntry.class);
 
         // sap config
         list.add(SapConfiguration.class);

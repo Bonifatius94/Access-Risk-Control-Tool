@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "CriticalAccessQueryEntries")
-public class CriticalAccessQueryEntry {
+public class CriticalAccessEntry {
 
     private Integer id;
     private CriticalAccessQuery query;
@@ -83,10 +83,18 @@ public class CriticalAccessQueryEntry {
             return true;
         }
 
-        if (!(other instanceof CriticalAccessQueryEntry)) {
+        if (!(other instanceof CriticalAccessEntry)) {
             return false;
         }
 
-        return (username.equals(((CriticalAccessQueryEntry) other).username) && accessPattern.getUsecaseId().equals(((CriticalAccessQueryEntry) other).getAccessPattern().getUsecaseId()));
+        CriticalAccessEntry elementToCompare = (CriticalAccessEntry) other;
+
+        return (this.username.equals(elementToCompare.getUsername())
+            && this.accessPattern.getUsecaseId().equals(elementToCompare.getAccessPattern().getUsecaseId()));
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null) ? id : 0;
     }
 }

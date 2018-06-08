@@ -18,8 +18,6 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 @Table(name = "CriticalAccessQueries")
@@ -28,7 +26,7 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
     private Integer id;
     private Configuration config;
     private SapConfiguration sapConfig;
-    private List<CriticalAccessQueryEntry> entries = new ArrayList<>();
+    private List<CriticalAccessEntry> entries = new ArrayList<>();
 
     private boolean isArchived;
     private ZonedDateTime createdAt;
@@ -66,11 +64,11 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(value = FetchMode.SUBSELECT)
-    public List<CriticalAccessQueryEntry> getEntries() {
+    public List<CriticalAccessEntry> getEntries() {
         return entries;
     }
 
-    public void setEntries(List<CriticalAccessQueryEntry> entries) {
+    public void setEntries(List<CriticalAccessEntry> entries) {
         this.entries = entries;
         entries.forEach(x -> x.setQuery(this));
     }
