@@ -15,6 +15,9 @@ import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,6 +94,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // TODO: test logic
 
         query.adjustReferences();
+        query.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
         insertRecord(query);
     }
 
@@ -106,6 +110,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // TODO: test logic
 
         config.adjustReferences();
+        config.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
         insertRecord(config);
     }
 
@@ -121,6 +126,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // TODO: test logic
 
         pattern.adjustReferences();
+        pattern.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
         insertRecord(pattern);
     }
 
@@ -136,6 +142,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // TODO: test logic
 
         whitelist.adjustReferences();
+        whitelist.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
         insertRecord(whitelist);
     }
 
@@ -149,6 +156,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     public void createSapConfig(SapConfiguration config) throws Exception {
 
         // TODO: test logic
+        config.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
         insertRecord(config);
     }
 
@@ -230,7 +238,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         List<DbUser> users = new ArrayList<>();
 
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactory().openSession()) {
 
             List<Object[]> results = session.createNativeQuery("SELECT * FROM DbUsers").getResultList();
             users = results.stream().map(x -> new DbUser((String)x[0], DbUserRole.parseRole((String)x[1]))).collect(Collectors.toList());
@@ -496,7 +504,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         Transaction transaction = null;
 
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactory().openSession()) {
 
             // avoid sql injection with username
             if (username.contains(" ")) {
@@ -547,7 +555,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
             Transaction transaction = null;
 
-            try (Session session = sessionFactory.openSession()) {
+            try (Session session = getSessionFactory().openSession()) {
 
                 transaction = session.beginTransaction();
 
@@ -587,7 +595,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         Transaction transaction = null;
 
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactory().openSession()) {
 
             // avoid sql injection with username
             if (username.contains(" ")) {
@@ -625,7 +633,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         Transaction transaction = null;
 
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactory().openSession()) {
 
             // avoid sql injection with username
             if (username.contains(" ")) {

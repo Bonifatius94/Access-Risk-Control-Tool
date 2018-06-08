@@ -1,18 +1,16 @@
 package data.entities;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "SapConfigurations")
-public class SapConfiguration {
+public class SapConfiguration implements ICreationFlagsHelper {
 
     private Integer id;
     private String serverDestination;
@@ -22,7 +20,7 @@ public class SapConfiguration {
     private String poolCapacity;
 
     private boolean isArchived;
-    private OffsetDateTime createdAt;
+    private ZonedDateTime createdAt;
     private String createdBy;
 
     @Id
@@ -83,11 +81,11 @@ public class SapConfiguration {
         isArchived = archived;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -100,17 +98,15 @@ public class SapConfiguration {
     }
 
     // =============================
-    //      hibernate triggers
-    // =============================
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
-    }
-
-    // =============================
     //          overrides
     // =============================
+
+    @Override
+    public void initCreationFlags(ZonedDateTime createdAt, String createdBy) {
+
+        setCreatedAt(createdAt);
+        setCreatedBy(createdBy);
+    }
 
     @Override
     public String toString() {

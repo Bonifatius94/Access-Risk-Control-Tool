@@ -27,15 +27,24 @@ public abstract class H2ContextBase implements Closeable {
     public H2ContextBase(String filePath, String username, String password) {
 
         this.filePath = filePath;
+        this.username = username;
+        this.password = password;
         sessionFactory = initSessionFactory(filePath, username, password);
     }
 
     // +++++++++++++++++++++++++++++++
-    // ++     Session Initiation    ++
+    // ++          Members          ++
     // +++++++++++++++++++++++++++++++
 
-    protected String filePath;
-    protected SessionFactory sessionFactory;
+    private String filePath;
+    private SessionFactory sessionFactory;
+
+    private String username;
+    private String password;
+
+    // +++++++++++++++++++++++++++++++
+    // ++     Session Initiation    ++
+    // +++++++++++++++++++++++++++++++
 
     /**
      * This method initializes a new session factory with settings from hibernate.properties file and the overloaded login credentials.
@@ -76,12 +85,17 @@ public abstract class H2ContextBase implements Closeable {
      */
     protected abstract List<Class> getAnnotatedClasses();
 
+    public Session openSession() {
+        return sessionFactory.openSession();
+    }
+
     /**
      * Apply new user credentials to the session factory to create connections for the new user.
      *
      * @param username new username of the sessions created by the session factory
      * @param password new password of the sessions created by the session factory
      */
+    @Deprecated
     protected void changeUser(String username, String password) {
 
         // close old session factory
@@ -207,5 +221,25 @@ public abstract class H2ContextBase implements Closeable {
     public void close() {
         sessionFactory.close();
     }
-    
+
+    // +++++++++++++++++++++++++++++++
+    // ++     Getters / Setters     ++
+    // +++++++++++++++++++++++++++++++
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
 }

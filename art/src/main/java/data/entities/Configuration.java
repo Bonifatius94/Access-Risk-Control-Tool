@@ -1,10 +1,9 @@
 package data.entities;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -15,7 +14,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -23,7 +21,7 @@ import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "Configurations")
-public class Configuration implements IReferenceAware {
+public class Configuration implements IReferenceAware, ICreationFlagsHelper {
 
     private Integer id;
     private String name;
@@ -32,7 +30,7 @@ public class Configuration implements IReferenceAware {
     private Whitelist whitelist;
 
     private boolean isArchived;
-    private OffsetDateTime createdAt;
+    private ZonedDateTime createdAt;
     private String createdBy;
 
     @Id
@@ -96,11 +94,11 @@ public class Configuration implements IReferenceAware {
         isArchived = archived;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -110,15 +108,6 @@ public class Configuration implements IReferenceAware {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
-    }
-
-    // =============================
-    //      hibernate triggers
-    // =============================
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
     // =============================
@@ -151,6 +140,13 @@ public class Configuration implements IReferenceAware {
                 x.getConfigurations().add(this);
             }
         });
+    }
+
+    @Override
+    public void initCreationFlags(ZonedDateTime createdAt, String createdBy) {
+
+        setCreatedAt(createdAt);
+        setCreatedBy(createdBy);
     }
 
     /**

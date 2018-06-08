@@ -1,7 +1,6 @@
 package data.entities;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,9 +16,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -31,7 +28,7 @@ import org.hibernate.annotations.FetchMode;
  */
 @Entity
 @Table(name = "AccessPatterns")
-public class AccessPattern implements IReferenceAware {
+public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
 
     // =============================
     //      empty constructor
@@ -128,7 +125,7 @@ public class AccessPattern implements IReferenceAware {
     private List<Configuration> configurations;
 
     private boolean isArchived;
-    private OffsetDateTime createdAt;
+    private ZonedDateTime createdAt;
     private String createdBy;
 
     // =============================
@@ -198,11 +195,11 @@ public class AccessPattern implements IReferenceAware {
         isArchived = archived;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -212,15 +209,6 @@ public class AccessPattern implements IReferenceAware {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
-    }
-
-    // =============================
-    //      hibernate triggers
-    // =============================
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
     // =============================
@@ -242,6 +230,13 @@ public class AccessPattern implements IReferenceAware {
                 x.getPatterns().add(this);
             }
         });
+    }
+
+    @Override
+    public void initCreationFlags(ZonedDateTime createdAt, String createdBy) {
+
+        setCreatedAt(createdAt);
+        setCreatedBy(createdBy);
     }
 
     /**

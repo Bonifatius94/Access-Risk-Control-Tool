@@ -1,18 +1,17 @@
 package data.entities;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -20,13 +19,13 @@ import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "Whitelists")
-public class Whitelist implements IReferenceAware {
+public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
 
     private Integer id;
     private String description;
 
     private boolean isArchived;
-    private OffsetDateTime createdAt;
+    private ZonedDateTime createdAt;
     private String createdBy;
 
     private List<WhitelistEntry> entries = new ArrayList<>();
@@ -41,6 +40,7 @@ public class Whitelist implements IReferenceAware {
         this.id = id;
     }
 
+    @Column(columnDefinition = "TEXT")
     public String getDescription() {
         return description;
     }
@@ -68,11 +68,11 @@ public class Whitelist implements IReferenceAware {
         isArchived = archived;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -82,15 +82,6 @@ public class Whitelist implements IReferenceAware {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
-    }
-
-    // =============================
-    //      hibernate triggers
-    // =============================
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
     // =============================
@@ -107,6 +98,13 @@ public class Whitelist implements IReferenceAware {
         entries.forEach(x -> x.setWhitelist(this));
     }
 
+    @Override
+    public void initCreationFlags(ZonedDateTime createdAt, String createdBy) {
+
+        setCreatedAt(createdAt);
+        setCreatedBy(createdBy);
+    }
+
     /**
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *
@@ -117,8 +115,9 @@ public class Whitelist implements IReferenceAware {
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("Description = ").append(getDescription()).append(", Entries:");
+        builder.append("Description = ").append(getDescription()).append(isArchived).append(", Entries:");
         getEntries().forEach(x -> builder.append("\r\n").append(x));
+        builder.append("\r\nCreatedAt = ").append(getCreatedAt()).append(", CreatedBy = ").append(createdBy).append(", IsArchived = ").append(isArchived());
 
         return builder.toString();
     }

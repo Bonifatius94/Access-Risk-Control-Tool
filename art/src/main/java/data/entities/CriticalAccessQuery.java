@@ -1,7 +1,7 @@
 package data.entities;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -24,7 +23,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 @Table(name = "CriticalAccessQueries")
-public class CriticalAccessQuery implements IReferenceAware {
+public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelper {
 
     private Integer id;
     private Configuration config;
@@ -32,7 +31,7 @@ public class CriticalAccessQuery implements IReferenceAware {
     private List<CriticalAccessQueryEntry> entries = new ArrayList<>();
 
     private boolean isArchived;
-    private OffsetDateTime createdAt;
+    private ZonedDateTime createdAt;
     private String createdBy;
 
     @Id
@@ -84,11 +83,11 @@ public class CriticalAccessQuery implements IReferenceAware {
         isArchived = archived;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -98,15 +97,6 @@ public class CriticalAccessQuery implements IReferenceAware {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
-    }
-
-    // =============================
-    //      hibernate triggers
-    // =============================
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     }
 
     // =============================
@@ -121,6 +111,13 @@ public class CriticalAccessQuery implements IReferenceAware {
 
         // adjust entries
         entries.forEach(x -> x.setQuery(this));
+    }
+
+    @Override
+    public void initCreationFlags(ZonedDateTime createdAt, String createdBy) {
+
+        setCreatedAt(createdAt);
+        setCreatedBy(createdBy);
     }
 
     @Override
