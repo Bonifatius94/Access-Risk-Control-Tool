@@ -18,6 +18,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
+import javafx.scene.layout.HBox;
 import ui.custom.controls.ButtonCell;
 
 
@@ -47,6 +48,7 @@ public class PatternsController {
             AccessPatternImportHelper helper = new AccessPatternImportHelper();
 
             List<AccessPattern> patterns = helper.importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
+            patterns.addAll(patterns);
             ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
 
             patternsTable.setItems(list);
@@ -60,12 +62,12 @@ public class PatternsController {
      * Initializes the table columns that need extra content.
      */
     private void initializeTableColumns() {
-
         // Add the delete column
         deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPattern accessPattern) -> {
             patternsTable.getItems().remove(accessPattern);
             return accessPattern;
         }));
+        deleteColumn.setSortable(false);
         deleteColumn.getStyleClass().add("undecorated-column");
 
         // Add the edit column
@@ -73,6 +75,7 @@ public class PatternsController {
             editAccessPattern(accessPattern);
             return accessPattern;
         }));
+        editColumn.setSortable(false);
         editColumn.getStyleClass().add("undecorated-column");
 
         // overwrite the column in which the number of useCases is displayed
@@ -80,7 +83,7 @@ public class PatternsController {
             @Override
             protected void updateItem(List<AccessCondition> items, boolean empty) {
                 if (empty || items == null) {
-                    setText("" + 0);
+                    setText("");
                 } else {
                     // set image for non-empty cell
                     setText("" + items.size());
