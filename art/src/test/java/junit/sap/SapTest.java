@@ -1,22 +1,24 @@
-package sap;
+package junit.localdb;
 
 import data.entities.AccessPattern;
 import data.entities.Configuration;
 import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
+
 import io.msoffice.excel.AccessPatternImportHelper;
 import io.msoffice.excel.WhitelistImportHelper;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import sap.SapConnector;
+
 public class SapTest {
 
-    /**
-     * Testing Sap Stuff.
-     * TODO: move this code to a JUnit test
-     */
-    public static void main(String[] args) {
+    @Test
+    public void testSapQuery() {
 
         // init user credentials
         String username = "GROUP_11";
@@ -48,9 +50,19 @@ public class SapTest {
 
             // run sap query with config and sap settings
             SapConnector connector = new SapConnector(sapConfig, username, password);
-            CriticalAccessQuery result = connector.runAnalysis(config);
+            CriticalAccessQuery query = connector.runAnalysis(config);
             System.out.println("SAP query results:");
-            result.getEntries().forEach(x -> System.out.println(x));
+            query.getEntries().forEach(x -> System.out.println(x));
+
+            assert(
+                query.getSapConfig().equals(sapConfig)
+                    && query.getConfig().equals(config)
+                    && query.getConfig().getWhitelist().equals(whitelist)
+                    && query.getConfig().getPatterns().containsAll(patterns)
+                    && query.getEntries().size() == 24
+
+                // TODO: add code to check data equality of critical access entries
+            );
 
         } catch (Exception e) {
             e.printStackTrace();

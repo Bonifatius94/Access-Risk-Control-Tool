@@ -1,6 +1,9 @@
+
+/* Define custom color variables which are used throughout the whole application */
 * {
-    -fx-primary: #0F9D58;
-    -fx-alert: #ff4081;
+    -fx-primary: #4C9687;
+    -fx-error: #ff4081;
+    -fx-success: #55854B;
     -fx-text: white;
     -fx-alternatetext: #303030;
     -fx-background: #484848;
@@ -8,6 +11,7 @@
     -fx-primary-darker: derive(-fx-primary, -30%);
     -fx-primary-lighter: derive(-fx-primary, 30%);
 }
+
 
 /*
  *	Apply google Roboto font to all UI components
@@ -17,7 +21,9 @@
     -fx-font-family: "Roboto";
     -fx-font-smoothing-type: gray;
     -fx-background-color: -fx-background;
+
 }
+
 
 /*******************************************************************************
  *                                                                             *
@@ -39,13 +45,14 @@
 /* Close App Button extra styling */
 .windowButton {
     -fx-background-color: -fx-background;
-    -fx-text: white;
+    -fx-text-fill: white;
     -jfx-disable-visual-focus: true;
 }
 
 .closeWindowButton:hover {
-    -fx-background-color: -fx-alert;
+    -fx-background-color: -fx-error;
 }
+
 
 /*******************************************************************************
  *                                                                             *
@@ -60,6 +67,7 @@
     -fx-text-fill: -fx-text !important;
     -jfx-label-float: true;
 }
+
 
 /*******************************************************************************
 *                                                                              *
@@ -100,6 +108,7 @@
     -fx-padding: 15 5 5 5;
 }
 
+
 /*******************************************************************************
  *                                                                             *
  * Material CheckBox                                                           *
@@ -111,6 +120,7 @@
     -jfx-unchecked-color: -fx-light;
     -fx-cursor: hand;
 }
+
 
 /*******************************************************************************
 *                                                                             *
@@ -129,6 +139,7 @@
     -fx-border-color: -fx-light !important;
 }
 
+
 /*******************************************************************************
 *                                                                             *
 * Material RadioButton                                                        *
@@ -140,6 +151,7 @@
     -jfx-unchecked-color: -fx-light;
     -fx-cursor: hand;
 }
+
 
 /*******************************************************************************
 *                                                                             *
@@ -208,6 +220,146 @@ alternative design with separators left and right of complete header bar
 
 
 /*******************************************************************************
+*                                                                             *
+* Material TableView                                                          *
+*                                                                             *
+******************************************************************************/
+
+/*
+* The following CSS has been adapted from jfx-tree-table-view.css
+*/
+
+.table-view {
+    -fx-background-color: -fx-background;
+    -fx-table-rippler-color: -fx-text;
+}
+
+.table-view .column-header,
+.table-view .column-header-background,
+.table-view .column-header-background .filler {
+    -fx-background-color: derive(-fx-background, 30%);
+}
+
+.table-view .column-header {
+    -fx-border-color: derive(-fx-background, 30%);
+    -fx-background-color: derive(-fx-background, 30%);
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: -fx-text;
+    -fx-padding: 16 0 16 0;
+    -fx-alignment: baseline-center;
+}
+
+.table-view .column-header .arrow, .table-view .column-header .sort-order-dot {
+    -fx-background-color: -fx-text;
+    -fx-padding: 4;
+}
+
+.table-view .column-header-background {
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: -fx-text;
+}
+
+.table-view .table-cell {
+    -fx-border-width: 0 0 0 0;
+    -fx-padding: 16 20 8 20;
+    -fx-alignment: baseline-center;
+}
+
+.table-view .align-left {
+    -fx-padding: 16 20 8 20;
+    -fx-alignment: baseline-left;
+}
+
+.table-view .column-overlay {
+    -fx-background-color: -fx-primary;
+}
+
+.table-view .column-resize-line, .table-view .column-drag-header {
+    -fx-background-color: -fx-table-rippler-color;
+}
+
+.table-row-cell > .disclosure-node > .arrow {
+    -fx-background-color: -fx-text-fill;
+    -fx-padding: 0.333333em 0.229em 0.333333em 0.229em; /* 4 */
+    -fx-shape: "M 0 -3.5 L 4 0 L 0 3.5 z";
+}
+
+.table-view .table-row-cell {
+    -fx-padding: 5 0 5 0;
+    -fx-border-color: TRANSPARENT;
+    -fx-table-cell-border-color: TRANSPARENT;
+}
+
+.table-view .jfx-button {
+    -fx-padding: 8;
+    -fx-background-radius: 50%;
+}
+
+/* odd rows */
+.table-view .table-row-cell:odd:filled {
+    -fx-background-color: derive(-fx-background, 10%);
+}
+
+.table-view:focused .table-row-cell:selected{
+    -fx-background-color: derive(-fx-background, -50%);
+    -fx-table-cell-border-color: -fx-primary;
+    -fx-text-fill: -fx-text;
+}
+
+/* remove blue border from first entry of tableView on focus */
+.table-view:focused .table-row-cell:focused {
+    -fx-background-color: -fx-table-cell-border-color, -fx-background;
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+.table-view:focused .table-row-cell:selected .table-cell {
+    -fx-text-fill: -fx-text;
+}
+
+/* style vertical scrollbar on tableview */
+
+.table-view *.scroll-bar:vertical *.increment-button,
+.table-view *.scroll-bar:vertical *.decrement-button {
+    -fx-background-color: -fx-background;
+}
+
+.table-view *.scroll-bar:vertical *.increment-arrow,
+.table-view *.scroll-bar:vertical *.decrement-arrow {
+    -fx-background-color:  derive(-fx-background, -80%);
+}
+
+/* styling the vertical scrollbar */
+.scroll-bar:vertical {
+    -fx-pref-width: 15;
+    -fx-padding: 0;
+    -fx-background-color: -fx-background;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: derive(-fx-background, -40%);
+}
+
+/* hide horizontal scrollbar on tableview */
+.table-view *.scroll-bar:horizontal *.increment-button,
+.table-view *.scroll-bar:horizontal *.decrement-button {
+    -fx-background-color: null;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.table-view *.scroll-bar:horizontal *.increment-arrow,
+.table-view *.scroll-bar:horizontal *.decrement-arrow {
+    -fx-background-color: null;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-shape: null;
+}
+
+/*******************************************************************************
  *                                                                             *
  * Material Icons                                                              *
  *                                                                             *
@@ -217,3 +369,17 @@ alternative design with separators left and right of complete header bar
     -fx-font-family: "Material Design Icons";
     -fx-fill: -fx-text;
 }
+
+
+/* Alternative Header Styling */
+/*
+.custom-window-header {
+    -fx-background-color: derive(-fx-background, -30%);
+}
+
+.windowButton {
+    -fx-background-color: derive(-fx-background, -30%);
+}
+*/
+
+

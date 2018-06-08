@@ -1,4 +1,7 @@
-package data.localdb;
+package junit.localdb;
+
+import data.localdb.ArtDbContext;
+import org.junit.Test;
 
 import data.entities.DbUser;
 import data.entities.DbUserRole;
@@ -10,12 +13,10 @@ import java.util.List;
 
 public class H2Test {
 
-    /**
-     * This method runs a test program.
-     *
-     * @param args no args, will be ignored
-     */
-    public static void main(String[] args) {
+    @Test
+    public void testCreateSchema() {
+
+        boolean result = false;
 
         // delete database to ensure a clean test environment
         deleteFileIfExists("D:\\TEMP\\foo.h2.mv.db");
@@ -58,12 +59,15 @@ public class H2Test {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             System.out.println("database schema creation successful");
+            result = true;
 
         } catch (Exception ex) {
 
             System.out.println("database schema creation failed");
             ex.printStackTrace();
         }
+
+        assert(result);
     }
 
     private static void testDbAccountManagement() {
