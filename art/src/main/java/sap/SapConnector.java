@@ -19,8 +19,12 @@ import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @SuppressWarnings("WeakerAccess")
@@ -122,8 +126,9 @@ public class SapConnector {
         JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");
         JCoTable profileTable = function.getImportParameterList().getTable("IT_PROF1");
 
-        List<CriticalAccessEntry> result = new ArrayList<>();
+        Set<CriticalAccessEntry> results = new HashSet<>();
         boolean first = true;
+
         for (AccessCondition condition : pattern.getConditions()) {
 
             // apply condition to sap query
@@ -137,23 +142,24 @@ public class SapConnector {
                 // TODO: use intersect function of lambda if possible
 
                 if (first) {
-                    result.addAll(conditionResults);
+                    results.addAll(conditionResults);
                 } else {
-                    result.removeIf(entry -> !conditionResults.contains(entry));
+                    results = results.stream().filter(x -> conditionResults.contains(x)).collect(Collectors.toSet());
                 }
 
                 first = false;
 
             } else if (pattern.getLinkage() == ConditionLinkage.Or || pattern.getLinkage() == ConditionLinkage.None) {
 
-                // TODO: use lambda expression for this if possible
+                // TODO: test lambda
+                results.addAll(conditionResults);
 
                 // avoid duplicates
-                for (CriticalAccessEntry entry : conditionResults) {
-                    if (!result.contains(entry)) {
-                        result.add(entry);
+                /*for (CriticalAccessEntry entry : conditionResults) {
+                    if (!results.contains(entry)) {
+                        results.add(entry);
                     }
-                }
+                }*/
             }
 
             // clear sap input tables
@@ -161,7 +167,7 @@ public class SapConnector {
             profileTable.clear();
         }
 
-        return result;
+        return new ArrayList<>(results);
     }
 
     /**
