@@ -11,7 +11,7 @@
       spacing="10">
     <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable">
         <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
         </columnResizePolicy>
         <columns>
             <TableColumn text="ID">
@@ -28,6 +28,8 @@
                 <cellValueFactory>
                     <PropertyValueFactory property="conditions"/>
                 </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="50" fx:id="editColumn">
             </TableColumn>
             <TableColumn prefWidth="50" fx:id="deleteColumn">
             </TableColumn>

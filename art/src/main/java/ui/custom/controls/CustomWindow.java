@@ -114,6 +114,9 @@ public class CustomWindow extends VBox {
         updateMaximizeButton(stage);
     }
 
+    /**
+     * Initializes the custom window header.
+     */
     private void initCustomWindowHeader() {
 
         // add all controls
@@ -125,10 +128,16 @@ public class CustomWindow extends VBox {
         HBox.setHgrow(hbHeaderContainer, Priority.ALWAYS);
         pane.getChildren().addAll(hbHeaderContainer);
 
+        // used for styling
+        pane.getStyleClass().add("custom-window-header");
+
         // apply container to the vbox pane
         super.getChildren().addAll(pane);
     }
 
+    /**
+     * Initializes the controls for the CanMaximize-Mode in which all buttons are present.
+     */
     private void initControlsForCanMaximizeMode() {
 
         // init label for headline
@@ -163,6 +172,9 @@ public class CustomWindow extends VBox {
         hbHeaderContainer.getChildren().addAll(lblHeadline, regFiller, btnMinimize, btnMaximize, btnClose);
     }
 
+    /**
+     * Applies the current windowState.
+     */
     private void applyWindowState() {
 
         if (getWindowState() == WindowState.CanMinimize) {
@@ -178,6 +190,9 @@ public class CustomWindow extends VBox {
         }
     }
 
+    /**
+     * Initializes the event handlers needed for the buttons to work and for the resizing handlers.
+     */
     private void initEventHandlers() {
 
         btnMinimize.setOnAction(new EventHandler<ActionEvent>() {
@@ -266,6 +281,10 @@ public class CustomWindow extends VBox {
         return windowStateProperty.get();
     }
 
+    /**
+     * Sets the windowState accordingly.
+     * @param newState the new window state
+     */
     public void setWindowState(WindowState newState) {
 
         // set window state property
