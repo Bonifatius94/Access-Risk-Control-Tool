@@ -271,10 +271,6 @@ alternative design with separators left and right of complete header bar
     -fx-table-cell-border-color: -fx-text;
 }
 
-.table-view .column-header-background {
-    -fx-border-width: 0 0 0 0;
-}
-
 .table-view .undecorated-column {
     -fx-border-width: 0;
 }

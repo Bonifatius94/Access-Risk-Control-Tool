@@ -10,9 +10,6 @@
       fx:controller="ui.main.patterns.PatternsController"
       spacing="10">
     <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable">
-        <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-        </columnResizePolicy>
         <columns>
             <TableColumn text="ID">
                 <cellValueFactory>
@@ -24,7 +21,7 @@
                     <PropertyValueFactory property="description"/>
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn text="# Conditions">
+            <TableColumn text="#" fx:id="useCaseCountColumn">
                 <cellValueFactory>
                     <PropertyValueFactory property="conditions"/>
                 </cellValueFactory>
