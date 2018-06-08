@@ -115,7 +115,7 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("Description = ").append(getDescription()).append(isArchived).append(", Entries:");
+        builder.append("Description = ").append(getDescription()).append(", Entries:");
         getEntries().forEach(x -> builder.append("\r\n").append(x));
         builder.append("\r\nCreatedAt = ").append(getCreatedAt()).append(", CreatedBy = ").append(createdBy).append(", IsArchived = ").append(isArchived());
 
