@@ -29,7 +29,9 @@ public class PTableColumn<S, T> extends javafx.scene.control.TableColumn<S, T> {
     }
 
     /**
-     * Sets the percentage width.
+     * Sets the width in percentage according to value.
+     * @param value the given value
+     * @throws IllegalArgumentException if the percentage is above 1 or below 0
      */
     public final void setPercentageWidth(double value) throws IllegalArgumentException {
         if (value >= 0 && value <= 1) {
