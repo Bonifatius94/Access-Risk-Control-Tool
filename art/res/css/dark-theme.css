@@ -9,6 +9,21 @@
     -fx-primary-lighter: derive(-fx-primary, 30%);
 }
 
+
+/* blueish */
+* {
+    -fx-primary: #4C96A7;
+    -fx-error: #ff4081;
+    -fx-success: #55854B;
+    -fx-text: white;
+    -fx-alternatetext: #303030;
+    -fx-background: #263238;
+    -fx-light: #AAAAAA;
+    -fx-primary-darker: derive(-fx-primary, -30%);
+    -fx-primary-lighter: derive(-fx-primary, 30%);
+}
+
+
 /*
  *	Apply google Roboto font to all UI components
  */
