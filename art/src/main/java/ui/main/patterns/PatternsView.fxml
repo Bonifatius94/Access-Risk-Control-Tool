@@ -6,30 +6,31 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import ui.custom.controls.PTableColumn?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="ui.main.patterns.PatternsController"
       spacing="10">
     <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable">
         <columns>
-            <TableColumn text="ID">
+            <PTableColumn text="ID" percentageWidth="0.1">
                 <cellValueFactory>
                     <PropertyValueFactory property="id"/>
                 </cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Description">
+            </PTableColumn>
+            <PTableColumn text="Description" percentageWidth="0.66">
                 <cellValueFactory>
                     <PropertyValueFactory property="description"/>
                 </cellValueFactory>
-            </TableColumn>
-            <TableColumn text="#" fx:id="useCaseCountColumn">
+            </PTableColumn>
+            <PTableColumn text="#" fx:id="useCaseCountColumn" percentageWidth="0.1">
                 <cellValueFactory>
                     <PropertyValueFactory property="conditions"/>
                 </cellValueFactory>
-            </TableColumn>
-            <TableColumn prefWidth="50" fx:id="editColumn">
-            </TableColumn>
-            <TableColumn prefWidth="50" fx:id="deleteColumn">
-            </TableColumn>
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.07" fx:id="editColumn" resizable="false">
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.07" fx:id="deleteColumn" resizable="false">
+            </PTableColumn>
         </columns>
     </TableView>
 
