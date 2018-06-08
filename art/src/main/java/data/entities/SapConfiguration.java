@@ -114,4 +114,39 @@ public class SapConfiguration implements ICreationFlagsHelper {
             + ", Language = " + getLanguage() + ", Pool Capacity = " + getPoolCapacity();
     }
 
+    /**
+     * This is a custom implementation of equals method that checks for data equality.
+     *
+     * @param other the object to compare with
+     * @return whether they are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        boolean ret = (other == this);
+
+        if (other instanceof SapConfiguration) {
+
+            SapConfiguration cmp = (SapConfiguration) other;
+
+            ret = (this.serverDestination.equals(cmp.getServerDestination())
+                && this.sysNr.equals(cmp.getSysNr())
+                && this.client.equals(cmp.getClient())
+                && this.language.equals(cmp.getLanguage())
+                && this.poolCapacity.equals(cmp.getPoolCapacity())
+                && this.id == null || (
+                    this.isArchived == cmp.isArchived()
+                    && this.createdAt.equals(cmp.getCreatedAt())
+                    && this.createdBy.equals(cmp.getCreatedBy())
+                ));
+        }
+
+        return ret;
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null) ? id : 0;
+    }
+
 }

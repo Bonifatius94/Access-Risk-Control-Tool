@@ -67,6 +67,7 @@ public class AccessCondition {
      * @param profileCondition the profile condition to be applied
      */
     public void setProfileCondition(AccessProfileCondition profileCondition) {
+
         this.profileCondition = profileCondition;
         this.type = AccessConditionType.ProfileCondition;
         this.patternCondition = null;
@@ -85,6 +86,7 @@ public class AccessCondition {
      * @param patternCondition the pattern condition to be applied
      */
     public void setPatternCondition(AccessPatternCondition patternCondition) {
+
         this.patternCondition = patternCondition;
         this.type = AccessConditionType.PatternCondition;
         this.profileCondition = null;
@@ -103,6 +105,35 @@ public class AccessCondition {
     @Override
     public String toString() {
         return (type == AccessConditionType.ProfileCondition) ? profileCondition.toString() : patternCondition.toString();
+    }
+
+    /**
+     * This is a custom implementation of equals method that checks for data equality.
+     *
+     * @param other the object to compare with
+     * @return whether they are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        boolean ret = (other == this);
+
+        if (other instanceof AccessCondition) {
+
+            AccessCondition cmp = (AccessCondition) other;
+
+            ret = (type == cmp.getType()
+                && ((this.pattern == null && cmp.getPattern() == null) || (this.pattern != null && this.pattern.equals(cmp.getPattern())))
+                && ((this.profileCondition == null && cmp.getProfileCondition() == null) || (this.profileCondition != null && this.profileCondition.equals(cmp.getProfileCondition())))
+                && ((this.patternCondition == null && cmp.getPatternCondition() == null) || (this.patternCondition != null && this.patternCondition.equals(cmp.getPatternCondition()))));
+        }
+
+        return ret;
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null) ? id : 0;
     }
 
 }

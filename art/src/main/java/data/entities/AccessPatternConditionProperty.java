@@ -142,4 +142,36 @@ public class AccessPatternConditionProperty {
                 + ", value4='" + getValue4() + "'";
     }
 
+    /**
+     * This is a custom implementation of equals method that checks for data equality.
+     *
+     * @param other the object to compare with
+     * @return whether they are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        boolean ret = (other == this);
+
+        if (other instanceof AccessPatternConditionProperty) {
+
+            AccessPatternConditionProperty cmp = (AccessPatternConditionProperty) other;
+
+            ret = (authObject.equals(cmp.getAuthObject())
+                && authObjectProperty.equals(cmp.getAuthObjectProperty())
+                && ((this.value1 == null && cmp.getValue1() == null) || (this.value1 != null && this.value1.equals(cmp.getValue1())))
+                && ((this.value2 == null && cmp.getValue2() == null) || (this.value2 != null && this.value2.equals(cmp.getValue2())))
+                && ((this.value3 == null && cmp.getValue3() == null) || (this.value3 != null && this.value3.equals(cmp.getValue3())))
+                && ((this.value4 == null && cmp.getValue4() == null) || (this.value4 != null && this.value4.equals(cmp.getValue4())))
+                && ((this.condition == null && cmp.getCondition() == null) || (this.condition != null && this.condition.equals(cmp.getCondition()))));
+        }
+
+        return ret;
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null) ? id : 0;
+    }
+
 }

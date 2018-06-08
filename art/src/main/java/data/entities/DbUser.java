@@ -1,14 +1,5 @@
 package data.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-//@Entity
-//@Table(name = "ArtUsers")
 public class DbUser {
 
     /**
@@ -26,7 +17,6 @@ public class DbUser {
     private String username;
     private DbUserRole role;
 
-    //@Id
     public String getUsername() {
         return username;
     }
@@ -35,8 +25,6 @@ public class DbUser {
         this.username = username;
     }
 
-    //@Enumerated(EnumType.STRING)
-    //@Column(length = 11)
     public DbUserRole getRole() {
         return role;
     }

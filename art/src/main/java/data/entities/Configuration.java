@@ -2,7 +2,6 @@ package data.entities;
 
 import java.time.ZonedDateTime;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -174,6 +173,39 @@ public class Configuration implements IReferenceAware, ICreationFlagsHelper {
         getPatterns().forEach(x -> builder.append("\r\n").append(x));
 
         return builder.toString();
+    }
+
+    /**
+     * This is a custom implementation of equals method that checks for data equality.
+     *
+     * @param other the object to compare with
+     * @return whether they are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        boolean ret = (other == this);
+
+        if (other instanceof Configuration) {
+
+            Configuration cmp = (Configuration) other;
+
+            ret = (name.equals(cmp.getName())
+                && ((this.description == null && cmp.getDescription() == null) || (this.description != null && this.description.equals(cmp.getDescription())))
+                && ((this.whitelist == null && cmp.getWhitelist() == null) || (this.whitelist != null && this.whitelist.equals(cmp.getWhitelist())))
+                && this.id == null || (
+                this.isArchived == cmp.isArchived()
+                    && this.createdAt.equals(cmp.getCreatedAt())
+                    && this.createdBy.equals(cmp.getCreatedBy())
+                ));
+        }
+
+        return ret;
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null) ? id : 0;
     }
 
 }

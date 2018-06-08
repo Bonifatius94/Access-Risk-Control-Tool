@@ -2,7 +2,6 @@ package data.entities;
 
 import java.time.ZonedDateTime;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -129,6 +128,38 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
 
         // TODO: implement logic
         return super.toString();
+    }
+
+    /**
+     * This is a custom implementation of equals method that checks for data equality.
+     *
+     * @param other the object to compare with
+     * @return whether they are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        boolean ret = (other == this);
+
+        if (other instanceof CriticalAccessQuery) {
+
+            CriticalAccessQuery cmp = (CriticalAccessQuery) other;
+
+            ret = (((this.config == null && cmp.getConfig() == null) || (this.config != null && this.config.equals(cmp.getConfig())))
+                && ((this.sapConfig == null && cmp.getSapConfig() == null) || (this.sapConfig != null && this.sapConfig.equals(cmp.getSapConfig())))
+                && this.id == null || (
+                this.isArchived == cmp.isArchived()
+                    && this.createdAt.equals(cmp.getCreatedAt())
+                    && this.createdBy.equals(cmp.getCreatedBy())
+                ));
+        }
+
+        return ret;
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null) ? id : 0;
     }
 
 }

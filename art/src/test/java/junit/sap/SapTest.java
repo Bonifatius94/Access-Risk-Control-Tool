@@ -1,4 +1,4 @@
-package junit.localdb;
+package junit.sap;
 
 import data.entities.AccessPattern;
 import data.entities.Configuration;
@@ -11,7 +11,7 @@ import io.msoffice.excel.WhitelistImportHelper;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import sap.SapConnector;
 

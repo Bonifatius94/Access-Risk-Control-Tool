@@ -1,15 +1,17 @@
 package junit.localdb;
 
 import data.localdb.ArtDbContext;
-import org.junit.Test;
 
 import data.entities.DbUser;
 import data.entities.DbUserRole;
 import data.entities.Whitelist;
+
 import io.msoffice.excel.WhitelistImportHelper;
 
 import java.io.File;
 import java.util.List;
+
+import org.junit.jupiter.api.Test;
 
 public class H2Test {
 
@@ -55,6 +57,8 @@ public class H2Test {
         // create db context
         // this automatically creates a new database file with the database schema (code-first-approach)
         // the first user becomes db admin
+
+        boolean result = false;
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 

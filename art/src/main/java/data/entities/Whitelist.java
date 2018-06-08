@@ -41,7 +41,7 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
         this.id = id;
     }
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     public String getDescription() {
         return description;
     }
@@ -140,13 +140,14 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
 
         if (other instanceof Whitelist) {
 
-            Whitelist elementToCompare = (Whitelist) other;
+            Whitelist cmp = (Whitelist) other;
 
-            ret = (this.description.equals(elementToCompare.getDescription())
-                && this.isArchived == elementToCompare.isArchived()
-                && this.createdAt.equals(elementToCompare.getCreatedAt())
-                && this.createdBy.equals(elementToCompare.getCreatedBy())
-            );
+            ret = (this.description.equals(cmp.getDescription())
+                && this.id == null || (
+                    this.isArchived == cmp.isArchived()
+                    && this.createdAt.equals(cmp.getCreatedAt())
+                    && this.createdBy.equals(cmp.getCreatedBy())
+                ));
         }
 
         return ret;

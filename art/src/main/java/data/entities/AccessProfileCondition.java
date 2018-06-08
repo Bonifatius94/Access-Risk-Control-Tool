@@ -1,6 +1,5 @@
 package data.entities;
 
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -60,6 +59,32 @@ public class AccessProfileCondition {
     @Override
     public String toString() {
         return "profile='" + getProfile() + "'";
+    }
+
+    /**
+     * This is a custom implementation of equals method that checks for data equality.
+     *
+     * @param other the object to compare with
+     * @return whether they are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        boolean ret = (other == this);
+
+        if (other instanceof AccessProfileCondition) {
+
+            AccessProfileCondition cmp = (AccessProfileCondition) other;
+
+            ret = profile.equals(cmp.getProfile());
+        }
+
+        return ret;
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null) ? id : 0;
     }
 
 }

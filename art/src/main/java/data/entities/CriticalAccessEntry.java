@@ -79,10 +79,11 @@ public class CriticalAccessEntry {
 
         if (other instanceof CriticalAccessEntry) {
 
-            CriticalAccessEntry elementToCompare = (CriticalAccessEntry) other;
+            CriticalAccessEntry cmp = (CriticalAccessEntry) other;
 
-            ret = (this.username.equals(elementToCompare.getUsername())
-                && this.accessPattern.getUsecaseId().equals(elementToCompare.getAccessPattern().getUsecaseId()));
+            ret = (this.username.equals(cmp.getUsername())
+                && ((this.query == null && cmp.getQuery() == null) || (this.query != null && this.query.equals(cmp.getQuery())))
+                && ((this.accessPattern == null && cmp.getAccessPattern() == null) || (this.accessPattern != null && this.accessPattern.equals(cmp.getAccessPattern()))));
         }
 
         return ret;

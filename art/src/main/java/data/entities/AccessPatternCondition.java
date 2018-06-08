@@ -36,7 +36,7 @@ public class AccessPatternCondition implements IReferenceAware {
         setProperties(new ArrayList<>(properties));
     }
 
-    private int id;
+    private Integer id;
     private Set<AccessPatternConditionProperty> properties = new HashSet<>();
 
     @Id
@@ -90,6 +90,23 @@ public class AccessPatternCondition implements IReferenceAware {
         builder.append("properties: ");
         getProperties().forEach(x -> builder.append("\r\nproperty: ").append(x.toString()));
         return builder.toString();
+    }
+
+    /**
+     * This is a custom implementation of equals method that checks for data equality.
+     *
+     * @param other the object to compare with
+     * @return whether they are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        return other instanceof AccessPatternCondition;
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null) ? id : 0;
     }
 
 }

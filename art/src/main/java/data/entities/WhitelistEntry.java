@@ -1,9 +1,7 @@
 
 package data.entities;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -103,12 +101,11 @@ public class WhitelistEntry {
 
         if (other instanceof WhitelistEntry) {
 
-            WhitelistEntry elementToCompare = (WhitelistEntry) other;
+            WhitelistEntry cmp = (WhitelistEntry) other;
 
-            ret = (this.username.equals(elementToCompare.getUsername())
-                && this.usecaseId.equals(elementToCompare.getUsecaseId())
-                && this.whitelist.equals(elementToCompare.getWhitelist())
-            );
+            ret = (this.username.equals(cmp.getUsername())
+                && this.usecaseId.equals(cmp.getUsecaseId())
+                && ((this.whitelist == null && cmp.getWhitelist() == null) || (this.whitelist != null && this.whitelist.equals(cmp.getWhitelist()))));
         }
 
         return ret;
