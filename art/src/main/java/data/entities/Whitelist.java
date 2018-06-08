@@ -1,8 +1,9 @@
 package data.entities;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -28,7 +29,7 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
     private ZonedDateTime createdAt;
     private String createdBy;
 
-    private List<WhitelistEntry> entries = new ArrayList<>();
+    private Set<WhitelistEntry> entries = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -51,11 +52,15 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "whitelist", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(value = FetchMode.SUBSELECT)
-    public List<WhitelistEntry> getEntries() {
+    public Set<WhitelistEntry> getEntries() {
         return entries;
     }
 
     public void setEntries(List<WhitelistEntry> entries) {
+        setEntries(new HashSet(entries));
+    }
+
+    public void setEntries(Set<WhitelistEntry> entries) {
         this.entries = entries;
         entries.forEach(x -> x.setWhitelist(this));
     }

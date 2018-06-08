@@ -3,7 +3,9 @@ package data.entities;
 import java.time.ZonedDateTime;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -26,7 +28,7 @@ public class Configuration implements IReferenceAware, ICreationFlagsHelper {
     private Integer id;
     private String name;
     private String description;
-    private List<AccessPattern> patterns = new ArrayList<>();
+    private Set<AccessPattern> patterns = new HashSet<>();
     private Whitelist whitelist;
 
     private boolean isArchived;
@@ -68,12 +70,17 @@ public class Configuration implements IReferenceAware, ICreationFlagsHelper {
         inverseJoinColumns = { @JoinColumn(name = "AccessPatternId") }
     )
     @Fetch(value = FetchMode.SUBSELECT)
-    public List<AccessPattern> getPatterns() {
+    public Set<AccessPattern> getPatterns() {
         return patterns;
     }
 
     public void setPatterns(List<AccessPattern> patterns) {
+        setPatterns(new HashSet<>(patterns));
+    }
+
+    public void setPatterns(Set<AccessPattern> patterns) {
         this.patterns = patterns;
+        adjustReferences();
     }
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

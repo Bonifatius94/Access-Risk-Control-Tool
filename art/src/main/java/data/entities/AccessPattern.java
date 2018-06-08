@@ -3,7 +3,9 @@ package data.entities;
 import java.time.ZonedDateTime;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -121,8 +123,8 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
     private String description;
     private ConditionLinkage linkage = ConditionLinkage.None;
 
-    private List<AccessCondition> conditions;
-    private List<Configuration> configurations;
+    private Set<AccessCondition> conditions = new HashSet<>();
+    private Set<Configuration> configurations = new HashSet<>();
 
     private boolean isArchived;
     private ZonedDateTime createdAt;
@@ -160,12 +162,17 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "pattern", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(value = FetchMode.SUBSELECT)
-    public List<AccessCondition> getConditions() {
+    public Set<AccessCondition> getConditions() {
         return conditions;
     }
 
     public void setConditions(List<AccessCondition> conditions) {
+        setConditions(new HashSet<>(conditions));
+    }
+
+    public void setConditions(Set<AccessCondition> conditions) {
         this.conditions = conditions;
+        adjustReferences();
     }
 
     @Enumerated(EnumType.STRING)
@@ -179,12 +186,17 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
     }
 
     @ManyToMany(mappedBy = "patterns")
-    public List<Configuration> getConfigurations() {
+    public Set<Configuration> getConfigurations() {
         return configurations;
     }
 
     public void setConfigurations(List<Configuration> configurations) {
+        setConfigurations(new HashSet<>(configurations));
+    }
+
+    public void setConfigurations(Set<Configuration> configurations) {
         this.configurations = configurations;
+        adjustReferences();
     }
 
     public boolean isArchived() {

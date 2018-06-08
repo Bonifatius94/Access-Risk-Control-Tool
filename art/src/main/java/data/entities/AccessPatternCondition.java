@@ -1,7 +1,9 @@
 package data.entities;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -9,8 +11,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -37,7 +37,7 @@ public class AccessPatternCondition implements IReferenceAware {
     }
 
     private int id;
-    private List<AccessPatternConditionProperty> properties;
+    private Set<AccessPatternConditionProperty> properties = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -51,12 +51,17 @@ public class AccessPatternCondition implements IReferenceAware {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "condition", cascade = CascadeType.ALL)
     @Fetch(value = FetchMode.SUBSELECT)
-    public List<AccessPatternConditionProperty> getProperties() {
+    public Set<AccessPatternConditionProperty> getProperties() {
         return properties;
     }
 
     public void setProperties(List<AccessPatternConditionProperty> properties) {
+        setProperties(new HashSet<>(properties));
+    }
+
+    public void setProperties(Set<AccessPatternConditionProperty> properties) {
         this.properties = properties;
+        adjustReferences();
     }
 
     // =============================

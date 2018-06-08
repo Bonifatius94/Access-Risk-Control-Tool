@@ -3,7 +3,9 @@ package data.entities;
 import java.time.ZonedDateTime;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -26,7 +28,7 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
     private Integer id;
     private Configuration config;
     private SapConfiguration sapConfig;
-    private List<CriticalAccessEntry> entries = new ArrayList<>();
+    private Set<CriticalAccessEntry> entries = new HashSet<>();
 
     private boolean isArchived;
     private ZonedDateTime createdAt;
@@ -64,11 +66,15 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(value = FetchMode.SUBSELECT)
-    public List<CriticalAccessEntry> getEntries() {
+    public Set<CriticalAccessEntry> getEntries() {
         return entries;
     }
 
     public void setEntries(List<CriticalAccessEntry> entries) {
+        setEntries(new HashSet<>(entries));
+    }
+
+    public void setEntries(Set<CriticalAccessEntry> entries) {
         this.entries = entries;
         entries.forEach(x -> x.setQuery(this));
     }
