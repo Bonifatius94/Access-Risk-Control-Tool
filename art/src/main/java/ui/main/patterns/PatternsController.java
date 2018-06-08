@@ -50,6 +50,7 @@ public class PatternsController {
             ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
 
             patternsTable.setItems(list);
+            patternsTable.refresh();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,30 +66,28 @@ public class PatternsController {
             patternsTable.getItems().remove(accessPattern);
             return accessPattern;
         }));
-        deleteColumn.setSortable(false);
-        deleteColumn.getStyleClass().add("undecorated-column");
 
         // Add the edit column
         editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (AccessPattern accessPattern) -> {
             editAccessPattern(accessPattern);
             return accessPattern;
         }));
-        editColumn.setSortable(false);
-        editColumn.getStyleClass().add("undecorated-column");
 
         // overwrite the column in which the number of useCases is displayed
         useCaseCountColumn.setCellFactory(col -> new TableCell<AccessPattern, List<AccessCondition>>() {
+
             @Override
             protected void updateItem(List<AccessCondition> items, boolean empty) {
-                if (empty || items == null) {
-                    setText("");
-                } else {
-                    // set image for non-empty cell
-                    setText("" + items.size());
-                }
+
+                // display nothing if the row is empty, otherwise the item count
+                setText((empty || items == null) ? "" : "" + items.size());
+
             }
 
         });
+
+        // custom comparator for the useCaseCountColumn
+        useCaseCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
     }
 
     public void editAccessPattern(AccessPattern accessPattern) {
