@@ -4,20 +4,19 @@
 <?import com.jfoenix.controls.*?>
 
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import ui.custom.controls.PTableColumn?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="ui.main.patterns.PatternsController"
       spacing="10">
-    <TableView HBox.hgrow="ALWAYS" fx:id="patternsTable">
+    <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable">
         <columns>
             <PTableColumn text="ID" percentageWidth="0.05" resizable="false" >
                 <cellValueFactory>
                     <PropertyValueFactory property="id"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="Description" percentageWidth="0.71" resizable="false" >
+            <PTableColumn text="Description" percentageWidth="0.71" resizable="false" styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="description"/>
                 </cellValueFactory>
