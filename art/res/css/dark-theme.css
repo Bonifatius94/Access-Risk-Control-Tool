@@ -451,3 +451,15 @@ alternative design with separators left and right of complete header bar
 .dialog-pane .button-bar .cancel-button:focused  {
     -fx-background-color: -fx-error;
 }
+
+/* style different dialogs differently */
+
+/* information */
+.dialog-pane .information {
+    -fx-background-color: -fx-primary;
+}
+
+/* warning */
+.dialog-pane .warning {
+    -fx-background-color: -fx-error;
+}

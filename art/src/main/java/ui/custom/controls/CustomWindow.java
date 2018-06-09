@@ -76,7 +76,7 @@ public class CustomWindow extends VBox {
      * CanMinimize: Miximize button is disabled and resize arrows at the border of the window, too. Minimize is still working as usual.
      * NoResize: Window size cannot be changed by user and only close button is available.
      */
-    public enum WindowState { CanResize, CanMinimize, NoResize }
+    public enum WindowState { CanResize, CanMinimize, NoResize, NoButtons }
 
     private final ObjectProperty<WindowState> windowStateProperty = new SimpleObjectProperty<>(this, "windowState", WindowState.CanResize);
 
@@ -190,6 +190,13 @@ public class CustomWindow extends VBox {
             // remove minimize and maximize button
             btnMinimize.setVisible(false);
             btnMaximize.setVisible(false);
+
+        } else if (getWindowState() == WindowState.NoButtons) {
+
+            // remove all buttons
+            btnMinimize.setVisible(false);
+            btnMaximize.setVisible(false);
+            btnClose.setVisible(false);
         }
     }
 

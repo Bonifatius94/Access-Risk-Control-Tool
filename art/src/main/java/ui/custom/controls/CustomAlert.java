@@ -10,6 +10,7 @@ import javafx.stage.StageStyle;
 public class CustomAlert extends Alert {
 
     private CustomWindow window;
+
     private String title;
     private String contentText;
     private String okButtonText;
@@ -96,7 +97,7 @@ public class CustomAlert extends Alert {
 
         // add custom window as header
         window = new CustomWindow();
-        window.setWindowState(CustomWindow.WindowState.NoResize);
+        window.setWindowState(CustomWindow.WindowState.NoButtons);
         window.initStage((Stage) getDialogPane().getScene().getWindow());
 
         // set window title
@@ -121,6 +122,8 @@ public class CustomAlert extends Alert {
         // initialize buttons
         if (getAlertType() == AlertType.CONFIRMATION) {
 
+            window.getStyleClass().add("confirmation");
+
             if (okButtonText != null) {
                 ButtonType okButton = new ButtonType(this.okButtonText, ButtonBar.ButtonData.OK_DONE);
                 getButtonTypes().set(0, okButton);
@@ -135,11 +138,19 @@ public class CustomAlert extends Alert {
             }
 
         } else if (getAlertType() == AlertType.INFORMATION || getAlertType() == AlertType.WARNING) {
+            ButtonType okButton = new ButtonType(this.okButtonText, ButtonBar.ButtonData.OK_DONE);;
 
             if (okButtonText != null) {
-                ButtonType okButton = new ButtonType(this.okButtonText, ButtonBar.ButtonData.OK_DONE);
                 getButtonTypes().set(0, okButton);
             }
+
+            if (getAlertType() == AlertType.WARNING) {
+                window.getStyleClass().add("warning");
+                getDialogPane().lookupButton(okButton).getStyleClass().add("warning-button");
+            } else {
+                window.getStyleClass().add("information");
+            }
+
 
         } else {
 

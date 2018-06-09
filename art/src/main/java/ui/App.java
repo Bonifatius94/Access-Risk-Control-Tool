@@ -71,7 +71,8 @@ public class App extends Application {
         window.setTitle("Access Risk Control Tool");
         primaryStage.show();
 
-        CustomAlert alert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Titel", "Text message.", "Okayyy", "Nope");
+        CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "Titel", "Sample text message boii.", "Yeee", "Nope");
+        alert.showAndWait();
 
         TraceOut.leave();
     }
