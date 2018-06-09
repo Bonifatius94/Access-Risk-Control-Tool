@@ -110,12 +110,35 @@ public class SapSettingsController {
 
     @SuppressWarnings("all")
     public void newSapConnectionAction(ActionEvent actionEvent) {
-        //TODO: new SAP Dialog
+        try {
+            // create a new FXML loader with the NewSapSettingDialogView
+            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("NewSapSettingDialogView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
+
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow, 600, 400);
+            scene.getStylesheets().add("css/dark-theme.css");
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
+            customWindow.initStage(stage);
+
+
+            stage.show();
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getClass().toString());
+            e.printStackTrace();
+
+        }
     }
 
     @SuppressWarnings("all")
     public void cloneAction(ActionEvent actionEvent) {
-        if(sapConnectionTable.getSelectionModel().getSelectedItem()!= null) {
+        if (sapConnectionTable.getSelectionModel().getSelectedItem() != null) {
             SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
             sapConnectionTable.getItems().add(sapConfiguration);
             sapConnectionTable.refresh();

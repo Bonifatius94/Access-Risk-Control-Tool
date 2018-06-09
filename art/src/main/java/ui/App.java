@@ -18,6 +18,7 @@ public class App extends Application {
     }
 
     public static Stage primaryStage;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         //to make some windows modal

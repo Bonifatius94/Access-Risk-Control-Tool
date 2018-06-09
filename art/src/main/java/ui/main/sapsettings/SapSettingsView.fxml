@@ -6,7 +6,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import ui.custom.controls.PTableColumn?>
-<VBox spacing="10" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.sapsettings.SapSettingsController">
+<VBox spacing="10" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ui.main.sapsettings.SapSettingsController">
     <TableView VBox.vgrow="ALWAYS" fx:id="sapConnectionTable">
         <columns>
             <PTableColumn percentageWidth="0.05" resizable="false" text="Id">
@@ -24,12 +25,12 @@
                     <PropertyValueFactory property="sysNr"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" resizable="false" text="JCO Client" >
+            <PTableColumn percentageWidth="0.1" resizable="false" text="JCO Client">
                 <cellValueFactory>
                     <PropertyValueFactory property="client"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" resizable="false" text="Language" >
+            <PTableColumn percentageWidth="0.1" resizable="false" text="Language">
                 <cellValueFactory>
                     <PropertyValueFactory property="language"/>
                 </cellValueFactory>
@@ -40,7 +41,7 @@
                 </cellValueFactory>
             </PTableColumn>
             <!-- TODO: additional Columns for creationDate , Author,  ???? -->
-            <PTableColumn percentageWidth="0.1" resizable="false" fx:id="editConfigColumn" >
+            <PTableColumn percentageWidth="0.1" resizable="false" fx:id="editConfigColumn">
             </PTableColumn>
             <PTableColumn percentageWidth="0.1" resizable="false" fx:id="deleteConfigColumn">
             </PTableColumn>
@@ -49,8 +50,8 @@
 
     <HBox alignment="BOTTOM_RIGHT" spacing="15">
         <HBox alignment="BOTTOM_LEFT" spacing="10">
-            <JFXButton prefWidth="150"  prefHeight="40" text="New Sap Connection"  onAction="#newSapConnectionAction"/>
-            <JFXButton prefWidth="150"  prefHeight="40" text="Connect"  onAction="#connectAction"/>
+            <JFXButton prefWidth="150" prefHeight="40" text="New Sap Connection" onAction="#newSapConnectionAction"/>
+            <JFXButton prefWidth="150" prefHeight="40" text="Connect" onAction="#connectAction"/>
         </HBox>
         <JFXButton prefWidth="100" text="Clone ..." onAction="#cloneAction"/>
         <JFXButton prefWidth="100" text="Edit ..." onAction="#editAction"/>
