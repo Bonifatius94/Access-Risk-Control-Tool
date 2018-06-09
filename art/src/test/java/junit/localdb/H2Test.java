@@ -1,7 +1,8 @@
 package junit.localdb;
 
 import data.localdb.ArtDbContext;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 public class H2Test {
 
