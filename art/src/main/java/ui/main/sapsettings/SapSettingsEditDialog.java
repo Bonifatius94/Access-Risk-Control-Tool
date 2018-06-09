@@ -19,30 +19,29 @@ public class SapSettingsEditDialog {
     public JFXTextField userNameField;
     @FXML
     public JFXPasswordField passwordField;
-    
+
     private SapConfiguration sapConfig;
+
     /**
      * Initializes fields ???
      */
     @FXML
-    @SuppressWarnings("all")
     public void initialize(){
+
+    }
+
+    public void saveConnection(ActionEvent actionEvent) {
+    }
+
+    public void connect(ActionEvent actionEvent) {
+    }
+
+    public void fillDialog(SapConfiguration sapConfig) {
+        this.sapConfig = sapConfig;
+
         hostServerField.setText(sapConfig.getServerDestination());
         sysNrField.setText(sapConfig.getSysNr());
         jcoClientComboBox.getItems().add(sapConfig.getClient());
         userNameField.setText(sapConfig.getCreatedBy());
-    }
-    @FXML
-    @SuppressWarnings("all")
-    public void saveConnection(ActionEvent actionEvent) {
-    }
-    @FXML
-    @SuppressWarnings("all")
-    public void connect(ActionEvent actionEvent) {
-    }
-    @SuppressWarnings("all")
-    public SapSettingsEditDialog(SapConfiguration sapConfiguration) {
-        this.sapConfig = sapConfiguration;
-        
     }
 }

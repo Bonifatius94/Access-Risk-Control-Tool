@@ -86,28 +86,24 @@ public class SapSettingsController {
 
     private void editConfig(SapConfiguration sapConfiguration) {
 
-
         try {
-            System.out.println("woher kommt der error");
+            // create a new FXML loader with the SapSettingsEditDialog
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            System.out.println("nicht von bundle");
-            if(getClass().getResource("SapSettingsEditDialog.fxml")==null) {
-                System.out.println("ohhhhh  neinn");
-            }
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("SapSettingsEditDialog.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
 
-            CustomWindow customWindow = FXMLLoader.load(getClass().getResource("SapSettingsEditDialog.fxml"),bundle);
-
-            System.out.println("der loader wasrs nicht");
+            // build the scene and add it to the stage
             Scene scene = new Scene(customWindow, 600,400);
-            System.out.println("auch die scene nicht");
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
             customWindow.initStage(stage);
-            new SapSettingsEditDialog(sapConfiguration);
-            customWindow.setTitle("Edit Sap Connection");
 
             stage.show();
+
+            // give the dialog the sapConfiguration
+            SapSettingsEditDialog sapEdit = loader.getController();
+            sapEdit.fillDialog(sapConfiguration);
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
