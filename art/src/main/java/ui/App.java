@@ -71,8 +71,10 @@ public class App extends Application {
         primaryStage.show();
 
         // test alert
-        CustomAlert alert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Titel", "Sample text message boii.", "Yeee", "Nope");
-        alert.showAndWait();
+        CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "1 nicer Titel", "Hallo Jungs! Fetter TestAlert in rot!", "Yeee", "Wow!");
+        if (alert.showAndWait().get() == ButtonType.OK) {
+            System.out.println("Okay!");
+        }
 
         TraceOut.leave();
     }

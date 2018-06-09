@@ -1,7 +1,13 @@
+/*******************************************************************************
+ *                                                                             *
+ * Main .css file for the dark theme                                           *
+ *                                                                             *
+ ******************************************************************************/
+
 /* Define custom color variables which are used throughout the whole application */
 * {
     -fx-primary: #4C9687;
-    -fx-error: #ff4081;
+    -fx-error: #853149;
     -fx-success: #55854B;
     -fx-text: white;
     -fx-alternatetext: #303030;
@@ -366,4 +372,15 @@ alternative design with separators left and right of complete header bar
 .glyph-icon {
     -fx-font-family: "Material Design Icons";
     -fx-fill: -fx-text;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Custom window                                                               *
+ *                                                                             *
+ ******************************************************************************/
+
+.windowLabel {
+    -fx-font-weight: bold;
 }
