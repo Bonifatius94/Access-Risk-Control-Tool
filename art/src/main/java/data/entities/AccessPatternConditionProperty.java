@@ -151,7 +151,7 @@ public class AccessPatternConditionProperty {
     @Override
     public boolean equals(Object other) {
 
-        boolean ret = (other == this);
+        /*boolean ret = (other == this);
 
         if (other instanceof AccessPatternConditionProperty) {
 
@@ -166,12 +166,15 @@ public class AccessPatternConditionProperty {
                 && ((this.condition == null && cmp.getCondition() == null) || (this.condition != null && this.condition.equals(cmp.getCondition()))));
         }
 
-        return ret;
+        return ret;*/
+
+        return super.equals(other);
     }
 
     @Override
     public int hashCode() {
-        return (id != null) ? id : 0;
+        //return (id != null) ? id : 0;
+        return super.hashCode();
     }
 
 }

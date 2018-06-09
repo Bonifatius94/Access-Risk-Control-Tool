@@ -101,12 +101,14 @@ public class AccessPatternCondition implements IReferenceAware {
     @Override
     public boolean equals(Object other) {
 
-        return other instanceof AccessPatternCondition;
+        //return other instanceof AccessPatternCondition;
+        return super.equals(other);
     }
 
     @Override
     public int hashCode() {
-        return (id != null) ? id : 0;
+        //return (id != null) ? id : 0;
+        return super.hashCode();
     }
 
 }

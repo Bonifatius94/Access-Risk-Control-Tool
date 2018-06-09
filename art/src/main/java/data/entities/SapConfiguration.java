@@ -123,7 +123,7 @@ public class SapConfiguration implements ICreationFlagsHelper {
     @Override
     public boolean equals(Object other) {
 
-        boolean ret = (other == this);
+        /*boolean ret = (other == this);
 
         if (other instanceof SapConfiguration) {
 
@@ -141,12 +141,15 @@ public class SapConfiguration implements ICreationFlagsHelper {
                 ));
         }
 
-        return ret;
+        return ret;*/
+
+        return super.equals(other);
     }
 
     @Override
     public int hashCode() {
-        return (id != null) ? id : 0;
+        //return (id != null) ? id : 0;
+        return super.hashCode();
     }
 
 }

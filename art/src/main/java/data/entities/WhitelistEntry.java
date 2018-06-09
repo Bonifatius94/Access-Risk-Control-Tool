@@ -97,7 +97,7 @@ public class WhitelistEntry {
     @Override
     public boolean equals(Object other) {
 
-        boolean ret = (other == this);
+        /*boolean ret = (other == this);
 
         if (other instanceof WhitelistEntry) {
 
@@ -108,12 +108,21 @@ public class WhitelistEntry {
                 && ((this.whitelist == null && cmp.getWhitelist() == null) || (this.whitelist != null && this.whitelist.equals(cmp.getWhitelist()))));
         }
 
-        return ret;
+        return ret;*/
+
+        // TODO: change implementation of this method accordingly
+        // return false if types are not matching or other is null
+        // return false if both IDs are null
+        // otherwise return true if IDs match and IDs of referenced objects match also
+
+        return super.equals(other);
     }
 
     @Override
     public int hashCode() {
-        return (id != null) ? id : 0;
+
+        //return (id != null) ? id : 0;
+        return super.hashCode();
     }
 
 }

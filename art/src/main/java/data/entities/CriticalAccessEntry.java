@@ -11,8 +11,17 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "CriticalAccessQueryEntries")
+@Table(name = "CriticalAccessEntries")
 public class CriticalAccessEntry {
+
+    public CriticalAccessEntry() {
+
+    }
+
+    public CriticalAccessEntry(AccessPattern pattern, String username) {
+        setAccessPattern(pattern);
+        setUsername(username);
+    }
 
     private Integer id;
     private CriticalAccessQuery query;
@@ -75,7 +84,7 @@ public class CriticalAccessEntry {
     @Override
     public boolean equals(Object other) {
 
-        boolean ret = (other == this);
+        /*boolean ret = (other == this);
 
         if (other instanceof CriticalAccessEntry) {
 
@@ -86,11 +95,14 @@ public class CriticalAccessEntry {
                 && ((this.accessPattern == null && cmp.getAccessPattern() == null) || (this.accessPattern != null && this.accessPattern.equals(cmp.getAccessPattern()))));
         }
 
-        return ret;
+        return ret;*/
+
+        return super.equals(other);
     }
 
     @Override
     public int hashCode() {
-        return (id != null) ? id : 0;
+        //return (id != null) ? id : 0;
+        return super.hashCode();
     }
 }

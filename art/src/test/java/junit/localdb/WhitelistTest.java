@@ -1,4 +1,4 @@
-package data.localdb.test;
+package junit.localdb;
 
 import data.entities.Whitelist;
 import data.localdb.ArtDbContext;
