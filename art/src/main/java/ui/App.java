@@ -3,12 +3,10 @@ package ui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import tools.tracing.TraceLevel;
 import tools.tracing.TraceMode;
 import tools.tracing.TraceOut;
-import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 
 import java.util.ResourceBundle;
@@ -19,9 +17,11 @@ public class App extends Application {
         launch(args);
     }
 
+    public static Stage primaryStage;
     @Override
     public void start(Stage primaryStage) throws Exception {
-
+        //to make some windows modal
+        App.primaryStage = primaryStage;
         // TODO: change trace level to error for release version
         // init logging tool
         TraceOut.enable("log.trc.txt", TraceMode.Overwrite, TraceLevel.All);
@@ -65,11 +65,11 @@ public class App extends Application {
         window.setTitle("Access Risk Control Tool");
         primaryStage.show();
 
-        // test alert
+        /*/ test alert
         CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "1 nicer Titel", "Hallo Jungs! Fetter TestAlert in rot!", "Yeee", "Wow!");
         if (alert.showAndWait().get() == ButtonType.OK) {
             System.out.println("Okay!");
-        }
+        }*/
 
         TraceOut.leave();
     }

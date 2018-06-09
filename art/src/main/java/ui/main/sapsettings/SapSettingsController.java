@@ -11,7 +11,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import ui.App;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
 
@@ -79,7 +81,10 @@ public class SapSettingsController {
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
+
 
             stage.show();
 
