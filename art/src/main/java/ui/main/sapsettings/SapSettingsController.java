@@ -14,7 +14,6 @@ import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
-import ui.custom.controls.PTableColumn;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,23 +23,6 @@ import java.util.ResourceBundle;
 
 public class SapSettingsController {
 
-    @FXML
-    public JFXButton cloneButton;
-    @FXML
-    public JFXButton editButton;
-    @FXML
-    public JFXButton deleteButton;
-    @FXML
-    public JFXButton connectButton;
-    @FXML
-    public JFXButton newSapConnectionButton;
-
-    public PTableColumn<SapConfiguration, Integer> id;
-    public PTableColumn<SapConfiguration, String> hostnameColumn;
-    public PTableColumn<SapConfiguration, String> sysNr;
-    public PTableColumn<SapConfiguration, String> jcoCLient;
-    public PTableColumn<SapConfiguration, String> language;
-    public PTableColumn<SapConfiguration, String> poolCapacity;
     @FXML
     private TableView<SapConfiguration> sapConnectionTable;
     @FXML
@@ -87,13 +69,13 @@ public class SapSettingsController {
     private void editConfig(SapConfiguration sapConfiguration) {
 
         try {
-            // create a new FXML loader with the SapSettingsEditDialog
+            // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("SapSettingsEditDialog.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("SapSettingsEditDialogView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 600,400);
+            Scene scene = new Scene(customWindow, 600, 400);
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
@@ -102,8 +84,8 @@ public class SapSettingsController {
             stage.show();
 
             // give the dialog the sapConfiguration
-            SapSettingsEditDialog sapEdit = loader.getController();
-            sapEdit.fillDialog(sapConfiguration);
+            SapSettingsEditDialogController sapEdit = loader.getController();
+            sapEdit.giveSelectedSapConfig(sapConfiguration);
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -114,19 +96,33 @@ public class SapSettingsController {
 
 
     }
+
     @SuppressWarnings("all")
     public void connectAction(ActionEvent actionEvent) {
+        SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
+        //TODO:Saplogin Dialog
     }
+
     @SuppressWarnings("all")
     public void newSapConnectionAction(ActionEvent actionEvent) {
+        //TODO: new SAP Dialog
     }
+
     @SuppressWarnings("all")
     public void cloneAction(ActionEvent actionEvent) {
+        if(sapConnectionTable.getSelectionModel().getSelectedItem()!= null) {
+            SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
+            sapConnectionTable.getItems().add(sapConfiguration);
+            sapConnectionTable.refresh();
+        }
+
     }
+
     @SuppressWarnings("all")
     public void editAction(ActionEvent actionEvent) {
         editConfig(sapConnectionTable.getSelectionModel().getSelectedItem());
     }
+
     @SuppressWarnings("all")
     public void deleteAction(ActionEvent actionEvent) {
         SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();

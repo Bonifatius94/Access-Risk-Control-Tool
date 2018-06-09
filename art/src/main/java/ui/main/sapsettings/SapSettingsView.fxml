@@ -9,32 +9,32 @@
 <VBox spacing="10" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.sapsettings.SapSettingsController">
     <TableView VBox.vgrow="ALWAYS" fx:id="sapConnectionTable">
         <columns>
-            <PTableColumn percentageWidth="0.05" resizable="false" text="Id" fx:id="id">
+            <PTableColumn percentageWidth="0.05" resizable="false" text="Id">
                 <cellValueFactory>
                     <PropertyValueFactory property="id"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.35" resizable="false" text="Server" fx:id="hostnameColumn">
+            <PTableColumn percentageWidth="0.35" resizable="false" text="Server">
                 <cellValueFactory>
                     <PropertyValueFactory property="serverDestination"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" resizable="false" text="Sys Nr" fx:id="sysNr">
+            <PTableColumn percentageWidth="0.1" resizable="false" text="Sys Nr">
                 <cellValueFactory>
                     <PropertyValueFactory property="sysNr"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" resizable="false" text="JCO Client" fx:id="jcoCLient">
+            <PTableColumn percentageWidth="0.1" resizable="false" text="JCO Client" >
                 <cellValueFactory>
                     <PropertyValueFactory property="client"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" resizable="false" text="Language" fx:id="language">
+            <PTableColumn percentageWidth="0.1" resizable="false" text="Language" >
                 <cellValueFactory>
                     <PropertyValueFactory property="language"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" resizable="false" text="Pool Capacity" fx:id="poolCapacity">
+            <PTableColumn percentageWidth="0.1" resizable="false" text="Pool Capacity">
                 <cellValueFactory>
                     <PropertyValueFactory property="poolCapacity"/>
                 </cellValueFactory>
@@ -49,12 +49,12 @@
 
     <HBox alignment="BOTTOM_RIGHT" spacing="15">
         <HBox alignment="BOTTOM_LEFT" spacing="10">
-            <JFXButton prefWidth="150"  prefHeight="40" text="New Sap Connection" fx:id="newSapConnectionButton" onAction="#newSapConnectionAction"/>
-            <JFXButton prefWidth="150"  prefHeight="40" text="Connect" fx:id="connectButton" onAction="#connectAction"/>
+            <JFXButton prefWidth="150"  prefHeight="40" text="New Sap Connection"  onAction="#newSapConnectionAction"/>
+            <JFXButton prefWidth="150"  prefHeight="40" text="Connect"  onAction="#connectAction"/>
         </HBox>
-        <JFXButton prefWidth="100" text="Clone ..." fx:id="cloneButton" onAction="#cloneAction"/>
-        <JFXButton prefWidth="100" text="Edit ..." fx:id="editButton" onAction="#editAction"/>
-        <JFXButton prefWidth="100" text="Delete" fx:id="deleteButton" onAction="#deleteAction"/>
+        <JFXButton prefWidth="100" text="Clone ..." onAction="#cloneAction"/>
+        <JFXButton prefWidth="100" text="Edit ..." onAction="#editAction"/>
+        <JFXButton prefWidth="100" text="Delete" onAction="#deleteAction"/>
     </HBox>
 </VBox>
 

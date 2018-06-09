@@ -7,7 +7,7 @@ import data.entities.SapConfiguration;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
-public class SapSettingsEditDialog {
+public class SapSettingsEditDialogController {
 
     @FXML
     public JFXTextField hostServerField;
@@ -19,7 +19,7 @@ public class SapSettingsEditDialog {
     public JFXTextField userNameField;
     @FXML
     public JFXPasswordField passwordField;
-
+    @SuppressWarnings("all")
     private SapConfiguration sapConfig;
 
     /**
@@ -29,14 +29,16 @@ public class SapSettingsEditDialog {
     public void initialize(){
 
     }
-
+    @SuppressWarnings("all")
     public void saveConnection(ActionEvent actionEvent) {
+        //TODO: test if input is valid
     }
-
+    @SuppressWarnings("all")
     public void connect(ActionEvent actionEvent) {
+        //TODO:test if input is valid , Establish connection to Sap
     }
-
-    public void fillDialog(SapConfiguration sapConfig) {
+    @SuppressWarnings("all")
+    void giveSelectedSapConfig(SapConfiguration sapConfig) {
         this.sapConfig = sapConfig;
 
         hostServerField.setText(sapConfig.getServerDestination());
