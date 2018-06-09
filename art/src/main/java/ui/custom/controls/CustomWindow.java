@@ -76,7 +76,7 @@ public class CustomWindow extends VBox {
      * CanMinimize: Miximize button is disabled and resize arrows at the border of the window, too. Minimize is still working as usual.
      * NoResize: Window size cannot be changed by user and only close button is available.
      */
-    public enum WindowState { CanResize, CanMinimize, NoResize }
+    public enum WindowState { CanResize, CanMinimize, NoResize, NoButtons }
 
     private final ObjectProperty<WindowState> windowStateProperty = new SimpleObjectProperty<>(this, "windowState", WindowState.CanResize);
 
@@ -154,18 +154,21 @@ public class CustomWindow extends VBox {
         btnMinimize.setMnemonicParsing(false);
         btnMinimize.getStyleClass().addAll("windowButton");
         btnMinimize.setPrefWidth(20);
+        btnMinimize.setFocusTraversable(false);
 
         // init maximize button
         btnMaximize = new JFXButton(null, new MaterialDesignIconView(MaterialDesignIcon.WINDOW_MAXIMIZE));
         btnMaximize.setMnemonicParsing(false);
         btnMaximize.getStyleClass().addAll("windowButton");
         btnMaximize.setPrefWidth(20);
+        btnMaximize.setFocusTraversable(false);
 
         // init close button
         btnClose = new JFXButton(null, new MaterialDesignIconView(MaterialDesignIcon.CLOSE));
         btnClose.setMnemonicParsing(false);
         btnClose.getStyleClass().addAll("windowButton", "closeWindowButton");
         btnClose.setPrefWidth(20);
+        btnClose.setFocusTraversable(false);
 
         // init container with horizontal orientation and apply children to it
         hbHeaderContainer = new HBox();
@@ -187,6 +190,13 @@ public class CustomWindow extends VBox {
             // remove minimize and maximize button
             btnMinimize.setVisible(false);
             btnMaximize.setVisible(false);
+
+        } else if (getWindowState() == WindowState.NoButtons) {
+
+            // remove all buttons
+            btnMinimize.setVisible(false);
+            btnMaximize.setVisible(false);
+            btnClose.setVisible(false);
         }
     }
 

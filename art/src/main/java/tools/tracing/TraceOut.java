@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 @SuppressWarnings("unused")
 public class TraceOut {
 
+    private static boolean isEnabled;
     private static PrintStream out;
     private static TraceMode mode;
     private static TraceLevel level;
@@ -34,6 +35,17 @@ public class TraceOut {
         TraceOut.traceFilePath = filePath;
 
         initOutputStream(filePath);
+
+        isEnabled = true;
+    }
+
+    /**
+     * This method switches the logging tool off.
+     */
+    public static void disable() {
+
+        isEnabled = false;
+        out.close();
     }
 
     private static void initOutputStream(String filePath) throws Exception {
@@ -47,7 +59,7 @@ public class TraceOut {
 
         // init output file stream
         boolean append = (TraceOut.mode != TraceMode.Overwrite);
-        TraceOut.out = new PrintStream(new FileOutputStream(filePath, append));
+        out = new PrintStream(new FileOutputStream(filePath, append));
     }
 
     /**
@@ -56,7 +68,6 @@ public class TraceOut {
      * @return the output stream of the current log file
      */
     public static PrintStream getOutputStream() {
-
         return TraceOut.out;
     }
 
@@ -79,7 +90,7 @@ public class TraceOut {
     @SuppressWarnings({"WeakerAccess"})
     public static void enter(TraceLevel level) {
 
-        if (TraceOut.level.ordinal() >= level.ordinal()) {
+        if (isEnabled && TraceOut.level.ordinal() >= level.ordinal()) {
 
             // get caller from stack
             StackTraceElement[] stack = Thread.currentThread().getStackTrace();
@@ -113,7 +124,7 @@ public class TraceOut {
     @SuppressWarnings({"WeakerAccess"})
     public static void leave(TraceLevel level) {
 
-        if (TraceOut.level.ordinal() >= level.ordinal()) {
+        if (isEnabled && TraceOut.level.ordinal() >= level.ordinal()) {
 
             // get caller from stack
             StackTraceElement[] stack = Thread.currentThread().getStackTrace();
@@ -150,7 +161,7 @@ public class TraceOut {
     @SuppressWarnings({"WeakerAccess"})
     public static void writeInfo(String text, TraceLevel level) {
 
-        if (TraceOut.level.ordinal() >= level.ordinal()) {
+        if (isEnabled && TraceOut.level.ordinal() >= level.ordinal()) {
             writeToTrace("INFO ", text);
         }
     }
@@ -177,7 +188,7 @@ public class TraceOut {
     @SuppressWarnings({"WeakerAccess"})
     public static void writeException(Throwable throwable, TraceLevel level) {
 
-        if (TraceOut.level.ordinal() >= level.ordinal()) {
+        if (isEnabled && TraceOut.level.ordinal() >= level.ordinal()) {
             writeToTrace("ERROR", throwable.getMessage());
         }
     }
