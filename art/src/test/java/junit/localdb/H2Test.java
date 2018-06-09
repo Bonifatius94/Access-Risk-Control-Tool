@@ -1,13 +1,15 @@
-package data.localdb;
+package junit.localdb;
+
+import data.localdb.ArtDbContext;
+
+import org.junit.jupiter.api.Test;
 
 public class H2Test {
 
-    /**
-     * This method runs a test program.
-     *
-     * @param args no args, will be ignored
-     */
-    public static void main(String[] args) {
+    @Test
+    public void testCreateSchema() {
+
+        boolean result = false;
 
         // create db context
         // this automatically creates a new database file with the database schema (code-first-approach)
@@ -15,12 +17,15 @@ public class H2Test {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             System.out.println("database schema creation successful");
+            result = true;
 
         } catch (Exception ex) {
 
             System.out.println("database schema creation failed");
             ex.printStackTrace();
         }
+
+        assert(result);
     }
 
 }

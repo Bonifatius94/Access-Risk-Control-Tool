@@ -13,6 +13,15 @@ import javax.persistence.Table;
 @Table(name = "CriticalAccessEntries")
 public class CriticalAccessEntry {
 
+    public CriticalAccessEntry() {
+
+    }
+
+    public CriticalAccessEntry(AccessPattern pattern, String username) {
+        setAccessPattern(pattern);
+        setUsername(username);
+    }
+
     private Integer id;
     private AccessPattern accessPattern;
     private String username;
@@ -54,35 +63,4 @@ public class CriticalAccessEntry {
         return "ViolatedUseCaseID: " + accessPattern.getUsecaseId() + ", Username: " + username;
     }
 
-    /**
-     * Compares an entry to another entry using userName and useCaseID.
-     *
-     * @param other the object to compare with
-     * @return whether they are equal
-     */
-    @Override
-    public boolean equals(Object other) {
-
-        if (other == null) {
-            return false;
-        }
-
-        if (other == this) {
-            return true;
-        }
-
-        if (!(other instanceof CriticalAccessEntry)) {
-            return false;
-        }
-
-        CriticalAccessEntry elementToCompare = (CriticalAccessEntry) other;
-
-        return (this.username.equals(elementToCompare.getUsername())
-            && this.accessPattern.getUsecaseId().equals(elementToCompare.getAccessPattern().getUsecaseId()));
-    }
-
-    @Override
-    public int hashCode() {
-        return (id != null) ? id : 0;
-    }
 }
