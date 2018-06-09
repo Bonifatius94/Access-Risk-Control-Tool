@@ -61,7 +61,6 @@ public class App extends Application {
         ResourceBundle bundle = ResourceBundle.getBundle("lang");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main/MainView.fxml"), bundle);
         CustomWindow window = loader.load();
-        MainController controller = loader.getController();
 
         Scene scene = new Scene(window, 1000, 600);
         scene.getStylesheets().add("css/dark-theme.css");
@@ -71,7 +70,8 @@ public class App extends Application {
         window.setTitle("Access Risk Control Tool");
         primaryStage.show();
 
-        CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "Titel", "Sample text message boii.", "Yeee", "Nope");
+        // test alert
+        CustomAlert alert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Titel", "Sample text message boii.", "Yeee", "Nope");
         alert.showAndWait();
 
         TraceOut.leave();

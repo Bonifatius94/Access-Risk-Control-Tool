@@ -94,6 +94,7 @@ public class CustomAlert extends Alert {
 
         // add stylesheet
         getDialogPane().getStylesheets().add("/css/dark-theme.css");
+        getDialogPane().getStylesheets().add("/css/custom-dialog.css");
 
         // add custom window as header
         window = new CustomWindow();
@@ -122,40 +123,63 @@ public class CustomAlert extends Alert {
         // initialize buttons
         if (getAlertType() == AlertType.CONFIRMATION) {
 
-            window.getStyleClass().add("confirmation");
-
-            if (okButtonText != null) {
-                ButtonType okButton = new ButtonType(this.okButtonText, ButtonBar.ButtonData.OK_DONE);
-                getButtonTypes().set(0, okButton);
-            }
-
-            if (cancelButtonText != null) {
-                ButtonType cancelButton = new ButtonType(this.cancelButtonText, ButtonBar.ButtonData.CANCEL_CLOSE);
-                getButtonTypes().set(1, cancelButton);
-
-                getDialogPane().lookupButton(cancelButton).getStyleClass().add("cancel-button");
-                getDialogPane().lookupButton(cancelButton).requestFocus();
-            }
+            initConfirmationType();
 
         } else if (getAlertType() == AlertType.INFORMATION || getAlertType() == AlertType.WARNING) {
-            ButtonType okButton = new ButtonType(this.okButtonText, ButtonBar.ButtonData.OK_DONE);;
 
-            if (okButtonText != null) {
-                getButtonTypes().set(0, okButton);
-            }
-
-            if (getAlertType() == AlertType.WARNING) {
-                window.getStyleClass().add("warning");
-                getDialogPane().lookupButton(okButton).getStyleClass().add("warning-button");
-            } else {
-                window.getStyleClass().add("information");
-            }
-
+            initOtherAlertTypes();
 
         } else {
 
             // TODO: remove this
             System.err.println("Only use CONFIRMATION, INFORMATION and WARNING as AlertType!");
+
+        }
+    }
+
+    /**
+     * Initialize the dialog for a ConfirmationType Alert.
+     */
+    private void initConfirmationType() {
+
+        window.getStyleClass().add("confirmation");
+
+        if (okButtonText != null) {
+
+            ButtonType okButton = new ButtonType(this.okButtonText, ButtonBar.ButtonData.OK_DONE);
+            getButtonTypes().set(0, okButton);
+
+        }
+
+        if (cancelButtonText != null) {
+
+            ButtonType cancelButton = new ButtonType(this.cancelButtonText, ButtonBar.ButtonData.CANCEL_CLOSE);
+            getButtonTypes().set(1, cancelButton);
+
+            getDialogPane().lookupButton(cancelButton).getStyleClass().add("cancel-button");
+
+        }
+    }
+
+    /**
+     * Initialize the dialog for other types of Alert (Information and Warning).
+     */
+    private void initOtherAlertTypes() {
+
+        ButtonType okButton = new ButtonType(this.okButtonText, ButtonBar.ButtonData.OK_DONE);
+
+        if (okButtonText != null) {
+            getButtonTypes().set(0, okButton);
+        }
+
+        if (getAlertType() == AlertType.WARNING) {
+
+            window.getStyleClass().add("warning");
+            getDialogPane().lookupButton(okButton).getStyleClass().add("cancel-button");
+
+        } else {
+
+            window.getStyleClass().add("information");
 
         }
     }
