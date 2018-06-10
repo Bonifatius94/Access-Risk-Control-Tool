@@ -15,6 +15,8 @@ import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -31,11 +33,17 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     // ===================================
 
     public ArtDbContext(String username, String password) {
-        super("D:\\TEMP\\foo.h2", username, password);
+        super(getDefaultDatabaseFilePath(), username, password);
     }
 
     public ArtDbContext(String filePath, String username, String password) {
         super(filePath, username, password);
+    }
+
+    private static String getDefaultDatabaseFilePath() {
+
+        String currentExeFolder = System.getProperty("user.dir");
+        return Paths.get(currentExeFolder, "foo.h2").toAbsolutePath().toString();
     }
 
     // ===================================

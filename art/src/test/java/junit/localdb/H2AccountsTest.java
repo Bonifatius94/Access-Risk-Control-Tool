@@ -21,7 +21,7 @@ public class H2AccountsTest {
     public void cleanupDatabase() throws Exception {
 
         System.out.print("cleaning up datebase ...");
-        deleteFileIfExists("D:\\TEMP\\foo.h2.mv.db");
+        deleteFileIfExists(getDefaultDatabaseFilePath());
         System.out.println(" done");
 
         String currentExeFolder = System.getProperty("user.dir");
@@ -39,6 +39,12 @@ public class H2AccountsTest {
         }
 
         System.out.println("created a new test database and inserted test data");
+    }
+
+    private static String getDefaultDatabaseFilePath() {
+
+        String currentExeFolder = System.getProperty("user.dir");
+        return Paths.get(currentExeFolder, "foo.h2.mv.db").toAbsolutePath().toString();
     }
 
     private static void deleteFileIfExists(String filePath) {

@@ -4,31 +4,48 @@ import data.entities.DbUser;
 import data.entities.DbUserRole;
 import data.localdb.ArtDbContext;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class PrivilegesTest {
 
-    @BeforeAll
-    public static void initTests() {
+    @BeforeEach
+    public void cleanupDatabase() throws Exception {
 
         System.out.print("cleaning up datebase ...");
-        deleteFileIfExists("D:\\TEMP\\foo.h2.mv.db");
+        deleteFileIfExists(getDefaultDatabaseFilePath());
         System.out.println(" done");
+
+        String currentExeFolder = System.getProperty("user.dir");
+        Path scriptPath = Paths.get(currentExeFolder, "target", "test-classes", "scripts", "create_test_data_seed.sql");
+        List<String> sqlStatements = Files.readAllLines(scriptPath);
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
-            // create new database accounts
-            context.createDatabaseUser("TestAdmin", "foobar", DbUserRole.Admin);
-            context.createDatabaseUser("TestDataAnalyst", "foobar", DbUserRole.DataAnalyst);
-            context.createDatabaseUser("TestViewer", "foobar", DbUserRole.Viewer);
+            try (Session session = context.openSession()) {
 
-        } catch (Exception ex) {
-            assert(false);
+                Transaction transaction = session.beginTransaction();
+                sqlStatements.forEach(sql -> session.createNativeQuery(sql).executeUpdate());
+                transaction.commit();
+            }
         }
+
+        System.out.println("created a new test database and inserted test data");
+    }
+
+    private static String getDefaultDatabaseFilePath() {
+
+        String currentExeFolder = System.getProperty("user.dir");
+        return Paths.get(currentExeFolder, "foo.h2.mv.db").toAbsolutePath().toString();
     }
 
     private static void deleteFileIfExists(String filePath) {
