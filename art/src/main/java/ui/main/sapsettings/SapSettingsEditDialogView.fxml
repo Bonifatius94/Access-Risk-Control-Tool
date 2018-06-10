@@ -9,11 +9,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import ui.custom.controls.CustomWindow?>
-<CustomWindow prefHeight="500.0" prefWidth="350.0" spacing="30" style="-fx-border-color: White;"
+<CustomWindow spacing="30" style="-fx-border-color: White;"
               title="            Edit Sap Configuration" windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
               xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.sapsettings.SapSettingsEditDialogController">
     <HBox alignment="TOP_CENTER" spacing="30" VBox.vgrow="ALWAYS">
-        <VBox alignment="BASELINE_CENTER" spacing="25">
+        <VBox alignment="BASELINE_CENTER" spacing="35">
             <JFXTextField fx:id="hostServerField" prefWidth="300" promptText="Host Server">
                 <font>
                     <Font size="14.0"/>
@@ -34,7 +34,17 @@
                     </RequiredFieldValidator>
                 </validators>
             </JFXTextField>
-            <JFXTextField fx:id="jcoClientComboBox" prefWidth="75" promptText="JCO Client">
+            <JFXTextField fx:id="jcoClientField" prefWidth="75" promptText="JCO Client">
+                <font>
+                    <Font size="14.0"/>
+                </font>
+                <validators>
+                    <RequiredFieldValidator message="Input Required!">
+                        <FontAwesomeIconView glyphName="WARNING" style="-fx-font-family: FontAwesome;"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+            <JFXTextField fx:id="jcoLanguageField" prefWidth="75" promptText="JCO Language">
                 <font>
                     <Font size="14.0"/>
                 </font>
@@ -58,9 +68,13 @@
                 <font>
                     <Font size="14.0"/>
                 </font>
-
+                <validators>
+                    <RequiredFieldValidator message="Input Required!">
+                        <FontAwesomeIconView glyphName="WARNING" style="-fx-font-family: FontAwesome;"/>
+                    </RequiredFieldValidator>
+                </validators>
             </JFXPasswordField>
-            <HBox spacing="20">
+            <HBox spacing="20" alignment="BASELINE_CENTER">
                 <JFXButton onAction="#connect" prefHeight="35" prefWidth="75" text="Connect"/>
                 <JFXButton onAction="#saveConnection" prefHeight="35" prefWidth="75" text="Save Changes"/>
             </HBox>

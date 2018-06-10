@@ -1,6 +1,8 @@
 package ui.main.sapsettings;
 
+import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
+import data.entities.SapConfiguration;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -17,6 +19,8 @@ public class NewSapSettingDialogController {
     public JFXTextField jcoClientField;
     //private StringProperty jcoClient = new SimpleStringProperty();
     public JFXTextField userNameField;
+    public JFXPasswordField passwordField;
+    public JFXTextField jcoLanguageField;
     //private StringProperty userName = new SimpleStringProperty();
 
 
@@ -24,6 +28,7 @@ public class NewSapSettingDialogController {
      * Initializes fields ???
      */
     @FXML
+    @SuppressWarnings("all")
     public void initialize() {
         hostServerField.focusedProperty().addListener((o, oldVal, newVal) -> {
             if (!newVal) {
@@ -40,10 +45,22 @@ public class NewSapSettingDialogController {
                 sysNrField.validate();
             }
         });
+        passwordField.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                passwordField.validate();
+            }
+        });
+        jcoLanguageField.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                jcoLanguageField.validate();
+            }
+        });
     }
 
+    @FXML
     @SuppressWarnings("all")
     public void saveConnection(ActionEvent actionEvent) {
+
         //TODO: implement Test if input is valid
 
         if (hostServerField.getText().equals("")) {
@@ -51,18 +68,32 @@ public class NewSapSettingDialogController {
             if (alert.showAndWait().get() == ButtonType.OK) {
                 System.out.println("ok");
             }
-        }
-        if (sysNrField.getText().equals("")) {
+        } else if (sysNrField.getText().equals("")) {
             CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "WARNING No Sys Nr", "If you want to save SAP Configuration/n you need to set a valid Sys NR", "OK", "Cancel");
             if (alert.showAndWait().get() == ButtonType.OK) {
                 System.out.println("ok");
             }
-        }
-        if (jcoClientField.getText().equals("")) {
+        } else if (jcoClientField.getText().equals("")) {
             CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "WARNING No JCO Client", "If you want to save SAP Configuration/n you need to set a valid JCO Client", "OK", "Cancel");
             if (alert.showAndWait().get() == ButtonType.OK) {
                 System.out.println("ok");
             }
+        } else if (jcoClientField.getText().equals("")) {
+            CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "WARNING No JCO Language", "If you want to save SAP Configuration/n you need to set a valid JCO Language", "OK", "Cancel");
+            if (alert.showAndWait().get() == ButtonType.OK) {
+                System.out.println("ok");
+            }
+        } else {
+
+            SapConfiguration sapConfiguration = new SapConfiguration();
+            sapConfiguration.setClient(jcoClientField.getText());
+            sapConfiguration.setServerDestination(hostServerField.getText());
+            sapConfiguration.setSysNr(sysNrField.getText());
+            sapConfiguration.setLanguage(jcoLanguageField.getText());
+            sapConfiguration.setCreatedBy(userNameField.getText());
+            //TODO: save data in Table
+
+
         }
 
     }

@@ -10,11 +10,6 @@
       fx:controller="ui.main.sapsettings.SapSettingsController">
     <TableView VBox.vgrow="ALWAYS" fx:id="sapConnectionTable">
         <columns>
-            <PTableColumn percentageWidth="0.05" resizable="false" text="Id">
-                <cellValueFactory>
-                    <PropertyValueFactory property="id"/>
-                </cellValueFactory>
-            </PTableColumn>
             <PTableColumn percentageWidth="0.35" resizable="false" text="Server">
                 <cellValueFactory>
                     <PropertyValueFactory property="serverDestination"/>

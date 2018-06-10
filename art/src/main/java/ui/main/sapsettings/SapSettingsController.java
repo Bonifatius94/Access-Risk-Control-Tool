@@ -11,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.MouseButton;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
@@ -36,13 +37,12 @@ public class SapSettingsController {
     public void initialize() {
         initializeTableColumn();
         SapConfiguration sapConfig = new SapConfiguration();
-        sapConfig.setSysNr("Peter");
+        sapConfig.setSysNr("00");
         sapConfig.setServerDestination("Pertersserver");
-        sapConfig.setClient("bla");
-        sapConfig.setLanguage("English");
+        sapConfig.setClient("100");
+        sapConfig.setLanguage("EN");
         sapConfig.setPoolCapacity("3");
         sapConfig.setCreatedBy("Hans");
-        sapConfig.setId(3);
         List<SapConfiguration> sapConfigList = new ArrayList<>();
         sapConfigList.add(sapConfig);
         sapConfigList.add(sapConfig);
@@ -77,7 +77,7 @@ public class SapSettingsController {
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 600, 400);
+            Scene scene = new Scene(customWindow, 500, 550);
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
@@ -104,8 +104,11 @@ public class SapSettingsController {
 
     @SuppressWarnings("all")
     public void connectAction(ActionEvent actionEvent) {
-        SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
-        //TODO:Saplogin Dialog
+        if (sapConnectionTable.getFocusModel().getFocusedItem().equals(sapConnectionTable.getSelectionModel().getSelectedItem())) {
+
+            SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
+            //TODO:Saplogin Dialog
+        }
     }
 
     @SuppressWarnings("all")
@@ -117,15 +120,13 @@ public class SapSettingsController {
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 600, 400);
+            Scene scene = new Scene(customWindow, 500, 550);
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
-
-
             stage.show();
 
         } catch (IOException e) {
@@ -138,7 +139,7 @@ public class SapSettingsController {
 
     @SuppressWarnings("all")
     public void cloneAction(ActionEvent actionEvent) {
-        if (sapConnectionTable.getSelectionModel().getSelectedItem() != null) {
+        if (sapConnectionTable.getFocusModel().getFocusedItem().equals(sapConnectionTable.getSelectionModel().getSelectedItem())) {
             SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
             sapConnectionTable.getItems().add(sapConfiguration);
             sapConnectionTable.refresh();
@@ -148,13 +149,31 @@ public class SapSettingsController {
 
     @SuppressWarnings("all")
     public void editAction(ActionEvent actionEvent) {
-        editConfig(sapConnectionTable.getSelectionModel().getSelectedItem());
+        sapConnectionTable.setOnMouseClicked(event -> {
+            if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
+                editConfig(sapConnectionTable.getSelectionModel().getSelectedItem());
+            }
+        });
+        if (sapConnectionTable.getFocusModel().getFocusedItem().equals(sapConnectionTable.getSelectionModel().getSelectedItem())) {
+            editConfig(sapConnectionTable.getSelectionModel().getSelectedItem());
+        }
     }
 
     @SuppressWarnings("all")
     public void deleteAction(ActionEvent actionEvent) {
-        SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
-        sapConnectionTable.getItems().remove(sapConfiguration);
-        sapConnectionTable.refresh();
+        if (sapConnectionTable.getFocusModel().getFocusedItem().equals(sapConnectionTable.getSelectionModel().getSelectedItem())) {
+            SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
+            sapConnectionTable.getItems().remove(sapConfiguration);
+            sapConnectionTable.refresh();
+        }
     }
+    //Test functions
+    /*
+    void addToSapSettingTable(SapConfiguration sapConfiguration) {
+        this.sapConnectionTable.getItems().add(sapConfiguration);
+    }
+
+    TableView<SapConfiguration> getSapConnectionTable() {
+        return this.sapConnectionTable;
+    }*/
 }
