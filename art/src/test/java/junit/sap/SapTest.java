@@ -19,7 +19,7 @@ import sap.SapConnector;
 public class SapTest {
 
     @Test
-    @Disabled // TODO: re-enable test
+    @Disabled
     public void testSapQuery() {
 
         // init user credentials

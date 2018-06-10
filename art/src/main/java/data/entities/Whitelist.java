@@ -22,17 +22,21 @@ import org.hibernate.annotations.FetchMode;
 @Table(name = "Whitelists")
 public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "whitelist", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@Fetch(value = FetchMode.SUBSELECT)
+    private Set<WhitelistEntry> entries = new HashSet<>();
 
     private boolean isArchived;
     private ZonedDateTime createdAt;
     private String createdBy;
 
-    private Set<WhitelistEntry> entries = new HashSet<>();
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -41,7 +45,6 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
         this.id = id;
     }
 
-    @Column(columnDefinition = "TEXT", nullable = false)
     public String getDescription() {
         return description;
     }
@@ -50,8 +53,6 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
         this.description = description;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "whitelist", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Fetch(value = FetchMode.SUBSELECT)
     public Set<WhitelistEntry> getEntries() {
         return entries;
     }
@@ -60,9 +61,17 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
         setEntries(new HashSet<>(entries));
     }
 
+    /**
+     * This setter applies the new entries while managing to handle foreign key references.
+     *
+     * @param entries the conditions to be set
+     */
     public void setEntries(Set<WhitelistEntry> entries) {
-        this.entries = entries;
-        entries.forEach(x -> x.setWhitelist(this));
+
+        this.entries.forEach(x -> x.setWhitelist(null));
+        this.entries.clear();
+        this.entries.addAll(entries);
+        adjustReferences();
     }
 
     public boolean isArchived() {
@@ -114,7 +123,6 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *
      * @return JSON-like data representation of this instance as a string
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     @Override
     public String toString() {

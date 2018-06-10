@@ -1,6 +1,7 @@
 package data.entities;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,12 +32,18 @@ public class ConfigurationXAccessPatternMap {
         setPattern(pattern);
     }
 
-    private Integer id;
-    private AccessPattern pattern;
-    private Configuration config;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+
+    @ManyToOne/*(cascade = { CascadeType.PERSIST, CascadeType.MERGE })*/
+    @JoinColumn(name = "AccessPatternId")
+    private AccessPattern pattern;
+
+    @ManyToOne/*(cascade = { CascadeType.PERSIST, CascadeType.MERGE })*/
+    @JoinColumn(name = "ConfigId")
+    private Configuration config;
+
     public Integer getId() {
         return id;
     }
@@ -45,8 +52,6 @@ public class ConfigurationXAccessPatternMap {
         this.id = id;
     }
 
-    @ManyToOne/*(cascade = { CascadeType.PERSIST, CascadeType.MERGE })*/
-    @JoinColumn(name = "AccessPatternId")
     public AccessPattern getPattern() {
         return pattern;
     }
@@ -55,8 +60,6 @@ public class ConfigurationXAccessPatternMap {
         this.pattern = pattern;
     }
 
-    @ManyToOne/*(cascade = { CascadeType.PERSIST, CascadeType.MERGE })*/
-    @JoinColumn(name = "ConfigId")
     public Configuration getConfig() {
         return config;
     }

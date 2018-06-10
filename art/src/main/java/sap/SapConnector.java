@@ -18,7 +18,6 @@ import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -185,14 +184,14 @@ public class SapConnector implements ISapConnector {
 
         TraceOut.enter();
 
-        if (condition.getType() == AccessConditionType.ProfileCondition) {
+        if (condition.getType() == AccessConditionType.Profile) {
 
             profileTable.appendRow();
             profileTable.setValue("SIGN", "I");
             profileTable.setValue("OPTION", "EQ");
             profileTable.setValue("LOW", condition.getProfileCondition().getProfile());
 
-        } else if (condition.getType() == AccessConditionType.PatternCondition) {
+        } else if (condition.getType() == AccessConditionType.Pattern) {
 
             for (AccessPatternConditionProperty property : condition.getPatternCondition().getProperties()) {
 

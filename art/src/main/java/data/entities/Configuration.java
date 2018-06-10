@@ -25,18 +25,33 @@ import org.hibernate.annotations.FetchMode;
 @Table(name = "Configurations")
 public class Configuration implements IReferenceAware, ICreationFlagsHelper {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    // CAUTION: cascade types ALL or REMOVE lead to cascading deletions on both sides!!!
+    // this @ManyToMany setup should only write entries into the mapping table and not into the referenced table
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "nm_Configuration_AccessPattern",
+        joinColumns = { @JoinColumn(name = "ConfigId") },
+        inverseJoinColumns = { @JoinColumn(name = "AccessPatternId") }
+    )
+    //@Fetch(value = FetchMode.SUBSELECT)
+    private Set<AccessPattern> patterns = new HashSet<>();
+
+    @ManyToOne/*(cascade = {CascadeType.PERSIST, CascadeType.MERGE})*/
+    @JoinColumn(name = "WhitelistId")
+    private Whitelist whitelist;
+
     private String name;
     private String description;
-    private Set<AccessPattern> patterns = new HashSet<>();
-    private Whitelist whitelist;
 
     private boolean isArchived;
     private ZonedDateTime createdAt;
     private String createdBy;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     public Integer getId() {
         return id;
     }
@@ -61,15 +76,6 @@ public class Configuration implements IReferenceAware, ICreationFlagsHelper {
         this.description = description;
     }
 
-    // CAUTION: cascade types ALL or REMOVE lead to cascading deletions on both sides!!!
-    // this @ManyToMany setup should only write entries into the mapping table and not into the referenced table
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "nm_Configuration_AccessPattern",
-        joinColumns = { @JoinColumn(name = "ConfigId") },
-        inverseJoinColumns = { @JoinColumn(name = "AccessPatternId") }
-    )
-    @Fetch(value = FetchMode.SUBSELECT)
     public Set<AccessPattern> getPatterns() {
         return patterns;
     }
@@ -78,13 +84,19 @@ public class Configuration implements IReferenceAware, ICreationFlagsHelper {
         setPatterns(new HashSet<>(patterns));
     }
 
+    /**
+     * This setter applies the new patterns while managing to handle foreign key references.
+     *
+     * @param patterns the conditions to be set
+     */
     public void setPatterns(Set<AccessPattern> patterns) {
-        this.patterns = patterns;
+
+        this.patterns.forEach(x -> x.getConfigurations().remove(this));
+        this.patterns.clear();
+        this.patterns.addAll(patterns);
         adjustReferences();
     }
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "WhitelistId")
     public Whitelist getWhitelist() {
         return whitelist;
     }
@@ -142,11 +154,7 @@ public class Configuration implements IReferenceAware, ICreationFlagsHelper {
     public void adjustReferences() {
 
         // adjust patterns
-        getPatterns().forEach(x -> {
-            if (!x.getConfigurations().contains(this)) {
-                x.getConfigurations().add(this);
-            }
-        });
+        getPatterns().forEach(x -> x.getConfigurations().add(this));
     }
 
     @Override
@@ -160,7 +168,6 @@ public class Configuration implements IReferenceAware, ICreationFlagsHelper {
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *
      * @return JSON-like data representation of this instance as a string
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     @Override
     public String toString() {

@@ -1,6 +1,7 @@
 
 package data.entities;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -13,8 +14,6 @@ import javax.persistence.Table;
 /**
  * This is a data object class for an entry specified in a whitelist.
  * It contains properties like usecase id or username.
- *
- * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
 @Table(name = "WhitelistEntries")
@@ -29,7 +28,6 @@ public class WhitelistEntry {
      *
      * @param usecaseId the usecase id of the whitelist entry
      * @param username the username of the whitelist entry
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     public WhitelistEntry(String usecaseId, String username) {
 
@@ -37,13 +35,18 @@ public class WhitelistEntry {
         setUsername(username);
     }
 
-    private Integer id;
-    private String usecaseId;
-    private String username;
-    private Whitelist whitelist;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name = "WhitelistId")
+    private Whitelist whitelist;
+
+    private String usecaseId;
+    private String username;
+
+
     public Integer getId() {
         return id;
     }
@@ -68,8 +71,6 @@ public class WhitelistEntry {
         this.usecaseId = usecaseId;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "WhitelistId")
     public Whitelist getWhitelist() {
         return whitelist;
     }
@@ -82,7 +83,6 @@ public class WhitelistEntry {
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *
      * @return JSON-like data representation of this instance as a string
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     @Override
     public String toString() {

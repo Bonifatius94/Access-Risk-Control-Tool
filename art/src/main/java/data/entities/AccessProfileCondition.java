@@ -9,8 +9,6 @@ import javax.persistence.Table;
 /**
  * This class represents an auth profile condition.
  * It contains properties like condition name or auth profile name and implements the ICondition interface.
- *
- * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
 @Table(name = "AccessProfileConditions")
@@ -25,11 +23,12 @@ public class AccessProfileCondition {
         setProfile(profile);
     }
 
-    private Integer id;
-    private String profile;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    private String profile;
+
     public Integer getId() {
         return id;
     }
@@ -54,7 +53,6 @@ public class AccessProfileCondition {
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *
      * @return JSON-like data representation of this instance as a string
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     @Override
     public String toString() {

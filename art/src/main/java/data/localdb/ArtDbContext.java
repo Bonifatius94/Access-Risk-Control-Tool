@@ -174,7 +174,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     public List<CriticalAccessQuery> getSapQueries() throws Exception {
 
         // TODO: test logic
-        return queryDataset("FROM CriticalAccessQuery WHERE Archived = 0");
+        return queryDataset("FROM CriticalAccessQuery WHERE IsArchived = 0");
     }
 
     /**
@@ -187,7 +187,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     public List<Configuration> getConfigs() throws Exception {
 
         // TODO: test logic
-        return queryDataset("FROM Configuration WHERE Archived = 0");
+        return queryDataset("FROM Configuration WHERE IsArchived = 0");
     }
 
     /**
@@ -200,7 +200,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     public List<AccessPattern> getPatterns() throws Exception {
 
         // TODO: test logic
-        return queryDataset("FROM AccessPattern WHERE Archived = 0");
+        return queryDataset("FROM AccessPattern WHERE IsArchived = 0");
     }
 
     /**
@@ -213,7 +213,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     public List<Whitelist> getWhitelists() throws Exception {
 
         // TODO: add order by clause
-        return queryDataset("FROM Whitelist WHERE Archived = 0");
+        return queryDataset("FROM Whitelist WHERE IsArchived = 0");
     }
 
     /**
@@ -226,7 +226,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     public List<SapConfiguration> getSapConfigs() throws Exception {
 
         // TODO: test logic
-        return queryDataset("FROM SapConfiguration WHERE Archived = 0");
+        return queryDataset("FROM SapConfiguration WHERE IsArchived = 0");
     }
 
     /**

@@ -24,17 +24,26 @@ import org.hibernate.annotations.FetchMode;
 @Table(name = "CriticalAccessQueries")
 public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelper {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name = "ConfigId")
     private Configuration config;
+
+    @ManyToOne
+    @JoinColumn(name = "SapConfigId")
     private SapConfiguration sapConfig;
+
+    @OneToMany(mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@Fetch(value = FetchMode.SUBSELECT)
     private Set<CriticalAccessEntry> entries = new HashSet<>();
 
     private boolean isArchived;
     private ZonedDateTime createdAt;
     private String createdBy;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -43,8 +52,6 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
         this.id = id;
     }
 
-    @ManyToOne/*(cascade = { CascadeType.PERSIST, CascadeType.MERGE })*/
-    @JoinColumn(name = "ConfigId")
     public Configuration getConfig() {
         return config;
     }
@@ -53,8 +60,6 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
         this.config = config;
     }
 
-    @ManyToOne/*(cascade = { CascadeType.PERSIST, CascadeType.MERGE })*/
-    @JoinColumn(name = "SapConfigId")
     public SapConfiguration getSapConfig() {
         return sapConfig;
     }
@@ -63,8 +68,6 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
         this.sapConfig = sapConfig;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Fetch(value = FetchMode.SUBSELECT)
     public Set<CriticalAccessEntry> getEntries() {
         return entries;
     }
@@ -73,9 +76,17 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
         setEntries(new HashSet<>(entries));
     }
 
+    /**
+     * This setter applies the new entries while managing to handle foreign key references.
+     *
+     * @param entries the conditions to be set
+     */
     public void setEntries(Set<CriticalAccessEntry> entries) {
-        this.entries = entries;
-        entries.forEach(x -> x.setQuery(this));
+
+        this.entries.forEach(x -> x.setQuery(null));
+        this.entries.clear();
+        this.entries.addAll(entries);
+        adjustReferences();
     }
 
     public boolean isArchived() {

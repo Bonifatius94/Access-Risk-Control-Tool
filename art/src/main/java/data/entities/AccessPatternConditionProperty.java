@@ -12,8 +12,6 @@ import javax.persistence.Table;
 
 /**
  * This class represents an auth pattern condition property.
- *
- * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
 @Table(name = "AccessPatternConditionProperties")
@@ -32,7 +30,6 @@ public class AccessPatternConditionProperty {
      * @param value2             the new second value of this instance
      * @param value3             the new third value of this instance
      * @param value4             the new fourth value of this instance
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     public AccessPatternConditionProperty(String authObject, String authObjectProperty, String value1, String value2, String value3, String value4) {
 
@@ -44,8 +41,14 @@ public class AccessPatternConditionProperty {
         setValue4(value4);
     }
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name = "ConditionId")
     private AccessPatternCondition condition;
+
     private String authObject;
     private String authObjectProperty;
     private String value1;
@@ -53,8 +56,6 @@ public class AccessPatternConditionProperty {
     private String value3;
     private String value4;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -63,8 +64,6 @@ public class AccessPatternConditionProperty {
         this.id = id;
     }
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "ConditionId")
     public AccessPatternCondition getCondition() {
         return condition;
     }
@@ -129,7 +128,6 @@ public class AccessPatternConditionProperty {
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *
      * @return JSON-like data representation of this instance as a string
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     @Override
     public String toString() {

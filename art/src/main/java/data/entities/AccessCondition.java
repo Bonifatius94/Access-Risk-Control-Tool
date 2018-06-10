@@ -18,14 +18,26 @@ import javax.persistence.Table;
 @Table(name = "AccessConditions")
 public class AccessCondition {
 
-    private Integer id;
-    private AccessConditionType type;
-    private AccessPattern pattern;
-    private AccessProfileCondition profileCondition;
-    private AccessPatternCondition patternCondition;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 7)
+    private AccessConditionType type;
+
+    @ManyToOne
+    @JoinColumn(name = "PatternId")
+    private AccessPattern pattern;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "ProfileConditionId")
+    private AccessProfileCondition profileCondition;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "PatternConditionId")
+    private AccessPatternCondition patternCondition;
+
     public Integer getId() {
         return id;
     }
@@ -34,8 +46,6 @@ public class AccessCondition {
         this.id = id;
     }
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 7)
     public AccessConditionType getType() {
         return type;
     }
@@ -44,8 +54,7 @@ public class AccessCondition {
         this.type = type;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "PatternId")
+
     public AccessPattern getPattern() {
         return pattern;
     }
@@ -54,8 +63,6 @@ public class AccessCondition {
         this.pattern = pattern;
     }
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "ProfileConditionId")
     public AccessProfileCondition getProfileCondition() {
         return profileCondition;
     }
@@ -69,12 +76,10 @@ public class AccessCondition {
     public void setProfileCondition(AccessProfileCondition profileCondition) {
 
         this.profileCondition = profileCondition;
-        this.type = AccessConditionType.ProfileCondition;
+        this.type = AccessConditionType.Profile;
         this.patternCondition = null;
     }
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "PatternConditionId")
     public AccessPatternCondition getPatternCondition() {
         return patternCondition;
     }
@@ -88,7 +93,7 @@ public class AccessCondition {
     public void setPatternCondition(AccessPatternCondition patternCondition) {
 
         this.patternCondition = patternCondition;
-        this.type = AccessConditionType.PatternCondition;
+        this.type = AccessConditionType.Pattern;
         this.profileCondition = null;
     }
 
@@ -100,11 +105,10 @@ public class AccessCondition {
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *
      * @return JSON-like data representation of this instance as a string
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     @Override
     public String toString() {
-        return (type == AccessConditionType.ProfileCondition) ? profileCondition.toString() : patternCondition.toString();
+        return (type == AccessConditionType.Profile) ? profileCondition.toString() : patternCondition.toString();
     }
 
     /**

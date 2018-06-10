@@ -1,6 +1,7 @@
 package junit.localdb;
 
 import data.entities.Whitelist;
+import data.entities.WhitelistEntry;
 import data.localdb.ArtDbContext;
 
 import io.msoffice.excel.WhitelistImportHelper;
@@ -9,14 +10,13 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class WhitelistTest {
 
@@ -71,7 +71,7 @@ public class WhitelistTest {
         }
 
         System.out.println("whitelist query test " + (ret ? "successful" : "failed"));
-        assertTrue(ret);
+        assert(ret);
     }
 
     @Test
@@ -97,7 +97,7 @@ public class WhitelistTest {
             int countAfter = (whitelists != null) ? whitelists.size() : 0;
 
             // compare counts
-            ret = (countBefore + 1 == countAfter);
+            ret = (countBefore + 1 == countAfter && whitelists.stream().allMatch(x -> x.getEntries().size() == 7));
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -107,73 +107,81 @@ public class WhitelistTest {
         assert(ret);
     }
 
-    /*@Test
+    @Test
     public void testUpdateWhitelist() throws Exception {
+
+        boolean ret = false;
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
-            // create a new whitelist
-            Whitelist whitelist = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");
-            System.out.println(whitelist);
-            context.createWhitelist(whitelist);
+            // query first whitelist from database
+            Whitelist whitelist = context.getWhitelists().get(0);
+            int whitelistId = whitelist.getId();
 
-            // update
+            // make changes
+            final String newDescription = "another description";
+            whitelist.setDescription(newDescription);
+
+            List<WhitelistEntry> entries = new ArrayList<>(whitelist.getEntries());
+            WhitelistEntry entry1 = entries.get(0);
+            int entry1Id = entry1.getId();
+            entries.remove(1);
+
+            final String newUsername = "foo123";
+            final String newUsecaseId = "blabla";
+            entry1.setUsername(newUsername);
+            entry1.setUsecaseId(newUsecaseId);
+
+            whitelist.setEntries(entries);
+
+            // update whitelist
+            context.updateWhitelist(whitelist);
+
+            // query whitelist
+            whitelist = context.getWhitelists().stream().filter(x -> x.getId().equals(whitelistId)).findFirst().orElse(null);
+            entry1 = whitelist.getEntries().stream().filter(x -> x.getId().equals(entry1Id)).findFirst().get();
+
+            ret = newDescription.equals(whitelist.getDescription())
+                && whitelist.getEntries().size() == 6
+                && entry1.getUsecaseId().equals(newUsecaseId) && entry1.getUsername().equals(newUsername);
+
+            // TODO: add a test for archiving logic (old whitelist was used by a sap query)
 
         } catch (Exception ex) {
-
-            System.out.println("whitelist update test failed");
             ex.printStackTrace();
         }
-    }*/
 
-    /*@Test
+        assert(ret);
+    }
+
+    @Test
     public void testDeleteWhitelist() {
 
         boolean ret = false;
 
-        // delete database to ensure a clean test environment
-        deleteFileIfExists("D:\\TEMP\\foo.h2.mv.db");
-
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
-
-            try (Session session = context.openSession()) {
-
-                Transaction transaction = session.beginTransaction();
-
-                // insert an unarchived whitelists
-                int rowsAffected = session.createNativeQuery(
-                    "INSERT INTO Whitelists (archived, createdAt, createdBy, description, id) "
-                        + "VALUES (0, '2018-06-08T15:09:15', 'test', 'test description', 1)"
-                ).executeUpdate();
-
-                rowsAffected = session.createNativeQuery(
-                    "INSERT INTO WhitelistEntries (usecaseId, username, WhitelistId, id) "
-                        + "VALUES ('usecase 1', 'test123', 1, 1)"
-                ).executeUpdate();
-
-                // insert an archived whitelists
-                rowsAffected = session.createNativeQuery(
-                    "INSERT INTO Whitelists (archived, createdAt, createdBy, description, id) "
-                        + "VALUES (1, '2018-06-08T15:09:15', 'test', 'test description', 2)"
-                ).executeUpdate();
-
-                rowsAffected = session.createNativeQuery(
-                    "INSERT INTO WhitelistEntries (usecaseId, username, WhitelistId, id) "
-                        + "VALUES ('usecase 1', 'test123', 1, 2)"
-                ).executeUpdate();
-
-                transaction.commit();
-            }
 
             // query whitelists
             List<Whitelist> whitelists = context.getWhitelists();
+            Whitelist whitelist = whitelists.get(0);
+            int id = whitelist.getId();
+
+            // delete whitelist
+            context.deleteWhitelist(whitelist);
+
+            // query whitelist again. check if everything was deleted
+            whitelist = context.getWhitelists().stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
 
             // check if test data was queried successfully
-            ret = whitelists != null && whitelists.size() == 2 && whitelists.stream().allMatch(x -> x.getEntries().size() == 3);
+            ret = whitelist == null;
+
+            // TODO: write a test for archiving logic (old whitelist was used by a sap query)
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }*/
+
+        assert(ret);
+    }
 
 }

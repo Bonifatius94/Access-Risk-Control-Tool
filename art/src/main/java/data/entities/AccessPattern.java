@@ -49,7 +49,6 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
      *
      * @param conditions a list of conditions applied to this auth pattern
      * @param linkage    the linkage applied to this auth pattern (not none)
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     public AccessPattern(List<AccessCondition> conditions, ConditionLinkage linkage) {
 
@@ -68,7 +67,6 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
      * @param description the description applied to this auth pattern
      * @param conditions  a list of conditions applied to this auth pattern
      * @param linkage     the linkage applied to this auth pattern (not none)
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     public AccessPattern(String usecaseId, String description, List<AccessCondition> conditions, ConditionLinkage linkage) {
 
@@ -90,7 +88,6 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
      * This constructor creates a new instance of an auth pattern of simple type (without usecase id and description defined).
      *
      * @param condition the condition applied to this auth pattern
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     public AccessPattern(AccessCondition condition) {
 
@@ -104,7 +101,6 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
      * @param usecaseId   the usecase id applied to this auth pattern
      * @param description the description applied to this auth pattern
      * @param condition   the condition applied to this auth pattern
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     public AccessPattern(String usecaseId, String description, AccessCondition condition) {
 
@@ -118,12 +114,22 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
     //           properties
     // =============================
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private String usecaseId;
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 4)
     private ConditionLinkage linkage = ConditionLinkage.None;
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "pattern", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@Fetch(value = FetchMode.SUBSELECT)
     private Set<AccessCondition> conditions = new HashSet<>();
+
+    @ManyToMany(mappedBy = "patterns", fetch = FetchType.EAGER)
     private Set<Configuration> configurations = new HashSet<>();
 
     private boolean isArchived;
@@ -134,8 +140,6 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
     //        getter / setter
     // =============================
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -160,8 +164,6 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
         this.description = description;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "pattern", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Fetch(value = FetchMode.SUBSELECT)
     public Set<AccessCondition> getConditions() {
         return conditions;
     }
@@ -170,13 +172,19 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
         setConditions(new HashSet<>(conditions));
     }
 
+    /**
+     * This setter applies the new conditions while managing to handle foreign key references.
+     *
+     * @param conditions the conditions to be set
+     */
     public void setConditions(Set<AccessCondition> conditions) {
-        this.conditions = conditions;
+
+        this.conditions.forEach(x -> x.setPattern(null));
+        this.conditions.clear();
+        this.conditions.addAll(conditions);
         adjustReferences();
     }
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 4)
     public ConditionLinkage getLinkage() {
         return linkage;
     }
@@ -185,7 +193,6 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
         this.linkage = linkage;
     }
 
-    @ManyToMany(mappedBy = "patterns")
     public Set<Configuration> getConfigurations() {
         return configurations;
     }
@@ -194,8 +201,16 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
         setConfigurations(new HashSet<>(configurations));
     }
 
+    /**
+     * This setter applies the new configurations while managing to handle foreign key references.
+     *
+     * @param configurations the conditions to be set
+     */
     public void setConfigurations(Set<Configuration> configurations) {
-        this.configurations = configurations;
+
+        this.configurations.forEach(x -> x.getPatterns().remove(this));
+        this.configurations.clear();
+        this.configurations.addAll(configurations);
         adjustReferences();
     }
 
@@ -237,11 +252,7 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
         getConditions().forEach(x -> x.setPattern(this));
 
         // adjust configurations
-        getConfigurations().forEach(x -> {
-            if (!x.getPatterns().contains(this)) {
-                x.getPatterns().add(this);
-            }
-        });
+        getConfigurations().forEach(x -> x.getPatterns().add(this));
     }
 
     @Override
@@ -255,7 +266,6 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *
      * @return JSON-like data representation of this instance as a string
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     @Override
     public String toString() {

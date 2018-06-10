@@ -5,18 +5,40 @@ import data.entities.DbUserRole;
 import data.localdb.ArtDbContext;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class H2AccountsTest {
 
     @BeforeEach
-    public void cleanupDatabase() {
+    public void cleanupDatabase() throws Exception {
 
-        // delete database to ensure a clean test environment
+        System.out.print("cleaning up datebase ...");
         deleteFileIfExists("D:\\TEMP\\foo.h2.mv.db");
+        System.out.println(" done");
+
+        String currentExeFolder = System.getProperty("user.dir");
+        Path scriptPath = Paths.get(currentExeFolder, "target", "test-classes", "scripts", "create_test_data_seed.sql");
+        List<String> sqlStatements = Files.readAllLines(scriptPath);
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            try (Session session = context.openSession()) {
+
+                Transaction transaction = session.beginTransaction();
+                sqlStatements.forEach(sql -> session.createNativeQuery(sql).executeUpdate());
+                transaction.commit();
+            }
+        }
+
+        System.out.println("created a new test database and inserted test data");
     }
 
     private static void deleteFileIfExists(String filePath) {
@@ -31,97 +53,91 @@ public class H2AccountsTest {
     @Test
     public void testCreateDatabaseUser() {
 
+        boolean ret = false;
+
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // create new database accounts
-            context.createDatabaseUser("TestAdmin", "foobar", DbUserRole.Admin);
-            context.createDatabaseUser("TestDataAnalyst", "foobar", DbUserRole.DataAnalyst);
-            context.createDatabaseUser("TestViewer", "foobar", DbUserRole.Viewer);
+            context.createDatabaseUser("FooAdmin", "foobar", DbUserRole.Admin);
+            context.createDatabaseUser("FooDataAnalyst", "foobar", DbUserRole.DataAnalyst);
+            context.createDatabaseUser("FooViewer", "foobar", DbUserRole.Viewer);
 
             // query accounts
             List<DbUser> users = context.getDatabaseUsers();
-            assert(users.size() == 3);
+            ret = users.size() == 6;
 
         } catch (Exception ex) {
-            assert(false);
+            ex.printStackTrace();
         }
+
+        assert(ret);
     }
 
     @Test
     public void testChangeUserRole() {
 
-        try (ArtDbContext context = new ArtDbContext("test", "test")) {
-
-            // create new database accounts
-            context.createDatabaseUser("TestAdmin", "foobar", DbUserRole.Admin);
-            context.createDatabaseUser("TestDataAnalyst", "foobar", DbUserRole.DataAnalyst);
-            context.createDatabaseUser("TestViewer", "foobar", DbUserRole.Viewer);
-
-            // query accounts
-            List<DbUser> users = context.getDatabaseUsers();
-            assert(users.size() == 3);
-
-        } catch (Exception ex) {
-            assert(false);
-        }
-    }
-
-    @Test
-    public void testDbAccountManagement() {
+        boolean ret = false;
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
-            // create new database accounts
-            context.createDatabaseUser("TestAdmin", "foobar", DbUserRole.Admin);
-            context.createDatabaseUser("TestDataAnalyst", "foobar", DbUserRole.DataAnalyst);
-            context.createDatabaseUser("TestViewer", "foobar", DbUserRole.Viewer);
-
-            // test db accounts query
-            List<DbUser> users = context.getDatabaseUsers();
-            System.out.println("Db account creation test " + (users.size() == 3 ? "successful" : "failed"));
-            System.out.println();
-            users.forEach(System.out::println);
-            System.out.println();
-
-            // test change role
+            // create new user as viewer
             context.createDatabaseUser("Foo", "foobar", DbUserRole.Viewer);
 
             // check if an additional user was created
-            users = context.getDatabaseUsers();
-            boolean roleOk = users.stream().filter(x -> x.getUsername().toUpperCase().equals("FOO")).findFirst().orElse(null).getRole() == DbUserRole.Viewer;
-            System.out.println("creation of foo account " + ((users.size() == 4 && roleOk) ? "successful" : "failed"));
-            System.out.println();
-            users.forEach(System.out::println);
-            System.out.println();
+            List<DbUser> users = context.getDatabaseUsers();
+            boolean roleOk = users.stream().filter(x -> x.getUsername().toUpperCase().equals("FOO")).findFirst().get().getRole() == DbUserRole.Viewer;
+            assert(roleOk);
 
+            // change role to data analyst
             context.changeUserRole("Foo", DbUserRole.DataAnalyst);
 
             // check if the role was changed
             users = context.getDatabaseUsers();
-            roleOk = users.stream().filter(x -> x.getUsername().toUpperCase().equals("FOO")).findFirst().orElse(null).getRole() == DbUserRole.DataAnalyst;
-            System.out.println("Db account role change test " + ((users.size() == 4 && roleOk) ? "successful" : "failed"));
-            System.out.println();
-            users.forEach(System.out::println);
-            System.out.println();
+            roleOk = users.stream().filter(x -> x.getUsername().toUpperCase().equals("FOO")).findFirst().get().getRole() == DbUserRole.DataAnalyst;
 
-            // test change password
-            // TODO: implement test
+            ret = roleOk;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert(ret);
+    }
+
+    @Test
+    public void testChangePassword() {
+
+        // TODO: implement test
+    }
+
+    @Test
+    public void testDeleteDatabaseUser() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // create new user as viewer
+            context.createDatabaseUser("Foo", "foobar", DbUserRole.Viewer);
+
+            // query new user
+            DbUser user = context.getDatabaseUsers().stream().filter(x -> x.getUsername().equals("FOO")).findFirst().get();
 
             // test delete role
             context.deleteDatabaseUser("Foo");
 
             // check if user was deleted
-            users = context.getDatabaseUsers();
-            System.out.println("Db account deletion test " + (users.size() == 3 ? "successful" : "failed"));
-            System.out.println();
-            users.forEach(System.out::println);
-            System.out.println();
+            user = context.getDatabaseUsers().stream().filter(x -> x.getUsername().equals("FOO")).findFirst().orElse(null);
+
+            ret = user == null;
 
         } catch (Exception ex) {
 
             System.out.println("db account test failed");
             ex.printStackTrace();
         }
+
+        assert(ret);
     }
 
 }

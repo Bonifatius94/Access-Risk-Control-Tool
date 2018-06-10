@@ -23,13 +23,20 @@ public class CriticalAccessEntry {
         setUsername(username);
     }
 
-    private Integer id;
-    private CriticalAccessQuery query;
-    private AccessPattern accessPattern;
-    private String username;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name = "QueryId")
+    private CriticalAccessQuery query;
+
+    @ManyToOne
+    @JoinColumn(name = "ViolatedPatternId")
+    private AccessPattern accessPattern;
+
+    private String username;
+
     public Integer getId() {
         return id;
     }
@@ -38,8 +45,6 @@ public class CriticalAccessEntry {
         this.id = id;
     }
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "QueryId")
     public CriticalAccessQuery getQuery() {
         return query;
     }
@@ -48,8 +53,6 @@ public class CriticalAccessEntry {
         this.query = query;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY/*, (cascade = { CascadeType.PERSIST, CascadeType.MERGE }*/)
-    @JoinColumn(name = "ViolatedPatternId")
     public AccessPattern getAccessPattern() {
         return accessPattern;
     }

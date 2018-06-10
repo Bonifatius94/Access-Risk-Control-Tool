@@ -12,7 +12,10 @@ import javax.persistence.Table;
 @Table(name = "SapConfigurations")
 public class SapConfiguration implements ICreationFlagsHelper {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private String serverDestination;
     private String sysNr;
     private String client;
@@ -23,8 +26,7 @@ public class SapConfiguration implements ICreationFlagsHelper {
     private ZonedDateTime createdAt;
     private String createdBy;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     public Integer getId() {
         return id;
     }

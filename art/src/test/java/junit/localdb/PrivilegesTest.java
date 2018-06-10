@@ -56,7 +56,7 @@ public class PrivilegesTest {
         boolean ret = false;
 
         // test privileges: getDatabaseUsers() X Admin
-        try (ArtDbContext context = new ArtDbContext("TestAdmin", "foobar")) {
+        try (ArtDbContext context = new ArtDbContext(username, password)) {
 
             // test switch user
             List<DbUser> users = context.getDatabaseUsers();

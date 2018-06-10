@@ -20,8 +20,6 @@ import org.hibernate.annotations.FetchMode;
 /**
  * This class represents an auth pattern condition.
  * It contains a list of auth pattern condition properties, a condition name and implements the ICondition interface.
- *
- * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
 @Table(name = "AccessPatternConditions")
@@ -36,11 +34,14 @@ public class AccessPatternCondition implements IReferenceAware {
         setProperties(new ArrayList<>(properties));
     }
 
-    private Integer id;
-    private Set<AccessPatternConditionProperty> properties = new HashSet<>();
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@Fetch(value = FetchMode.)
+    private Set<AccessPatternConditionProperty> properties = new HashSet<>();
+
     public Integer getId() {
         return id;
     }
@@ -49,8 +50,6 @@ public class AccessPatternCondition implements IReferenceAware {
         this.id = id;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Fetch(value = FetchMode.)
     public Set<AccessPatternConditionProperty> getProperties() {
         return properties;
     }
@@ -59,8 +58,16 @@ public class AccessPatternCondition implements IReferenceAware {
         setProperties(new HashSet<>(properties));
     }
 
+    /**
+     * This setter applies the new properties while managing to handle foreign key references.
+     *
+     * @param properties the conditions to be set
+     */
     public void setProperties(Set<AccessPatternConditionProperty> properties) {
-        this.properties = properties;
+
+        this.properties.forEach(x -> x.setCondition(null));
+        this.properties.clear();
+        this.properties.addAll(properties);
         adjustReferences();
     }
 
@@ -82,7 +89,6 @@ public class AccessPatternCondition implements IReferenceAware {
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *
      * @return JSON-like data representation of this instance as a string
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     @Override
     public String toString() {
