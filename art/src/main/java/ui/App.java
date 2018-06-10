@@ -20,6 +20,8 @@ import ui.main.MainController;
 
 public class App extends Application {
 
+    public static Stage primaryStage;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -70,11 +72,7 @@ public class App extends Application {
         window.setTitle("Access Risk Control Tool");
         primaryStage.show();
 
-        // test alert
-        CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "1 nicer Titel", "Hallo Jungs! Fetter TestAlert in rot!", "Yeee", "Wow!");
-        if (alert.showAndWait().get() == ButtonType.OK) {
-            System.out.println("Okay!");
-        }
+        this.primaryStage = primaryStage;
 
         TraceOut.leave();
     }

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.validation.RequiredFieldValidator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import ui.custom.controls.CustomWindow?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import ui.custom.controls.PTableColumn?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<CustomWindow spacing="30"
+              title="%editPatternTitle" windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
+              xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.patterns.PatternsFormController">
+    <HBox spacing="30" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+        <VBox alignment="BASELINE_LEFT" spacing="35" HBox.hgrow="ALWAYS" style="-fx-padding: 10">
+            <JFXTextField fx:id="useCaseIDInput" promptText="%useCaseID" maxWidth="200">
+                <font>
+                    <Font size="14.0"/>
+                </font>
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+            <JFXTextField fx:id="descriptionInput" promptText="%description" maxWidth="200">
+                <font>
+                    <Font size="14.0"/>
+                </font>
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+            <HBox alignment="BASELINE_LEFT" spacing="20">
+                <Label text="%type"/>
+                <JFXComboBox fx:id="conditionTypeInput"/>
+            </HBox>
+            <HBox fx:id="profileBox" visible="false" alignment="BASELINE_LEFT" spacing="20">
+                <Label text="%profile"/>
+                <JFXTextField fx:id="profileInput" promptText="%description">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                    <validators>
+                        <RequiredFieldValidator message="%required">
+                            <MaterialDesignIconView glyphName="ALERT"/>
+                        </RequiredFieldValidator>
+                    </validators>
+                </JFXTextField>
+            </HBox>
+            <HBox fx:id="conditionBox" visible="false" HBox.hgrow="ALWAYS">
+                <TableView VBox.vgrow="ALWAYS" fx:id="conditionPropertiesTable" HBox.hgrow="ALWAYS">
+                    <columns>
+                        <PTableColumn text="%authObject" percentageWidth="0.2" resizable="false">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="authObject"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn text="%authField" percentageWidth="0.2" resizable="false" styleClass="align-left">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="authObjectProperty"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn text="1" percentageWidth="0.12" resizable="false">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="value1"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn text="2" percentageWidth="0.12" resizable="false">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="value2"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn text="3" percentageWidth="0.12" resizable="false">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="value3"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn text="4" percentageWidth="0.12" resizable="false">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="value4"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn fx:id="editColumn" percentageWidth="0.06" resizable="false" sortable="false">
+                        </PTableColumn>
+                        <PTableColumn fx:id="deleteColumn" percentageWidth="0.06" resizable="false" sortable="false">
+                        </PTableColumn>
+                    </columns>
+                </TableView>
+            </HBox>
+            <HBox spacing="20">
+                <JFXButton onAction="#saveChanges" prefHeight="35" prefWidth="75" text="%save"/>
+            </HBox>
+        </VBox>
+    </HBox>
+
+</CustomWindow>

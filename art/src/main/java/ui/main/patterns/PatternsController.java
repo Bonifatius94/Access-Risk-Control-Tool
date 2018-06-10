@@ -9,15 +9,22 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import io.msoffice.excel.AccessPatternImportHelper;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import ui.App;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.CustomWindow;
 
 
 public class PatternsController {
@@ -91,6 +98,31 @@ public class PatternsController {
     }
 
     public void editAccessPattern(AccessPattern accessPattern) {
-        System.out.println(accessPattern);
+        try {
+            // create a new FXML loader with the SapSettingsEditDialogController
+            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("PatternsFormView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
+
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow, 600, 400);
+            scene.getStylesheets().add("css/dark-theme.css");
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
+            stage.setHeight(600);
+            stage.setWidth(800);
+            customWindow.initStage(stage);
+
+            stage.show();
+
+            // give the dialog the sapConfiguration
+            PatternsFormController sapEdit = loader.getController();
+            sapEdit.giveSelectedAccessPattern(accessPattern);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
