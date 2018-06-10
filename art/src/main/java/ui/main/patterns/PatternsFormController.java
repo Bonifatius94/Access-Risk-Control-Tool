@@ -8,13 +8,16 @@ import data.entities.AccessPattern;
 import data.entities.AccessPatternConditionProperty;
 import data.entities.ConditionLinkage;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -225,6 +228,10 @@ public class PatternsFormController {
      */
     public void saveChanges() {
 
+    }
+
+    public void close(ActionEvent event) {
+        (((Button)event.getSource()).getScene().getWindow()).hide();
     }
 
 

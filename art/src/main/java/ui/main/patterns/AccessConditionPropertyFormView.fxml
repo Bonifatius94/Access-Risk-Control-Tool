@@ -59,8 +59,8 @@
             </validators>
         </JFXTextField>
         <HBox spacing="20" alignment="BASELINE_RIGHT">
-            <JFXButton onAction="#saveChanges" prefHeight="35" prefWidth="75" text="%cancel"/>
-            <JFXButton onAction="#saveChanges" prefHeight="35" prefWidth="75" text="%save"/>
+            <JFXButton onAction="#saveChanges" prefHeight="35" prefWidth="75" text="%ok"/>
+            <JFXButton onAction="#close" prefHeight="35" prefWidth="75" text="%cancel"/>
         </HBox>
     </VBox>
 </CustomWindow>
