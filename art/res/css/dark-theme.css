@@ -139,6 +139,17 @@
 *                                                                             *
 ******************************************************************************/
 
+.jfx-combo-box {
+    -jfx-focus-color: -fx-primary;
+    -jfx-unfocus-color: -fx-light;
+    -fx-cursor: hand;
+    -fx-text-fill: -fx-text !important;
+}
+
+.jfx-combo-box .cell {
+    -fx-text-fill: -fx-text !important;
+}
+
 .combo-box-popup .list-view {
     -fx-background-color: -fx-background !important;
     -fx-border-color: -fx-light !important;
@@ -154,13 +165,6 @@
 
 .combo-box-popup .list-view .list-cell:filled:hover {
     -fx-background-color: -fx-primary !important;
-}
-
-.jfx-combo-box {
-    -jfx-focus-color: -fx-primary;
-    -jfx-unfocus-color: -fx-light;
-    -fx-cursor: hand;
-    -fx-text-fill: -fx-text !important;
 }
 
 

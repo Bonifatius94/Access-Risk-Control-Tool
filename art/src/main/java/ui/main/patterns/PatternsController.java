@@ -18,6 +18,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 import javafx.stage.Modality;
@@ -47,6 +48,18 @@ public class PatternsController {
     @FXML
     public void initialize() {
         initializeTableColumns();
+
+        /* catch row double click */
+        patternsTable.setRowFactory(tv -> {
+            TableRow<AccessPattern> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    AccessPattern pattern = row.getItem();
+                    editAccessPattern(pattern);
+                }
+            });
+            return row;
+        });
 
         // test the table with data from the Example - Zugriffsmuster.xlsx file
         try {
@@ -97,6 +110,11 @@ public class PatternsController {
         useCaseCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
     }
 
+    /**
+     * Opens a modal edit dialog for the selected AccessPattern.
+     *
+     * @param accessPattern the selected AccessPattern
+     */
     public void editAccessPattern(AccessPattern accessPattern) {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
@@ -105,14 +123,12 @@ public class PatternsController {
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 600, 400);
+            Scene scene = new Scene(customWindow, 750, 700);
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(App.primaryStage);
-            stage.setHeight(600);
-            stage.setWidth(800);
             customWindow.initStage(stage);
 
             stage.show();
@@ -123,6 +139,5 @@ public class PatternsController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }

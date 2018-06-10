@@ -37,6 +37,11 @@ public class AccessConditionPropertyFormController {
 
     }
 
+    /**
+     * Prefill the inputs with the given AccessPatternConditionProperty.
+     *
+     * @param accessPatternConditionProperty the selected AccessPatternConditionProperty
+     */
     public void giveSelectedAccessConditionProperty(AccessPatternConditionProperty accessPatternConditionProperty) {
         this.accessPatternConditionProperty = accessPatternConditionProperty;
 

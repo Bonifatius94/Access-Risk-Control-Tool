@@ -15,11 +15,8 @@
 <CustomWindow spacing="20"
               title="%editPatternTitle" windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
               xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.patterns.AccessConditionPropertyFormController">
-    <VBox alignment="BASELINE_LEFT" spacing="35" HBox.hgrow="ALWAYS" style="-fx-padding: 10">
+    <VBox alignment="BASELINE_LEFT" spacing="35" HBox.hgrow="ALWAYS" style="-fx-padding: 20">
         <JFXTextField fx:id="authObjectInput" promptText="%authObject" maxWidth="250">
-            <font>
-                <Font size="14.0"/>
-            </font>
             <validators>
                 <RequiredFieldValidator message="%required">
                     <MaterialDesignIconView glyphName="ALERT"/>
@@ -27,9 +24,6 @@
             </validators>
         </JFXTextField>
         <JFXTextField fx:id="authFieldInput" promptText="%authField" maxWidth="250">
-            <font>
-                <Font size="14.0"/>
-            </font>
             <validators>
                 <RequiredFieldValidator message="%required">
                     <MaterialDesignIconView glyphName="ALERT"/>
@@ -37,9 +31,6 @@
             </validators>
         </JFXTextField>
         <JFXTextField fx:id="authFieldValue1Input" promptText="%authFieldValue1" maxWidth="250">
-            <font>
-                <Font size="14.0"/>
-            </font>
             <validators>
                 <RequiredFieldValidator message="%required">
                     <MaterialDesignIconView glyphName="ALERT"/>
@@ -47,9 +38,6 @@
             </validators>
         </JFXTextField>
         <JFXTextField fx:id="authFieldValue2Input" promptText="%authFieldValue2" maxWidth="250">
-            <font>
-                <Font size="14.0"/>
-            </font>
             <validators>
                 <RequiredFieldValidator message="%required">
                     <MaterialDesignIconView glyphName="ALERT"/>
@@ -57,9 +45,6 @@
             </validators>
         </JFXTextField>
         <JFXTextField fx:id="authFieldValue3Input" promptText="%authFieldValue3" maxWidth="250">
-            <font>
-                <Font size="14.0"/>
-            </font>
             <validators>
                 <RequiredFieldValidator message="%required">
                     <MaterialDesignIconView glyphName="ALERT"/>
@@ -67,9 +52,6 @@
             </validators>
         </JFXTextField>
         <JFXTextField fx:id="authFieldValue4Input" promptText="%authFieldValue4" maxWidth="250">
-            <font>
-                <Font size="14.0"/>
-            </font>
             <validators>
                 <RequiredFieldValidator message="%required">
                     <MaterialDesignIconView glyphName="ALERT"/>
