@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import tools.tracing.TraceLevel;
@@ -70,11 +71,11 @@ public class App extends Application {
         window.setTitle("Access Risk Control Tool");
         primaryStage.show();
 
-        // test alert
-        CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "1 nicer Titel", "Hallo Jungs! Fetter TestAlert in rot!", "Yeee", "Wow!");
-        if (alert.showAndWait().get() == ButtonType.OK) {
-            System.out.println("Okay!");
-        }
+        // add application icons
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_64.png")));
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_128.png")));
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_256.png")));
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_512.png")));
 
         TraceOut.leave();
     }
