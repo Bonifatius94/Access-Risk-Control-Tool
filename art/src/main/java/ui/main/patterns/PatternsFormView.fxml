@@ -13,12 +13,11 @@
 <?import javafx.scene.control.TableView?>
 <?import ui.custom.controls.PTableColumn?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
-<CustomWindow spacing="30"
+<CustomWindow spacing="20"
               title="%editPatternTitle" windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
               xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.patterns.PatternsFormController">
-    <HBox spacing="30" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
         <VBox alignment="BASELINE_LEFT" spacing="35" HBox.hgrow="ALWAYS" style="-fx-padding: 10">
-            <JFXTextField fx:id="useCaseIDInput" promptText="%useCaseID" maxWidth="200">
+            <JFXTextField fx:id="useCaseIDInput" promptText="%useCaseID" maxWidth="250">
                 <font>
                     <Font size="14.0"/>
                 </font>
@@ -28,7 +27,7 @@
                     </RequiredFieldValidator>
                 </validators>
             </JFXTextField>
-            <JFXTextField fx:id="descriptionInput" promptText="%description" maxWidth="200">
+            <JFXTextField fx:id="descriptionInput" promptText="%description" maxWidth="500">
                 <font>
                     <Font size="14.0"/>
                 </font>
@@ -38,13 +37,13 @@
                     </RequiredFieldValidator>
                 </validators>
             </JFXTextField>
-            <HBox alignment="BASELINE_LEFT" spacing="20">
+            <HBox alignment="BASELINE_LEFT" spacing="30">
                 <Label text="%type"/>
                 <JFXComboBox fx:id="conditionTypeInput"/>
             </HBox>
-            <HBox fx:id="profileBox" visible="false" alignment="BASELINE_LEFT" spacing="20">
+            <HBox fx:id="profileBox" alignment="BASELINE_LEFT" spacing="30" visible="false" HBox.hgrow="ALWAYS">
                 <Label text="%profile"/>
-                <JFXTextField fx:id="profileInput" promptText="%description">
+                <JFXTextField fx:id="profileInput" promptText="%value" maxWidth="350">
                     <font>
                         <Font size="14.0"/>
                     </font>
@@ -95,10 +94,9 @@
                     </columns>
                 </TableView>
             </HBox>
-            <HBox spacing="20">
+            <HBox spacing="20" alignment="BASELINE_RIGHT">
+                <JFXButton onAction="#saveChanges" prefHeight="35" prefWidth="75" text="%cancel"/>
                 <JFXButton onAction="#saveChanges" prefHeight="35" prefWidth="75" text="%save"/>
             </HBox>
         </VBox>
-    </HBox>
-
 </CustomWindow>

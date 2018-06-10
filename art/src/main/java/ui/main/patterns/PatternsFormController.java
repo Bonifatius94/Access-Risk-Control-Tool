@@ -12,10 +12,18 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import ui.App;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.CustomWindow;
+
+import java.util.ResourceBundle;
 
 
 public class PatternsFormController {
@@ -118,7 +126,29 @@ public class PatternsFormController {
     }
 
     private void editAccessPatternConditionProperty(AccessPatternConditionProperty accessPatternConditionProperty) {
-        System.out.println(accessPatternConditionProperty);
+            try {
+                // create a new FXML loader with the SapSettingsEditDialogController
+                ResourceBundle bundle = ResourceBundle.getBundle("lang");
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("AccessConditionPropertyFormView.fxml"), bundle);
+                CustomWindow customWindow = loader.load();
+
+                // build the scene and add it to the stage
+                Scene scene = new Scene(customWindow, 600, 400);
+                scene.getStylesheets().add("css/dark-theme.css");
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.initModality(Modality.WINDOW_MODAL);
+                stage.initOwner(App.primaryStage);
+                customWindow.initStage(stage);
+
+                stage.show();
+
+                // give the dialog the sapConfiguration
+                AccessConditionPropertyFormController accessConditionPropertyFormEdit = loader.getController();
+                accessConditionPropertyFormEdit.giveSelectedAccessConditionProperty(accessPatternConditionProperty);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
     }
 
     public void saveChanges() {

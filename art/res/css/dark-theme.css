@@ -25,8 +25,8 @@
     -fx-font-family: "Roboto";
     -fx-font-smoothing-type: gray;
     -fx-background-color: -fx-background;
+    -fx-border-color: derive(-fx-background, -30%);
 }
-
 
 /*******************************************************************************
  *                                                                             *

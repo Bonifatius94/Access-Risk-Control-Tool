@@ -118,8 +118,8 @@ public class PatternsController {
             stage.show();
 
             // give the dialog the sapConfiguration
-            PatternsFormController sapEdit = loader.getController();
-            sapEdit.giveSelectedAccessPattern(accessPattern);
+            PatternsFormController patternEdit = loader.getController();
+            patternEdit.giveSelectedAccessPattern(accessPattern);
         } catch (Exception e) {
             e.printStackTrace();
         }
