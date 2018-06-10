@@ -1,36 +1,32 @@
 package data.entities;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "SapConfigurations")
-public class SapConfiguration {
+public class SapConfiguration implements ICreationFlagsHelper {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private String serverDestination;
     private String sysNr;
     private String client;
-
-    //private String user;
-    //private String password;
-
     private String language;
     private String poolCapacity;
 
     private boolean isArchived;
-    private OffsetDateTime createdAt;
+    private ZonedDateTime createdAt;
     private String createdBy;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
     public Integer getId() {
         return id;
     }
@@ -63,22 +59,6 @@ public class SapConfiguration {
         this.client = client;
     }
 
-    //public String getUser() {
-    //    return user;
-    //}
-
-    //public void setUser(String user) {
-    //    this.user = user;
-    //}
-
-    //public String getPassword() {
-    //    return password;
-    //}
-
-    //public void setPassword(String password) {
-    //    this.password = password;
-    //}
-
     public String getLanguage() {
         return language;
     }
@@ -103,11 +83,11 @@ public class SapConfiguration {
         isArchived = archived;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -120,22 +100,58 @@ public class SapConfiguration {
     }
 
     // =============================
-    //      hibernate triggers
-    // =============================
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
-    }
-
-    // =============================
     //          overrides
     // =============================
+
+    @Override
+    public void initCreationFlags(ZonedDateTime createdAt, String createdBy) {
+
+        setCreatedAt(createdAt);
+        setCreatedBy(createdBy);
+    }
 
     @Override
     public String toString() {
         return "Server Destination = " + getServerDestination() + ", SysNr = " + getSysNr() + ", Client = " + getClient()
             + ", Language = " + getLanguage() + ", Pool Capacity = " + getPoolCapacity();
+    }
+
+    /**
+     * This is a custom implementation of equals method that checks for data equality.
+     *
+     * @param other the object to compare with
+     * @return whether they are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        /*boolean ret = (other == this);
+
+        if (other instanceof SapConfiguration) {
+
+            SapConfiguration cmp = (SapConfiguration) other;
+
+            ret = (this.serverDestination.equals(cmp.getServerDestination())
+                && this.sysNr.equals(cmp.getSysNr())
+                && this.client.equals(cmp.getClient())
+                && this.language.equals(cmp.getLanguage())
+                && this.poolCapacity.equals(cmp.getPoolCapacity())
+                && this.id == null || (
+                    this.isArchived == cmp.isArchived()
+                    && this.createdAt.equals(cmp.getCreatedAt())
+                    && this.createdBy.equals(cmp.getCreatedBy())
+                ));
+        }
+
+        return ret;*/
+
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        //return (id != null) ? id : 0;
+        return super.hashCode();
     }
 
 }

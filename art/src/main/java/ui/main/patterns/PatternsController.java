@@ -9,6 +9,7 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import io.msoffice.excel.AccessPatternImportHelper;
 
 import java.util.List;
+import java.util.Set;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,7 +27,7 @@ public class PatternsController {
     public TableView<AccessPattern> patternsTable;
 
     @FXML
-    public TableColumn<AccessPattern, List<AccessCondition>> useCaseCountColumn;
+    public TableColumn<AccessPattern, Set<AccessCondition>> useCaseCountColumn;
 
     @FXML
     public TableColumn<AccessPattern, JFXButton> deleteColumn;
@@ -74,10 +75,10 @@ public class PatternsController {
         }));
 
         // overwrite the column in which the number of useCases is displayed
-        useCaseCountColumn.setCellFactory(col -> new TableCell<AccessPattern, List<AccessCondition>>() {
+        useCaseCountColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
 
             @Override
-            protected void updateItem(List<AccessCondition> items, boolean empty) {
+            protected void updateItem(Set<AccessCondition> items, boolean empty) {
 
                 // display nothing if the row is empty, otherwise the item count
                 setText((empty || items == null) ? "" : "" + items.size());

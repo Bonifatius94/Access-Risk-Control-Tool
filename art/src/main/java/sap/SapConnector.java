@@ -17,9 +17,7 @@ import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -55,6 +53,7 @@ public class SapConnector implements ISapConnector {
         TraceOut.leave();
     }
 
+    /**
     /** This method pings the sap server specified in the sap server config.
      *
      * @return a boolean value that indicates whether the ping was successful
@@ -98,25 +97,18 @@ public class SapConnector implements ISapConnector {
 
         Set<CriticalAccessEntry> entries = new HashSet<>();
 
-        // run sap queries (use cases / conditions ...)
         for (AccessPattern pattern : config.getPatterns()) {
-
-            TraceOut.writeInfo("executing sap query for pattern " + pattern.getUsecaseId());
 
             // executing query for pattern
             Set<CriticalAccessEntry> resultsOfPattern = runSapQuery(pattern, config.getWhitelist());
             entries.addAll(resultsOfPattern);
 
-            TraceOut.writeInfo("results returned: " + resultsOfPattern.size());
+            TraceOut.writeInfo("Pattern: " + pattern.getUsecaseId() + ", results count: " + resultsOfPattern.size());
         }
-
-        // log critical access entries per pattern
-        Map<String, Long> entriesPerPattern = entries.stream().collect(Collectors.groupingBy(x -> x.getAccessPattern().getUsecaseId(), Collectors.counting()));
-        entriesPerPattern.forEach((key, value) -> TraceOut.writeInfo("Pattern " + key + ": " + value));
 
         // write results to critical access query (ready for insertion into database)
         CriticalAccessQuery query = new CriticalAccessQuery();
-        query.setEntries(new ArrayList<>(entries));
+        query.setEntries(entries);
         query.setConfig(config);
         query.setSapConfig(this.sapConfig);
 
@@ -192,14 +184,14 @@ public class SapConnector implements ISapConnector {
 
         TraceOut.enter();
 
-        if (condition.getType() == AccessConditionType.ProfileCondition) {
+        if (condition.getType() == AccessConditionType.Profile) {
 
             profileTable.appendRow();
             profileTable.setValue("SIGN", "I");
             profileTable.setValue("OPTION", "EQ");
             profileTable.setValue("LOW", condition.getProfileCondition().getProfile());
 
-        } else if (condition.getType() == AccessConditionType.PatternCondition) {
+        } else if (condition.getType() == AccessConditionType.Pattern) {
 
             for (AccessPatternConditionProperty property : condition.getPatternCondition().getProperties()) {
 

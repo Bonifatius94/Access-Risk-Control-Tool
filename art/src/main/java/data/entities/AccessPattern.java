@@ -1,28 +1,27 @@
 package data.entities;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 /**
  * This class represents an auth pattern (simple or complex).
@@ -31,7 +30,7 @@ import javax.persistence.Transient;
  */
 @Entity
 @Table(name = "AccessPatterns")
-public class AccessPattern {
+public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
 
     // =============================
     //      empty constructor
@@ -50,7 +49,6 @@ public class AccessPattern {
      *
      * @param conditions a list of conditions applied to this auth pattern
      * @param linkage    the linkage applied to this auth pattern (not none)
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     public AccessPattern(List<AccessCondition> conditions, ConditionLinkage linkage) {
 
@@ -69,7 +67,6 @@ public class AccessPattern {
      * @param description the description applied to this auth pattern
      * @param conditions  a list of conditions applied to this auth pattern
      * @param linkage     the linkage applied to this auth pattern (not none)
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     public AccessPattern(String usecaseId, String description, List<AccessCondition> conditions, ConditionLinkage linkage) {
 
@@ -91,7 +88,6 @@ public class AccessPattern {
      * This constructor creates a new instance of an auth pattern of simple type (without usecase id and description defined).
      *
      * @param condition the condition applied to this auth pattern
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     public AccessPattern(AccessCondition condition) {
 
@@ -105,7 +101,6 @@ public class AccessPattern {
      * @param usecaseId   the usecase id applied to this auth pattern
      * @param description the description applied to this auth pattern
      * @param condition   the condition applied to this auth pattern
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     public AccessPattern(String usecaseId, String description, AccessCondition condition) {
 
@@ -119,27 +114,32 @@ public class AccessPattern {
     //           properties
     // =============================
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private String usecaseId;
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 4)
     private ConditionLinkage linkage = ConditionLinkage.None;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AccessCondition> conditions;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "pattern", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@Fetch(value = FetchMode.SUBSELECT)
+    private Set<AccessCondition> conditions = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ConfigurationXAccessPatternMap> configurations;
+    @ManyToMany(mappedBy = "patterns", fetch = FetchType.EAGER)
+    private Set<Configuration> configurations = new HashSet<>();
 
     private boolean isArchived;
-    private OffsetDateTime createdAt;
+    private ZonedDateTime createdAt;
     private String createdBy;
 
     // =============================
     //        getter / setter
     // =============================
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId() {
         return id;
     }
@@ -164,17 +164,27 @@ public class AccessPattern {
         this.description = description;
     }
 
-    @Transient
-    public List<AccessCondition> getConditions() {
+    public Set<AccessCondition> getConditions() {
         return conditions;
     }
 
     public void setConditions(List<AccessCondition> conditions) {
-        this.conditions = conditions;
+        setConditions(new HashSet<>(conditions));
     }
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 4)
+    /**
+     * This setter applies the new conditions while managing to handle foreign key references.
+     *
+     * @param conditions the conditions to be set
+     */
+    public void setConditions(Set<AccessCondition> conditions) {
+
+        this.conditions.forEach(x -> x.setPattern(null));
+        this.conditions.clear();
+        this.conditions.addAll(conditions);
+        adjustReferences();
+    }
+
     public ConditionLinkage getLinkage() {
         return linkage;
     }
@@ -183,14 +193,25 @@ public class AccessPattern {
         this.linkage = linkage;
     }
 
-    @Transient
-    public List<Configuration> getConfigurations() {
-        // TODO: test if this code works fine with sap test
-        return configurations.stream().map(x -> x.getConfig()).collect(Collectors.toList());
+    public Set<Configuration> getConfigurations() {
+        return configurations;
     }
 
-    public void setConfigurations(List<ConfigurationXAccessPatternMap> configurations) {
-        this.configurations = configurations;
+    public void setConfigurations(List<Configuration> configurations) {
+        setConfigurations(new HashSet<>(configurations));
+    }
+
+    /**
+     * This setter applies the new configurations while managing to handle foreign key references.
+     *
+     * @param configurations the conditions to be set
+     */
+    public void setConfigurations(Set<Configuration> configurations) {
+
+        this.configurations.forEach(x -> x.getPatterns().remove(this));
+        this.configurations.clear();
+        this.configurations.addAll(configurations);
+        adjustReferences();
     }
 
     public boolean isArchived() {
@@ -201,11 +222,11 @@ public class AccessPattern {
         isArchived = archived;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -218,23 +239,33 @@ public class AccessPattern {
     }
 
     // =============================
-    //      hibernate triggers
-    // =============================
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
-    }
-
-    // =============================
     //          overrides
     // =============================
+
+    /**
+     * This method adjusts the foreign key references.
+     */
+    @Override
+    public void adjustReferences() {
+
+        // adjust conditions
+        getConditions().forEach(x -> x.setPattern(this));
+
+        // adjust configurations
+        getConfigurations().forEach(x -> x.getPatterns().add(this));
+    }
+
+    @Override
+    public void initCreationFlags(ZonedDateTime createdAt, String createdBy) {
+
+        setCreatedAt(createdAt);
+        setCreatedBy(createdBy);
+    }
 
     /**
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *
      * @return JSON-like data representation of this instance as a string
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     @Override
     public String toString() {
@@ -243,6 +274,42 @@ public class AccessPattern {
         builder.append(", linkage='").append(linkage.toString()).append("', conditions: ");
         conditions.forEach(x -> builder.append("\r\ncondition: ").append(x.toString()));
         return builder.toString();
+    }
+
+    /**
+     * This is a custom implementation of equals method that checks for data equality.
+     *
+     * @param other the object to compare with
+     * @return whether they are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        /*boolean ret = (other == this);
+
+        if (other instanceof AccessPattern) {
+
+            AccessPattern cmp = (AccessPattern) other;
+
+            ret = (usecaseId.equals(cmp.getUsecaseId())
+                && ((this.description == null && cmp.getDescription() == null) || (this.description != null && this.description.equals(cmp.getDescription())))
+                && this.linkage == cmp.getLinkage()
+                && this.id == null || (
+                    this.isArchived == cmp.isArchived()
+                    && this.createdAt.equals(cmp.getCreatedAt())
+                    && this.createdBy.equals(cmp.getCreatedBy())
+                ));
+        }
+
+        return ret;*/
+
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        //return (id != null) ? id : 0;
+        return super.hashCode();
     }
 
 }

@@ -11,6 +11,7 @@ import io.msoffice.excel.WhitelistImportHelper;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import sap.SapConnector;
@@ -18,6 +19,7 @@ import sap.SapConnector;
 public class SapTest {
 
     @Test
+    @Disabled
     public void testSapQuery() {
 
         // init user credentials
