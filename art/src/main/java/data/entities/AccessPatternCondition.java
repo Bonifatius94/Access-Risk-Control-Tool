@@ -40,7 +40,7 @@ public class AccessPatternCondition implements IReferenceAware {
     private Set<AccessPatternConditionProperty> properties = new HashSet<>();
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -49,8 +49,8 @@ public class AccessPatternCondition implements IReferenceAware {
         this.id = id;
     }
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "condition", cascade = CascadeType.ALL)
-    @Fetch(value = FetchMode.SUBSELECT)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@Fetch(value = FetchMode.)
     public Set<AccessPatternConditionProperty> getProperties() {
         return properties;
     }

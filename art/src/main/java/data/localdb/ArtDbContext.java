@@ -34,6 +34,10 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         super("D:\\TEMP\\foo.h2", username, password);
     }
 
+    public ArtDbContext(String filePath, String username, String password) {
+        super(filePath, username, password);
+    }
+
     // ===================================
     //         INIT DATA ENTITIES
     // ===================================
@@ -170,7 +174,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     public List<CriticalAccessQuery> getSapQueries() throws Exception {
 
         // TODO: test logic
-        return queryDataset("FROM CriticalAccessQuery");
+        return queryDataset("FROM CriticalAccessQuery WHERE Archived = 0");
     }
 
     /**
@@ -183,7 +187,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     public List<Configuration> getConfigs() throws Exception {
 
         // TODO: test logic
-        return queryDataset("FROM Configuration");
+        return queryDataset("FROM Configuration WHERE Archived = 0");
     }
 
     /**
@@ -196,7 +200,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     public List<AccessPattern> getPatterns() throws Exception {
 
         // TODO: test logic
-        return queryDataset("FROM AccessPattern");
+        return queryDataset("FROM AccessPattern WHERE Archived = 0");
     }
 
     /**
@@ -209,7 +213,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     public List<Whitelist> getWhitelists() throws Exception {
 
         // TODO: add order by clause
-        return queryDataset("FROM Whitelist");
+        return queryDataset("FROM Whitelist WHERE Archived = 0");
     }
 
     /**
@@ -222,7 +226,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     public List<SapConfiguration> getSapConfigs() throws Exception {
 
         // TODO: test logic
-        return queryDataset("FROM SapConfiguration");
+        return queryDataset("FROM SapConfiguration WHERE Archived = 0");
     }
 
     /**

@@ -29,7 +29,7 @@ public class CriticalAccessEntry {
     private String username;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -48,7 +48,7 @@ public class CriticalAccessEntry {
         this.query = query;
     }
 
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToOne(fetch = FetchType.LAZY/*, (cascade = { CascadeType.PERSIST, CascadeType.MERGE }*/)
     @JoinColumn(name = "ViolatedPatternId")
     public AccessPattern getAccessPattern() {
         return accessPattern;

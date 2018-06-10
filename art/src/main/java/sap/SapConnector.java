@@ -104,12 +104,8 @@ public class SapConnector implements ISapConnector {
             Set<CriticalAccessEntry> resultsOfPattern = runSapQuery(pattern, config.getWhitelist());
             entries.addAll(resultsOfPattern);
 
-            TraceOut.writeInfo("results returned: " + resultsOfPattern.size());
+            TraceOut.writeInfo("Pattern: " + pattern.getUsecaseId() + ", results count: " + resultsOfPattern.size());
         }
-
-        // log critical access entries per pattern
-        Map<String, Long> entriesPerPattern = entries.stream().collect(Collectors.groupingBy(x -> x.getAccessPattern().getUsecaseId(), Collectors.counting()));
-        entriesPerPattern.forEach((key, value) -> TraceOut.writeInfo("Pattern " + key + ": " + value));
 
         // write results to critical access query (ready for insertion into database)
         CriticalAccessQuery query = new CriticalAccessQuery();

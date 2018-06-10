@@ -34,7 +34,7 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
     private String createdBy;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -63,8 +63,8 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
         this.sapConfig = sapConfig;
     }
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Fetch(value = FetchMode.SUBSELECT)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@Fetch(value = FetchMode.SUBSELECT)
     public Set<CriticalAccessEntry> getEntries() {
         return entries;
     }

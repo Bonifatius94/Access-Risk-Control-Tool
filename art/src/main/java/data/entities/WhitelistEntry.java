@@ -2,6 +2,7 @@
 package data.entities;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -42,7 +43,7 @@ public class WhitelistEntry {
     private Whitelist whitelist;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -67,7 +68,7 @@ public class WhitelistEntry {
         this.usecaseId = usecaseId;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WhitelistId")
     public Whitelist getWhitelist() {
         return whitelist;

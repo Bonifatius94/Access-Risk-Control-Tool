@@ -54,7 +54,7 @@ public class AccessPatternConditionProperty {
     private String value4;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }

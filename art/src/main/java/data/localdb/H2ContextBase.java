@@ -227,7 +227,7 @@ public abstract class H2ContextBase implements Closeable {
     // +++++++++++++++++++++++++++++++
 
     public String getFilePath() {
-        return filePath;
+        return filePath + ".mv.db";
     }
 
     public SessionFactory getSessionFactory() {

@@ -25,7 +25,7 @@ public class AccessCondition {
     private AccessPatternCondition patternCondition;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -44,7 +44,7 @@ public class AccessCondition {
         this.type = type;
     }
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "PatternId")
     public AccessPattern getPattern() {
         return pattern;
@@ -54,7 +54,7 @@ public class AccessCondition {
         this.pattern = pattern;
     }
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "ProfileConditionId")
     public AccessProfileCondition getProfileCondition() {
         return profileCondition;
@@ -73,7 +73,7 @@ public class AccessCondition {
         this.patternCondition = null;
     }
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "PatternConditionId")
     public AccessPatternCondition getPatternCondition() {
         return patternCondition;

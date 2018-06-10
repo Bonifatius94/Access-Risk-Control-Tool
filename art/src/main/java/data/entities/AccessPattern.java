@@ -135,7 +135,7 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
     // =============================
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -160,8 +160,8 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
         this.description = description;
     }
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "pattern", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Fetch(value = FetchMode.SUBSELECT)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "pattern", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@Fetch(value = FetchMode.SUBSELECT)
     public Set<AccessCondition> getConditions() {
         return conditions;
     }

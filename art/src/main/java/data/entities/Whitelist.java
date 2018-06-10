@@ -32,7 +32,7 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
     private Set<WhitelistEntry> entries = new HashSet<>();
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -50,14 +50,14 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
         this.description = description;
     }
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "whitelist", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Fetch(value = FetchMode.SUBSELECT)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "whitelist", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@Fetch(value = FetchMode.SUBSELECT)
     public Set<WhitelistEntry> getEntries() {
         return entries;
     }
 
     public void setEntries(List<WhitelistEntry> entries) {
-        setEntries(new HashSet(entries));
+        setEntries(new HashSet<>(entries));
     }
 
     public void setEntries(Set<WhitelistEntry> entries) {
@@ -120,7 +120,7 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("Description = ").append(getDescription()).append(", Entries:");
+        builder.append("Description = '").append(getDescription()).append("', Entries:");
         getEntries().forEach(x -> builder.append("\r\n").append(x));
         builder.append("\r\nCreatedAt = ").append(getCreatedAt()).append(", CreatedBy = ").append(createdBy).append(", IsArchived = ").append(isArchived());
 
