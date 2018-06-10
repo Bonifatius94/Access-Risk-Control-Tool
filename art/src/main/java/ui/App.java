@@ -1,17 +1,22 @@
 package ui;
 
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
 import tools.tracing.TraceLevel;
 import tools.tracing.TraceMode;
 import tools.tracing.TraceOut;
 
+import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
+import ui.main.MainController;
 
 public class App extends Application {
 
@@ -43,6 +48,8 @@ public class App extends Application {
         System.out.println("Stack Trace:");
         System.out.println(e.getMessage());
 
+        e.printStackTrace();
+
         // write exception to log file
         TraceOut.writeException(e);
     }
@@ -52,7 +59,8 @@ public class App extends Application {
         TraceOut.enter();
 
         ResourceBundle bundle = ResourceBundle.getBundle("lang");
-        CustomWindow window = FXMLLoader.load(getClass().getResource("main/MainView.fxml"), bundle);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("main/MainView.fxml"), bundle);
+        CustomWindow window = loader.load();
 
         Scene scene = new Scene(window, 1000, 600);
         scene.getStylesheets().add("css/dark-theme.css");
@@ -62,7 +70,12 @@ public class App extends Application {
         window.setTitle("Access Risk Control Tool");
         primaryStage.show();
 
+        // test alert
+        CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "1 nicer Titel", "Hallo Jungs! Fetter TestAlert in rot!", "Yeee", "Wow!");
+        if (alert.showAndWait().get() == ButtonType.OK) {
+            System.out.println("Okay!");
+        }
+
         TraceOut.leave();
     }
-
 }

@@ -1,8 +1,13 @@
+/*******************************************************************************
+ *                                                                             *
+ * Main .css file for the dark theme                                           *
+ *                                                                             *
+ ******************************************************************************/
 
 /* Define custom color variables which are used throughout the whole application */
 * {
     -fx-primary: #4C9687;
-    -fx-error: #ff4081;
+    -fx-error: #853149;
     -fx-success: #55854B;
     -fx-text: white;
     -fx-alternatetext: #303030;
@@ -11,7 +16,6 @@
     -fx-primary-darker: derive(-fx-primary, -30%);
     -fx-primary-lighter: derive(-fx-primary, 30%);
 }
-
 
 /*
  *	Apply google Roboto font to all UI components
@@ -23,7 +27,6 @@
     -fx-background-color: -fx-background;
 
 }
-
 
 /*******************************************************************************
  *                                                                             *
@@ -42,6 +45,10 @@
     -fx-background-color: -fx-primary-lighter;
 }
 
+.jfx-button:focused {
+    -fx-background-color: -fx-primary-lighter;
+}
+
 /* Close App Button extra styling */
 .windowButton {
     -fx-background-color: -fx-background;
@@ -53,6 +60,9 @@
     -fx-background-color: -fx-error;
 }
 
+.closeWindowButton:focused {
+    -fx-background-color: -fx-error;
+}
 
 /*******************************************************************************
  *                                                                             *
@@ -67,7 +77,6 @@
     -fx-text-fill: -fx-text !important;
     -jfx-label-float: true;
 }
-
 
 /*******************************************************************************
 *                                                                              *
@@ -108,7 +117,6 @@
     -fx-padding: 15 5 5 5;
 }
 
-
 /*******************************************************************************
  *                                                                             *
  * Material CheckBox                                                           *
@@ -120,7 +128,6 @@
     -jfx-unchecked-color: -fx-light;
     -fx-cursor: hand;
 }
-
 
 /*******************************************************************************
 *                                                                             *
@@ -139,7 +146,6 @@
     -fx-border-color: -fx-light !important;
 }
 
-
 /*******************************************************************************
 *                                                                             *
 * Material RadioButton                                                        *
@@ -151,7 +157,6 @@
     -jfx-unchecked-color: -fx-light;
     -fx-cursor: hand;
 }
-
 
 /*******************************************************************************
 *                                                                             *
@@ -217,7 +222,6 @@ alternative design with separators left and right of complete header bar
 .jfx-tree-table-view .column-header-background {
     -fx-border-width: 0 0 0 0;
 }
-
 
 /*******************************************************************************
 *                                                                             *
@@ -302,7 +306,7 @@ alternative design with separators left and right of complete header bar
     -fx-background-color: derive(-fx-background, 10%);
 }
 
-.table-view:focused .table-row-cell:selected{
+.table-view:focused .table-row-cell:selected {
     -fx-background-color: derive(-fx-background, -50%);
     -fx-table-cell-border-color: -fx-primary;
     -fx-text-fill: -fx-text;
@@ -327,7 +331,7 @@ alternative design with separators left and right of complete header bar
 
 .table-view *.scroll-bar:vertical *.increment-arrow,
 .table-view *.scroll-bar:vertical *.decrement-arrow {
-    -fx-background-color:  derive(-fx-background, -80%);
+    -fx-background-color: derive(-fx-background, -80%);
 }
 
 /* styling the vertical scrollbar */
@@ -371,15 +375,12 @@ alternative design with separators left and right of complete header bar
 }
 
 
-/* Alternative Header Styling */
-/*
-.custom-window-header {
-    -fx-background-color: derive(-fx-background, -30%);
+/*******************************************************************************
+ *                                                                             *
+ * Custom window                                                               *
+ *                                                                             *
+ ******************************************************************************/
+
+.windowLabel {
+    -fx-font-weight: bold;
 }
-
-.windowButton {
-    -fx-background-color: derive(-fx-background, -30%);
-}
-*/
-
-
