@@ -68,6 +68,8 @@ public class PatternsFormController {
     @FXML
     public void initialize() {
 
+        initializeValidation();
+
         // set condition input items
         this.conditionTypeInput.getItems().setAll("Condition", "Profile");
         this.linkageInput.getItems().setAll(ConditionLinkage.None, ConditionLinkage.And, ConditionLinkage.Or);
@@ -119,6 +121,24 @@ public class PatternsFormController {
                 }
             });
             return row;
+        });
+    }
+
+    private void initializeValidation() {
+        useCaseIdInput.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                useCaseIdInput.validate();
+            }
+        });
+        descriptionInput.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                descriptionInput.validate();
+            }
+        });
+        profileInput.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                profileInput.validate();
+            }
         });
     }
 

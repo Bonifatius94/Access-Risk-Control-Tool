@@ -13,6 +13,7 @@
     -fx-alternatetext: #303030;
     -fx-background: #484848;
     -fx-light: #AAAAAA;
+    -fx-select: derive(-fx-background, -50%);
     -fx-primary-darker: derive(-fx-primary, -30%);
     -fx-primary-lighter: derive(-fx-primary, 30%);
 }
@@ -331,14 +332,14 @@ alternative design with separators left and right of complete header bar
 }
 
 .table-view:focused .table-row-cell:selected {
-    -fx-background-color: derive(-fx-background, -50%);
+    -fx-background-color: -fx-select;
     -fx-table-cell-border-color: -fx-primary;
     -fx-text-fill: -fx-text;
 }
 
 /* remove blue border from first entry of tableView on focus */
 .table-view:focused .table-row-cell:focused {
-    -fx-background-color: -fx-table-cell-border-color, -fx-background;
+    -fx-background-color: -fx-select;
     -fx-background-insets: 0, 0 0 1 0;
 }
 

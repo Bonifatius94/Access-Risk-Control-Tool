@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -138,6 +139,38 @@ public class PatternsController {
             patternEdit.giveSelectedAccessPattern(accessPattern);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Clones the selected entry and adds it to the table.
+     */
+    public void cloneAction() {
+        if (patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
+            AccessPattern clonedPattern = patternsTable.getSelectionModel().getSelectedItem();
+            patternsTable.getItems().add(clonedPattern);
+            patternsTable.refresh();
+        }
+
+    }
+
+    /**
+     * Opens the edit dialog with the selected item.
+     */
+    public void editAction() {
+        if (patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
+            editAccessPattern(patternsTable.getSelectionModel().getSelectedItem());
+        }
+    }
+
+    /**
+     * Deletes the item from the table.
+     */
+    public void deleteAction() {
+        if (patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
+            patternsTable.getItems().remove(patternsTable.getSelectionModel().getSelectedItem());
+            patternsTable.refresh();
         }
     }
 }

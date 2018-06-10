@@ -34,9 +34,9 @@
     </TableView>
 
     <HBox alignment="BOTTOM_RIGHT" spacing="10">
-        <JFXButton text="Clone ..." prefWidth="100"/>
-        <JFXButton text="New ..." prefWidth="100"/>
-        <JFXButton text="Edit ..." prefWidth="100"/>
-        <JFXButton text="Delete" prefWidth="100"/>
+        <JFXButton text="Clone" onAction="#cloneAction" prefWidth="100"/>
+        <JFXButton text="New..." prefWidth="100"/>
+        <JFXButton text="Edit..." onAction="#editAction" prefWidth="100"/>
+        <JFXButton text="Delete" onAction="#deleteAction" prefWidth="100"/>
     </HBox>
 </VBox>
