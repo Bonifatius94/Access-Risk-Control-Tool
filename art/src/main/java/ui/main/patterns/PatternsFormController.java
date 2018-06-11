@@ -84,13 +84,13 @@ public class PatternsFormController {
     private JFXTextField authFieldValue4Input;
 
 
+    private AccessPattern accessPattern;
+
     /**
      * Initializes the view and sets up bindings for component visibility.
      */
     @FXML
     public void initialize() {
-
-        initializeValidation();
 
         // set condition input items
         this.conditionTypeInput.getItems().setAll("Condition", "Profile");
@@ -101,9 +101,27 @@ public class PatternsFormController {
         this.conditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
         this.linkageBox.managedProperty().bind(this.conditionBox.visibleProperty());
         this.linkageBox.visibleProperty().bind(this.conditionBox.visibleProperty());
+        this.conditionChooser.managedProperty().bind(this.conditionChooser.visibleProperty());
 
         // initialize condition type combo box component
         initializeConditionTypeComboBox();
+
+        initializeValidation();
+
+        initializeLinkageInput();
+    }
+
+    /**
+     * Initializes the LinkageInputComboBox.
+     */
+    public void initializeLinkageInput() {
+        linkageInput.getSelectionModel().selectedItemProperty().addListener((ChangeListener<ConditionLinkage>) (selected, oldValue, newValue) -> {
+            if (newValue.equals(ConditionLinkage.None)) {
+                this.conditionChooser.setVisible(false);
+            } else {
+                this.conditionChooser.setVisible(true);
+            }
+        });
     }
 
     /**
@@ -191,6 +209,8 @@ public class PatternsFormController {
      * @param pattern the selected pattern
      */
     public void giveSelectedAccessPattern(AccessPattern pattern) {
+
+        this.accessPattern = pattern;
 
         this.useCaseIdInput.setText(pattern.getUsecaseId());
         this.descriptionInput.setText(pattern.getDescription());
@@ -299,7 +319,7 @@ public class PatternsFormController {
      * Used for displaying the Conditions with a name in a ComboBox.
      */
     class ConditionComboBoxEntry {
-        
+
         private String name;
         private AccessCondition condition;
 
