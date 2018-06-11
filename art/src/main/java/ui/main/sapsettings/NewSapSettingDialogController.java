@@ -3,7 +3,6 @@ package ui.main.sapsettings;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import data.entities.SapConfiguration;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -25,7 +24,7 @@ public class NewSapSettingDialogController {
 
 
     /**
-     * Initializes fields ???
+     * Initializes the view and sets the validation listeners.
      */
     @FXML
     @SuppressWarnings("all")
@@ -57,9 +56,10 @@ public class NewSapSettingDialogController {
         });
     }
 
-    @FXML
-    @SuppressWarnings("all")
-    public void saveConnection(ActionEvent actionEvent) {
+    /**
+     * Saves the currently edited connection.
+     */
+    public void saveConnection() {
 
         //TODO: implement Test if input is valid
 

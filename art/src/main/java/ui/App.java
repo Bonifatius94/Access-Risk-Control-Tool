@@ -1,15 +1,17 @@
 package ui;
 
+import java.util.ResourceBundle;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
 import tools.tracing.TraceLevel;
 import tools.tracing.TraceMode;
 import tools.tracing.TraceOut;
-import ui.custom.controls.CustomWindow;
 
-import java.util.ResourceBundle;
+import ui.custom.controls.CustomWindow;
 
 public class App extends Application {
 

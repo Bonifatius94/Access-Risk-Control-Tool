@@ -26,7 +26,7 @@ public class SapSettingsEditDialogController {
     private SapConfiguration sapConfig;
 
     /**
-     * Initializes fields ???
+     * Initializes the view.
      */
     @FXML
     @SuppressWarnings("all")
@@ -59,8 +59,10 @@ public class SapSettingsEditDialogController {
         });
     }
 
-    @SuppressWarnings("all")
-    public void saveConnection(ActionEvent actionEvent) {
+    /**
+     * Saves the currently edited connection.
+     */
+    public void saveConnection() {
         //TODO: test if input is valid
 
         if (hostServerField.getText().equals("")) {
@@ -88,11 +90,14 @@ public class SapSettingsEditDialogController {
         }
     }
 
-    @SuppressWarnings("all")
-    public void connect(ActionEvent actionEvent) {
+    public void connect() {
         //TODO:test if input is valid , Establish connection to Sap
     }
 
+    /**
+     * Prefills the inputs with the given SapConfig.
+     * @param sapConfig the given SapConfig
+     */
     void giveSelectedSapConfig(SapConfiguration sapConfig) {
         this.sapConfig = sapConfig;
 
