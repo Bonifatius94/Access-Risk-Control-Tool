@@ -15,6 +15,7 @@ import org.hibernate.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("all")
 public class H2AccountsTest {
 
     @BeforeEach

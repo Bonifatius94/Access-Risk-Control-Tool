@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import sap.SapConnector;
 
+@SuppressWarnings("all")
 public class SapTest {
 
     @Test

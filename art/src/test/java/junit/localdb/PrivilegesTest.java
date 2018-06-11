@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+@SuppressWarnings("all")
 public class PrivilegesTest {
 
     @BeforeEach

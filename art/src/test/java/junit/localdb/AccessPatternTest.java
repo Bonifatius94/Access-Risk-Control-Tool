@@ -1,6 +1,5 @@
 package junit.localdb;
 
-import data.entities.AccessConditionType;
 import data.entities.AccessPattern;
 import data.entities.AccessProfileCondition;
 import data.localdb.ArtDbContext;
@@ -10,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -18,6 +16,7 @@ import org.hibernate.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("all")
 public class AccessPatternTest {
 
     @BeforeEach
