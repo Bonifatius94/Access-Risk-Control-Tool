@@ -55,11 +55,11 @@
         </VBox>
         <Separator/>
         <VBox fx:id="conditionBox" visible="false">
-            <HBox HBox.hgrow="ALWAYS" spacing="50" style="-fx-padding: 10 0 20 0">
+            <HBox HBox.hgrow="ALWAYS" spacing="50" style="-fx-padding: 10 0 30 0">
                 <VBox maxWidth="200">
                     <JFXComboBox fx:id="conditionChooser"/>
                 </VBox>
-                <HBox alignment="BASELINE_LEFT" spacing="20">
+                <HBox alignment="BASELINE_LEFT" spacing="20" HBox.hgrow="ALWAYS">
                     <VBox HBox.hgrow="ALWAYS" spacing="40">
                         <JFXTextField fx:id="authObjectInput" promptText="%authObject" maxWidth="250">
                             <validators>
