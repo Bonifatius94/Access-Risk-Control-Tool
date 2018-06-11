@@ -95,22 +95,27 @@ public class SapConnector implements ISapConnector {
 
         TraceOut.enter();
 
-        Set<CriticalAccessEntry> entries = new HashSet<>();
+        CriticalAccessQuery query = null;
 
-        for (AccessPattern pattern : config.getPatterns()) {
+        if (canPingServer()) {
 
-            // executing query for pattern
-            Set<CriticalAccessEntry> resultsOfPattern = runSapQuery(pattern, config.getWhitelist());
-            entries.addAll(resultsOfPattern);
+            Set<CriticalAccessEntry> entries = new HashSet<>();
 
-            TraceOut.writeInfo("Pattern: " + pattern.getUsecaseId() + ", results count: " + resultsOfPattern.size());
+            for (AccessPattern pattern : config.getPatterns()) {
+
+                // executing query for pattern
+                Set<CriticalAccessEntry> resultsOfPattern = runSapQuery(pattern, config.getWhitelist());
+                entries.addAll(resultsOfPattern);
+
+                TraceOut.writeInfo("Pattern: " + pattern.getUsecaseId() + ", results count: " + resultsOfPattern.size());
+            }
+
+            // write results to critical access query (ready for insertion into database)
+            query = new CriticalAccessQuery();
+            query.setEntries(entries);
+            query.setConfig(config);
+            query.setSapConfig(this.sapConfig);
         }
-
-        // write results to critical access query (ready for insertion into database)
-        CriticalAccessQuery query = new CriticalAccessQuery();
-        query.setEntries(entries);
-        query.setConfig(config);
-        query.setSapConfig(this.sapConfig);
 
         TraceOut.leave();
         return query;
@@ -237,21 +242,21 @@ public class SapConnector implements ISapConnector {
         JCoTable results = null;
         JCoDestination destination = JCoDestinationManager.getDestination(sapConfig.getServerDestination());
 
-        if (canPingServer()) {
+        /*if (canPingServer()) {*/
 
-            if (function != null) {
+        if (function != null) {
 
-                // run query
-                function.execute(destination);
-                results = function.getExportParameterList().getTable("ET_USERS");
-
-            } else {
-                throw new Exception("Function could not be initialized!");
-            }
+            // run query
+            function.execute(destination);
+            results = function.getExportParameterList().getTable("ET_USERS");
 
         } else {
-            throw new Exception("Can't connect to the server!");
+            throw new Exception("Function could not be initialized!");
         }
+
+        /*} else {
+            throw new Exception("Can't connect to the server!");
+        }*/
 
         TraceOut.leave();
         return results;

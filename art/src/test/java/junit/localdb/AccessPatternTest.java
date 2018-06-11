@@ -1,61 +1,25 @@
 package junit.localdb;
 
+import data.entities.AccessCondition;
 import data.entities.AccessPattern;
+import data.entities.AccessPatternCondition;
+import data.entities.AccessPatternConditionProperty;
 import data.entities.AccessProfileCondition;
+import data.entities.ConditionLinkage;
 import data.localdb.ArtDbContext;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("all")
 public class AccessPatternTest {
 
     @BeforeEach
     public void cleanupDatabase() throws Exception {
-
-        System.out.print("cleaning up datebase ...");
-        deleteFileIfExists(getDefaultDatabaseFilePath());
-        System.out.println(" done");
-
-        String currentExeFolder = System.getProperty("user.dir");
-        Path scriptPath = Paths.get(currentExeFolder, "target", "test-classes", "scripts", "create_test_data_seed.sql");
-        List<String> sqlStatements = Files.readAllLines(scriptPath);
-
-        try (ArtDbContext context = new ArtDbContext("test", "test")) {
-
-            try (Session session = context.openSession()) {
-
-                Transaction transaction = session.beginTransaction();
-                sqlStatements.forEach(sql -> session.createNativeQuery(sql).executeUpdate());
-                transaction.commit();
-            }
-        }
-
-        System.out.println("created a new test database and inserted test data");
-    }
-
-    private static String getDefaultDatabaseFilePath() {
-
-        String currentExeFolder = System.getProperty("user.dir");
-        return Paths.get(currentExeFolder, "foo.h2.mv.db").toAbsolutePath().toString();
-    }
-
-    private static void deleteFileIfExists(String filePath) {
-
-        File database = new File(filePath);
-
-        if (database.exists()) {
-            database.delete();
-        }
+        new DatabaseCleanupHelper().cleanupDatabase();
     }
 
     @Test
@@ -65,7 +29,7 @@ public class AccessPatternTest {
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
-            // query whitelists
+            // query patterns
             List<AccessPattern> patterns = context.getPatterns();
 
             AccessPattern profileAccessPattern = patterns.stream().filter(x -> x.getConditions().size() == 1).findFirst().get();
@@ -83,6 +47,191 @@ public class AccessPatternTest {
         assert(ret);
     }
 
-    // TODO: implement missing tests
+    @Test
+    public void testCreateAccessPatternWithPatternConditions() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // create pattern data objects
+            final String usecaseId = "1.A";
+            final String description = "a test description";
+
+            AccessPattern pattern = new AccessPattern(usecaseId, description, new ArrayList<>(), ConditionLinkage.And);
+
+            pattern.setConditions(Arrays.asList(
+                new AccessCondition(
+                    pattern,
+                    new AccessPatternCondition(Arrays.asList(
+                        new AccessPatternConditionProperty("S_TCODE", "TCD", "SCCL", null, null, null),
+                        new AccessPatternConditionProperty("S_ADMI_FCD", "S_ADMI_FCD", "T000", null, null, null),
+                        new AccessPatternConditionProperty("S_TABU_DIS", "ACTVT", "02", null, null, null),
+                        new AccessPatternConditionProperty("S_TABU_DIS", "DICBERCLS", "\"*\"", null, null, null),
+                        new AccessPatternConditionProperty("S_TABU_CLI", "CLIIDMAINT", "X", null, null, null)
+                    ))
+                ),
+                new AccessCondition(
+                    pattern,
+                    new AccessPatternCondition(Arrays.asList(
+                        new AccessPatternConditionProperty("S_TCODE", "TCD", "SCCL", null, null, null),
+                        new AccessPatternConditionProperty("S_ADMI_FCD", "S_ADMI_FCD", "T000", null, null, null),
+                        new AccessPatternConditionProperty("S_TABU_DIS", "ACTVT", "02", null, null, null),
+                        new AccessPatternConditionProperty("S_TABU_DIS", "DICBERCLS", "\"*\"", null, null, null),
+                        new AccessPatternConditionProperty("S_TABU_CLI", "CLIIDMAINT", "X", null, null, null)
+                    ))
+                )
+            ));
+
+            // insert pattern into database
+            context.createPattern(pattern);
+
+            // query database
+            List<AccessPattern> patterns = context.getPatterns();
+
+            // check if new pattern was inserted
+            ret = patterns.size() == 4
+                && patterns.stream().anyMatch(
+                       x -> x.getConditions().size() == 2
+                    && x.getUsecaseId().equals(usecaseId)
+                    && x.getDescription().equals(description)
+                    && x.getLinkage() == ConditionLinkage.And
+                );
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert(ret);
+    }
+
+    @Test
+    public void testCreateAccessPatternWithProfileCondition() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // create pattern data objects
+            final String usecaseId = "3.A";
+            final String description = "a test description";
+            final String profile = "SAP_ALL";
+
+            AccessPattern pattern = new AccessPattern(usecaseId, description, new AccessCondition());
+            pattern.setConditions(Arrays.asList(new AccessCondition(pattern, new AccessProfileCondition(profile))));
+
+            // insert pattern into database
+            context.createPattern(pattern);
+
+            // query database
+            List<AccessPattern> patterns = context.getPatterns();
+
+            // check if new pattern was inserted
+            ret = patterns.size() == 4
+                && patterns.stream().anyMatch(
+                x -> x.getConditions().size() == 1
+                    && x.getUsecaseId().equals(usecaseId)
+                    && x.getDescription().equals(description)
+                    && x.getLinkage() == ConditionLinkage.None
+                    && x.getConditions().stream().anyMatch(y -> y.getProfileCondition().getProfile().equals(profile))
+            );
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert(ret);
+    }
+
+    @Test
+    public void testUpdatePattern() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query patterns
+            List<AccessPattern> patterns = context.getPatterns();
+            AccessPattern profilePattern = patterns.stream().filter(x -> x.getConditions().size() == 1).findFirst().get();
+            AccessProfileCondition profileCondition = profilePattern.getConditions().stream().findFirst().get().getProfileCondition();
+            AccessPattern multiConditionPattern = patterns.stream().filter(x -> x.getConditions().size() == 2).findFirst().get();
+            Integer profilePatternId = profilePattern.getId();
+            Integer multiConditionPatternId = multiConditionPattern.getId();
+
+            // apply changes to profile condition
+            final String newProfile = "SAP_NEW";
+            final String newDescription = "another description";
+            profilePattern.setLinkage(ConditionLinkage.Or);
+            profilePattern.setDescription(newDescription);
+            profileCondition.setProfile(newProfile);
+
+            // apply changes to complex conditions
+            List<AccessCondition> patternConditions = new ArrayList<>(multiConditionPattern.getConditions());
+            patternConditions.remove(0);
+            AccessCondition condition = patternConditions.get(0);
+            AccessPatternConditionProperty property = condition.getPatternCondition().getProperties().stream().findFirst().get();
+            final String newValue4 = "foobar";
+            property.setValue4(newValue4);
+            multiConditionPattern.setConditions(patternConditions);
+            Integer propertyId = property.getId();
+            Integer conditionId = condition.getId();
+
+            // update database
+            context.updatePattern(profilePattern);
+            context.updatePattern(multiConditionPattern);
+
+            // query data again
+            patterns = context.getPatterns();
+            profilePattern = patterns.stream().filter(x -> x.getId().equals(profilePatternId)).findFirst().get();
+            profileCondition = profilePattern.getConditions().stream().findFirst().get().getProfileCondition();
+            multiConditionPattern = patterns.stream().filter(x -> x.getId().equals(multiConditionPatternId)).findFirst().get();
+
+            // check if test data was queried successfully
+            ret = patterns.size() == 3
+                && multiConditionPattern.getConditions().size() == 1
+                && multiConditionPattern.getConditions().stream().anyMatch(x ->
+                       x.getId().equals(conditionId)
+                    && x.getPatternCondition().getProperties().stream().anyMatch(y -> y.getId().equals(propertyId) && newValue4.equals(y.getValue4()))
+                )
+                && profilePattern.getDescription().equals(newDescription) && profilePattern.getLinkage() == ConditionLinkage.Or
+                && profileCondition.getProfile().equals(newProfile);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        // TODO: add another test for evaluating archiving logic on update
+
+        assert(ret);
+    }
+
+    @Test
+    public void deletePattern() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query patterns
+            List<AccessPattern> patterns = context.getPatterns();
+            AccessPattern profilePattern = patterns.stream().filter(x -> x.getConditions().size() == 1).findFirst().get();
+            AccessPattern multiConditionPattern = patterns.stream().filter(x -> x.getConditions().size() == 2).findFirst().get();
+
+            // delete patterns
+            context.deletePattern(profilePattern);
+            context.deletePattern(multiConditionPattern);
+
+            // query patterns again
+            patterns = context.getPatterns();
+
+            // check if patterns were deleted
+            ret = patterns.size() == 1;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert(ret);
+    }
 
 }

@@ -120,3 +120,14 @@ INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty
 INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (38, 'S_DEVELOP', 'OBJNAME',  '*',     NULL,   NULL, NULL, 8);
 INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (39, 'S_DEVELOP', 'P_GROUP',  '*',     NULL,   NULL, NULL, 8);
 INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (40, 'S_DEVELOP', 'ACTVT',    '01',    '02',   NULL, NULL, 8);
+
+-- ==============================
+--         sap settings
+-- ==============================
+
+-- active config
+INSERT INTO SapConfigurations (ID, CLIENT, CREATEDAT, CREATEDBY, ISARCHIVED, LANGUAGE, POOLCAPACITY, SERVERDESTINATION, SYSNR) VALUES (1, '001', '2018-06-08T15:09:15', 'test', 0, 'EN', '0', 'ec2-54-209-137-85.compute-1.amazonaws.com', '00');
+
+-- archived config
+INSERT INTO SapConfigurations (ID, CLIENT, CREATEDAT, CREATEDBY, ISARCHIVED, LANGUAGE, POOLCAPACITY, SERVERDESTINATION, SYSNR) VALUES (2, '001', '2018-06-08T15:09:15', 'test', 1, 'EN', '0', 'ec2-54-209-137-85.compute-1.amazonaws.com', '00');
+

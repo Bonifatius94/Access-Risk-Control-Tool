@@ -12,6 +12,22 @@ import javax.persistence.Table;
 @Table(name = "SapConfigurations")
 public class SapConfiguration implements ICreationFlagsHelper {
 
+    public SapConfiguration() {
+
+    }
+
+    /**
+     * This constructor sets all members of the new instance.
+     */
+    public SapConfiguration(String serverDestination, String sysNr, String client, String language, String poolCapacity) {
+
+        setServerDestination(serverDestination);
+        setSysNr(sysNr);
+        setClient(client);
+        setLanguage(language);
+        setPoolCapacity(poolCapacity);
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

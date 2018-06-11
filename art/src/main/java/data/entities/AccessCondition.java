@@ -18,6 +18,20 @@ import javax.persistence.Table;
 @Table(name = "AccessConditions")
 public class AccessCondition {
 
+    public AccessCondition() {
+
+    }
+
+    public AccessCondition(AccessPattern pattern, AccessPatternCondition patternCondition) {
+        setPattern(pattern);
+        setPatternCondition(patternCondition);
+    }
+
+    public AccessCondition(AccessPattern pattern, AccessProfileCondition profileCondition) {
+        setPattern(pattern);
+        setProfileCondition(profileCondition);
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
