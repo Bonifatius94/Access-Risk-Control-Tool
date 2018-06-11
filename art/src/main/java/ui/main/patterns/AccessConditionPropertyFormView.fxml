@@ -13,7 +13,7 @@
 <?import ui.custom.controls.CustomWindow?>
 <?import com.jfoenix.controls.JFXButton?>
 <CustomWindow spacing="20"
-              title="%editPatternTitle" windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
+              title="%newPatternTitle" windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
               xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.patterns.AccessConditionPropertyFormController">
     <VBox alignment="BASELINE_LEFT" spacing="35" HBox.hgrow="ALWAYS" style="-fx-padding: 20">
         <JFXTextField fx:id="authObjectInput" promptText="%authObject" maxWidth="250">

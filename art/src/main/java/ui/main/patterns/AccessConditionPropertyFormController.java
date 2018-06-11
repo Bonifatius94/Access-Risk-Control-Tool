@@ -13,8 +13,6 @@ import javafx.scene.layout.HBox;
 
 public class AccessConditionPropertyFormController {
 
-    private AccessPatternConditionProperty accessPatternConditionProperty;
-
     @FXML
     private JFXTextField authObjectInput;
 
@@ -36,23 +34,30 @@ public class AccessConditionPropertyFormController {
 
     @FXML
     public void initialize() {
-
+        initializeValidation();
     }
 
     /**
-     * Prefill the inputs with the given AccessPatternConditionProperty.
-     *
-     * @param accessPatternConditionProperty the selected AccessPatternConditionProperty
+     * Initializes the validation for certain text inputs in order to display an error message (e.g. required).
      */
-    public void giveSelectedAccessConditionProperty(AccessPatternConditionProperty accessPatternConditionProperty) {
-        this.accessPatternConditionProperty = accessPatternConditionProperty;
+    private void initializeValidation() {
+        authObjectInput.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                authObjectInput.validate();
+            }
+        });
 
-        authObjectInput.setText(accessPatternConditionProperty.getAuthObject());
-        authFieldInput.setText(accessPatternConditionProperty.getAuthObjectProperty());
-        authFieldValue1Input.setText(accessPatternConditionProperty.getValue1());
-        authFieldValue2Input.setText(accessPatternConditionProperty.getValue2());
-        authFieldValue3Input.setText(accessPatternConditionProperty.getValue3());
-        authFieldValue4Input.setText(accessPatternConditionProperty.getValue4());
+        authFieldInput.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                authFieldInput.validate();
+            }
+        });
+
+        authFieldValue1Input.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                authFieldValue1Input.validate();
+            }
+        });
     }
 
     public void saveChanges() {
@@ -60,6 +65,6 @@ public class AccessConditionPropertyFormController {
     }
 
     public void close(ActionEvent event) {
-        (((Button)event.getSource()).getScene().getWindow()).hide();
+        (((Button) event.getSource()).getScene().getWindow()).hide();
     }
 }

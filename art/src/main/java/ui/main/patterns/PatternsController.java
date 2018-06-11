@@ -124,7 +124,7 @@ public class PatternsController {
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 750, 700);
+            Scene scene = new Scene(customWindow, 700, 850);
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
