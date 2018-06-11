@@ -112,7 +112,6 @@ public class PatternsFormController {
     private void initializeConditionTypeComboBox() {
         // add a change listener to the conditionType input so other components are hidden accordingly
         this.conditionTypeInput.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (selected, oldValue, newValue) -> {
-            this.conditionChooser.getSelectionModel().select(0);
 
             if (oldValue != null) {
                 switch (oldValue) {
@@ -141,22 +140,26 @@ public class PatternsFormController {
                     break;
             }
         });
+
     }
 
     /**
      * Initializes the validation for certain text inputs in order to display an error message (e.g. required).
      */
     private void initializeValidation() {
+
         useCaseIdInput.focusedProperty().addListener((o, oldVal, newVal) -> {
             if (!newVal) {
                 useCaseIdInput.validate();
             }
         });
+
         descriptionInput.focusedProperty().addListener((o, oldVal, newVal) -> {
             if (!newVal) {
                 descriptionInput.validate();
             }
         });
+
         profileInput.focusedProperty().addListener((o, oldVal, newVal) -> {
             if (!newVal) {
                 profileInput.validate();
@@ -249,6 +252,8 @@ public class PatternsFormController {
      * @param accessPatternConditionProperty the selected AccessConditionProperty
      */
     private void editSelectedAccessConditionProperty(AccessPatternConditionProperty accessPatternConditionProperty) {
+
+        // set the inputs to the given values
         authObjectInput.setText(accessPatternConditionProperty.getAuthObject());
         authFieldInput.setText(accessPatternConditionProperty.getAuthObjectProperty());
         authFieldValue1Input.setText(accessPatternConditionProperty.getValue1());
@@ -294,6 +299,7 @@ public class PatternsFormController {
      * Used for displaying the Conditions with a name in a ComboBox.
      */
     class ConditionComboBoxEntry {
+        
         private String name;
         private AccessCondition condition;
 
