@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.*?>
+
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import ui.custom.controls.PTableColumn?>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ui.main.patterns.PatternsController"
+      spacing="10">
+    <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable">
+        <columns>
+            <PTableColumn text="ID" percentageWidth="0.05" resizable="false" >
+                <cellValueFactory>
+                    <PropertyValueFactory property="id"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="Description" percentageWidth="0.71" resizable="false" styleClass="align-left">
+                <cellValueFactory>
+                    <PropertyValueFactory property="description"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="#" fx:id="useCaseCountColumn" percentageWidth="0.1" resizable="false" >
+                <cellValueFactory>
+                    <PropertyValueFactory property="conditions"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.07" fx:id="editColumn" resizable="false" sortable="false">
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.07" fx:id="deleteColumn" resizable="false" sortable="false">
+            </PTableColumn>
+        </columns>
+    </TableView>
+
+    <HBox alignment="BOTTOM_RIGHT" spacing="10">
+        <JFXButton text="Clone ..." prefWidth="100"/>
+        <JFXButton text="New ..." prefWidth="100"/>
+        <JFXButton text="Edit ..." prefWidth="100"/>
+        <JFXButton text="Delete" prefWidth="100"/>
+    </HBox>
+</VBox>

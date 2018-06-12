@@ -1,0 +1,129 @@
+
+package data.entities;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+/**
+ * This is a data object class for an entry specified in a whitelist.
+ * It contains properties like usecase id or username.
+ */
+@Entity
+@Table(name = "WhitelistEntries")
+public class WhitelistEntry {
+
+    public WhitelistEntry() {
+
+    }
+
+    /**
+     * This constructor creates a new instance of a whitelist entry.
+     *
+     * @param usecaseId the usecase id of the whitelist entry
+     * @param username the username of the whitelist entry
+     */
+    public WhitelistEntry(String usecaseId, String username) {
+
+        setUsecaseId(usecaseId);
+        setUsername(username);
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name = "WhitelistId")
+    private Whitelist whitelist;
+
+    private String usecaseId;
+    private String username;
+
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUsecaseId() {
+        return usecaseId;
+    }
+
+    public void setUsecaseId(String usecaseId) {
+        this.usecaseId = usecaseId;
+    }
+
+    public Whitelist getWhitelist() {
+        return whitelist;
+    }
+
+    public void setWhitelist(Whitelist whitelist) {
+        this.whitelist = whitelist;
+    }
+
+    /**
+     * This is a new implementation of toString method for writing this instance to console in JSON-like style.
+     *
+     * @return JSON-like data representation of this instance as a string
+     */
+    @Override
+    public String toString() {
+        return "usecaseId='" + getUsecaseId() + "', username='" + getUsername() + "'";
+    }
+
+    /**
+     * This is a custom implementation of equals method that checks for data equality.
+     *
+     * @param other the object to compare with
+     * @return whether they are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        /*boolean ret = (other == this);
+
+        if (other instanceof WhitelistEntry) {
+
+            WhitelistEntry cmp = (WhitelistEntry) other;
+
+            ret = (this.username.equals(cmp.getUsername())
+                && this.usecaseId.equals(cmp.getUsecaseId())
+                && ((this.whitelist == null && cmp.getWhitelist() == null) || (this.whitelist != null && this.whitelist.equals(cmp.getWhitelist()))));
+        }
+
+        return ret;*/
+
+        // TODO: change implementation of this method accordingly
+        // return false if types are not matching or other is null
+        // return false if both IDs are null
+        // otherwise return true if IDs match and IDs of referenced objects match also
+
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+
+        //return (id != null) ? id : 0;
+        return super.hashCode();
+    }
+
+}

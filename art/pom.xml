@@ -10,10 +10,10 @@
 
     <!-- set java version used -->
     <properties>
-        <maven.compiler.source>10</maven.compiler.source>
-        <maven.compiler.target>10</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
 
     <!-- all dependencies we need for the project-->
     <dependencies>
@@ -31,6 +31,29 @@
             <version>3.17</version>
         </dependency>
 
+        <!-- general JUnit testing framework -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Provides a testing framework for JavaFX Applications -->
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-core</artifactId>
+            <version>4.0.13-alpha</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- sap jco connector lib (linked as local jar file in /lib folder) -->
         <dependency>
             <groupId>com.sap.conn</groupId>
@@ -38,6 +61,46 @@
             <version>3</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/sapjco3.jar</systemPath>
+        </dependency>
+
+        <!-- hibernate ORM -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>5.2.10.Final</version>
+        </dependency>
+
+        <!-- H2 JDBC driver and hibernate H2 tools -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.193</version>
+        </dependency>
+
+        <!-- xml libs required for hibernate -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+
+        <!-- JFoenix Material Design Library -->
+        <dependency>
+            <groupId>com.jfoenix</groupId>
+            <artifactId>jfoenix</artifactId>
+            <version>8.0.4</version>
+        </dependency>
+
+        <!-- Dependency for Icon Collections -->
+        <dependency>
+            <groupId>de.jensd</groupId>
+            <artifactId>fontawesomefx</artifactId>
+            <version>8.9</version>
         </dependency>
     </dependencies>
 
@@ -60,7 +123,7 @@
                         <phase>validate</phase>
                         <configuration>
                             <!-- Changes made to google checks: 200 characters per line (instead of 100), indent set 4 instead of 2 -->
-                            <configLocation>res/custom_checks.xml</configLocation>
+                            <configLocation>custom_checks.xml</configLocation>
                             <encoding>UTF-8</encoding>
                             <consoleOutput>true</consoleOutput>
                             <failsOnError>true</failsOnError>
@@ -73,16 +136,54 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>1.1.0</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
-		
-		<!-- add *.fxml files to the build process (otherwise *.fxml files are not copied to the target folder and the program crashes) -->
+
+        <!-- add *.fxml files to the build process (otherwise *.fxml files are not copied to the target folder and the program crashes) -->
         <resources>
+            <!-- copy the fxml files to the build output directory -->
             <resource>
                 <directory>src/main/java</directory>
                 <includes>
                     <include>**/*.fxml</include>
                 </includes>
             </resource>
+
+            <!-- define resources directory -->
+            <resource>
+                <directory>res</directory>
+            </resource>
         </resources>
+
+        <testResources>
+            <!-- copy the fxml files to the build output directory -->
+            <testResource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.fxml</include>
+                </includes>
+            </testResource>
+
+            <!-- define test resources directory -->
+            <testResource>
+                <directory>res-test</directory>
+            </testResource>
+
+            <!-- include resources also as test resources -->
+            <testResource>
+                <directory>res</directory>
+            </testResource>
+        </testResources>
     </build>
 </project>
