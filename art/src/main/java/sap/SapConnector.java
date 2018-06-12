@@ -164,12 +164,15 @@ public class SapConnector implements ISapConnector {
             profileTable.clear();
         }
 
-        // get whitelisted users
-        Set<String> whitelistedUsers = whitelist.getEntries().stream()
-            .filter(x -> x.getUsecaseId().equals(pattern.getUsecaseId())).map(x -> x.getUsername()).collect(Collectors.toSet());
+        if (whitelist != null) {
 
-        // apply whitelist to query results (remove whitelisted users)
-        usernames.removeAll(whitelistedUsers);
+            // get whitelisted users
+            Set<String> whitelistedUsers = whitelist.getEntries().stream()
+                .filter(x -> x.getUsecaseId().equals(pattern.getUsecaseId())).map(x -> x.getUsername()).collect(Collectors.toSet());
+
+            // apply whitelist to query results (remove whitelisted users)
+            usernames.removeAll(whitelistedUsers);
+        }
 
         // create critical access entries from remaining usernames + pattern
         Set<CriticalAccessEntry> entries = usernames.stream().map(x -> new CriticalAccessEntry(pattern, x)).collect(Collectors.toSet());

@@ -20,7 +20,9 @@ import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
@@ -57,7 +59,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         // configuration
         list.add(Configuration.class);
-        list.add(ConfigurationXAccessPatternMap.class);
+        //list.add(ConfigurationXAccessPatternMap.class);
 
         // access pattern
         list.add(AccessPattern.class);
@@ -89,9 +91,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         config.setProperty("hibernate.hbm2ddl.import_files", "scripts/create_views.sql, scripts/create_roles.sql");
     }
 
-    // ===================================
-    //           HIBERNATE LOGIC
-    // ===================================
+    // ============================================
+    //        H I B E R N A T E    L O G I C
+    // ============================================
+
+    // ============================================
+    //                 C R E A T E
+    // ============================================
 
     /**
      * This method writes the results of an already executed sap query to the local database. All referenced table entries are also created.
@@ -101,8 +107,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void createSapQuery(CriticalAccessQuery query) throws Exception {
-
-        // TODO: test logic
 
         query.adjustReferences();
         query.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
@@ -118,8 +122,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void createConfig(Configuration config) throws Exception {
 
-        // TODO: test logic
-
         config.adjustReferences();
         config.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
         insertRecord(config);
@@ -133,8 +135,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void createPattern(AccessPattern pattern) throws Exception {
-
-        // TODO: test logic
 
         pattern.adjustReferences();
         pattern.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
@@ -150,8 +150,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void createWhitelist(Whitelist whitelist) throws Exception {
 
-        // TODO: test logic
-
         whitelist.adjustReferences();
         whitelist.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
         insertRecord(whitelist);
@@ -166,75 +164,78 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void createSapConfig(SapConfiguration config) throws Exception {
 
-        // TODO: test logic
         config.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
         insertRecord(config);
     }
+
+    // ============================================
+    //                   R E A D
+    // ============================================
 
     /**
      * This method selects all already executed sap queries from the local database.
      * TODO: add filter option (e.g. by time: today, last week, last month, last year, all)
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of already executed sap queries
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
     @Override
-    public List<CriticalAccessQuery> getSapQueries() throws Exception {
+    public List<CriticalAccessQuery> getSapQueries(boolean includeArchived) throws Exception {
 
-        // TODO: test logic
-        return queryDataset("FROM CriticalAccessQuery WHERE IsArchived = 0");
+        return queryDataset("FROM CriticalAccessQuery" + (includeArchived ? "" : " WHERE IsArchived = 0"));
     }
 
     /**
      * This method selects all configurations from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all configurations
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
     @Override
-    public List<Configuration> getConfigs() throws Exception {
+    public List<Configuration> getConfigs(boolean includeArchived) throws Exception {
 
-        // TODO: test logic
-        return queryDataset("FROM Configuration WHERE IsArchived = 0");
+        return queryDataset("FROM Configuration" + (includeArchived ? "" : " WHERE IsArchived = 0"));
     }
 
     /**
      * This method selects all access patterns from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all access patterns
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
     @Override
-    public List<AccessPattern> getPatterns() throws Exception {
+    public List<AccessPattern> getPatterns(boolean includeArchived) throws Exception {
 
-        // TODO: test logic
-        return queryDataset("FROM AccessPattern WHERE IsArchived = 0");
+        return queryDataset("FROM AccessPattern" + (includeArchived ? "" : " WHERE IsArchived = 0"));
     }
 
     /**
      * This method selects all whitelists from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all whitelists
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
     @Override
-    public List<Whitelist> getWhitelists() throws Exception {
+    public List<Whitelist> getWhitelists(boolean includeArchived) throws Exception {
 
-        // TODO: add order by clause
-        return queryDataset("FROM Whitelist WHERE IsArchived = 0");
+        return queryDataset("FROM Whitelist" + (includeArchived ? "" : " WHERE IsArchived = 0"));
     }
 
     /**
      * This method selects all sap configurations from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all sap configurations
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
     @Override
-    public List<SapConfiguration> getSapConfigs() throws Exception {
+    public List<SapConfiguration> getSapConfigs(boolean includeArchived) throws Exception {
 
-        // TODO: test logic
-        return queryDataset("FROM SapConfiguration WHERE IsArchived = 0");
+        return queryDataset("FROM SapConfiguration" + (includeArchived ? "" : " WHERE IsArchived = 0"));
     }
 
     /**
@@ -261,6 +262,10 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         return users;
     }
 
+    // ============================================
+    //                 U P D A T E
+    // ============================================
+
     /**
      * This method updates all properties referenced in the config.
      * If the config has already been used in sap queries, the history flag is set and the changes are applied to a new
@@ -276,13 +281,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         config.adjustReferences();
 
         // check if the config has already been used by a critical access query
-        boolean isConfigUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getConfig().equals(config));
+        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getId().equals(config.getId()));
 
-        if (isConfigUsedBySapQuery) {
+        if (archive) {
 
             // get the id of the original config
             Integer originalId = config.getId();
-            Configuration original = getConfigs().stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
+            Configuration original = getConfigs(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
 
             // set archived flag to original and update it
             original.setArchived(true);
@@ -290,9 +295,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
             // request new id for config to update
             config.setId(null);
-        }
+            insertRecord(config);
 
-        updateRecord(config);
+        } else {
+            updateRecord(config);
+        }
     }
 
     /**
@@ -309,13 +316,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         pattern.adjustReferences();
 
         // check if the pattern has already been used by a critical access query
-        boolean isPatternUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getConfig().getPatterns().contains(pattern));
+        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getPatterns().stream().anyMatch(y -> y.getId().equals(pattern.getId())));
 
-        if (isPatternUsedBySapQuery) {
+        if (archive) {
 
             // get the id of the original pattern
             Integer originalId = pattern.getId();
-            AccessPattern original = getPatterns().stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
+            AccessPattern original = getPatterns(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
 
             // set archived flag to original and update it
             original.setArchived(true);
@@ -323,9 +330,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
             // request new id for pattern to update
             pattern.setId(null);
-        }
+            insertRecord(pattern);
 
-        updateRecord(pattern);
+        } else {
+            updateRecord(pattern);
+        }
     }
 
     /**
@@ -342,13 +351,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         whitelist.adjustReferences();
 
         // check if the whitelist has already been used by a critical access query
-        boolean isWhitelistUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getConfig().getWhitelist().equals(whitelist));
+        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
 
-        if (isWhitelistUsedBySapQuery) {
+        if (archive) {
 
             // get the id of the original whitelist
             Integer originalId = whitelist.getId();
-            Whitelist original = getWhitelists().stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
+            Whitelist original = getWhitelists(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
 
             // set archived flag to original and update it
             original.setArchived(true);
@@ -373,13 +382,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // TODO: test logic (especially foreign keys when archiving!!!)
 
         // check if the sap config has already been used by a critical access query
-        boolean isSapConfigUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getSapConfig().equals(config));
+        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getSapConfig().getId().equals(config.getId()));
 
-        if (isSapConfigUsedBySapQuery) {
+        if (archive) {
 
             // get the id of the original whitelist
             Integer originalId = config.getId();
-            SapConfiguration original = getSapConfigs().stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
+            SapConfiguration original = getSapConfigs(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
 
             // set archived flag to original and update it
             original.setArchived(true);
@@ -392,6 +401,10 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         updateRecord(config);
     }
 
+    // ============================================
+    //                 D E L E T E
+    // ============================================
+
     /**
      * This method deletes an existing configuration from the local database. Referenced table entries are not deleted.
      * If the config has already been used in sap queries, the history flag is set instead of deleting.
@@ -402,14 +415,12 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void deleteConfig(Configuration config) throws Exception {
 
-        // TODO: test logic (especially foreign keys when deleting!!!)
-
         config.adjustReferences();
 
         // check if the config has already been used by a critical access query
-        boolean isConfigUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getConfig().equals(config));
+        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getId().equals(config.getId()));
 
-        if (isConfigUsedBySapQuery) {
+        if (archive) {
 
             config.setArchived(true);
             updateRecord(config);
@@ -430,20 +441,26 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void deletePattern(AccessPattern pattern) throws Exception {
 
-        // TODO: test logic (especially foreign keys when deleting!!!)
-
         pattern.adjustReferences();
 
         // check if the pattern has already been used by a critical access query
-        boolean isPatternUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getConfig().getPatterns().contains(pattern));
+        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getPatterns().stream().anyMatch(y -> y.getId().equals(pattern.getId())));
 
-        if (isPatternUsedBySapQuery) {
+        if (archive) {
 
             pattern.setArchived(true);
             updateRecord(pattern);
 
         } else {
 
+            // remove pattern references on configs and update configs to remove entries on mapping table
+            pattern.getConfigurations().stream().filter(x -> x.getPatterns().contains(pattern))
+                .forEach(x -> {
+                    x.getPatterns().remove(pattern);
+                    updateRecord(x);
+                });
+
+            // delete pattern
             deleteRecord(pattern);
         }
     }
@@ -458,20 +475,26 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void deleteWhitelist(Whitelist whitelist) throws Exception {
 
-        // TODO: test logic (especially foreign keys when deleting!!!)
-
         whitelist.adjustReferences();
 
         // check if the whitelist has already been used by a critical access query
-        boolean isWhitelistUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getConfig().getWhitelist().equals(whitelist));
+        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
 
-        if (isWhitelistUsedBySapQuery) {
+        if (archive) {
 
             whitelist.setArchived(true);
             updateRecord(whitelist);
 
         } else {
 
+            // remove whitelist references on configs and update configs to remove entries on mapping table
+            getConfigs(true).stream().filter(x -> x.getWhitelist().getId().equals(whitelist.getId()))
+                .forEach(x -> {
+                    x.setWhitelist(null);
+                    updateRecord(x);
+                });
+
+            // delete whitelist
             deleteRecord(whitelist);
         }
     }
@@ -486,21 +509,30 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void deleteSapConfig(SapConfiguration config) throws Exception {
 
-        // TODO: test logic (especially foreign keys when deleting!!!)
-
         // check if the sap config has already been used by a critical access query
-        boolean isSapConfigUsedBySapQuery = getSapQueries().stream().anyMatch(x -> x.getSapConfig().equals(config));
+        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getSapConfig().getId().equals(config.getId()));
 
-        if (isSapConfigUsedBySapQuery) {
+        if (archive) {
 
             config.setArchived(true);
             updateRecord(config);
 
         } else {
 
+            // delete the sap config references in all queries
+            getSapQueries(true).stream().filter(x -> x.getSapConfig().getId().equals(config.getId()))
+                .forEach(x -> {
+                    x.setSapConfig(null);
+                    updateRecord(x);
+                });
+
             deleteRecord(config);
         }
     }
+
+    // ============================================
+    //          U S E R   A C C O U N T S
+    // ============================================
 
     /**
      * This method adds a new database user with rights according to the given role.
@@ -526,14 +558,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             transaction = session.beginTransaction();
 
             // create a new database account
-            session.createNativeQuery("CREATE USER " + username + " PASSWORD :password " + ((role == DbUserRole.Admin) ? "ADMIN" : ""))
-                .setParameter("password", password)
-                .executeUpdate();
+            String sql = "CREATE USER " + username + " PASSWORD :password " + ((role == DbUserRole.Admin) ? "ADMIN" : "");
+            session.createNativeQuery(sql).setParameter("password", password).executeUpdate();
 
             // grant privileges to account accordingly
-            session.createNativeQuery("GRANT " + role.toString() + " TO " + username)
-                .executeUpdate();
+            session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
 
+            session.flush();
             transaction.commit();
 
         } catch (Exception ex) {
@@ -571,13 +602,12 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                 transaction = session.beginTransaction();
 
                 // remove old privileges from database account
-                session.createNativeQuery("REVOKE " + original.getRole().toString() + " FROM " + username)
-                    .executeUpdate();
+                session.createNativeQuery("REVOKE " + original.getRole().toString() + " FROM " + username).executeUpdate();
 
                 // grant new privileges to database account
-                session.createNativeQuery("GRANT " + role.toString() + " TO " + username)
-                    .executeUpdate();
+                session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
 
+                session.flush();
                 transaction.commit();
 
             } catch (Exception ex) {
@@ -617,10 +647,9 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             transaction = session.beginTransaction();
 
             // change password for database account
-            session.createNativeQuery("ALTER USER " + username + " SET PASSWORD :password")
-                .setParameter("password", password)
-                .executeUpdate();
+            session.createNativeQuery("ALTER USER " + username + " SET PASSWORD :password").setParameter("password", password).executeUpdate();
 
+            session.flush();
             transaction.commit();
 
         } catch (Exception ex) {
@@ -655,9 +684,9 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             transaction = session.beginTransaction();
 
             // delete database account
-            session.createNativeQuery("DROP USER " + username)
-                .executeUpdate();
+            session.createNativeQuery("DROP USER " + username).executeUpdate();
 
+            session.flush();
             transaction.commit();
 
         } catch (Exception ex) {

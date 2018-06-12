@@ -28,7 +28,7 @@ public class WhitelistTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query whitelists
-            List<Whitelist> whitelists = context.getWhitelists();
+            List<Whitelist> whitelists = context.getWhitelists(false);
 
             // check if test data was queried successfully
             ret = whitelists.size() == 1 && whitelists.stream().allMatch(x -> x.getEntries().size() == 7);
@@ -37,7 +37,6 @@ public class WhitelistTest {
             ex.printStackTrace();
         }
 
-        System.out.println("whitelist query test " + (ret ? "successful" : "failed"));
         assert(ret);
     }
 
@@ -49,7 +48,7 @@ public class WhitelistTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query whitelists before insertion
-            List<Whitelist> whitelists = context.getWhitelists();
+            List<Whitelist> whitelists = context.getWhitelists(false);
             int countBefore = (whitelists != null) ? whitelists.size() : 0;
 
             // insert a whitelist
@@ -59,7 +58,7 @@ public class WhitelistTest {
             context.createWhitelist(whitelist);
 
             // query whitelists after insertion
-            whitelists = context.getWhitelists();
+            whitelists = context.getWhitelists(false);
             System.out.println(whitelist);
             int countAfter = (whitelists != null) ? whitelists.size() : 0;
 
@@ -70,7 +69,6 @@ public class WhitelistTest {
             ex.printStackTrace();
         }
 
-        System.out.println("whitelist creation test " + (ret ? "successful" : "failed"));
         assert(ret);
     }
 
@@ -82,7 +80,7 @@ public class WhitelistTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query first whitelist from database
-            Whitelist whitelist = context.getWhitelists().get(0);
+            Whitelist whitelist = context.getWhitelists(false).get(0);
             int whitelistId = whitelist.getId();
 
             // make changes
@@ -105,7 +103,7 @@ public class WhitelistTest {
             context.updateWhitelist(whitelist);
 
             // query whitelist
-            whitelist = context.getWhitelists().stream().filter(x -> x.getId().equals(whitelistId)).findFirst().orElse(null);
+            whitelist = context.getWhitelists(false).stream().filter(x -> x.getId().equals(whitelistId)).findFirst().orElse(null);
             entry1 = whitelist.getEntries().stream().filter(x -> x.getId().equals(entry1Id)).findFirst().get();
 
             ret = newDescription.equals(whitelist.getDescription())
@@ -129,7 +127,7 @@ public class WhitelistTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query whitelists
-            List<Whitelist> whitelists = context.getWhitelists();
+            List<Whitelist> whitelists = context.getWhitelists(false);
             Whitelist whitelist = whitelists.get(0);
             int id = whitelist.getId();
 
@@ -137,7 +135,7 @@ public class WhitelistTest {
             context.deleteWhitelist(whitelist);
 
             // query whitelist again. check if everything was deleted
-            whitelist = context.getWhitelists().stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
+            whitelist = context.getWhitelists(false).stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
 
             // check if test data was queried successfully
             ret = whitelist == null;

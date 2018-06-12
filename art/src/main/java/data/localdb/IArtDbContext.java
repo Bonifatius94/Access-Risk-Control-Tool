@@ -65,42 +65,47 @@ public interface IArtDbContext {
      * This method selects all already executed sap queries from the local database.
      * TODO: add filter option (e.g. by time: today, last week, last month, last year, all)
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of already executed sap queries
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<CriticalAccessQuery> getSapQueries() throws Exception;
+    List<CriticalAccessQuery> getSapQueries(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all configurations from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all configurations
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<Configuration> getConfigs() throws Exception;
+    List<Configuration> getConfigs(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all access patterns from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all access patterns
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<AccessPattern> getPatterns() throws Exception;
+    List<AccessPattern> getPatterns(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all whitelists from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all whitelists
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<Whitelist> getWhitelists() throws Exception;
+    List<Whitelist> getWhitelists(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all sap configurations from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all sap configurations
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<SapConfiguration> getSapConfigs() throws Exception;
+    List<SapConfiguration> getSapConfigs(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all user names of existing local database accounts and their privileges.

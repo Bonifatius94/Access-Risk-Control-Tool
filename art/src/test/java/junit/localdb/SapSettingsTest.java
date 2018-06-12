@@ -1,13 +1,13 @@
 package junit.localdb;
 
 import data.entities.SapConfiguration;
-import data.entities.Whitelist;
 import data.localdb.ArtDbContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+@SuppressWarnings("all")
 public class SapSettingsTest {
 
     @BeforeEach
@@ -23,7 +23,7 @@ public class SapSettingsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query whitelists
-            List<SapConfiguration> configs = context.getSapConfigs();
+            List<SapConfiguration> configs = context.getSapConfigs(false);
 
             // check if test data was queried successfully
             ret = configs.size() == 1;
@@ -32,7 +32,6 @@ public class SapSettingsTest {
             ex.printStackTrace();
         }
 
-        System.out.println("whitelist query test " + (ret ? "successful" : "failed"));
         assert(ret);
     }
 
@@ -44,19 +43,83 @@ public class SapSettingsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // create a new data object
-            SapConfiguration config = new SapConfiguration();
+            final String poolCapacity = "1";
+            SapConfiguration sapConfig = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "00", "001", "EN", poolCapacity);
 
-            // check if test data was queried successfully
-            //ret = configs.size() == 1;
+            // insert into database
+            context.createSapConfig(sapConfig);
+
+            // query updated data
+            List<SapConfiguration> configs = context.getSapConfigs(false);
+
+            // check if config was inserted successfully
+            ret = configs.size() == 2 && configs.stream().anyMatch(x -> x.getPoolCapacity().equals(poolCapacity));
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        System.out.println("whitelist query test " + (ret ? "successful" : "failed"));
         assert(ret);
     }
 
-    // TODO: implement tests
+    @Test
+    public void testUpdateSapConfig() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query sap config
+            SapConfiguration config = context.getSapConfigs(false).stream().findFirst().get();
+            Integer id = config.getId();
+
+            // apply changes to sap config
+            final String newLanguage = "DE";
+            config.setLanguage(newLanguage);
+
+            // insert into database
+            context.updateSapConfig(config);
+
+            // query updated data
+            config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(id)).findFirst().get();
+
+            // check if config was inserted successfully
+            ret = config.getLanguage().equals(newLanguage);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        // TODO: test logic for archiving sap config on update
+
+        assert(ret);
+    }
+
+    @Test
+    public void testDeleteSapConfig() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query sap config
+            SapConfiguration config = context.getSapConfigs(false).stream().findFirst().get();
+            Integer id = config.getId();
+
+            // insert into database
+            context.deleteSapConfig(config);
+
+            // query updated data
+            config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
+
+            // check if config was inserted successfully
+            ret = config == null;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert(ret);
+    }
 
 }

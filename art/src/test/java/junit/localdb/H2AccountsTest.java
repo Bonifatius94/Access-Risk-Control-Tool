@@ -99,8 +99,6 @@ public class H2AccountsTest {
             ret = user == null;
 
         } catch (Exception ex) {
-
-            System.out.println("db account test failed");
             ex.printStackTrace();
         }
 

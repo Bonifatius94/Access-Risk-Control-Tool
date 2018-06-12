@@ -189,7 +189,7 @@ public abstract class H2ContextBase implements Closeable {
      * @param record the DAO to be deleted
      * @param <T> the type of the DAO (implicitly set)
      */
-    public <T> void deleteRecord(T record) {
+    public <T> void deleteRecord(T record)  {
 
         Transaction transaction = null;
 

@@ -32,9 +32,9 @@ public class ConfigurationXAccessPatternMap {
         setPattern(pattern);
     }
 
-    @Id
+    /*@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Integer id;*/
 
     @ManyToOne/*(cascade = { CascadeType.PERSIST, CascadeType.MERGE })*/
     @JoinColumn(name = "AccessPatternId")
@@ -44,13 +44,13 @@ public class ConfigurationXAccessPatternMap {
     @JoinColumn(name = "ConfigId")
     private Configuration config;
 
-    public Integer getId() {
+    /*public Integer getId() {
         return id;
     }
 
     public void setId(Integer id) {
         this.id = id;
-    }
+    }*/
 
     public AccessPattern getPattern() {
         return pattern;

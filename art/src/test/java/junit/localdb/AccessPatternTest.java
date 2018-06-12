@@ -30,7 +30,7 @@ public class AccessPatternTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query patterns
-            List<AccessPattern> patterns = context.getPatterns();
+            List<AccessPattern> patterns = context.getPatterns(false);
 
             AccessPattern profileAccessPattern = patterns.stream().filter(x -> x.getConditions().size() == 1).findFirst().get();
             AccessProfileCondition profileCondition = profileAccessPattern.getConditions().stream().findFirst().get().getProfileCondition();
@@ -87,7 +87,7 @@ public class AccessPatternTest {
             context.createPattern(pattern);
 
             // query database
-            List<AccessPattern> patterns = context.getPatterns();
+            List<AccessPattern> patterns = context.getPatterns(false);
 
             // check if new pattern was inserted
             ret = patterns.size() == 4
@@ -124,7 +124,7 @@ public class AccessPatternTest {
             context.createPattern(pattern);
 
             // query database
-            List<AccessPattern> patterns = context.getPatterns();
+            List<AccessPattern> patterns = context.getPatterns(false);
 
             // check if new pattern was inserted
             ret = patterns.size() == 4
@@ -151,7 +151,7 @@ public class AccessPatternTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query patterns
-            List<AccessPattern> patterns = context.getPatterns();
+            List<AccessPattern> patterns = context.getPatterns(false);
             AccessPattern profilePattern = patterns.stream().filter(x -> x.getConditions().size() == 1).findFirst().get();
             AccessProfileCondition profileCondition = profilePattern.getConditions().stream().findFirst().get().getProfileCondition();
             AccessPattern multiConditionPattern = patterns.stream().filter(x -> x.getConditions().size() == 2).findFirst().get();
@@ -181,7 +181,7 @@ public class AccessPatternTest {
             context.updatePattern(multiConditionPattern);
 
             // query data again
-            patterns = context.getPatterns();
+            patterns = context.getPatterns(false);
             profilePattern = patterns.stream().filter(x -> x.getId().equals(profilePatternId)).findFirst().get();
             profileCondition = profilePattern.getConditions().stream().findFirst().get().getProfileCondition();
             multiConditionPattern = patterns.stream().filter(x -> x.getId().equals(multiConditionPatternId)).findFirst().get();
@@ -213,7 +213,7 @@ public class AccessPatternTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query patterns
-            List<AccessPattern> patterns = context.getPatterns();
+            List<AccessPattern> patterns = context.getPatterns(false);
             AccessPattern profilePattern = patterns.stream().filter(x -> x.getConditions().size() == 1).findFirst().get();
             AccessPattern multiConditionPattern = patterns.stream().filter(x -> x.getConditions().size() == 2).findFirst().get();
 
@@ -222,7 +222,7 @@ public class AccessPatternTest {
             context.deletePattern(multiConditionPattern);
 
             // query patterns again
-            patterns = context.getPatterns();
+            patterns = context.getPatterns(false);
 
             // check if patterns were deleted
             ret = patterns.size() == 1;
