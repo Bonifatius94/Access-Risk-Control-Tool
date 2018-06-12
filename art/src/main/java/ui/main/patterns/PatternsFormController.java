@@ -6,12 +6,15 @@ import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.JFXTextField;
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
+import data.entities.AccessPatternCondition;
 import data.entities.AccessPatternConditionProperty;
 import data.entities.ConditionLinkage;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import java.util.List;
 import java.util.ResourceBundle;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -22,11 +25,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -228,10 +233,8 @@ public class PatternsFormController {
         if (pattern.getConditions().get(0).getProfileCondition() == null) {
             this.conditionTypeInput.getSelectionModel().select("Condition");
 
-            int i = 0;
             for (AccessCondition condition : pattern.getConditions()) {
                 addConditionTableTab(condition);
-
             }
 
             // preselect correct linkage
@@ -241,15 +244,6 @@ public class PatternsFormController {
 
             this.profileInput.setText(pattern.getConditions().get(0).getProfileCondition().getProfile());
         }
-    }
-
-    /**
-     * Saves the changes to the database.
-     */
-    public void saveChanges() {
-
-
-
     }
 
     public void close(ActionEvent event) {
@@ -308,6 +302,34 @@ public class PatternsFormController {
 
     public void addEmptyConditionTableTab() {
         this.addConditionTableTab(new AccessCondition());
+    }
+
+    /**
+     * Resets the form.
+     */
+    public void resetForm() {
+        this.conditionTabs.getTabs().clear();
+
+        // TODO: Deep copy of accessPattern for AccessConditions
+        this.giveSelectedAccessPattern(accessPattern);
+
+        this.validateInputs();
+    }
+
+    /**
+     * Validates the main inputs once (e.g to remove errors).
+     */
+    private void validateInputs() {
+        useCaseIdInput.validate();
+        descriptionInput.validate();
+        profileInput.validate();
+    }
+
+    /**
+     * Saves the changes to the database.
+     */
+    public void saveChanges() {
+        System.out.println(this.accessPattern);
     }
 
     /**
@@ -394,10 +416,18 @@ public class PatternsFormController {
             conditionTable.scrollTo(conditionTable.getItems().size() - 1);
         });
 
+        // disable button on 10 entries
+        addButton.disableProperty().bind(Bindings.size(conditionTable.getItems()).isEqualTo(10));
+
+        // add warning label on 10 entries
+        Label warningTextItemLimit = new Label(bundle.getString("warningTextItemLimit"));
+        warningTextItemLimit.visibleProperty().bind(Bindings.size(conditionTable.getItems()).isEqualTo(10));
+
         // box for the button
         HBox buttonBox = new HBox();
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
-        buttonBox.getChildren().add(addButton);
+        buttonBox.getChildren().addAll(warningTextItemLimit, addButton);
+        buttonBox.setSpacing(20);
         HBox.setHgrow(buttonBox, Priority.ALWAYS);
 
         // wrapper for everything

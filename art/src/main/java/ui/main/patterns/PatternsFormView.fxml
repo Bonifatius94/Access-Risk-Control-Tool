@@ -113,9 +113,14 @@
             </VBox>
         </HBox>
         <Separator/>
-        <HBox spacing="20" alignment="BASELINE_RIGHT">
-            <JFXButton onAction="#saveChanges" prefHeight="35" prefWidth="75" text="%save"/>
-            <JFXButton onAction="#close" prefHeight="35" prefWidth="75" text="%cancel"/>
+        <HBox HBox.hgrow="ALWAYS">
+            <HBox alignment="BASELINE_LEFT" HBox.hgrow="ALWAYS">
+                <JFXButton text="%revert" onAction="#resetForm"></JFXButton>
+            </HBox>
+            <HBox spacing="20" alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS">
+                <JFXButton onAction="#saveChanges" prefHeight="35" prefWidth="75" text="%save"/>
+                <JFXButton onAction="#close" prefHeight="35" prefWidth="75" text="%cancel"/>
+            </HBox>
         </HBox>
     </VBox>
 </CustomWindow>
