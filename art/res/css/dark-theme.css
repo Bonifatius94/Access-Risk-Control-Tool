@@ -43,11 +43,7 @@
     -jfx-button-type: RAISED;
 }
 
-.jfx-button:hover {
-    -fx-background-color: -fx-primary-lighter;
-}
-
-.jfx-button:focused {
+.jfx-button:hover, .jfx-button:focused  {
     -fx-background-color: -fx-primary-lighter;
 }
 
@@ -59,11 +55,15 @@
     -jfx-button-type: FLAT;
 }
 
-.closeWindowButton:hover {
+.warning-button {
     -fx-background-color: -fx-error;
 }
 
-.closeWindowButton:focused {
+.warning-button:hover, .warning-button:focused {
+    -fx-background-color: derive(-fx-error, 30%);
+}
+
+.closeWindowButton:hover, .closeWindowButton:focused {
     -fx-background-color: -fx-error;
 }
 

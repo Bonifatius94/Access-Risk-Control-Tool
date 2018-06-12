@@ -304,6 +304,10 @@ public class PatternsFormController {
         this.addConditionTableTab(new AccessCondition());
     }
 
+    public void deleteSelectedTableTab() {
+        this.conditionTabs.getTabs().remove(this.conditionTabs.getSelectionModel().getSelectedItem());
+    }
+
     /**
      * Resets the form.
      */

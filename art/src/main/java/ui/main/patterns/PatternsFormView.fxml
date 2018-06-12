@@ -17,6 +17,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.Tab?>
 <?import com.jfoenix.controls.JFXTabPane?>
+<?import javafx.scene.control.Tooltip?>
 <CustomWindow title="%editPatternTitle" windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
               xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.patterns.PatternsFormController">
     <VBox spacing="20" HBox.hgrow="ALWAYS" style="-fx-padding: 20">
@@ -44,9 +45,6 @@
                     <Label text="%linkage"/>
                     <JFXComboBox fx:id="linkageInput"/>
                 </HBox>
-                <HBox fx:id="addConditionBox" visible="false" alignment="BASELINE_LEFT" spacing="20">
-                    <JFXButton text="%newCondition" onAction="#addEmptyConditionTableTab"/>
-                </HBox>
                 <JFXTextField fx:id="profileInput" promptText="%profileValue" maxWidth="350" visible="false">
                     <validators>
                         <RequiredFieldValidator message="%required">
@@ -59,7 +57,26 @@
         <Separator/>
         <HBox HBox.hgrow="ALWAYS" fx:id="conditionBox" visible="false" spacing="30" alignment="CENTER">
             <JFXTabPane fx:id="conditionTabs" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"/>
-            <VBox spacing="30" alignment="CENTER">
+            <VBox spacing="20" alignment="TOP_CENTER">
+                <HBox fx:id="addConditionBox" visible="false" alignment="BASELINE_LEFT" spacing="20">
+                    <JFXButton onAction="#addEmptyConditionTableTab" prefHeight="30">
+                        <graphic>
+                            <MaterialDesignIconView glyphName="PLUS"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%addCondition"/>
+                        </tooltip>
+                    </JFXButton>
+                    <JFXButton styleClass="warning-button" onAction="#deleteSelectedTableTab" prefHeight="30">
+                        <graphic>
+                            <MaterialDesignIconView glyphName="MINUS"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%deleteCondition"/>
+                        </tooltip>
+                    </JFXButton>
+                </HBox>
+                <Separator/>
                 <Label text="%conditionPropertiesTitle">
                     <font>
                         <Font size="18"/>
