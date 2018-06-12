@@ -92,7 +92,9 @@ public class PatternsFormController {
     @FXML
     private HBox addConditionBox;
 
+    private AccessPatternConditionProperty selectedProperty;
     private AccessPattern accessPattern;
+    private TableView selectedTable;
 
     /**
      * Initializes the view and sets up bindings for component visibility.
@@ -258,7 +260,10 @@ public class PatternsFormController {
      *
      * @param accessPatternConditionProperty the selected AccessConditionProperty
      */
-    private void editSelectedAccessConditionProperty(AccessPatternConditionProperty accessPatternConditionProperty) {
+    private void editSelectedAccessConditionProperty(AccessPatternConditionProperty accessPatternConditionProperty, TableView table) {
+
+        this.selectedProperty = accessPatternConditionProperty;
+        this.selectedTable = table;
 
         // set the inputs to the given values
         authObjectInput.setText(accessPatternConditionProperty.getAuthObject());
@@ -364,7 +369,7 @@ public class PatternsFormController {
         // listen to selects on conditionPropertiesTable
         conditionTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                editSelectedAccessConditionProperty(newValue);
+                editSelectedAccessConditionProperty(newValue, conditionTable);
             }
         });
 
@@ -409,17 +414,26 @@ public class PatternsFormController {
     }
 
     /**
-     * Edits a condition property.
+     * Edits the selected condition property.
      */
     public void editConditionProperty() {
+
+        // create a new property which stores all the new values from the textFields
         AccessPatternConditionProperty newProperty = new AccessPatternConditionProperty();
+
         newProperty.setAuthObject(authObjectInput.getText());
         newProperty.setAuthObjectProperty(authFieldInput.getText());
         newProperty.setValue1(authFieldValue1Input.getText());
         newProperty.setValue2(authFieldValue2Input.getText());
         newProperty.setValue3(authFieldValue3Input.getText());
         newProperty.setValue4(authFieldValue4Input.getText());
+        newProperty.setId(this.selectedProperty.getId());
 
-        System.out.println(newProperty);
+        // retrieve old index and remove item from view
+        int index = this.selectedTable.getItems().indexOf(this.selectedProperty);
+        this.selectedTable.getItems().remove(this.selectedProperty);
+
+        // add new item to view
+        this.selectedTable.getItems().add(index, newProperty);
     }
 }
