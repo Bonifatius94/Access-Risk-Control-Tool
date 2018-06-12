@@ -6,7 +6,6 @@ import data.entities.AccessPatternCondition;
 import data.entities.AccessPatternConditionProperty;
 import data.entities.AccessProfileCondition;
 import data.entities.Configuration;
-import data.entities.ConfigurationXAccessPatternMap;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
 import data.entities.DbUser;
@@ -15,14 +14,11 @@ import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
@@ -59,7 +55,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         // configuration
         list.add(Configuration.class);
-        //list.add(ConfigurationXAccessPatternMap.class);
 
         // access pattern
         list.add(AccessPattern.class);
