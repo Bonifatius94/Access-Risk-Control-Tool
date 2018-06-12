@@ -152,3 +152,23 @@ INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (3
 INSERT INTO Configurations (ID, CREATEDAT, CREATEDBY, DESCRIPTION, ISARCHIVED, NAME, WHITELISTID) VALUES (4, '2018-06-08T15:09:15', 'test', 'a test description', 1, 'foo config 2', 2);
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (4, 1);
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (4, 2);
+
+-- ==============================
+--    critical access queries
+-- ==============================
+
+-- query without archived references
+INSERT INTO CriticalAccessQueries (ID, CONFIGID, SAPCONFIGID, CREATEDAT, CREATEDBY , ISARCHIVED) VALUES (1, 1, 1, '2018-06-08T15:09:15', 'test', 0);
+INSERT INTO CriticalAccessEntries (ID, USERNAME, VIOLATEDPATTERNID, QUERYID) VALUES (1, 'foo123', 1, 1);
+INSERT INTO CriticalAccessEntries (ID, USERNAME, VIOLATEDPATTERNID, QUERYID) VALUES (2, 'foobar', 3, 1);
+
+-- query with archived references
+INSERT INTO CriticalAccessQueries (ID, CONFIGID, SAPCONFIGID, CREATEDAT, CREATEDBY , ISARCHIVED) VALUES (2, 3, 2, '2018-06-08T15:09:15', 'test', 0);
+INSERT INTO CriticalAccessEntries (ID, USERNAME, VIOLATEDPATTERNID, QUERYID) VALUES (3, 'foo123', 4, 2);
+INSERT INTO CriticalAccessEntries (ID, USERNAME, VIOLATEDPATTERNID, QUERYID) VALUES (4, 'foobar', 6, 2);
+
+-- ==============================
+-- authors: Marco Tröster,
+--          Joshua SChreibeis
+-- last modified: 12.06.2018
+-- ==============================

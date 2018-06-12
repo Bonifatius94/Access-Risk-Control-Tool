@@ -142,8 +142,8 @@ public abstract class H2ContextBase implements Closeable {
         try (Session session = sessionFactory.openSession()) {
 
             transaction = session.beginTransaction();
-            session.save(record);
-            session.flush();
+            session.persist(record);
+            //session.flush();
             transaction.commit();
 
         } catch (Exception ex) {

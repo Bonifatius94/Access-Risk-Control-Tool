@@ -1,6 +1,7 @@
 package data.localdb;
 
 import data.entities.AccessCondition;
+import data.entities.AccessConditionType;
 import data.entities.AccessPattern;
 import data.entities.AccessPatternCondition;
 import data.entities.AccessPatternConditionProperty;
@@ -19,6 +20,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
@@ -319,13 +321,55 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             Integer originalId = pattern.getId();
             AccessPattern original = getPatterns(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
 
+            /*// get configs that are referencing the the pattern
+            Set<Configuration> configs = getConfigs(true).stream()
+                .filter(x -> x.getPatterns().stream().anyMatch(y -> y.getId().equals(originalId)))
+                .collect(Collectors.toSet());*/
+
+            /*// remove mapping entries referencing the pattern
+            configs.forEach(x -> {
+                x.getPatterns().remove(original);
+                updateRecord(x);
+            });*/
+
             // set archived flag to original and update it
             original.setArchived(true);
             updateRecord(original);
 
-            // request new id for pattern to update
+            /*// clone configs referencing the pattern
+            Set<Configuration> newConfigs = configs.stream().map(x -> {
+
+                Configuration copy = new Configuration();
+
+                copy.setName(x.getName());
+                copy.setDescription(x.getDescription());
+                copy.setWhitelist(x.getWhitelist());
+
+
+                copy.getPatterns().addAll();
+                copy.getPatterns().remove();
+
+                return copy;
+            }).collect(Collectors.toSet());*/
+
+            // request new ids for pattern to update
             pattern.setId(null);
+
+            pattern.getConditions().forEach(x -> {
+                x.setId(null);
+
+                if (x.getType() == AccessConditionType.Profile) {
+                    x.getProfileCondition().setId(null);
+                } else {
+                    x.getPatternCondition().setId(null);
+                }
+            });
+
+            // insert new pattern into database
             insertRecord(pattern);
+
+            // create new configs referencing the new pattern
+
 
         } else {
             updateRecord(pattern);
