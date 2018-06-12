@@ -2,6 +2,7 @@ package ui.main.patterns;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.JFXTextField;
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
@@ -12,22 +13,30 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import java.util.ResourceBundle;
 
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
+import ui.custom.controls.PTableColumn;
 
 
 public class PatternsFormController {
@@ -45,7 +54,7 @@ public class PatternsFormController {
     private JFXComboBox<ConditionLinkage> linkageInput;
 
     @FXML
-    private VBox conditionBox;
+    private HBox conditionBox;
 
     @FXML
     private HBox linkageBox;
@@ -55,15 +64,6 @@ public class PatternsFormController {
 
 
     // Auth properties table
-
-    @FXML
-    private TableView<AccessPatternConditionProperty> conditionPropertiesTable;
-
-    @FXML
-    private TableColumn<AccessPatternConditionProperty, JFXButton> deleteColumn;
-
-    @FXML
-    private JFXComboBox<ConditionComboBoxEntry> conditionChooser;
 
     @FXML
     private JFXTextField authObjectInput;
@@ -83,6 +83,14 @@ public class PatternsFormController {
     @FXML
     private JFXTextField authFieldValue4Input;
 
+    @FXML
+    private JFXTabPane conditionTabs;
+
+    @FXML
+    private JFXButton addPropertyButton;
+
+    @FXML
+    private HBox addConditionBox;
 
     private AccessPattern accessPattern;
 
@@ -91,7 +99,6 @@ public class PatternsFormController {
      */
     @FXML
     public void initialize() {
-
         // set condition input items
         this.conditionTypeInput.getItems().setAll("Condition", "Profile");
         this.linkageInput.getItems().setAll(ConditionLinkage.None, ConditionLinkage.And, ConditionLinkage.Or);
@@ -101,7 +108,8 @@ public class PatternsFormController {
         this.conditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
         this.linkageBox.managedProperty().bind(this.conditionBox.visibleProperty());
         this.linkageBox.visibleProperty().bind(this.conditionBox.visibleProperty());
-        this.conditionChooser.managedProperty().bind(this.conditionChooser.visibleProperty());
+        this.addConditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
+        this.addConditionBox.visibleProperty().bind(this.conditionBox.visibleProperty());
 
         // initialize condition type combo box component
         initializeConditionTypeComboBox();
@@ -116,11 +124,11 @@ public class PatternsFormController {
      */
     public void initializeLinkageInput() {
         linkageInput.getSelectionModel().selectedItemProperty().addListener((ChangeListener<ConditionLinkage>) (selected, oldValue, newValue) -> {
+            /*
             if (newValue.equals(ConditionLinkage.None)) {
-                this.conditionChooser.setVisible(false);
             } else {
-                this.conditionChooser.setVisible(true);
             }
+            */
         });
     }
 
@@ -215,36 +223,15 @@ public class PatternsFormController {
         this.useCaseIdInput.setText(pattern.getUsecaseId());
         this.descriptionInput.setText(pattern.getDescription());
 
-        // listen to selects on conditionPropertiesTable
-        conditionPropertiesTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                editSelectedAccessConditionProperty(newValue);
-            }
-        });
-
-        // add listener to condition chooser which fills the table accordingly
-        conditionChooser.getSelectionModel().selectedItemProperty().addListener((ChangeListener<ConditionComboBoxEntry>) (selected, oldValue, newValue) -> {
-            ObservableList<AccessPatternConditionProperty> properties = FXCollections.observableList(newValue.getCondition().getPatternCondition().getProperties());
-            conditionPropertiesTable.setItems(properties);
-        });
-
-        // Add the delete column
-        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPatternConditionProperty accessPatternConditionProperty) -> {
-            conditionPropertiesTable.getItems().remove(accessPatternConditionProperty);
-            return accessPatternConditionProperty;
-        }));
-
         // Fill choose box
         if (pattern.getConditions().get(0).getProfileCondition() == null) {
             this.conditionTypeInput.getSelectionModel().select("Condition");
 
             int i = 0;
             for (AccessCondition condition : pattern.getConditions()) {
-                conditionChooser.getItems().add(new ConditionComboBoxEntry("Condition " + i, condition));
-                i++;
+                addConditionTableTab(condition);
+
             }
-            // preselect first condition
-            conditionChooser.getSelectionModel().select(0);
 
             // preselect correct linkage
             this.linkageInput.getSelectionModel().select(pattern.getLinkage());
@@ -290,7 +277,7 @@ public class PatternsFormController {
     /**
      * Opens a modal dialog for adding a new AccessPatternConditionProperty.
      */
-    public void addAccessPatternConditionProperty() {
+    public void openCreateAccessPatternConditionProperty() {
 
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
@@ -311,41 +298,128 @@ public class PatternsFormController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
-
+    public void addEmptyConditionTableTab() {
+        this.addConditionTableTab(new AccessCondition());
     }
 
     /**
-     * Used for displaying the Conditions with a name in a ComboBox.
+     * Creates a new TableView, wraps it into a Tab and adds it to the ConditionTabs.
+     *
+     * @param condition the condition which items are displayed in the tableView
      */
-    class ConditionComboBoxEntry {
+    public void addConditionTableTab(AccessCondition condition) {
 
-        private String name;
-        private AccessCondition condition;
+        // get the resource bundle for internationalization
+        ResourceBundle bundle = ResourceBundle.getBundle("lang");
 
-        public ConditionComboBoxEntry(String name, AccessCondition condition) {
-            this.name = name;
-            this.condition = condition;
+        // AuthObject Column
+        PTableColumn<AccessPatternConditionProperty, String> authObject = new PTableColumn<>();
+        authObject.setCellValueFactory(new PropertyValueFactory<>("authObject"));
+        authObject.setPercentageWidth(0.2);
+        authObject.setText(bundle.getString("authObject"));
+
+        // AuthField Column
+        PTableColumn<AccessPatternConditionProperty, String> authObjectProperty = new PTableColumn<>();
+        authObjectProperty.setCellValueFactory(new PropertyValueFactory<>("authObjectProperty"));
+        authObjectProperty.setPercentageWidth(0.2);
+        authObjectProperty.setText(bundle.getString("authField"));
+
+        // Field Value 1 Column
+        PTableColumn<AccessPatternConditionProperty, String> value1 = new PTableColumn<>();
+        value1.setCellValueFactory(new PropertyValueFactory<>("value1"));
+        value1.setPercentageWidth(0.13);
+        value1.setText("1");
+
+        // Field Value 2 Column
+        PTableColumn<AccessPatternConditionProperty, String> value2 = new PTableColumn<>();
+        value2.setCellValueFactory(new PropertyValueFactory<>("value2"));
+        value2.setPercentageWidth(0.13);
+        value2.setText("2");
+
+        // Field Value 3 Column
+        PTableColumn<AccessPatternConditionProperty, String> value3 = new PTableColumn<>();
+        value3.setCellValueFactory(new PropertyValueFactory<>("value3"));
+        value3.setPercentageWidth(0.13);
+        value3.setText("3");
+
+        // Field Value 4 Column
+        PTableColumn<AccessPatternConditionProperty, String> value4 = new PTableColumn<>();
+        value4.setCellValueFactory(new PropertyValueFactory<>("value4"));
+        value4.setPercentageWidth(0.13);
+        value4.setText("4");
+
+        // create a new TableView of type AccessPatternConditionProperty
+        TableView<AccessPatternConditionProperty> conditionTable = new TableView();
+
+        // Add the delete column
+        PTableColumn<AccessPatternConditionProperty, JFXButton> deleteColumn = new PTableColumn<>();
+        deleteColumn.setPercentageWidth(0.07);
+        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPatternConditionProperty accessPatternConditionProperty) -> {
+            conditionTable.getItems().remove(accessPatternConditionProperty);
+            return accessPatternConditionProperty;
+        }));
+
+        // listen to selects on conditionPropertiesTable
+        conditionTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                editSelectedAccessConditionProperty(newValue);
+            }
+        });
+
+        // add columns to the table
+        conditionTable.getColumns().addAll(authObject, authObjectProperty, value1, value2, value3, value4, deleteColumn);
+
+        // add entries to the table
+        if (condition.getPatternCondition() != null) {
+            ObservableList<AccessPatternConditionProperty> entries = FXCollections.observableList(condition.getPatternCondition().getProperties());
+            conditionTable.setItems(entries);
+            conditionTable.refresh();
         }
 
-        public String getName() {
-            return name;
-        }
+        // create add button
+        JFXButton addButton = new JFXButton(bundle.getString("add"));
+        addButton.setOnAction(event -> {
+            conditionTable.getItems().add(new AccessPatternConditionProperty());
+            conditionTable.requestFocus();
+            conditionTable.getSelectionModel().selectLast();
+            conditionTable.getFocusModel().focus(conditionTable.getItems().size() - 1);
+            conditionTable.scrollTo(conditionTable.getItems().size() - 1);
+        });
 
-        public void setName(String name) {
-            this.name = name;
-        }
+        // box for the button
+        HBox buttonBox = new HBox();
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        buttonBox.getChildren().add(addButton);
+        HBox.setHgrow(buttonBox, Priority.ALWAYS);
 
-        public AccessCondition getCondition() {
-            return condition;
-        }
+        // wrapper for everything
+        VBox wrapper = new VBox();
+        wrapper.setSpacing(10);
 
-        public void setCondition(AccessCondition condition) {
-            this.condition = condition;
-        }
+        // add everything to wrapper
+        wrapper.getChildren().addAll(conditionTable, buttonBox);
 
-        public String toString() {
-            return name;
-        }
+        // add table to tab and add tab to TabPane
+        Tab tab = new Tab("Condition " + this.conditionTabs.getTabs().size());
+        tab.setContent(wrapper);
+
+        this.conditionTabs.getTabs().add(tab);
+    }
+
+    /**
+     * Edits a condition property.
+     */
+    public void editConditionProperty() {
+        AccessPatternConditionProperty newProperty = new AccessPatternConditionProperty();
+        newProperty.setAuthObject(authObjectInput.getText());
+        newProperty.setAuthObjectProperty(authFieldInput.getText());
+        newProperty.setValue1(authFieldValue1Input.getText());
+        newProperty.setValue2(authFieldValue2Input.getText());
+        newProperty.setValue3(authFieldValue3Input.getText());
+        newProperty.setValue4(authFieldValue4Input.getText());
+
+        System.out.println(newProperty);
     }
 }

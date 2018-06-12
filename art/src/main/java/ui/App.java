@@ -64,7 +64,7 @@ public class App extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main/MainView.fxml"), bundle);
         CustomWindow window = loader.load();
 
-        Scene scene = new Scene(window, 1000, 600);
+        Scene scene = new Scene(window);
         scene.getStylesheets().add("css/dark-theme.css");
         primaryStage.setScene(scene);
 
