@@ -92,9 +92,11 @@ public class PatternsFormController {
     @FXML
     private HBox addConditionBox;
 
-    private AccessPatternConditionProperty selectedProperty;
     private AccessPattern accessPattern;
+
     private TableView selectedTable;
+    private AccessPatternConditionProperty selectedProperty;
+
 
     /**
      * Initializes the view and sets up bindings for component visibility.
@@ -103,7 +105,6 @@ public class PatternsFormController {
     public void initialize() {
         // set condition input items
         this.conditionTypeInput.getItems().setAll("Condition", "Profile");
-        this.linkageInput.getItems().setAll(ConditionLinkage.None, ConditionLinkage.And, ConditionLinkage.Or);
 
         // set visibility of certain components according to user input
         this.profileInput.managedProperty().bind(this.profileInput.visibleProperty());
@@ -125,12 +126,10 @@ public class PatternsFormController {
      * Initializes the LinkageInputComboBox.
      */
     public void initializeLinkageInput() {
+        linkageInput.getItems().setAll(ConditionLinkage.None, ConditionLinkage.And, ConditionLinkage.Or);
+
         linkageInput.getSelectionModel().selectedItemProperty().addListener((ChangeListener<ConditionLinkage>) (selected, oldValue, newValue) -> {
-            /*
-            if (newValue.equals(ConditionLinkage.None)) {
-            } else {
-            }
-            */
+            // TODO: if Linkage is NONE, only one condition is allowed
         });
     }
 
@@ -249,6 +248,8 @@ public class PatternsFormController {
      */
     public void saveChanges() {
 
+
+
     }
 
     public void close(ActionEvent event) {
@@ -358,7 +359,7 @@ public class PatternsFormController {
         // create a new TableView of type AccessPatternConditionProperty
         TableView<AccessPatternConditionProperty> conditionTable = new TableView();
 
-        // Add the delete column
+        // add the delete column
         PTableColumn<AccessPatternConditionProperty, JFXButton> deleteColumn = new PTableColumn<>();
         deleteColumn.setPercentageWidth(0.07);
         deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPatternConditionProperty accessPatternConditionProperty) -> {
@@ -401,13 +402,13 @@ public class PatternsFormController {
 
         // wrapper for everything
         VBox wrapper = new VBox();
-        wrapper.setSpacing(10);
+        wrapper.setSpacing(20);
 
         // add everything to wrapper
         wrapper.getChildren().addAll(conditionTable, buttonBox);
 
         // add table to tab and add tab to TabPane
-        Tab tab = new Tab("Condition " + this.conditionTabs.getTabs().size());
+        Tab tab = new Tab("Condition " + (this.conditionTabs.getTabs().size() + 1));
         tab.setContent(wrapper);
 
         this.conditionTabs.getTabs().add(tab);
@@ -421,19 +422,13 @@ public class PatternsFormController {
         // create a new property which stores all the new values from the textFields
         AccessPatternConditionProperty newProperty = new AccessPatternConditionProperty();
 
-        newProperty.setAuthObject(authObjectInput.getText());
-        newProperty.setAuthObjectProperty(authFieldInput.getText());
-        newProperty.setValue1(authFieldValue1Input.getText());
-        newProperty.setValue2(authFieldValue2Input.getText());
-        newProperty.setValue3(authFieldValue3Input.getText());
-        newProperty.setValue4(authFieldValue4Input.getText());
-        newProperty.setId(this.selectedProperty.getId());
+        selectedProperty.setAuthObject(authObjectInput.getText());
+        selectedProperty.setAuthObjectProperty(authFieldInput.getText());
+        selectedProperty.setValue1(authFieldValue1Input.getText());
+        selectedProperty.setValue2(authFieldValue2Input.getText());
+        selectedProperty.setValue3(authFieldValue3Input.getText());
+        selectedProperty.setValue4(authFieldValue4Input.getText());
 
-        // retrieve old index and remove item from view
-        int index = this.selectedTable.getItems().indexOf(this.selectedProperty);
-        this.selectedTable.getItems().remove(this.selectedProperty);
-
-        // add new item to view
-        this.selectedTable.getItems().add(index, newProperty);
+        this.selectedTable.refresh();
     }
 }
