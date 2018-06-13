@@ -111,10 +111,7 @@ public class SapConnector implements ISapConnector {
             }
 
             // write results to critical access query (ready for insertion into database)
-            query = new CriticalAccessQuery();
-            query.setEntries(entries);
-            query.setConfig(config);
-            query.setSapConfig(this.sapConfig);
+            query = new CriticalAccessQuery(config, sapConfig, entries);
         }
 
         TraceOut.leave();

@@ -20,6 +20,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
@@ -88,7 +89,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     }
 
     // ============================================
-    //        H I B E R N A T E    L O G I C
+    //       H I B E R N A T E    L O G I C
     // ============================================
 
     // ============================================
@@ -308,8 +309,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void updatePattern(AccessPattern pattern) throws Exception {
 
-        // TODO: test logic (especially foreign keys when archiving!!!)
-
         pattern.adjustReferences();
 
         // check if the pattern has already been used by a critical access query
@@ -325,66 +324,31 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             original.setArchived(true);
             updateRecord(original);
 
-            // clone new pattern (without configs referenced)
-            // public AccessPattern(String usecaseId, String description, List<AccessCondition> conditions, ConditionLinkage linkage) {
-
-            // TODO: make this work
-
-            /*AccessPattern newPattern = new AccessPattern(pattern.getUsecaseId(), pattern.getDescription(), new ArrayList<>(), pattern.getLinkage());
-            pattern.getConditions().stream().map(x -> {
-
-                AccessCondition condition;
-
-                if (x.getType() == AccessConditionType.Profile) {
-                    AccessProfileCondition profileCondition = new AccessProfileCondition(x.getProfileCondition().getProfile());
-                    condition = new AccessCondition(newPattern, profileCondition);
-                } else {
-
-                }
-
-                x.setId(null);
-
-                if (x.getType() == AccessConditionType.Profile) {
-                    x.getProfileCondition().setId(null);
-                } else {
-                    x.getPatternCondition().setId(null);
-                }
-            });*/
-
-            /*// clone configs referencing the pattern
-            Set<Configuration> newConfigs = configs.stream().map(x -> {
-
-                Configuration copy = new Configuration();
-
-                copy.setName(x.getName());
-                copy.setDescription(x.getDescription());
-                copy.setWhitelist(x.getWhitelist());
-
-
-                copy.getPatterns().addAll();
-                copy.getPatterns().remove();
-
-                return copy;
-            }).collect(Collectors.toSet());*/
-
-            // request new ids for pattern to update
-            pattern.setId(null);
-
-            pattern.getConditions().forEach(x -> {
-                x.setId(null);
-
-                if (x.getType() == AccessConditionType.Profile) {
-                    x.getProfileCondition().setId(null);
-                } else {
-                    x.getPatternCondition().setId(null);
-                }
-            });
-
-            // insert new pattern into database
-            insertRecord(pattern);
+            // copy pattern (without copying references)
+            AccessPattern newPattern = new AccessPattern(pattern);
+            createPattern(newPattern);
 
             // create new configs referencing the new pattern
+            Set<Configuration> newConfigs = pattern.getConfigurations().stream().map(x -> {
 
+                Configuration copy = new Configuration(x);
+
+                copy.setWhitelist(x.getWhitelist());
+                Set<AccessPattern> patterns = x.getPatterns();
+                patterns.remove(pattern);
+                patterns.add(newPattern);
+                copy.setPatterns(patterns);
+                copy.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
+
+                return copy;
+
+            }).collect(Collectors.toSet());
+
+            // apply new configs to pattern
+            newPattern.getConfigurations().addAll(newConfigs);
+
+            // create new configs and update mapping table
+            newConfigs.forEach(x -> insertRecord(x));
 
         } else {
             updateRecord(pattern);

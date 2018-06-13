@@ -53,6 +53,7 @@ public class WhitelistTest {
 
             // insert a whitelist
             Whitelist whitelist = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");
+            whitelist.setName("a name");
             whitelist.setDescription("a test description");
             System.out.println(whitelist);
             context.createWhitelist(whitelist);

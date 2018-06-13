@@ -141,18 +141,21 @@ public abstract class H2ContextBase implements Closeable {
 
         try (Session session = sessionFactory.openSession()) {
 
-            transaction = session.beginTransaction();
-            session.persist(record);
-            //session.flush();
-            transaction.commit();
+            try {
 
-        } catch (Exception ex) {
+                transaction = session.beginTransaction();
+                session.save(record);
+                session.flush();
+                transaction.commit();
 
-            if (transaction != null) {
-                transaction.rollback();
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
             }
-
-            throw ex;
         }
     }
 
@@ -168,18 +171,21 @@ public abstract class H2ContextBase implements Closeable {
 
         try (Session session = sessionFactory.openSession()) {
 
-            transaction = session.beginTransaction();
-            session.update(record);
-            session.flush();
-            transaction.commit();
+            try {
 
-        } catch (Exception ex) {
+                transaction = session.beginTransaction();
+                session.update(record);
+                session.flush();
+                transaction.commit();
 
-            if (transaction != null) {
-                transaction.rollback();
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
             }
-
-            throw ex;
         }
     }
 
@@ -195,18 +201,21 @@ public abstract class H2ContextBase implements Closeable {
 
         try (Session session = sessionFactory.openSession()) {
 
-            transaction = session.beginTransaction();
-            session.delete(record);
-            session.flush();
-            transaction.commit();
+            try {
 
-        } catch (Exception ex) {
+                transaction = session.beginTransaction();
+                session.delete(record);
+                session.flush();
+                transaction.commit();
 
-            if (transaction != null) {
-                transaction.rollback();
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
             }
-
-            throw ex;
         }
     }
 
