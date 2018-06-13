@@ -274,8 +274,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void updateConfig(Configuration config) throws Exception {
 
-        // TODO: test logic (especially foreign keys when archiving!!!)
-
         config.adjustReferences();
 
         // check if the config has already been used by a critical access query
@@ -328,8 +326,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             AccessPattern newPattern = new AccessPattern(pattern);
             createPattern(newPattern);
 
-            // create new configs referencing the new pattern
-            Set<Configuration> newConfigs = pattern.getConfigurations().stream().map(x -> {
+            // create new configs (where the original was not already archived) referencing the new pattern
+            Set<Configuration> newConfigs = pattern.getConfigurations().stream().filter(x -> !x.isArchived()).map(x -> {
 
                 Configuration copy = new Configuration(x);
 
@@ -364,8 +362,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void updateWhitelist(Whitelist whitelist) throws Exception {
 
-        // TODO: test logic (especially foreign keys when archiving!!!)
-
         whitelist.adjustReferences();
 
         // check if the whitelist has already been used by a critical access query
@@ -373,7 +369,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         if (archive) {
 
-            // get the id of the original whitelist
+            // get the id of the original pattern
             Integer originalId = whitelist.getId();
             Whitelist original = getWhitelists(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
 
@@ -381,8 +377,23 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             original.setArchived(true);
             updateRecord(original);
 
-            // request new id for pattern to update
-            whitelist.setId(null);
+            // copy whitelist (without copying references)
+            Whitelist newWhitelist = new Whitelist(whitelist);
+            createWhitelist(newWhitelist);
+
+            // create new configs (where the original was not already archived) referencing the new whitelist
+            Set<Configuration> newConfigs = getConfigs(true).stream().filter(x -> x.getWhitelist().getId().equals(originalId)).map(x -> {
+
+                Configuration copy = new Configuration(x);
+                copy.setWhitelist(whitelist);
+                copy.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
+
+                return copy;
+
+            }).collect(Collectors.toSet());
+
+            // create new configs and update mapping table
+            newConfigs.forEach(x -> insertRecord(x));
         }
 
         updateRecord(whitelist);
@@ -397,8 +408,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void updateSapConfig(SapConfiguration config) throws Exception {
 
-        // TODO: test logic (especially foreign keys when archiving!!!)
-
         // check if the sap config has already been used by a critical access query
         boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getSapConfig().getId().equals(config.getId()));
 
@@ -412,11 +421,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             original.setArchived(true);
             updateRecord(original);
 
-            // request new id for pattern to update
-            config.setId(null);
-        }
+            // copy sap config (without copying references)
+            SapConfiguration newConfig = new SapConfiguration(config);
+            createSapConfig(newConfig);
 
-        updateRecord(config);
+        } else {
+            updateRecord(config);
+        }
     }
 
     // ============================================

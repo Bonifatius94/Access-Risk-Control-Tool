@@ -34,6 +34,21 @@ public class SapConfiguration implements ICreationFlagsHelper {
         setPoolCapacity(poolCapacity);
     }
 
+    /**
+     * This constructor clones the given instance.
+     *
+     * @param original the instance to be cloned
+     */
+    public SapConfiguration(SapConfiguration original) {
+
+        setServerDestination(original.getServerDestination());
+        setDescription(original.getDescription());
+        setSysNr(original.getSysNr());
+        setClient(original.getClient());
+        setLanguage(original.getLanguage());
+        setPoolCapacity(original.getPoolCapacity());
+    }
+
     // =============================
     //           members
     // =============================
