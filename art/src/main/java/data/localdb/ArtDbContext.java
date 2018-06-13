@@ -20,7 +20,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
@@ -169,9 +168,10 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     //                   R E A D
     // ============================================
 
+    // TODO: add filter options (e.g. by time: today, last week, last month, last year, all)
+
     /**
      * This method selects all already executed sap queries from the local database.
-     * TODO: add filter option (e.g. by time: today, last week, last month, last year, all)
      *
      * @param includeArchived determines whether archived records are also loaded
      * @return a list of already executed sap queries
@@ -245,7 +245,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @SuppressWarnings("unchecked")
     public List<DbUser> getDatabaseUsers() throws Exception {
 
-        List<DbUser> users = new ArrayList<>();
+        List<DbUser> users;
 
         try (Session session = getSessionFactory().openSession()) {
 
@@ -321,20 +321,35 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             Integer originalId = pattern.getId();
             AccessPattern original = getPatterns(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
 
-            /*// get configs that are referencing the the pattern
-            Set<Configuration> configs = getConfigs(true).stream()
-                .filter(x -> x.getPatterns().stream().anyMatch(y -> y.getId().equals(originalId)))
-                .collect(Collectors.toSet());*/
-
-            /*// remove mapping entries referencing the pattern
-            configs.forEach(x -> {
-                x.getPatterns().remove(original);
-                updateRecord(x);
-            });*/
-
             // set archived flag to original and update it
             original.setArchived(true);
             updateRecord(original);
+
+            // clone new pattern (without configs referenced)
+            // public AccessPattern(String usecaseId, String description, List<AccessCondition> conditions, ConditionLinkage linkage) {
+
+            // TODO: make this work
+
+            /*AccessPattern newPattern = new AccessPattern(pattern.getUsecaseId(), pattern.getDescription(), new ArrayList<>(), pattern.getLinkage());
+            pattern.getConditions().stream().map(x -> {
+
+                AccessCondition condition;
+
+                if (x.getType() == AccessConditionType.Profile) {
+                    AccessProfileCondition profileCondition = new AccessProfileCondition(x.getProfileCondition().getProfile());
+                    condition = new AccessCondition(newPattern, profileCondition);
+                } else {
+
+                }
+
+                x.setId(null);
+
+                if (x.getType() == AccessConditionType.Profile) {
+                    x.getProfileCondition().setId(null);
+                } else {
+                    x.getPatternCondition().setId(null);
+                }
+            });*/
 
             /*// clone configs referencing the pattern
             Set<Configuration> newConfigs = configs.stream().map(x -> {

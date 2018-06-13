@@ -1,9 +1,13 @@
 package data.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -24,9 +28,14 @@ public class AccessProfileCondition {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @OneToOne
+    @MapsId
+    private AccessCondition condition;
+
+    @Column(nullable = false)
     private String profile;
 
     public Integer getId() {
@@ -35,6 +44,14 @@ public class AccessProfileCondition {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public AccessCondition getCondition() {
+        return condition;
+    }
+
+    public void setCondition(AccessCondition condition) {
+        this.condition = condition;
     }
 
     public String getProfile() {
@@ -57,35 +74,6 @@ public class AccessProfileCondition {
     @Override
     public String toString() {
         return "profile='" + getProfile() + "'";
-    }
-
-    /**
-     * This is a custom implementation of equals method that checks for data equality.
-     *
-     * @param other the object to compare with
-     * @return whether they are equal
-     */
-    @Override
-    public boolean equals(Object other) {
-
-        /*boolean ret = (other == this);
-
-        if (other instanceof AccessProfileCondition) {
-
-            AccessProfileCondition cmp = (AccessProfileCondition) other;
-
-            ret = profile.equals(cmp.getProfile());
-        }
-
-        return ret;*/
-
-        return super.equals(other);
-    }
-
-    @Override
-    public int hashCode() {
-        //return (id != null) ? id : 0;
-        return super.hashCode();
     }
 
 }

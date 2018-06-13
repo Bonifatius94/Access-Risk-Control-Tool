@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -37,18 +38,25 @@ public class Configuration implements IReferenceAware, ICreationFlagsHelper {
         joinColumns = { @JoinColumn(name = "ConfigId") },
         inverseJoinColumns = { @JoinColumn(name = "AccessPatternId") }
     )
-    //@Fetch(value = FetchMode.SUBSELECT)
     private Set<AccessPattern> patterns = new HashSet<>();
 
-    @ManyToOne/*(cascade = {CascadeType.PERSIST, CascadeType.MERGE})*/
+    @ManyToOne
     @JoinColumn(name = "WhitelistId")
     private Whitelist whitelist;
 
+    @Column(nullable = false)
     private String name;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(nullable = false)
     private boolean isArchived;
+
+    @Column(nullable = false)
     private ZonedDateTime createdAt;
+
+    @Column(nullable = false)
     private String createdBy;
 
 
@@ -181,42 +189,6 @@ public class Configuration implements IReferenceAware, ICreationFlagsHelper {
         getPatterns().forEach(x -> builder.append("\r\n").append(x));
 
         return builder.toString();
-    }
-
-    /**
-     * This is a custom implementation of equals method that checks for data equality.
-     *
-     * @param other the object to compare with
-     * @return whether they are equal
-     */
-    @Override
-    public boolean equals(Object other) {
-
-        /*boolean ret = (other == this);
-
-        if (other instanceof Configuration) {
-
-            Configuration cmp = (Configuration) other;
-
-            ret = (name.equals(cmp.getName())
-                && ((this.description == null && cmp.getDescription() == null) || (this.description != null && this.description.equals(cmp.getDescription())))
-                && ((this.whitelist == null && cmp.getWhitelist() == null) || (this.whitelist != null && this.whitelist.equals(cmp.getWhitelist())))
-                && this.id == null || (
-                this.isArchived == cmp.isArchived()
-                    && this.createdAt.equals(cmp.getCreatedAt())
-                    && this.createdBy.equals(cmp.getCreatedBy())
-                ));
-        }
-
-        return ret;*/
-
-        return super.equals(other);
-    }
-
-    @Override
-    public int hashCode() {
-        //return (id != null) ? id : 0;
-        return super.hashCode();
     }
 
 }

@@ -44,7 +44,7 @@ public class SapSettingsTest {
 
             // create a new data object
             final String poolCapacity = "1";
-            SapConfiguration sapConfig = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "00", "001", "EN", poolCapacity);
+            SapConfiguration sapConfig = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "some description", "00", "001", "EN", poolCapacity);
 
             // insert into database
             context.createSapConfig(sapConfig);

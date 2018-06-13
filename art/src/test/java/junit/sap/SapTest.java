@@ -30,7 +30,7 @@ public class SapTest {
         String password = "Wir sind das beste Team!";
 
         // init sap settings (here: test server data)
-        SapConfiguration sapConfig = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "00", "001", "EN", "0");
+        SapConfiguration sapConfig = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "some description", "00", "001", "EN", "0");
 
         try {
 

@@ -11,7 +11,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -35,11 +37,14 @@ public class AccessPatternCondition implements IReferenceAware {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @OneToOne
+    @MapsId
+    private AccessCondition condition;
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Fetch(value = FetchMode.)
     private Set<AccessPatternConditionProperty> properties = new HashSet<>();
 
     public Integer getId() {
@@ -48,6 +53,14 @@ public class AccessPatternCondition implements IReferenceAware {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public AccessCondition getCondition() {
+        return condition;
+    }
+
+    public void setCondition(AccessCondition condition) {
+        this.condition = condition;
     }
 
     public Set<AccessPatternConditionProperty> getProperties() {
@@ -96,25 +109,6 @@ public class AccessPatternCondition implements IReferenceAware {
         builder.append("properties: ");
         getProperties().forEach(x -> builder.append("\r\nproperty: ").append(x.toString()));
         return builder.toString();
-    }
-
-    /**
-     * This is a custom implementation of equals method that checks for data equality.
-     *
-     * @param other the object to compare with
-     * @return whether they are equal
-     */
-    @Override
-    public boolean equals(Object other) {
-
-        //return other instanceof AccessPatternCondition;
-        return super.equals(other);
-    }
-
-    @Override
-    public int hashCode() {
-        //return (id != null) ? id : 0;
-        return super.hashCode();
     }
 
 }

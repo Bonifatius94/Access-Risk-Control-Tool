@@ -26,15 +26,22 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(nullable = false)
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "whitelist", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Fetch(value = FetchMode.SUBSELECT)
     private Set<WhitelistEntry> entries = new HashSet<>();
 
+    @Column(nullable = false)
     private boolean isArchived;
+
+    @Column(nullable = false)
     private ZonedDateTime createdAt;
+
+    @Column(nullable = false)
     private String createdBy;
 
     public Integer getId() {
@@ -43,6 +50,14 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -133,40 +148,6 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
         builder.append("\r\nCreatedAt = ").append(getCreatedAt()).append(", CreatedBy = ").append(createdBy).append(", IsArchived = ").append(isArchived());
 
         return builder.toString();
-    }
-
-    /**
-     * This is a custom implementation of equals method that checks for data equality.
-     *
-     * @param other the object to compare with
-     * @return whether they are equal
-     */
-    @Override
-    public boolean equals(Object other) {
-
-        /*boolean ret = (other == this);
-
-        if (other instanceof Whitelist) {
-
-            Whitelist cmp = (Whitelist) other;
-
-            ret = (this.description.equals(cmp.getDescription())
-                && this.id == null || (
-                    this.isArchived == cmp.isArchived()
-                    && this.createdAt.equals(cmp.getCreatedAt())
-                    && this.createdBy.equals(cmp.getCreatedBy())
-                ));
-        }
-
-        return ret;*/
-
-        return super.equals(other);
-    }
-
-    @Override
-    public int hashCode() {
-        //return (id != null) ? id : 0;
-        return super.hashCode();
     }
 
 }
