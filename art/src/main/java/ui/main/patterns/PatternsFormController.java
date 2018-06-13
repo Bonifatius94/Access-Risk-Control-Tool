@@ -8,6 +8,7 @@ import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 import data.entities.AccessPatternCondition;
 import data.entities.AccessPatternConditionProperty;
+import data.entities.AccessProfileCondition;
 import data.entities.ConditionLinkage;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
@@ -108,6 +109,7 @@ public class PatternsFormController {
     private AccessPattern accessPattern;
     private AccessPattern originalPattern;
 
+    private List<TableView> conditionTables;
     private TableView selectedTable;
     private AccessPatternConditionProperty selectedProperty;
 
@@ -117,6 +119,10 @@ public class PatternsFormController {
      */
     @FXML
     public void initialize() {
+
+        // initialize conditionTables
+        this.conditionTables = new ArrayList<>();
+
         // set condition input items
         this.conditionTypeInput.getItems().setAll("Condition", "Profile");
 
@@ -162,6 +168,7 @@ public class PatternsFormController {
         linkageInput.getSelectionModel().selectedItemProperty().addListener((ChangeListener<ConditionLinkage>) (selected, oldValue, newValue) -> {
             if (newValue == ConditionLinkage.None) {
                 conditionTabs.getTabs().clear();
+                this.conditionTables.clear();
                 addConditionTableTab(accessPattern.getConditions().stream().findFirst().get());
                 this.editConditionBox.managedProperty().unbind();
                 this.editConditionBox.visibleProperty().unbind();
@@ -338,11 +345,12 @@ public class PatternsFormController {
 
         // remove items from AccessPattern
         this.selectedTable.getItems().clear();
+        this.conditionTables.remove(selectedTable);
 
         // remove the tab from the conditionTabs
         this.conditionTabs.getTabs().remove(this.conditionTabs.getSelectionModel().getSelectedItem());
 
-        // rename tabs to after deleting so no numbers are left out
+        // rename tabs after deleting so no numbers are left out
         int i = 0;
         for (Tab tab : this.conditionTabs.getTabs()) {
             tab.setText("Condition " + ++i);
@@ -374,8 +382,47 @@ public class PatternsFormController {
      * Saves the changes to the database.
      */
     public void saveChanges() {
+
+        // replace the useCaseId and the description with the text field values
         this.accessPattern.setUsecaseId(this.useCaseIdInput.getText());
         this.accessPattern.setDescription(this.descriptionInput.getText());
+
+        // store the condition in here
+        List<AccessCondition> newConditions = new ArrayList<>();
+
+        // execute only if the pattern is no profile
+        if (this.accessPattern.getConditions().stream().findFirst().get().getProfileCondition() == null) {
+
+            // copy conditions to the list
+            for (TableView<AccessPatternConditionProperty> condTable : conditionTables) {
+
+                // add table if it is not empty
+                if (condTable.getItems() != null) {
+
+                    AccessPatternCondition patternCondition = new AccessPatternCondition();
+                    AccessCondition accessCondition = new AccessCondition();
+
+                    patternCondition.setProperties(condTable.getItems());
+                    accessCondition.setPatternCondition(patternCondition);
+
+                    newConditions.add(accessCondition);
+
+                }
+            }
+        } else {
+
+            // overwrite the profile
+            AccessCondition accessCondition = new AccessCondition();
+            AccessProfileCondition profileCond = new AccessProfileCondition();
+
+            profileCond.setProfile(this.profileInput.getText());
+            accessCondition.setProfileCondition(profileCond);
+
+            newConditions.add(accessCondition);
+        }
+
+        // add the list to the AccessPattern
+        this.accessPattern.setConditions(newConditions);
 
         System.out.println(this.accessPattern);
     }
@@ -446,6 +493,9 @@ public class PatternsFormController {
 
         // add columns to the table
         conditionTable.getColumns().addAll(authObject, authObjectProperty, value1, value2, value3, value4, deleteColumn);
+
+        // table to all tables
+        this.conditionTables.add(conditionTable);
 
         // add entries to the table
         if (condition.getPatternCondition() != null) {
