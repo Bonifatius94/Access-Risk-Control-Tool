@@ -13,14 +13,29 @@ import javax.persistence.Table;
 @Table(name = "CriticalAccessEntries")
 public class CriticalAccessEntry {
 
-    public CriticalAccessEntry() {
+    // =============================
+    //         constructors
+    // =============================
 
+    public CriticalAccessEntry() {
+        // nothing to do here ...
     }
 
+    /**
+     * This constructor creates a new instance with the given data.
+     *
+     * @param pattern the pattern of the new instance
+     * @param username the username of the new instance
+     */
     public CriticalAccessEntry(AccessPattern pattern, String username) {
+
         setAccessPattern(pattern);
         setUsername(username);
     }
+
+    // =============================
+    //            members
+    // =============================
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +51,10 @@ public class CriticalAccessEntry {
 
     @Column(nullable = false)
     private String username;
+
+    // =============================
+    //      getters / setters
+    // =============================
 
     public Integer getId() {
         return id;

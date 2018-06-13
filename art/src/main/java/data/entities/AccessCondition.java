@@ -18,6 +18,10 @@ import javax.persistence.Table;
 @Table(name = "AccessConditions")
 public class AccessCondition {
 
+    // =============================
+    //         constructors
+    // =============================
+
     public AccessCondition() {
 
     }
@@ -32,6 +36,28 @@ public class AccessCondition {
         setProfileCondition(profileCondition);
     }
 
+    /**
+     * This constructor clone the given instance.
+     *
+     * @param original the instance to be cloned
+     */
+    public AccessCondition(AccessCondition original) {
+
+        this.setType(original.getType());
+
+        if (original.getType() == AccessConditionType.Profile) {
+            this.setProfileCondition(new AccessProfileCondition(original.getProfileCondition()));
+            this.getProfileCondition().setCondition(this);
+        } else {
+            this.setPatternCondition(new AccessPatternCondition(original.getPatternCondition()));
+            this.getPatternCondition().setCondition(this);
+        }
+    }
+
+    // =============================
+    //           members
+    // =============================
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -45,12 +71,14 @@ public class AccessCondition {
     private AccessPattern pattern;
 
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@JoinColumn(name = "ProfileConditionId")
     private AccessProfileCondition profileCondition;
 
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@JoinColumn(name = "PatternConditionId")
     private AccessPatternCondition patternCondition;
+
+    // =============================
+    //       getters / setters
+    // =============================
 
     public Integer getId() {
         return id;
@@ -124,11 +152,6 @@ public class AccessCondition {
     @Override
     public String toString() {
         return (type == AccessConditionType.Profile) ? profileCondition.toString() : patternCondition.toString();
-    }
-
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
     }
 
 }

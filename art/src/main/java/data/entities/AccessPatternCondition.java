@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -27,6 +28,10 @@ import org.hibernate.annotations.FetchMode;
 @Table(name = "AccessPatternConditions")
 public class AccessPatternCondition implements IReferenceAware {
 
+    // =============================
+    //         constructors
+    // =============================
+
     // empty constructor is required for hibernate
     public AccessPatternCondition() {
         // nothing to do here ...
@@ -36,8 +41,21 @@ public class AccessPatternCondition implements IReferenceAware {
         setProperties(new ArrayList<>(properties));
     }
 
+    /**
+     * This constructor clones the given condition.
+     *
+     * @param original this condition to be cloned
+     */
+    public AccessPatternCondition(AccessPatternCondition original) {
+
+        setProperties(original.getProperties().stream().map(x -> new AccessPatternConditionProperty(x)).collect(Collectors.toSet()));
+    }
+
+    // =============================
+    //           members
+    // =============================
+
     @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @OneToOne
@@ -46,6 +64,10 @@ public class AccessPatternCondition implements IReferenceAware {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<AccessPatternConditionProperty> properties = new HashSet<>();
+
+    // =============================
+    //       getters / setters
+    // =============================
 
     public Integer getId() {
         return id;

@@ -26,6 +26,45 @@ import org.hibernate.annotations.FetchMode;
 @Table(name = "Configurations")
 public class Configuration implements IReferenceAware, ICreationFlagsHelper {
 
+    // =============================
+    //         constructors
+    // =============================
+
+    public Configuration() {
+        // nothing to do here ...
+    }
+
+    /**
+     * This constructor initializes an instance with the given parameters.
+     *
+     * @param name the name of the new instance
+     * @param description the description of the new instance
+     * @param patterns the patterns referenced by the new instance
+     * @param whitelist the whitelist referenced by the new instance
+     */
+    public Configuration(String name, String description, List<AccessPattern> patterns, Whitelist whitelist) {
+
+        setName(name);
+        setDescription(description);
+        setPatterns(patterns);
+        setWhitelist(whitelist);
+    }
+
+    /**
+     * This constructor clones the given config (patterns and whitelist are not cloned).
+     *
+     * @param original the config to clone
+     */
+    public Configuration(Configuration original) {
+
+        this.setName(original.getName());
+        this.setDescription(original.getDescription());
+    }
+
+    // =============================
+    //           members
+    // =============================
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -59,6 +98,9 @@ public class Configuration implements IReferenceAware, ICreationFlagsHelper {
     @Column(nullable = false)
     private String createdBy;
 
+    // =============================
+    //      getters / setters
+    // =============================
 
     public Integer getId() {
         return id;
@@ -137,7 +179,7 @@ public class Configuration implements IReferenceAware, ICreationFlagsHelper {
         this.createdBy = createdBy;
     }
 
-    // =============================
+    /*// =============================
     //   helpers for foreign keys
     // =============================
 
@@ -149,7 +191,7 @@ public class Configuration implements IReferenceAware, ICreationFlagsHelper {
     public void removePattern(AccessPattern pattern) {
         patterns.remove(pattern);
         pattern.getConfigurations().remove(this);
-    }
+    }*/
 
     // =============================
     //          overrides

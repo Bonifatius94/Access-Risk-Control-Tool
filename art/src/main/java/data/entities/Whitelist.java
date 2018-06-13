@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -21,6 +22,44 @@ import org.hibernate.annotations.FetchMode;
 @Entity
 @Table(name = "Whitelists")
 public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
+
+    // =============================
+    //         constructors
+    // =============================
+
+    public Whitelist() {
+        // nothing to do here ...
+    }
+
+    /**
+     * This constructor creates a new instance with the given parameters.
+     *
+     * @param name the name of the new instance
+     * @param description the description of the new instance
+     * @param entries the whitelist entries of the new instance
+     */
+    public Whitelist(String name, String description, List<WhitelistEntry> entries) {
+
+        setName(name);
+        setDescription(description);
+        setEntries(entries);
+    }
+
+    /**
+     * This constructor clones the given instance.
+     *
+     * @param original the instance to be cloned
+     */
+    public Whitelist(Whitelist original) {
+
+        this.setName(original.getName());
+        this.setDescription(original.getDescription());
+        this.setEntries(original.getEntries().stream().map(x -> new WhitelistEntry(x)).collect(Collectors.toSet()));
+    }
+
+    // =============================
+    //           members
+    // =============================
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +82,10 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
 
     @Column(nullable = false)
     private String createdBy;
+
+    // =============================
+    //      getters / setters
+    // =============================
 
     public Integer getId() {
         return id;

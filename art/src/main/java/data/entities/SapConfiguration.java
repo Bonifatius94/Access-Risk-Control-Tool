@@ -13,6 +13,10 @@ import javax.persistence.Table;
 @Table(name = "SapConfigurations")
 public class SapConfiguration implements ICreationFlagsHelper {
 
+    // =============================
+    //         constructors
+    // =============================
+
     public SapConfiguration() {
 
     }
@@ -29,6 +33,10 @@ public class SapConfiguration implements ICreationFlagsHelper {
         setLanguage(language);
         setPoolCapacity(poolCapacity);
     }
+
+    // =============================
+    //           members
+    // =============================
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,6 +69,9 @@ public class SapConfiguration implements ICreationFlagsHelper {
     @Column(nullable = false)
     private String createdBy;
 
+    // =============================
+    //      getters / setters
+    // =============================
 
     public Integer getId() {
         return id;

@@ -25,6 +25,32 @@ import org.hibernate.annotations.FetchMode;
 @Table(name = "CriticalAccessQueries")
 public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelper {
 
+    // =============================
+    //        constructors
+    // =============================
+
+    public CriticalAccessQuery() {
+        // nothing to do here ...
+    }
+
+    /**
+     * This constructor create a new instance with the given parameters.
+     *
+     * @param config the config of the new instance
+     * @param sapConfig the sap config of the new instance
+     * @param entries the critical entries of the new instance
+     */
+    public CriticalAccessQuery(Configuration config, SapConfiguration sapConfig, Set<CriticalAccessEntry> entries) {
+
+        setConfig(config);
+        setSapConfig(sapConfig);
+        setEntries(entries);
+    }
+
+    // =============================
+    //            members
+    // =============================
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -48,6 +74,10 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
 
     @Column(nullable = false)
     private String createdBy;
+
+    // =============================
+    //      getters / setters
+    // =============================
 
     public Integer getId() {
         return id;

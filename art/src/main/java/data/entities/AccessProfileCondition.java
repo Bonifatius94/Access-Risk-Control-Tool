@@ -18,6 +18,10 @@ import javax.persistence.Table;
 @Table(name = "AccessProfileConditions")
 public class AccessProfileCondition {
 
+    // =============================
+    //         constructors
+    // =============================
+
     public AccessProfileCondition() {
         // nothing to do here ...
     }
@@ -27,8 +31,20 @@ public class AccessProfileCondition {
         setProfile(profile);
     }
 
+    /**
+     * This constructor clones the given instance.
+     *
+     * @param original the instance to be cloned
+     */
+    public AccessProfileCondition(AccessProfileCondition original) {
+        this.setProfile(original.getProfile());
+    }
+
+    // =============================
+    //           members
+    // =============================
+
     @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @OneToOne
@@ -37,6 +53,10 @@ public class AccessProfileCondition {
 
     @Column(nullable = false)
     private String profile;
+
+    // =============================
+    //      getters / setters
+    // =============================
 
     public Integer getId() {
         return id;

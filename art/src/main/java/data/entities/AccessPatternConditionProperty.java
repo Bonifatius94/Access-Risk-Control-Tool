@@ -18,6 +18,10 @@ import javax.persistence.Table;
 @Table(name = "AccessPatternConditionProperties")
 public class AccessPatternConditionProperty {
 
+    // =============================
+    //         constructors
+    // =============================
+
     public AccessPatternConditionProperty() {
         // nothing to do here ...
     }
@@ -42,6 +46,25 @@ public class AccessPatternConditionProperty {
         setValue4(value4);
     }
 
+    /**
+     * This constructor clone the given instance.
+     *
+     * @param original the instance to be cloned
+     */
+    public AccessPatternConditionProperty(AccessPatternConditionProperty original) {
+
+        this.setAuthObject(original.getAuthObject());
+        this.setAuthObjectProperty(original.getAuthObjectProperty());
+        this.setValue1(original.getValue1());
+        this.setValue2(original.getValue2());
+        this.setValue3(original.getValue3());
+        this.setValue4(original.getValue4());
+    }
+
+    // =============================
+    //           members
+    // =============================
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -62,6 +85,10 @@ public class AccessPatternConditionProperty {
     private String value2;
     private String value3;
     private String value4;
+
+    // =============================
+    //      getters / setters
+    // =============================
 
     public Integer getId() {
         return id;

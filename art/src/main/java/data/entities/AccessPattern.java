@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -33,16 +34,12 @@ import org.hibernate.annotations.FetchMode;
 public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
 
     // =============================
-    //      empty constructor
+    //        constructors
     // =============================
 
     public AccessPattern() {
         // nothing to do here ...
     }
-
-    // =============================
-    //      complex auth pattern
-    // =============================
 
     /**
      * This constructor creates a new instance of an auth pattern of complex type (without usecase id and description defined).
@@ -80,10 +77,6 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
         setLinkage(linkage);
     }
 
-    // =============================
-    //      simple auth pattern
-    // =============================
-
     /**
      * This constructor creates a new instance of an auth pattern of simple type (without usecase id and description defined).
      *
@@ -110,8 +103,23 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
         setLinkage(ConditionLinkage.None);
     }
 
+    /**
+     * This constructor clones an existing.
+     *
+     * @param original the pattern to clone
+     */
+    public AccessPattern(AccessPattern original) {
+
+        this.setUsecaseId(original.getUsecaseId());
+        this.setDescription(original.getDescription());
+        this.setLinkage(original.getLinkage());
+
+        this.setConditions(original.getConditions().stream().map(x -> new AccessCondition(x)).collect(Collectors.toSet()));
+        //conditions.forEach(x -> x.setPattern(this));
+    }
+
     // =============================
-    //           properties
+    //           members
     // =============================
 
     @Id

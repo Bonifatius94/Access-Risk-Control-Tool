@@ -18,6 +18,10 @@ import javax.persistence.Table;
 @Table(name = "WhitelistEntries")
 public class WhitelistEntry {
 
+    // =============================
+    //         constructors
+    // =============================
+
     public WhitelistEntry() {
 
     }
@@ -34,6 +38,21 @@ public class WhitelistEntry {
         setUsername(username);
     }
 
+    /**
+     * This constructor clones the given instance.
+     *
+     * @param original the instance to be cloned
+     */
+    public WhitelistEntry(WhitelistEntry original) {
+
+        this.setUsecaseId(original.getUsecaseId());
+        this.setUsername(original.getUsername());
+    }
+
+    // =============================
+    //           members
+    // =============================
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -47,6 +66,10 @@ public class WhitelistEntry {
 
     @Column(nullable = false)
     private String username;
+
+    // =============================
+    //      getters / setters
+    // =============================
 
     public Integer getId() {
         return id;
