@@ -10,12 +10,12 @@ import data.entities.AccessPatternCondition;
 import data.entities.AccessPatternConditionProperty;
 import data.entities.ConditionLinkage;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
