@@ -15,6 +15,7 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
@@ -105,6 +106,8 @@ public class PatternsFormController {
 
 
     private AccessPattern accessPattern;
+    private AccessPattern originalPattern;
+
     private TableView selectedTable;
     private AccessPatternConditionProperty selectedProperty;
 
@@ -125,6 +128,18 @@ public class PatternsFormController {
         this.editConditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
         this.editConditionBox.visibleProperty().bind(this.conditionBox.visibleProperty());
 
+        // deselect on tab change
+        this.conditionTabs.getSelectionModel().selectedItemProperty().addListener((ov, oldTab, newTab) -> {
+            this.selectedProperty = null;
+
+            if (selectedTable != null) {
+                this.selectedTable.getSelectionModel().clearSelection();
+            }
+
+            // reset inputs
+            this.editSelectedAccessConditionProperty(null, null);
+        });
+
         // don't allow less than 1 tab
         deleteSelectedTableTabButton.disableProperty().bind(Bindings.size(conditionTabs.getTabs()).isEqualTo(1));
         atLeastOneCondWarning.visibleProperty().bind(Bindings.size(conditionTabs.getTabs()).isEqualTo(1));
@@ -135,8 +150,7 @@ public class PatternsFormController {
         initializeValidation();
 
         initializeLinkageInput();
-
-
+        
     }
 
     /**
@@ -244,7 +258,11 @@ public class PatternsFormController {
      * @param pattern the selected pattern
      */
     public void giveSelectedAccessPattern(AccessPattern pattern) {
+
         this.accessPattern = pattern;
+
+        // save the original pattern as deep copy
+        this.originalPattern = new AccessPattern(pattern);
 
         this.useCaseIdInput.setText(pattern.getUsecaseId());
         this.descriptionInput.setText(pattern.getDescription());
@@ -277,21 +295,36 @@ public class PatternsFormController {
      */
     private void editSelectedAccessConditionProperty(AccessPatternConditionProperty accessPatternConditionProperty, TableView table) {
 
-        this.selectedProperty = accessPatternConditionProperty;
-        this.selectedTable = table;
+        if (accessPatternConditionProperty != null) {
 
-        // set the inputs to the given values
-        authObjectInput.setText(accessPatternConditionProperty.getAuthObject());
-        authFieldInput.setText(accessPatternConditionProperty.getAuthObjectProperty());
-        authFieldValue1Input.setText(accessPatternConditionProperty.getValue1());
-        authFieldValue2Input.setText(accessPatternConditionProperty.getValue2());
-        authFieldValue3Input.setText(accessPatternConditionProperty.getValue3());
-        authFieldValue4Input.setText(accessPatternConditionProperty.getValue4());
+            this.selectedProperty = accessPatternConditionProperty;
+            this.selectedTable = table;
 
-        // reset error validation
-        authObjectInput.validate();
-        authFieldInput.validate();
-        authFieldValue1Input.validate();
+            // set the inputs to the given values
+            authObjectInput.setText(accessPatternConditionProperty.getAuthObject());
+            authFieldInput.setText(accessPatternConditionProperty.getAuthObjectProperty());
+            authFieldValue1Input.setText(accessPatternConditionProperty.getValue1());
+            authFieldValue2Input.setText(accessPatternConditionProperty.getValue2());
+            authFieldValue3Input.setText(accessPatternConditionProperty.getValue3());
+            authFieldValue4Input.setText(accessPatternConditionProperty.getValue4());
+
+            // reset error validation
+            authObjectInput.validate();
+            authFieldInput.validate();
+            authFieldValue1Input.validate();
+
+        } else {
+
+            // reset form
+            authObjectInput.setText("");
+            authFieldInput.setText("");
+            authFieldValue1Input.setText("");
+            authFieldValue2Input.setText("");
+            authFieldValue3Input.setText("");
+            authFieldValue4Input.setText("");
+
+        }
+
     }
 
     public void addEmptyConditionTableTab() {
@@ -323,8 +356,7 @@ public class PatternsFormController {
     public void resetForm() {
         this.conditionTabs.getTabs().clear();
 
-        // TODO: Deep copy of accessPattern for AccessConditions
-        this.giveSelectedAccessPattern(accessPattern);
+        this.giveSelectedAccessPattern(this.originalPattern);
 
         this.validateInputs();
     }
@@ -417,7 +449,7 @@ public class PatternsFormController {
 
         // add entries to the table
         if (condition.getPatternCondition() != null) {
-            ObservableList<AccessPatternConditionProperty> entries = FXCollections.observableList(condition.getPatternCondition().getProperties().stream().collect(Collectors.toList()));
+            ObservableList<AccessPatternConditionProperty> entries = FXCollections.observableList(new ArrayList<>(condition.getPatternCondition().getProperties()));
             conditionTable.setItems(entries);
             conditionTable.refresh();
         }
@@ -488,7 +520,7 @@ public class PatternsFormController {
             selectedProperty.setValue4(authFieldValue4Input.getText());
 
             this.selectedTable.refresh();
-        }
 
+        }
     }
 }
