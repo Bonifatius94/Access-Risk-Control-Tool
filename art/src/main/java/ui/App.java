@@ -1,22 +1,19 @@
 package ui;
 
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import tools.tracing.TraceLevel;
 import tools.tracing.TraceMode;
 import tools.tracing.TraceOut;
 
-import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
-import ui.main.MainController;
+
 
 public class App extends Application {
 
@@ -71,6 +68,12 @@ public class App extends Application {
         window.initStage(primaryStage);
         window.setTitle("Access Risk Control Tool");
         primaryStage.show();
+
+        // add application icons
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_64.png")));
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_128.png")));
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_256.png")));
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_512.png")));
 
         this.primaryStage = primaryStage;
 

@@ -2,13 +2,13 @@ package data.entities;
 
 public enum AccessConditionType {
 
-    ProfileCondition, PatternCondition;
+    Profile, Pattern;
 
     @Override
     public String toString() {
         switch (this) {
-            case PatternCondition: return "Pattern";
-            case ProfileCondition: return "Profile";
+            case Pattern: return "Pattern";
+            case Profile: return "Profile";
             default: throw new IllegalArgumentException("Cannot convert enum to string. Unknown type.");
         }
     }

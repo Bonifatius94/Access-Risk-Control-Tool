@@ -17,9 +17,7 @@ import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -55,6 +53,7 @@ public class SapConnector implements ISapConnector {
         TraceOut.leave();
     }
 
+    /**
     /** This method pings the sap server specified in the sap server config.
      *
      * @return a boolean value that indicates whether the ping was successful
@@ -96,29 +95,27 @@ public class SapConnector implements ISapConnector {
 
         TraceOut.enter();
 
-        Set<CriticalAccessEntry> entries = new HashSet<>();
+        CriticalAccessQuery query = null;
 
-        // run sap queries (use cases / conditions ...)
-        for (AccessPattern pattern : config.getPatterns()) {
+        if (canPingServer()) {
 
-            TraceOut.writeInfo("executing sap query for pattern " + pattern.getUsecaseId());
+            Set<CriticalAccessEntry> entries = new HashSet<>();
 
-            // executing query for pattern
-            Set<CriticalAccessEntry> resultsOfPattern = runSapQuery(pattern, config.getWhitelist());
-            entries.addAll(resultsOfPattern);
+            for (AccessPattern pattern : config.getPatterns()) {
 
-            TraceOut.writeInfo("results returned: " + resultsOfPattern.size());
+                // executing query for pattern
+                Set<CriticalAccessEntry> resultsOfPattern = runSapQuery(pattern, config.getWhitelist());
+                entries.addAll(resultsOfPattern);
+
+                TraceOut.writeInfo("Pattern: " + pattern.getUsecaseId() + ", results count: " + resultsOfPattern.size());
+            }
+
+            // write results to critical access query (ready for insertion into database)
+            query = new CriticalAccessQuery();
+            query.setEntries(entries);
+            query.setConfig(config);
+            query.setSapConfig(this.sapConfig);
         }
-
-        // log critical access entries per pattern
-        Map<String, Long> entriesPerPattern = entries.stream().collect(Collectors.groupingBy(x -> x.getAccessPattern().getUsecaseId(), Collectors.counting()));
-        entriesPerPattern.forEach((key, value) -> TraceOut.writeInfo("Pattern " + key + ": " + value));
-
-        // write results to critical access query (ready for insertion into database)
-        CriticalAccessQuery query = new CriticalAccessQuery();
-        query.setEntries(new ArrayList<>(entries));
-        query.setConfig(config);
-        query.setSapConfig(this.sapConfig);
 
         TraceOut.leave();
         return query;
@@ -167,12 +164,15 @@ public class SapConnector implements ISapConnector {
             profileTable.clear();
         }
 
-        // get whitelisted users
-        Set<String> whitelistedUsers = whitelist.getEntries().stream()
-            .filter(x -> x.getUsecaseId().equals(pattern.getUsecaseId())).map(x -> x.getUsername()).collect(Collectors.toSet());
+        if (whitelist != null) {
 
-        // apply whitelist to query results (remove whitelisted users)
-        usernames.removeAll(whitelistedUsers);
+            // get whitelisted users
+            Set<String> whitelistedUsers = whitelist.getEntries().stream()
+                .filter(x -> x.getUsecaseId().equals(pattern.getUsecaseId())).map(x -> x.getUsername()).collect(Collectors.toSet());
+
+            // apply whitelist to query results (remove whitelisted users)
+            usernames.removeAll(whitelistedUsers);
+        }
 
         // create critical access entries from remaining usernames + pattern
         Set<CriticalAccessEntry> entries = usernames.stream().map(x -> new CriticalAccessEntry(pattern, x)).collect(Collectors.toSet());
@@ -192,14 +192,14 @@ public class SapConnector implements ISapConnector {
 
         TraceOut.enter();
 
-        if (condition.getType() == AccessConditionType.ProfileCondition) {
+        if (condition.getType() == AccessConditionType.Profile) {
 
             profileTable.appendRow();
             profileTable.setValue("SIGN", "I");
             profileTable.setValue("OPTION", "EQ");
             profileTable.setValue("LOW", condition.getProfileCondition().getProfile());
 
-        } else if (condition.getType() == AccessConditionType.PatternCondition) {
+        } else if (condition.getType() == AccessConditionType.Pattern) {
 
             for (AccessPatternConditionProperty property : condition.getPatternCondition().getProperties()) {
 
@@ -245,21 +245,21 @@ public class SapConnector implements ISapConnector {
         JCoTable results = null;
         JCoDestination destination = JCoDestinationManager.getDestination(sapConfig.getServerDestination());
 
-        if (canPingServer()) {
+        /*if (canPingServer()) {*/
 
-            if (function != null) {
+        if (function != null) {
 
-                // run query
-                function.execute(destination);
-                results = function.getExportParameterList().getTable("ET_USERS");
-
-            } else {
-                throw new Exception("Function could not be initialized!");
-            }
+            // run query
+            function.execute(destination);
+            results = function.getExportParameterList().getTable("ET_USERS");
 
         } else {
-            throw new Exception("Can't connect to the server!");
+            throw new Exception("Function could not be initialized!");
         }
+
+        /*} else {
+            throw new Exception("Can't connect to the server!");
+        }*/
 
         TraceOut.leave();
         return results;

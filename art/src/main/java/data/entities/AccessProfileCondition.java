@@ -1,21 +1,26 @@
 package data.entities;
 
-import javax.persistence.DiscriminatorValue;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
  * This class represents an auth profile condition.
  * It contains properties like condition name or auth profile name and implements the ICondition interface.
- *
- * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
 @Table(name = "AccessProfileConditions")
 public class AccessProfileCondition {
+
+    // =============================
+    //         constructors
+    // =============================
 
     public AccessProfileCondition() {
         // nothing to do here ...
@@ -26,17 +31,47 @@ public class AccessProfileCondition {
         setProfile(profile);
     }
 
-    private Integer id;
-    private String profile;
+    /**
+     * This constructor clones the given instance.
+     *
+     * @param original the instance to be cloned
+     */
+    public AccessProfileCondition(AccessProfileCondition original) {
+        this.setProfile(original.getProfile());
+    }
+
+    // =============================
+    //           members
+    // =============================
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+
+    @OneToOne
+    @MapsId
+    private AccessCondition condition;
+
+    @Column(nullable = false)
+    private String profile;
+
+    // =============================
+    //      getters / setters
+    // =============================
+
     public Integer getId() {
         return id;
     }
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public AccessCondition getCondition() {
+        return condition;
+    }
+
+    public void setCondition(AccessCondition condition) {
+        this.condition = condition;
     }
 
     public String getProfile() {
@@ -55,7 +90,6 @@ public class AccessProfileCondition {
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *
      * @return JSON-like data representation of this instance as a string
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     @Override
     public String toString() {

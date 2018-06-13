@@ -1,36 +1,78 @@
 package data.entities;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "SapConfigurations")
-public class SapConfiguration {
+public class SapConfiguration implements ICreationFlagsHelper {
 
-    private Integer id;
-    private String serverDestination;
-    private String sysNr;
-    private String client;
+    // =============================
+    //         constructors
+    // =============================
 
-    //private String user;
-    //private String password;
+    public SapConfiguration() {
 
-    private String language;
-    private String poolCapacity;
+    }
 
-    private boolean isArchived;
-    private OffsetDateTime createdAt;
-    private String createdBy;
+    /**
+     * This constructor sets all members of the new instance.
+     */
+    public SapConfiguration(String serverDestination, String description, String sysNr, String client, String language, String poolCapacity) {
+
+        setServerDestination(serverDestination);
+        setDescription(description);
+        setSysNr(sysNr);
+        setClient(client);
+        setLanguage(language);
+        setPoolCapacity(poolCapacity);
+    }
+
+    // =============================
+    //           members
+    // =============================
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(nullable = false)
+    private String serverDestination;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(nullable = false)
+    private String sysNr;
+
+    @Column(nullable = false)
+    private String client;
+
+    @Column(nullable = false)
+    private String language;
+
+    @Column(nullable = false)
+    private String poolCapacity;
+
+    @Column(nullable = false)
+    private boolean isArchived;
+
+    @Column(nullable = false)
+    private ZonedDateTime createdAt;
+
+    @Column(nullable = false)
+    private String createdBy;
+
+    // =============================
+    //      getters / setters
+    // =============================
+
     public Integer getId() {
         return id;
     }
@@ -45,6 +87,14 @@ public class SapConfiguration {
 
     public void setServerDestination(String serverDestination) {
         this.serverDestination = serverDestination;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getSysNr() {
@@ -62,22 +112,6 @@ public class SapConfiguration {
     public void setClient(String client) {
         this.client = client;
     }
-
-    //public String getUser() {
-    //    return user;
-    //}
-
-    //public void setUser(String user) {
-    //    this.user = user;
-    //}
-
-    //public String getPassword() {
-    //    return password;
-    //}
-
-    //public void setPassword(String password) {
-    //    this.password = password;
-    //}
 
     public String getLanguage() {
         return language;
@@ -103,11 +137,11 @@ public class SapConfiguration {
         isArchived = archived;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -120,17 +154,15 @@ public class SapConfiguration {
     }
 
     // =============================
-    //      hibernate triggers
-    // =============================
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
-    }
-
-    // =============================
     //          overrides
     // =============================
+
+    @Override
+    public void initCreationFlags(ZonedDateTime createdAt, String createdBy) {
+
+        setCreatedAt(createdAt);
+        setCreatedBy(createdBy);
+    }
 
     @Override
     public String toString() {

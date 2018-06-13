@@ -15,6 +15,7 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
@@ -147,7 +148,7 @@ public class PatternsFormController {
         linkageInput.getSelectionModel().selectedItemProperty().addListener((ChangeListener<ConditionLinkage>) (selected, oldValue, newValue) -> {
             if (newValue == ConditionLinkage.None) {
                 conditionTabs.getTabs().clear();
-                addConditionTableTab(accessPattern.getConditions().get(0));
+                addConditionTableTab(accessPattern.getConditions().stream().findFirst().get());
                 this.editConditionBox.managedProperty().unbind();
                 this.editConditionBox.visibleProperty().unbind();
                 this.editConditionBox.setVisible(false);
@@ -249,7 +250,7 @@ public class PatternsFormController {
         this.descriptionInput.setText(pattern.getDescription());
 
         // Fill choose box
-        if (pattern.getConditions().get(0).getProfileCondition() == null) {
+        if (pattern.getConditions().stream().findFirst().get().getProfileCondition() == null) {
             this.conditionTypeInput.getSelectionModel().select("Condition");
 
             for (AccessCondition condition : pattern.getConditions()) {
@@ -261,7 +262,7 @@ public class PatternsFormController {
         } else {
             this.conditionTypeInput.getSelectionModel().select("Profile");
 
-            this.profileInput.setText(pattern.getConditions().get(0).getProfileCondition().getProfile());
+            this.profileInput.setText(pattern.getConditions().stream().findFirst().get().getProfileCondition().getProfile());
         }
     }
 
@@ -416,7 +417,7 @@ public class PatternsFormController {
 
         // add entries to the table
         if (condition.getPatternCondition() != null) {
-            ObservableList<AccessPatternConditionProperty> entries = FXCollections.observableList(condition.getPatternCondition().getProperties());
+            ObservableList<AccessPatternConditionProperty> entries = FXCollections.observableList(condition.getPatternCondition().getProperties().stream().collect(Collectors.toList()));
             conditionTable.setItems(entries);
             conditionTable.refresh();
         }

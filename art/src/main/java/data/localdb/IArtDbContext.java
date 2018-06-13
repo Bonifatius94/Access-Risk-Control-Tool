@@ -3,6 +3,7 @@ package data.localdb;
 import data.entities.AccessPattern;
 import data.entities.Configuration;
 import data.entities.CriticalAccessQuery;
+import data.entities.DbUser;
 import data.entities.DbUserRole;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
@@ -61,45 +62,50 @@ public interface IArtDbContext {
     // ============================================
 
     /**
-     * This method selects all already executed ART queries from the local database.
+     * This method selects all already executed sap queries from the local database.
      * TODO: add filter option (e.g. by time: today, last week, last month, last year, all)
      *
-     * @return a list of already executed ART queries
+     * @param includeArchived determines whether archived records are also loaded
+     * @return a list of already executed sap queries
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<CriticalAccessQuery> getArtQueries() throws Exception;
+    List<CriticalAccessQuery> getSapQueries(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all configurations from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all configurations
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<Configuration> getConfigs() throws Exception;
+    List<Configuration> getConfigs(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all access patterns from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all access patterns
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<AccessPattern> getPatterns() throws Exception;
+    List<AccessPattern> getPatterns(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all whitelists from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all whitelists
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<Whitelist> getWhitelists() throws Exception;
+    List<Whitelist> getWhitelists(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all sap configurations from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all sap configurations
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<SapConfiguration> getSapConfigs() throws Exception;
+    List<SapConfiguration> getSapConfigs(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all user names of existing local database accounts and their privileges.
@@ -107,7 +113,7 @@ public interface IArtDbContext {
      * @return a list of local database users
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<String> getDatabaseUsers() throws Exception;
+    List<DbUser> getDatabaseUsers() throws Exception;
 
     // TODO: add some userful views for more complicated queries
 
@@ -214,6 +220,15 @@ public interface IArtDbContext {
     void changeUserRole(String username, DbUserRole role) throws Exception;
 
     /**
+     * This method changes the password of an existing user.
+     *
+     * @param username the name of an existing database user
+     * @param password the new password of the user
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    void changePassword(String username, String password) throws Exception;
+
+    /**
      * This method deletes an existing database user.
      *
      * @param username the name of the user to delete
@@ -232,6 +247,7 @@ public interface IArtDbContext {
      * @param password the password of the new user
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    boolean switchUser(String username, String password) throws Exception;
+    @Deprecated
+    void switchUser(String username, String password) throws Exception;
 
 }

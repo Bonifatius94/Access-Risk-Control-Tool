@@ -105,12 +105,12 @@ public class AccessPatternExportHelper {
      */
     private void writeCondition(Sheet sheet, AccessCondition condition, boolean isComplex) {
 
-        if (condition.getType() == AccessConditionType.ProfileCondition) {
+        if (condition.getType() == AccessConditionType.Profile) {
 
             // write auth profile condition
             writeAuthProfileCondition(sheet, condition.getProfileCondition(), isComplex);
 
-        } else if (condition.getType() == AccessConditionType.PatternCondition) {
+        } else if (condition.getType() == AccessConditionType.Pattern) {
 
             // write auth profile condition
             writeAuthPatternCondition(sheet, condition.getPatternCondition(), isComplex);

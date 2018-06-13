@@ -11,26 +11,26 @@ import io.msoffice.excel.WhitelistImportHelper;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import sap.SapConnector;
 
+@SuppressWarnings("all")
 public class SapTest {
 
     @Test
+    @Disabled
     public void testSapQuery() {
+
+        boolean ret = false;
 
         // init user credentials
         String username = "GROUP_11";
         String password = "Wir sind das beste Team!";
 
         // init sap settings (here: test server data)
-        SapConfiguration sapConfig = new SapConfiguration();
-        sapConfig.setServerDestination("ec2-54-209-137-85.compute-1.amazonaws.com");
-        sapConfig.setSysNr("00");
-        sapConfig.setClient("001");
-        sapConfig.setLanguage("EN");
-        sapConfig.setPoolCapacity("0");
+        SapConfiguration sapConfig = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "some description", "00", "001", "EN", "0");
 
         try {
 
@@ -54,19 +54,18 @@ public class SapTest {
             System.out.println("SAP query results:");
             query.getEntries().forEach(x -> System.out.println(x));
 
-            assert(
+            ret =
                 query.getSapConfig().equals(sapConfig)
-                    && query.getConfig().equals(config)
-                    && query.getConfig().getWhitelist().equals(whitelist)
-                    && query.getConfig().getPatterns().containsAll(patterns)
-                    && query.getEntries().size() == 24
-
-                // TODO: add code to check data equality of critical access entries
-            );
+                && query.getConfig().equals(config)
+                && query.getConfig().getWhitelist().equals(whitelist)
+                && query.getConfig().getPatterns().containsAll(patterns)
+                && query.getEntries().size() == 24;
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        assert(ret);
     }
 
     /**
