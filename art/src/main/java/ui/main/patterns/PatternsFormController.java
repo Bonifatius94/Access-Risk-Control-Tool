@@ -6,12 +6,16 @@ import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.JFXTextField;
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
+import data.entities.AccessPatternCondition;
 import data.entities.AccessPatternConditionProperty;
 import data.entities.ConditionLinkage;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -19,12 +23,14 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -85,7 +91,7 @@ public class PatternsFormController {
     private JFXTabPane conditionTabs;
 
     @FXML
-    private JFXButton addPropertyButton;
+    private JFXButton applyPropertyChanges;
 
     @FXML
     private HBox editConditionBox;
@@ -237,7 +243,6 @@ public class PatternsFormController {
      * @param pattern the selected pattern
      */
     public void giveSelectedAccessPattern(AccessPattern pattern) {
-
         this.accessPattern = pattern;
 
         this.useCaseIdInput.setText(pattern.getUsecaseId());
@@ -336,6 +341,9 @@ public class PatternsFormController {
      * Saves the changes to the database.
      */
     public void saveChanges() {
+        this.accessPattern.setUsecaseId(this.useCaseIdInput.getText());
+        this.accessPattern.setDescription(this.descriptionInput.getText());
+
         System.out.println(this.accessPattern);
     }
 
@@ -414,7 +422,7 @@ public class PatternsFormController {
         }
 
         // create add button
-        JFXButton addButton = new JFXButton(bundle.getString("add"));
+        JFXButton addButton = new JFXButton();
         addButton.setOnAction(event -> {
             conditionTable.getItems().add(new AccessPatternConditionProperty());
             conditionTable.requestFocus();
@@ -422,6 +430,12 @@ public class PatternsFormController {
             conditionTable.getFocusModel().focus(conditionTable.getItems().size() - 1);
             conditionTable.scrollTo(conditionTable.getItems().size() - 1);
         });
+        MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.PLUS);
+        addButton.setGraphic(view);
+        addButton.setTooltip(new Tooltip(bundle.getString("addProperty")));
+        addButton.getStyleClass().add("round-button");
+        addButton.setMinHeight(30);
+        addButton.setPrefHeight(30);
 
         // disable button on 10 entries
         addButton.disableProperty().bind(Bindings.size(conditionTable.getItems()).isEqualTo(10));
@@ -435,11 +449,12 @@ public class PatternsFormController {
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
         buttonBox.getChildren().addAll(warningTextItemLimit, addButton);
         buttonBox.setSpacing(20);
+        buttonBox.setPadding(new Insets(0, 20, 0, 0));
         HBox.setHgrow(buttonBox, Priority.ALWAYS);
 
         // wrapper for everything
         VBox wrapper = new VBox();
-        wrapper.setSpacing(20);
+        wrapper.setSpacing(15);
 
         // add everything to wrapper
         wrapper.getChildren().addAll(conditionTable, buttonBox);
@@ -461,7 +476,7 @@ public class PatternsFormController {
      */
     public void editConditionProperty() {
 
-        if (authObjectInput.validate() && authFieldInput.validate() && authFieldValue1Input.validate()) {
+        if (selectedProperty != null && authObjectInput.validate() && authFieldInput.validate() && authFieldValue1Input.validate()) {
 
             // store all the new values from the textFields
             selectedProperty.setAuthObject(authObjectInput.getText());

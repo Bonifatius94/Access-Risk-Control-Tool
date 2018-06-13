@@ -26,6 +26,7 @@ public class ButtonCell<S> extends TableCell<S, JFXButton> {
 
         MaterialDesignIconView view = new MaterialDesignIconView(icon);
         this.actionButton = new JFXButton(null, view);
+        this.actionButton.setMinSize(30, 30);
         this.actionButton.setOnAction((ActionEvent e) -> {
             function.apply(getCurrentItem());
         });

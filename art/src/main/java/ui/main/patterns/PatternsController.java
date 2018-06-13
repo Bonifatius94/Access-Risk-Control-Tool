@@ -17,6 +17,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -61,6 +62,9 @@ public class PatternsController {
             });
             return row;
         });
+
+        // set multiple editable
+        patternsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         // test the table with data from the Example - Zugriffsmuster.xlsx file
         try {
@@ -149,10 +153,11 @@ public class PatternsController {
     public void cloneAction() {
         if (patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
             AccessPattern clonedPattern = patternsTable.getSelectionModel().getSelectedItem();
-            patternsTable.getItems().add(clonedPattern);
+            patternsTable.getItems().add(0, clonedPattern);
+            patternsTable.getSelectionModel().select(clonedPattern);
+            patternsTable.scrollTo(clonedPattern);
             patternsTable.refresh();
         }
-
     }
 
     /**
@@ -169,8 +174,15 @@ public class PatternsController {
      */
     public void deleteAction() {
         if (patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
-            patternsTable.getItems().remove(patternsTable.getSelectionModel().getSelectedItem());
+            patternsTable.getItems().removeAll(patternsTable.getSelectionModel().getSelectedItems());
             patternsTable.refresh();
         }
+    }
+
+    /**
+     * Opens the modal dialog to create a new item.
+     */
+    public void addAction() {
+        editAccessPattern(null);
     }
 }

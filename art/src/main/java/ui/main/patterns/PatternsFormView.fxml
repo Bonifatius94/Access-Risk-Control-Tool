@@ -67,7 +67,8 @@
                             <Tooltip text="%addCondition"/>
                         </tooltip>
                     </JFXButton>
-                    <JFXButton fx:id="deleteSelectedTableTabButton" styleClass="warning-button, round-button" onAction="#deleteSelectedTableTab" prefHeight="30">
+                    <JFXButton fx:id="deleteSelectedTableTabButton" styleClass="warning-button, round-button"
+                               onAction="#deleteSelectedTableTab" prefHeight="30">
                         <graphic>
                             <MaterialDesignIconView glyphName="MINUS"/>
                         </graphic>
@@ -99,34 +100,37 @@
                         </validators>
                     </JFXTextField>
                 </VBox>
-                <HBox HBox.hgrow="ALWAYS" spacing="30">
-                    <JFXTextField fx:id="authFieldValue1Input" promptText="%authFieldValue1" minWidth="150"
-                                  maxWidth="300" HBox.hgrow="ALWAYS" >
-                        <validators>
-                            <RequiredFieldValidator message="%required">
-                                <MaterialDesignIconView glyphName="ALERT"/>
-                            </RequiredFieldValidator>
-                        </validators>
-                    </JFXTextField>
-                    <JFXTextField fx:id="authFieldValue2Input" promptText="%authFieldValue2" minWidth="150"
-                                  maxWidth="300" HBox.hgrow="ALWAYS" >
-                        <validators>
-                            <RequiredFieldValidator message="%required">
-                                <MaterialDesignIconView glyphName="ALERT"/>
-                            </RequiredFieldValidator>
-                        </validators>
-                    </JFXTextField>
-                </HBox>
-                <HBox HBox.hgrow="ALWAYS" spacing="30">
-                    <JFXTextField fx:id="authFieldValue3Input" promptText="%authFieldValue3" minWidth="150"
-                                  maxWidth="300" HBox.hgrow="ALWAYS" >
-                    </JFXTextField>
-                    <JFXTextField fx:id="authFieldValue4Input" promptText="%authFieldValue4" minWidth="150"
-                                  maxWidth="300" HBox.hgrow="ALWAYS" >
-                    </JFXTextField>
-                </HBox>
+                <VBox HBox.hgrow="ALWAYS" spacing="35">
+                    <HBox HBox.hgrow="ALWAYS" spacing="30">
+                        <JFXTextField fx:id="authFieldValue1Input" promptText="%authFieldValue1" minWidth="150"
+                                      maxWidth="300" HBox.hgrow="ALWAYS">
+                            <validators>
+                                <RequiredFieldValidator message="%required">
+                                    <MaterialDesignIconView glyphName="ALERT"/>
+                                </RequiredFieldValidator>
+                            </validators>
+                        </JFXTextField>
+                        <JFXTextField fx:id="authFieldValue2Input" promptText="%authFieldValue2" minWidth="150"
+                                      maxWidth="300" HBox.hgrow="ALWAYS">
+                            <validators>
+                                <RequiredFieldValidator message="%required">
+                                    <MaterialDesignIconView glyphName="ALERT"/>
+                                </RequiredFieldValidator>
+                            </validators>
+                        </JFXTextField>
+                    </HBox>
+                    <HBox HBox.hgrow="ALWAYS" spacing="30">
+                        <JFXTextField fx:id="authFieldValue3Input" promptText="%authFieldValue3" minWidth="150"
+                                      maxWidth="300" HBox.hgrow="ALWAYS">
+                        </JFXTextField>
+                        <JFXTextField fx:id="authFieldValue4Input" promptText="%authFieldValue4" minWidth="150"
+                                      maxWidth="300" HBox.hgrow="ALWAYS">
+                        </JFXTextField>
+                    </HBox>
+                </VBox>
                 <HBox alignment="CENTER_RIGHT">
-                    <JFXButton onAction="#editConditionProperty" prefHeight="40" prefWidth="40" styleClass="round-button">
+                    <JFXButton onAction="#editConditionProperty" prefHeight="30" prefWidth="30"
+                               styleClass="round-button" fx:id="applyPropertyChanges">
                         <graphic>
                             <MaterialDesignIconView glyphName="CHECK"/>
                         </graphic>
@@ -140,11 +144,23 @@
         <Separator/>
         <HBox HBox.hgrow="ALWAYS">
             <HBox alignment="BASELINE_LEFT" HBox.hgrow="ALWAYS">
-                <JFXButton text="%revert" onAction="#resetForm"></JFXButton>
+                <JFXButton text="%revert" onAction="#resetForm">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="UNDO_VARIANT"/>
+                    </graphic>
+                </JFXButton>
             </HBox>
             <HBox spacing="20" alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS">
-                <JFXButton onAction="#saveChanges" prefHeight="35" prefWidth="75" text="%save"/>
-                <JFXButton onAction="#close" prefHeight="35" prefWidth="75" text="%cancel"/>
+                <JFXButton onAction="#saveChanges" prefWidth="120" text="%save">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
+                    </graphic>
+                </JFXButton>
+                <JFXButton onAction="#close" prefWidth="120" text="%cancel">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="CLOSE"/>
+                    </graphic>
+                </JFXButton>
             </HBox>
         </HBox>
     </VBox>
