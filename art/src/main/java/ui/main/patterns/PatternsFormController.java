@@ -6,17 +6,14 @@ import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.JFXTextField;
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
-import data.entities.AccessPatternCondition;
 import data.entities.AccessPatternConditionProperty;
 import data.entities.ConditionLinkage;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -26,12 +23,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -95,10 +88,16 @@ public class PatternsFormController {
     private JFXButton addPropertyButton;
 
     @FXML
-    private HBox addConditionBox;
+    private HBox editConditionBox;
+
+    @FXML
+    private JFXButton deleteSelectedTableTabButton;
+
+    @FXML
+    private Label atLeastOneCondWarning;
+
 
     private AccessPattern accessPattern;
-
     private TableView selectedTable;
     private AccessPatternConditionProperty selectedProperty;
 
@@ -116,8 +115,12 @@ public class PatternsFormController {
         this.conditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
         this.linkageBox.managedProperty().bind(this.conditionBox.visibleProperty());
         this.linkageBox.visibleProperty().bind(this.conditionBox.visibleProperty());
-        this.addConditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
-        this.addConditionBox.visibleProperty().bind(this.conditionBox.visibleProperty());
+        this.editConditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
+        this.editConditionBox.visibleProperty().bind(this.conditionBox.visibleProperty());
+
+        // don't allow less than 1 tab
+        deleteSelectedTableTabButton.disableProperty().bind(Bindings.size(conditionTabs.getTabs()).isEqualTo(1));
+        atLeastOneCondWarning.visibleProperty().bind(Bindings.size(conditionTabs.getTabs()).isEqualTo(1));
 
         // initialize condition type combo box component
         initializeConditionTypeComboBox();
@@ -125,6 +128,8 @@ public class PatternsFormController {
         initializeValidation();
 
         initializeLinkageInput();
+
+
     }
 
     /**
@@ -134,7 +139,16 @@ public class PatternsFormController {
         linkageInput.getItems().setAll(ConditionLinkage.None, ConditionLinkage.And, ConditionLinkage.Or);
 
         linkageInput.getSelectionModel().selectedItemProperty().addListener((ChangeListener<ConditionLinkage>) (selected, oldValue, newValue) -> {
-            // TODO: if Linkage is NONE, only one condition is allowed
+            if (newValue == ConditionLinkage.None) {
+                conditionTabs.getTabs().clear();
+                addConditionTableTab(accessPattern.getConditions().get(0));
+                this.editConditionBox.managedProperty().unbind();
+                this.editConditionBox.visibleProperty().unbind();
+                this.editConditionBox.setVisible(false);
+            } else {
+                this.editConditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
+                this.editConditionBox.visibleProperty().bind(this.conditionBox.visibleProperty());
+            }
         });
     }
 
@@ -304,8 +318,23 @@ public class PatternsFormController {
         this.addConditionTableTab(new AccessCondition());
     }
 
+    /**
+     * Deletes the selected Tab from the conditionTabs and removes its items from the AccessPattern.
+     */
     public void deleteSelectedTableTab() {
+
+        // remove items from AccessPattern
+        this.selectedTable.getItems().clear();
+
+        // remove the tab from the conditionTabs
         this.conditionTabs.getTabs().remove(this.conditionTabs.getSelectionModel().getSelectedItem());
+
+        // rename tabs to after deleting so no numbers are left out
+        int i = 0;
+        for (Tab tab : this.conditionTabs.getTabs()) {
+            tab.setText("Condition " + ++i);
+        }
+
     }
 
     /**
@@ -445,6 +474,11 @@ public class PatternsFormController {
         Tab tab = new Tab("Condition " + (this.conditionTabs.getTabs().size() + 1));
         tab.setContent(wrapper);
 
+        // "bind" the table to the tab
+        tab.setOnSelectionChanged((event) -> {
+            this.selectedTable = conditionTable;
+        });
+
         this.conditionTabs.getTabs().add(tab);
     }
 
@@ -453,16 +487,18 @@ public class PatternsFormController {
      */
     public void editConditionProperty() {
 
-        // create a new property which stores all the new values from the textFields
-        AccessPatternConditionProperty newProperty = new AccessPatternConditionProperty();
+        if (authObjectInput.validate() && authFieldInput.validate() && authFieldValue1Input.validate()) {
 
-        selectedProperty.setAuthObject(authObjectInput.getText());
-        selectedProperty.setAuthObjectProperty(authFieldInput.getText());
-        selectedProperty.setValue1(authFieldValue1Input.getText());
-        selectedProperty.setValue2(authFieldValue2Input.getText());
-        selectedProperty.setValue3(authFieldValue3Input.getText());
-        selectedProperty.setValue4(authFieldValue4Input.getText());
+            // store all the new values from the textFields
+            selectedProperty.setAuthObject(authObjectInput.getText());
+            selectedProperty.setAuthObjectProperty(authFieldInput.getText());
+            selectedProperty.setValue1(authFieldValue1Input.getText());
+            selectedProperty.setValue2(authFieldValue2Input.getText());
+            selectedProperty.setValue3(authFieldValue3Input.getText());
+            selectedProperty.setValue4(authFieldValue4Input.getText());
 
-        this.selectedTable.refresh();
+            this.selectedTable.refresh();
+        }
+
     }
 }

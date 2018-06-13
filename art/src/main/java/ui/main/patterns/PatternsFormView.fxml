@@ -58,8 +58,8 @@
         <HBox HBox.hgrow="ALWAYS" fx:id="conditionBox" visible="false" spacing="30" alignment="CENTER">
             <JFXTabPane fx:id="conditionTabs" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"/>
             <VBox spacing="20" alignment="TOP_CENTER">
-                <HBox fx:id="addConditionBox" visible="false" alignment="BASELINE_LEFT" spacing="20">
-                    <JFXButton onAction="#addEmptyConditionTableTab" prefHeight="30">
+                <HBox fx:id="editConditionBox" visible="false" alignment="BASELINE_LEFT" spacing="20">
+                    <JFXButton onAction="#addEmptyConditionTableTab" prefHeight="30" styleClass="round-button">
                         <graphic>
                             <MaterialDesignIconView glyphName="PLUS"/>
                         </graphic>
@@ -67,7 +67,7 @@
                             <Tooltip text="%addCondition"/>
                         </tooltip>
                     </JFXButton>
-                    <JFXButton styleClass="warning-button" onAction="#deleteSelectedTableTab" prefHeight="30">
+                    <JFXButton fx:id="deleteSelectedTableTabButton" styleClass="warning-button, round-button" onAction="#deleteSelectedTableTab" prefHeight="30">
                         <graphic>
                             <MaterialDesignIconView glyphName="MINUS"/>
                         </graphic>
@@ -75,6 +75,7 @@
                             <Tooltip text="%deleteCondition"/>
                         </tooltip>
                     </JFXButton>
+                    <Label fx:id="atLeastOneCondWarning" text="%atLeastOneCondWarning" visible="false"/>
                 </HBox>
                 <Separator/>
                 <Label text="%conditionPropertiesTitle">
@@ -100,7 +101,7 @@
                 </VBox>
                 <HBox HBox.hgrow="ALWAYS" spacing="30">
                     <JFXTextField fx:id="authFieldValue1Input" promptText="%authFieldValue1" minWidth="150"
-                                  maxWidth="300">
+                                  maxWidth="300" HBox.hgrow="ALWAYS" >
                         <validators>
                             <RequiredFieldValidator message="%required">
                                 <MaterialDesignIconView glyphName="ALERT"/>
@@ -108,7 +109,7 @@
                         </validators>
                     </JFXTextField>
                     <JFXTextField fx:id="authFieldValue2Input" promptText="%authFieldValue2" minWidth="150"
-                                  maxWidth="300">
+                                  maxWidth="300" HBox.hgrow="ALWAYS" >
                         <validators>
                             <RequiredFieldValidator message="%required">
                                 <MaterialDesignIconView glyphName="ALERT"/>
@@ -118,14 +119,21 @@
                 </HBox>
                 <HBox HBox.hgrow="ALWAYS" spacing="30">
                     <JFXTextField fx:id="authFieldValue3Input" promptText="%authFieldValue3" minWidth="150"
-                                  maxWidth="300">
+                                  maxWidth="300" HBox.hgrow="ALWAYS" >
                     </JFXTextField>
                     <JFXTextField fx:id="authFieldValue4Input" promptText="%authFieldValue4" minWidth="150"
-                                  maxWidth="300">
+                                  maxWidth="300" HBox.hgrow="ALWAYS" >
                     </JFXTextField>
                 </HBox>
                 <HBox alignment="CENTER_RIGHT">
-                    <JFXButton onAction="#editConditionProperty" text="%ok"/>
+                    <JFXButton onAction="#editConditionProperty" prefHeight="40" prefWidth="40" styleClass="round-button">
+                        <graphic>
+                            <MaterialDesignIconView glyphName="CHECK"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%apply"/>
+                        </tooltip>
+                    </JFXButton>
                 </HBox>
             </VBox>
         </HBox>

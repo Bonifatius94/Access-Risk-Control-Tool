@@ -59,6 +59,10 @@
     -fx-background-color: -fx-error;
 }
 
+.round-button {
+    -fx-background-radius: 100%;
+}
+
 .warning-button:hover, .warning-button:focused {
     -fx-background-color: derive(-fx-error, 30%);
 }
@@ -327,7 +331,7 @@ alternative design with separators left and right of complete header bar
 
 .table-view .jfx-button {
     -fx-padding: 8;
-    -fx-background-radius: 50%;
+    -fx-background-radius: 100%;
 }
 
 /* odd rows */
@@ -342,7 +346,7 @@ alternative design with separators left and right of complete header bar
 }
 
 /* remove blue border from first entry of tableView on focus */
-.table-view .table-row-cell:focused {
+.table-view:focused .table-row-cell:focused {
     -fx-background-color: -fx-select;
     -fx-background-insets: 0, 0 0 1 0;
 }
