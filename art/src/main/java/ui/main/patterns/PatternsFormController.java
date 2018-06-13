@@ -288,32 +288,6 @@ public class PatternsFormController {
         authFieldValue1Input.validate();
     }
 
-    /**
-     * Opens a modal dialog for adding a new AccessPatternConditionProperty.
-     */
-    public void openCreateAccessPatternConditionProperty() {
-
-        try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("AccessConditionPropertyFormView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
-
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 300, 500);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public void addEmptyConditionTableTab() {
         this.addConditionTableTab(new AccessCondition());
     }
