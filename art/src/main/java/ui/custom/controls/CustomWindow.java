@@ -11,6 +11,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -140,6 +142,12 @@ public class CustomWindow extends VBox {
      */
     private void initControlsForCanMaximizeMode() {
 
+        // init application icon
+        Image img = new Image(getClass().getResourceAsStream("/icons/art_64.png"));
+        ImageView icon = new ImageView(img);
+        icon.setFitWidth(20);
+        icon.setFitHeight(20);
+
         // init label for headline
         lblHeadline = new Label();
         lblHeadline.getStyleClass().addAll("windowLabel");
@@ -172,7 +180,7 @@ public class CustomWindow extends VBox {
 
         // init container with horizontal orientation and apply children to it
         hbHeaderContainer = new HBox();
-        hbHeaderContainer.getChildren().addAll(lblHeadline, regFiller, btnMinimize, btnMaximize, btnClose);
+        hbHeaderContainer.getChildren().addAll(icon, lblHeadline, regFiller, btnMinimize, btnMaximize, btnClose);
     }
 
     /**
