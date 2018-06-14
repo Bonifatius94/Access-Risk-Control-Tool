@@ -112,4 +112,96 @@ public class ConfigurationTest {
         assert(ret);
     }
 
+    @Test
+    public void testUpdateConfigurationWithArchiving() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query config
+            Configuration activeConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
+            Configuration archivedConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
+
+            // apply changes to configs
+            AccessPattern patternToRemove = activeConfig.getPatterns().stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
+            activeConfig.getPatterns().remove(patternToRemove);
+
+            final String newName = "a new name";
+            final String newDescription = "a new description";
+            activeConfig.setName(newName);
+            activeConfig.setDescription(newDescription);
+
+            // update configs
+            context.updateConfig(activeConfig);
+            context.updateConfig(archivedConfig);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert(false);
+    }
+
+    @Test
+    public void testDeleteConfiguration() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query config
+            Configuration activeConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
+            Configuration archivedConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
+
+            // apply changes to configs
+            AccessPattern patternToRemove = activeConfig.getPatterns().stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
+            activeConfig.getPatterns().remove(patternToRemove);
+
+            final String newName = "a new name";
+            final String newDescription = "a new description";
+            activeConfig.setName(newName);
+            activeConfig.setDescription(newDescription);
+
+            // update configs
+            context.updateConfig(activeConfig);
+            context.updateConfig(archivedConfig);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert(false);
+    }
+
+    @Test
+    public void testDeleteConfigurationWithArchiving() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query config
+            Configuration activeConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
+            Configuration archivedConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
+
+            // apply changes to configs
+            AccessPattern patternToRemove = activeConfig.getPatterns().stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
+            activeConfig.getPatterns().remove(patternToRemove);
+
+            final String newName = "a new name";
+            final String newDescription = "a new description";
+            activeConfig.setName(newName);
+            activeConfig.setDescription(newDescription);
+
+            // update configs
+            context.updateConfig(activeConfig);
+            context.updateConfig(archivedConfig);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert(false);
+    }
 }

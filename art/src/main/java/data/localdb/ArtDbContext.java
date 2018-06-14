@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import sun.security.krb5.Config;
 
 public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
@@ -296,7 +297,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             updateRecord(original);
 
             // request new id for config to update
-            config.setId(null);
+            Configuration newConfig = new Configuration(config);
+
+            // TODO: update references (foreign keys ...)
+
+            // insert new config into database
             insertRecord(config);
 
         } else {
@@ -556,13 +561,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             updateRecord(config);
 
         } else {
-
-            // delete the sap config references in all queries
-            getSapQueries(true).stream().filter(x -> x.getSapConfig().getId().equals(config.getId()))
-                .forEach(x -> {
-                    x.setSapConfig(null);
-                    updateRecord(x);
-                });
 
             deleteRecord(config);
         }

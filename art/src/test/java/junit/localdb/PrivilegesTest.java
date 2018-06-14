@@ -24,6 +24,8 @@ public class PrivilegesTest {
         assert(testPrivilegesGetDatabaseUsers("TestDataAnalyst", "foobar", false));
         assert(testPrivilegesGetDatabaseUsers("TestViewer", "foobar", false));
 
+        assert(false);
+
         // TODO: add calls for missing database operations here ...
     }
 

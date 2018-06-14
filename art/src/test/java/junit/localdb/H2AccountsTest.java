@@ -75,6 +75,8 @@ public class H2AccountsTest {
     public void testChangePassword() {
 
         // TODO: implement test
+
+        assert(false);
     }
 
     @Test
