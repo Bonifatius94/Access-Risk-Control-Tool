@@ -4,8 +4,10 @@ import com.jfoenix.controls.JFXButton;
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 
+import data.entities.AccessPatternConditionProperty;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import io.msoffice.excel.AccessPatternImportHelper;
 
 import java.util.List;
@@ -25,6 +27,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
@@ -54,6 +58,7 @@ public class PatternsController {
      */
     @FXML
     public void initialize() {
+
         initializeTableColumns();
 
         /* catch row double click */
@@ -68,6 +73,23 @@ public class PatternsController {
             return row;
         });
 
+        // load the ResourceBundle
+        ResourceBundle bundle = ResourceBundle.getBundle("lang");
+
+        // replace Placeholder of PatternsTable with addButton
+        JFXButton addButton = new JFXButton();
+        addButton.setOnAction(event -> {
+            addAction();
+        });
+        MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.PLUS);
+        addButton.setGraphic(view);
+        addButton.setTooltip(new Tooltip(bundle.getString("firstPattern")));
+        addButton.getStyleClass().add("round-button");
+        addButton.setMinHeight(30);
+        addButton.setPrefHeight(30);
+
+        patternsTable.setPlaceholder(addButton);
+
         // set multiple editable
         patternsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -81,13 +103,12 @@ public class PatternsController {
             patternsTable.setItems(list);
             patternsTable.refresh();
 
-            itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "), Bindings.size(patternsTable.getItems()).asString("%s selected")));
+            // show an item count (+ selected)
+            itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "), Bindings.size(patternsTable.getItems()).asString("%s " + bundle.getString("selected"))));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
     /**
