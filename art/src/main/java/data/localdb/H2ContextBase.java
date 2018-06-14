@@ -3,6 +3,10 @@ package data.localdb;
 import java.io.Closeable;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -217,6 +221,81 @@ public abstract class H2ContextBase implements Closeable {
                 throw ex;
             }
         }
+    }
+
+    // +++++++++++++++++++++++++++++++
+    // ++      execute script       ++
+    // +++++++++++++++++++++++++++++++
+
+    /**
+     * This method executes a sql script. Therefore it gets all statement from the script and executes them in one transaction.
+     *
+     * @param filePath the file path of the script to be executed
+     * @throws Exception caused by file errors while reading the script or while executing the sql commands
+     */
+    public void executeScript(String filePath) throws Exception {
+
+        List<String> sqlCommands = getCommands(filePath);
+
+        try (Session session = sessionFactory.openSession()) {
+
+            Transaction transaction = null;
+
+            try {
+
+                transaction = session.beginTransaction();
+                sqlCommands.forEach(sql -> session.createNativeQuery(sql).executeUpdate());
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
+            }
+        }
+    }
+
+    private List<String> getCommands(String filePath) throws Exception {
+
+        StringBuilder builder = new StringBuilder();
+
+        // get all line from script file
+        Files.readAllLines(Paths.get(filePath)).stream()
+            // remove line breaks
+            .map(x -> x.replace("\r\n", " "))
+            // remove rest of line after a line comment
+            .map(x -> x.contains("--") ? x.substring(0, x.indexOf("--")) : x)
+            // append everything to string builder
+            .forEach(x -> builder.append(x));
+
+        List<String> commands = new ArrayList<>();
+        int quotesCount = 0;
+        int start = 0;
+
+        for (int i = 0; i < builder.length(); i++) {
+
+            char c = builder.charAt(i);
+
+            // increase quotes count when a single quote occurs
+            if (c == '\'') {
+
+                quotesCount++;
+
+            // check if the end of a command is reached (when quotes count is not even, the semicolon is part of a quote text)
+            } else if (c == ';' && quotesCount % 2 == 0) {
+
+                // get the command, apply it to the commands list and reset all temporary variables
+                String command = builder.substring(start, i + 1);
+                commands.add(command);
+                quotesCount = 0;
+                start = i + 1;
+            }
+        }
+
+        return commands;
     }
 
     // +++++++++++++++++++++++++++++++

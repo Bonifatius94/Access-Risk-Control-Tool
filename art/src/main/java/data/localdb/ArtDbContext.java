@@ -21,6 +21,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
@@ -86,6 +87,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         // apply scripts that are executed after a new database file has been created by hibernate
         config.setProperty("hibernate.hbm2ddl.import_files", "scripts/create_views.sql, scripts/create_roles.sql");
+
+        // configure hibernate logging level
+        java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.SEVERE);
+
+        // TODO: remove all 'hibernate.hbm2ddl' settings in production builds
     }
 
     // ============================================
@@ -477,8 +483,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         if (archive) {
 
+            // archive pattern
             pattern.setArchived(true);
             updateRecord(pattern);
+
+            // TODO: copy non-archived configs referencing the pattern and remove pattern there
 
         } else {
 

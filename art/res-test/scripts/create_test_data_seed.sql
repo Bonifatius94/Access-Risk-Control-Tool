@@ -1,4 +1,8 @@
 
+-- =====================================================================================
+--             C R E A T E      T E S T     D A T A     S E E D
+-- =====================================================================================
+
 -- ==============================
 --             users
 -- ==============================
@@ -16,7 +20,7 @@ GRANT Viewer TO TestViewer;
 -- ==============================
 
 -- active whitelist
-INSERT INTO Whitelists (id, name, description, createdBy, createdAt, isArchived) VALUES (1, 'whitelist 1', 'test description', 'test', '2018-06-08T15:09:15', 0)
+INSERT INTO Whitelists (id, name, description, createdBy, createdAt, isArchived) VALUES (1, 'whitelist 1', 'test description', 'test', '2018-06-08T15:09:15', 0);
 INSERT INTO WhitelistEntries (id, whitelistId, username, usecaseId) VALUES (1, 1, '2.A', 'ZT2111_P');
 INSERT INTO WhitelistEntries (id, whitelistId, username, usecaseId) VALUES (2, 1, '2.A', 'ZT2112_F');
 INSERT INTO WhitelistEntries (id, whitelistId, username, usecaseId) VALUES (3, 1, '1.A', 'ZT2111_P');
@@ -166,6 +170,10 @@ INSERT INTO CriticalAccessEntries (ID, USERNAME, VIOLATEDPATTERNID, QUERYID) VAL
 INSERT INTO CriticalAccessQueries (ID, CONFIGID, SAPCONFIGID, CREATEDAT, CREATEDBY , ISARCHIVED) VALUES (2, 3, 2, '2018-06-08T15:09:15', 'test', 0);
 INSERT INTO CriticalAccessEntries (ID, USERNAME, VIOLATEDPATTERNID, QUERYID) VALUES (3, 'foo123', 4, 2);
 INSERT INTO CriticalAccessEntries (ID, USERNAME, VIOLATEDPATTERNID, QUERYID) VALUES (4, 'foobar', 6, 2);
+
+-- test executeScript() method on H2ContextBase
+INSERT INTO CriticalAccessEntries (ID, USERNAME, VIOLATEDPATTERNID, QUERYID) -- abc
+VALUES (5, 'foobar;', 6, 2);
 
 -- ==============================
 -- authors: Marco Tröster,
