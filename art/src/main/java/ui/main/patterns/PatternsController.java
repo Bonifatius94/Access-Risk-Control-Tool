@@ -104,7 +104,8 @@ public class PatternsController {
             patternsTable.refresh();
 
             // show an item count (+ selected)
-            itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "), Bindings.size(patternsTable.getItems()).asString("%s " + bundle.getString("selected"))));
+            itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "),
+                Bindings.size(patternsTable.getItems()).asString("%s " + bundle.getString("selected"))));
 
         } catch (Exception e) {
             e.printStackTrace();

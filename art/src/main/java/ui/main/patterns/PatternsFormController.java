@@ -129,10 +129,10 @@ public class PatternsFormController {
         // set visibility of certain components according to user input
         this.profileInput.managedProperty().bind(this.profileInput.visibleProperty());
         this.conditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
-        this.linkageBox.managedProperty().bind(this.conditionBox.visibleProperty());
-        this.linkageBox.visibleProperty().bind(this.conditionBox.visibleProperty());
-        this.editConditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
-        this.editConditionBox.visibleProperty().bind(this.conditionBox.visibleProperty());
+        this.linkageBox.managedProperty().bind(Bindings.not(this.conditionBox.disableProperty()));
+        this.linkageBox.visibleProperty().bind(Bindings.not(this.conditionBox.disableProperty()));
+        this.editConditionBox.managedProperty().bind(this.conditionBox.disableProperty());
+        this.editConditionBox.disableProperty().bind(this.conditionBox.disableProperty());
 
         // deselect on tab change
         this.conditionTabs.getSelectionModel().selectedItemProperty().addListener((ov, oldTab, newTab) -> {
@@ -197,7 +197,7 @@ public class PatternsFormController {
             if (oldValue != null) {
                 switch (oldValue) {
                     case "Condition":
-                        conditionBox.setVisible(false);
+                        conditionBox.setDisable(true);
                         break;
                     case "Profile":
                         profileInput.setVisible(false);
@@ -210,7 +210,7 @@ public class PatternsFormController {
             }
             switch (newValue) {
                 case "Condition":
-                    conditionBox.setVisible(true);
+                    conditionBox.setDisable(false);
                     break;
                 case "Profile":
                     profileInput.setVisible(true);
@@ -411,7 +411,7 @@ public class PatternsFormController {
             for (TableView<AccessPatternConditionProperty> condTable : conditionTables) {
 
                 // add table if it is not empty
-                if (condTable.getItems() != null) {
+                if (condTable.getItems() != null && condTable.getItems().size() != 0) {
 
                     AccessPatternCondition patternCondition = new AccessPatternCondition();
                     AccessCondition accessCondition = new AccessCondition();
