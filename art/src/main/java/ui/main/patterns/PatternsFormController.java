@@ -156,7 +156,7 @@ public class PatternsFormController {
         initializeValidation();
 
         initializeLinkageInput();
-        
+
     }
 
     /**
@@ -169,7 +169,11 @@ public class PatternsFormController {
             if (newValue == ConditionLinkage.None) {
                 conditionTabs.getTabs().clear();
                 this.conditionTables.clear();
-                addConditionTableTab(accessPattern.getConditions().stream().findFirst().get());
+                if (accessPattern.getConditions().size() != 0) {
+                    addConditionTableTab(accessPattern.getConditions().stream().findFirst().get());
+                } else {
+                    addConditionTableTab(new AccessCondition());
+                }
                 this.editConditionBox.managedProperty().unbind();
                 this.editConditionBox.visibleProperty().unbind();
                 this.editConditionBox.setVisible(false);
@@ -266,29 +270,35 @@ public class PatternsFormController {
      */
     public void giveSelectedAccessPattern(AccessPattern pattern) {
 
-        this.accessPattern = pattern;
+        if (pattern == null) {
+            this.accessPattern = new AccessPattern();
+        } else {
+
+            // prefill the inputs
+            this.accessPattern = pattern;
+
+            this.useCaseIdInput.setText(pattern.getUsecaseId());
+            this.descriptionInput.setText(pattern.getDescription());
+
+            // Fill choose box
+            if (pattern.getConditions().stream().findFirst().get().getProfileCondition() == null) {
+                this.conditionTypeInput.getSelectionModel().select("Condition");
+
+                for (AccessCondition condition : pattern.getConditions()) {
+                    addConditionTableTab(condition);
+                }
+
+                // preselect correct linkage
+                this.linkageInput.getSelectionModel().select(pattern.getLinkage());
+            } else {
+                this.conditionTypeInput.getSelectionModel().select("Profile");
+
+                this.profileInput.setText(pattern.getConditions().stream().findFirst().get().getProfileCondition().getProfile());
+            }
+        }
 
         // save the original pattern as deep copy
-        this.originalPattern = new AccessPattern(pattern);
-
-        this.useCaseIdInput.setText(pattern.getUsecaseId());
-        this.descriptionInput.setText(pattern.getDescription());
-
-        // Fill choose box
-        if (pattern.getConditions().stream().findFirst().get().getProfileCondition() == null) {
-            this.conditionTypeInput.getSelectionModel().select("Condition");
-
-            for (AccessCondition condition : pattern.getConditions()) {
-                addConditionTableTab(condition);
-            }
-
-            // preselect correct linkage
-            this.linkageInput.getSelectionModel().select(pattern.getLinkage());
-        } else {
-            this.conditionTypeInput.getSelectionModel().select("Profile");
-
-            this.profileInput.setText(pattern.getConditions().stream().findFirst().get().getProfileCondition().getProfile());
-        }
+        this.originalPattern = new AccessPattern(this.accessPattern);
     }
 
     public void close(ActionEvent event) {
@@ -391,7 +401,7 @@ public class PatternsFormController {
         List<AccessCondition> newConditions = new ArrayList<>();
 
         // execute only if the pattern is no profile
-        if (this.accessPattern.getConditions().stream().findFirst().get().getProfileCondition() == null) {
+        if (this.conditionTypeInput.getSelectionModel().getSelectedItem().equals("Condition")) {
 
             // copy conditions to the list
             for (TableView<AccessPatternConditionProperty> condTable : conditionTables) {
@@ -425,6 +435,7 @@ public class PatternsFormController {
         this.accessPattern.setConditions(newConditions);
 
         System.out.println(this.accessPattern);
+
     }
 
     /**
