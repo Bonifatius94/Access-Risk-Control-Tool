@@ -53,45 +53,19 @@ public class PatternsController {
     @FXML
     public Label itemCount;
 
+    private ResourceBundle bundle;
+
     /**
      * Initializes the controller.
      */
     @FXML
     public void initialize() {
 
-        initializeTableColumns();
-
-        /* catch row double click */
-        patternsTable.setRowFactory(tv -> {
-            TableRow<AccessPattern> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                    AccessPattern pattern = row.getItem();
-                    editAccessPattern(pattern);
-                }
-            });
-            return row;
-        });
-
         // load the ResourceBundle
-        ResourceBundle bundle = ResourceBundle.getBundle("lang");
+        bundle = ResourceBundle.getBundle("lang");
 
-        // replace Placeholder of PatternsTable with addButton
-        JFXButton addButton = new JFXButton();
-        addButton.setOnAction(event -> {
-            addAction();
-        });
-        MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.PLUS);
-        addButton.setGraphic(view);
-        addButton.setTooltip(new Tooltip(bundle.getString("firstPattern")));
-        addButton.getStyleClass().add("round-button");
-        addButton.setMinHeight(30);
-        addButton.setPrefHeight(30);
-
-        patternsTable.setPlaceholder(addButton);
-
-        // set multiple editable
-        patternsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        // initialize the table
+        initializePatternsTable();
 
         // test the table with data from the Example - Zugriffsmuster.xlsx file
         try {
@@ -110,6 +84,40 @@ public class PatternsController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void initializePatternsTable() {
+
+        // replace Placeholder of PatternsTable with addButton
+        JFXButton addButton = new JFXButton();
+        addButton.setOnAction(event -> {
+            addAction();
+        });
+        MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.PLUS);
+        addButton.setGraphic(view);
+        addButton.setTooltip(new Tooltip(bundle.getString("firstPattern")));
+        addButton.getStyleClass().add("round-button");
+        addButton.setMinHeight(30);
+        addButton.setPrefHeight(30);
+
+        patternsTable.setPlaceholder(addButton);
+
+        // catch row double click
+        patternsTable.setRowFactory(tv -> {
+            TableRow<AccessPattern> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    AccessPattern pattern = row.getItem();
+                    editAccessPattern(pattern);
+                }
+            });
+            return row;
+        });
+
+        // set selection mode to MULTIPLE
+        patternsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        initializeTableColumns();
     }
 
     /**
