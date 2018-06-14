@@ -110,7 +110,7 @@ public class PatternsFormController {
     private AccessPattern originalPattern;
 
     private List<TableView> conditionTables;
-    private TableView selectedTable;
+    private TableView<AccessPatternConditionProperty> selectedTable;
     private AccessPatternConditionProperty selectedProperty;
 
 
@@ -140,6 +140,9 @@ public class PatternsFormController {
 
             if (selectedTable != null) {
                 this.selectedTable.getSelectionModel().clearSelection();
+
+                // remove all empty properties from the list
+                this.selectedTable.getItems().removeAll(this.selectedTable.getItems().stream().filter(x -> x.getAuthObject() == null).collect(Collectors.toList()));
             }
 
             // reset inputs
@@ -396,6 +399,7 @@ public class PatternsFormController {
         // replace the useCaseId and the description with the text field values
         this.accessPattern.setUsecaseId(this.useCaseIdInput.getText());
         this.accessPattern.setDescription(this.descriptionInput.getText());
+        this.accessPattern.setLinkage(linkageInput.getValue());
 
         // store the condition in here
         List<AccessCondition> newConditions = new ArrayList<>();
@@ -554,7 +558,7 @@ public class PatternsFormController {
         wrapper.getChildren().addAll(conditionTable, buttonBox);
 
         // add table to tab and add tab to TabPane
-        Tab tab = new Tab("Condition " + (this.conditionTabs.getTabs().size() + 1));
+        Tab tab = new Tab("COND " + (this.conditionTabs.getTabs().size() + 1));
         tab.setContent(wrapper);
 
         // "bind" the table to the tab
