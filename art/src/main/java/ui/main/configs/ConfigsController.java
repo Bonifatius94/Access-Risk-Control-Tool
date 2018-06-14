@@ -1,24 +1,24 @@
 package ui.main.configs;
 
 import com.jfoenix.controls.JFXButton;
-import data.entities.AccessCondition;
-import data.entities.AccessPattern;
+
 import data.entities.Configuration;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+
+import java.util.ResourceBundle;
+
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
-import ui.custom.controls.ButtonCell;
 
-import java.util.ResourceBundle;
-import java.util.Set;
+import ui.custom.controls.ButtonCell;
 
 
 public class ConfigsController {
@@ -57,7 +57,7 @@ public class ConfigsController {
     }
 
     /**
-     * Initializes the patterns table.
+     * Initializes the configs table.
      */
     private void initializeConfigsTable() {
 
@@ -165,6 +165,7 @@ public class ConfigsController {
 
     /**
      * Edits the given configuration.
+     *
      * @param configuration the given config
      */
     private void editConfig(Configuration configuration) {
