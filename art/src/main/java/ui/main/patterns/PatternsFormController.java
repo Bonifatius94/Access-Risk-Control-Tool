@@ -94,9 +94,6 @@ public class PatternsFormController {
     private JFXTabPane conditionTabs;
 
     @FXML
-    private JFXButton applyPropertyChanges;
-
-    @FXML
     private HBox editConditionBox;
 
     @FXML
@@ -156,8 +153,10 @@ public class PatternsFormController {
         // initialize condition type combo box component
         initializeConditionTypeComboBox();
 
+        // initializes the validation binding on textinputs
         initializeValidation();
 
+        // initialize linkage type combo box component
         initializeLinkageInput();
 
     }
@@ -221,7 +220,6 @@ public class PatternsFormController {
                     break;
             }
         });
-
     }
 
     /**
@@ -266,6 +264,7 @@ public class PatternsFormController {
         });
     }
 
+
     /**
      * Prefills the inputs with the given pattern.
      *
@@ -304,6 +303,10 @@ public class PatternsFormController {
         this.originalPattern = new AccessPattern(this.accessPattern);
     }
 
+    /**
+     * Hides the stage.
+     * @param event the given ActionEvent
+     */
     public void close(ActionEvent event) {
         (((Button) event.getSource()).getScene().getWindow()).hide();
     }

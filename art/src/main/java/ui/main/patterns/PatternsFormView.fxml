@@ -130,7 +130,7 @@
                 </VBox>
                 <HBox alignment="CENTER_RIGHT">
                     <JFXButton onAction="#editConditionProperty" prefHeight="30" prefWidth="30"
-                               styleClass="round-button" fx:id="applyPropertyChanges">
+                               styleClass="round-button">
                         <graphic>
                             <MaterialDesignIconView glyphName="CHECK"/>
                         </graphic>

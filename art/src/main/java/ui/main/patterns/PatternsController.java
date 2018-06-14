@@ -86,6 +86,9 @@ public class PatternsController {
         }
     }
 
+    /**
+     * Initializes the patterns table.
+     */
     private void initializePatternsTable() {
 
         // replace Placeholder of PatternsTable with addButton
