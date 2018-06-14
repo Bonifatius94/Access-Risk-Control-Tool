@@ -12,11 +12,13 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -43,6 +45,9 @@ public class PatternsController {
 
     @FXML
     public TableColumn<AccessPattern, JFXButton> editColumn;
+
+    @FXML
+    public Label itemCount;
 
     /**
      * Initializes the controller.
@@ -71,15 +76,18 @@ public class PatternsController {
             AccessPatternImportHelper helper = new AccessPatternImportHelper();
 
             List<AccessPattern> patterns = helper.importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
-            patterns.addAll(patterns);
             ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
 
             patternsTable.setItems(list);
             patternsTable.refresh();
 
+            itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "), Bindings.size(patternsTable.getItems()).asString("%s selected")));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
     }
 
     /**

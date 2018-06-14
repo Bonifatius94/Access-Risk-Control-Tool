@@ -328,7 +328,6 @@ alternative design with separators left and right of complete header bar
 }
 
 .table-view .table-row-cell {
-    -fx-padding: 5 0 5 0;
     -fx-border-color: TRANSPARENT;
     -fx-table-cell-border-color: TRANSPARENT;
 }
@@ -350,7 +349,6 @@ alternative design with separators left and right of complete header bar
 
 /* remove blue border from first entry of tableView on focus */
 .table-view:focused .table-row-cell:focused {
-    -fx-background-color: -fx-select;
     -fx-background-insets: 0, 0 0 1 0;
 }
 

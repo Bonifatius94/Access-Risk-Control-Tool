@@ -7,6 +7,7 @@
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import ui.custom.controls.PTableColumn?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.control.Label?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="ui.main.patterns.PatternsController"
       spacing="10">
@@ -30,6 +31,8 @@
     </TableView>
 
     <HBox alignment="BOTTOM_RIGHT" spacing="10">
+        <Label fx:id="itemCount" />
+        <Region HBox.hgrow="ALWAYS" />
         <JFXButton text="Clone" onAction="#cloneAction" prefWidth="100">
             <graphic>
                 <MaterialDesignIconView glyphName="CONTENT_COPY"/>
@@ -45,7 +48,7 @@
                 <MaterialDesignIconView glyphName="PENCIL"/>
             </graphic>
         </JFXButton>
-        <JFXButton text="Delete" onAction="#deleteAction" prefWidth="100">
+        <JFXButton text="Delete" onAction="#deleteAction" prefWidth="100" styleClass="warning-button">
             <graphic>
                 <MaterialDesignIconView glyphName="DELETE"/>
             </graphic>
