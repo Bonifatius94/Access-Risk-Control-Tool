@@ -4,7 +4,6 @@ import com.jfoenix.controls.JFXButton;
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 
-import data.entities.AccessPatternConditionProperty;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
@@ -28,7 +27,6 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
@@ -111,7 +109,7 @@ public class PatternsController {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     AccessPattern pattern = row.getItem();
-                    editAccessPattern(pattern);
+                    openAccessPatternForm(pattern);
                 }
             });
             return row;
@@ -135,7 +133,7 @@ public class PatternsController {
 
         // Add the edit column
         editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (AccessPattern accessPattern) -> {
-            editAccessPattern(accessPattern);
+            openAccessPatternForm(accessPattern);
             return accessPattern;
         }));
 
@@ -159,9 +157,9 @@ public class PatternsController {
     /**
      * Opens a modal edit dialog for the selected AccessPattern.
      *
-     * @param accessPattern the selected AccessPattern
+     * @param accessPattern the selected AccessPattern to edit, or null if a new one is created
      */
-    public void editAccessPattern(AccessPattern accessPattern) {
+    public void openAccessPatternForm(AccessPattern accessPattern) {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
@@ -176,6 +174,13 @@ public class PatternsController {
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
+
+            // set stage name
+            if (accessPattern == null) {
+                customWindow.setTitle(bundle.getString("newPatternTitle"));
+            } else {
+                customWindow.setTitle(bundle.getString("editPatternTitle"));
+            }
 
             stage.show();
 
@@ -192,7 +197,7 @@ public class PatternsController {
      * Clones the selected entry and adds it to the table.
      */
     public void cloneAction() {
-        if (patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
+        if (patternsTable.getSelectionModel().getSelectedItems().size() != 0 && patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
 
             // clone the currently selected item and add it to the table
             AccessPattern clonedPattern = patternsTable.getSelectionModel().getSelectedItem();
@@ -210,8 +215,8 @@ public class PatternsController {
      * Opens the edit dialog with the selected item.
      */
     public void editAction() {
-        if (patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
-            editAccessPattern(patternsTable.getSelectionModel().getSelectedItem());
+        if (patternsTable.getSelectionModel().getSelectedItems().size() != 0 && patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
+            openAccessPatternForm(patternsTable.getSelectionModel().getSelectedItem());
         }
     }
 
@@ -231,6 +236,6 @@ public class PatternsController {
      * Opens the modal dialog to create a new item.
      */
     public void addAction() {
-        editAccessPattern(null);
+        openAccessPatternForm(null);
     }
 }
