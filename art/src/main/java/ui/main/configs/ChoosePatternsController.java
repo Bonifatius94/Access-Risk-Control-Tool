@@ -1,9 +1,18 @@
 package ui.main.configs;
 
 import com.jfoenix.controls.JFXButton;
+
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+
+import io.msoffice.excel.AccessPatternImportHelper;
+
+import java.util.List;
+import java.util.Set;
+
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,11 +20,9 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+
 import ui.custom.controls.ButtonCell;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ChoosePatternsController {
 
@@ -37,11 +44,17 @@ public class ChoosePatternsController {
     @FXML
     public TableColumn<AccessPattern, Set<AccessCondition>> selectedPatternsTableConditionCountColumn;
 
-    private List<AccessPattern> selectedPatterns;
+    @FXML
+    public JFXButton addToSelectedButton;
+
+    @FXML
+    public JFXButton removeFromSelectedButton;
+
+    private List<AccessPattern> alreadySelectedPatterns;
 
     @FXML
     public void initialize() {
-
+        initializePatternsTables();
     }
 
     /**
@@ -53,10 +66,17 @@ public class ChoosePatternsController {
         allPatternsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         selectedPatternsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+        // bind button disabled to tables selection models
+        addToSelectedButton.disableProperty().bind(Bindings.size(allPatternsTable.getSelectionModel().getSelectedItems()).isEqualTo(0));
+        removeFromSelectedButton.disableProperty().bind(Bindings.size(selectedPatternsTable.getSelectionModel().getSelectedItems()).isEqualTo(0));
+
         initializeAllPatternsTable();
         initializeSelectedPatternsTable();
     }
 
+    /**
+     * Initializes the allPatternsTable columns.
+     */
     private void initializeAllPatternsTable() {
 
         // overwrite the column in which the number of useCases is displayed
@@ -76,6 +96,9 @@ public class ChoosePatternsController {
         allPatternsTableConditionCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
     }
 
+    /**
+     * Initializes the selectedPatternsTable columns.
+     */
     private void initializeSelectedPatternsTable() {
         // Add the delete column
         selectedPatternsTableDeleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPattern accessPattern) -> {
@@ -100,29 +123,70 @@ public class ChoosePatternsController {
         selectedPatternsTableConditionCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
     }
 
+    /**
+     * Removes the selected patterns from the selectedList.
+     */
     public void removeFromSelected() {
-
-    }
-
-    public void addToSelected() {
-
-    }
-
-    public void giveSelectedPatterns(List<AccessPattern> selectedItems) {
-
-        this.selectedPatterns = selectedItems;
-
-        // add the selected patterns to the selected list
-        if (selectedItems != null || selectedItems.size() != 0) {
-            ObservableList<AccessPattern> items = FXCollections.observableList(selectedItems);
-            this.selectedPatternsTable.setItems(items);
-
-            // fill the allPatternsTable
-            fillAllPatternsTable();
+        if (selectedPatternsTable.getSelectionModel().getSelectedItems() != null) {
+            List<AccessPattern> selectedPatterns = selectedPatternsTable.getSelectionModel().getSelectedItems();
+            System.out.println(selectedPatterns);
+            allPatternsTable.getItems().addAll(selectedPatterns);
+            selectedPatternsTable.getItems().removeAll(selectedPatterns);
+            allPatternsTable.refresh();
+            selectedPatternsTable.refresh();
         }
     }
 
+    /**
+     * Adds the selected patterns to the selectedList.
+     */
+    public void addToSelected() {
+        if (allPatternsTable.getSelectionModel().getSelectedItems() != null) {
+            List<AccessPattern> selectedPatterns = allPatternsTable.getSelectionModel().getSelectedItems();
+            selectedPatternsTable.getItems().addAll(selectedPatterns);
+            allPatternsTable.getItems().removeAll(selectedPatterns);
+            allPatternsTable.refresh();
+            selectedPatternsTable.refresh();
+        }
+    }
+
+    /**
+     * Prefills the selectedTable with the given patterns.
+     *
+     * @param selectedPatterns the already selected patterns
+     */
+    public void giveSelectedPatterns(List<AccessPattern> selectedPatterns) {
+
+        this.alreadySelectedPatterns = selectedPatterns;
+
+        // add the selected patterns to the selected list
+        if (selectedPatterns != null || selectedPatterns.size() != 0) {
+            ObservableList<AccessPattern> items = FXCollections.observableList(selectedPatterns);
+            this.selectedPatternsTable.setItems(items);
+        }
+
+        // fill the allPatternsTable
+        fillAllPatternsTable();
+    }
+
+    /**
+     * Provides the data for the patternTable.
+     */
     private void fillAllPatternsTable() {
+
+        // test the table with data from the Example - Zugriffsmuster.xlsx file
+        try {
+            AccessPatternImportHelper helper = new AccessPatternImportHelper();
+
+            List<AccessPattern> patterns = helper.importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
+            ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
+
+            allPatternsTable.setItems(list);
+            allPatternsTable.refresh();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }

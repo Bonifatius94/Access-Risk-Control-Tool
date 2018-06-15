@@ -15,6 +15,10 @@ public class AutoCompleteComboBoxListener<T> implements EventHandler<KeyEvent> {
     private boolean moveCaretToPos = false;
     private int caretPos;
 
+    /**
+     * Adds a listener to the given comboBox which works like an autocomplete.
+     * @param comboBox the comboBox to turn into an autocomplete
+     */
     public AutoCompleteComboBoxListener(final JFXComboBox comboBox) {
         this.comboBox = comboBox;
         sb = new StringBuilder();

@@ -65,23 +65,8 @@ public class PatternsController {
         // initialize the table
         initializePatternsTable();
 
-        // test the table with data from the Example - Zugriffsmuster.xlsx file
-        try {
-            AccessPatternImportHelper helper = new AccessPatternImportHelper();
-
-            List<AccessPattern> patterns = helper.importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
-            ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
-
-            patternsTable.setItems(list);
-            patternsTable.refresh();
-
-            // show an item count (+ selected)
-            itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "),
-                Bindings.size(patternsTable.getItems()).asString("%s " + bundle.getString("selected"))));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // fill in table data
+        fillPatternsTable();
     }
 
     /**
@@ -117,6 +102,10 @@ public class PatternsController {
 
         // set selection mode to MULTIPLE
         patternsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        // show an item count (+ selected)
+        itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "),
+            Bindings.size(patternsTable.getItems()).asString("%s " + bundle.getString("selected"))));
 
         initializeTableColumns();
     }
@@ -237,5 +226,25 @@ public class PatternsController {
      */
     public void addAction() {
         openAccessPatternForm(null);
+    }
+
+    /**
+     * Provides the data for the patternTable.
+     */
+    private void fillPatternsTable() {
+
+        // test the table with data from the Example - Zugriffsmuster.xlsx file
+        try {
+            AccessPatternImportHelper helper = new AccessPatternImportHelper();
+
+            List<AccessPattern> patterns = helper.importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
+            ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
+
+            patternsTable.setItems(list);
+            patternsTable.refresh();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

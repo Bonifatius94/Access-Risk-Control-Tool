@@ -3,10 +3,16 @@ package ui.main.configs;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
+
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 import data.entities.Configuration;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+
+import java.util.ResourceBundle;
+import java.util.Set;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,19 +24,16 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import ui.App;
 import ui.custom.controls.AutoCompleteComboBoxListener;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
 
-import java.util.ResourceBundle;
-import java.util.Set;
+
 
 
 public class ConfigsFormController {
-
-    private Configuration configuration;
-
 
     @FXML
     private JFXTextField nameInput;
@@ -53,6 +56,11 @@ public class ConfigsFormController {
     @FXML
     public TableColumn<AccessPattern, Set<AccessCondition>> conditionCountColumn;
 
+    private Configuration configuration;
+
+    /**
+     * Initializes the view.
+     */
     @FXML
     public void initialize() {
         new AutoCompleteComboBoxListener<>(whitelistChooser);
@@ -127,32 +135,32 @@ public class ConfigsFormController {
      * Opens a modal window where patterns can be selected.
      */
     public void choosePattern() {
-    try {
-                // create a new FXML loader with the SapSettingsEditDialogController
-                ResourceBundle bundle = ResourceBundle.getBundle("lang");
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("ChoosePatternsView.fxml"), bundle);
-                CustomWindow customWindow = loader.load();
+        try {
+            // create a new FXML loader with the SapSettingsEditDialogController
+            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ChoosePatternsView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
 
-                // build the scene and add it to the stage
-                Scene scene = new Scene(customWindow, 1200, 500);
-                scene.getStylesheets().add("css/dark-theme.css");
-                Stage stage = new Stage();
-                stage.setScene(scene);
-                stage.initModality(Modality.WINDOW_MODAL);
-                stage.initOwner(App.primaryStage);
-                customWindow.initStage(stage);
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow, 1200, 500);
+            scene.getStylesheets().add("css/dark-theme.css");
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
+            customWindow.initStage(stage);
 
-                // set stage name
-                customWindow.setTitle(bundle.getString("selectPatternsTitle"));
+            // set stage name
+            customWindow.setTitle(bundle.getString("selectPatternsTitle"));
 
-                stage.show();
+            stage.show();
 
-                // give the dialog the currently selected items
-                ChoosePatternsController choosePatterns = loader.getController();
-                choosePatterns.giveSelectedPatterns(patternsTable.getItems());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            // give the dialog the currently selected items
+            ChoosePatternsController choosePatterns = loader.getController();
+            choosePatterns.giveSelectedPatterns(patternsTable.getItems());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void importPatterns() {
@@ -175,6 +183,7 @@ public class ConfigsFormController {
 
     /**
      * Hides the stage.
+     *
      * @param event the given ActionEvent
      */
     public void close(ActionEvent event) {
