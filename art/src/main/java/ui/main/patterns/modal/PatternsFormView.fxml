@@ -57,7 +57,7 @@
         <Separator/>
         <HBox HBox.hgrow="ALWAYS" fx:id="conditionBox" spacing="30" alignment="CENTER">
             <JFXTabPane fx:id="conditionTabs" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"/>
-            <VBox spacing="20" alignment="TOP_CENTER">
+            <VBox spacing="20">
                 <HBox fx:id="editConditionBox" alignment="BASELINE_LEFT" spacing="20">
                     <JFXButton onAction="#addEmptyConditionTableTab" prefHeight="30" styleClass="round-button">
                         <graphic>
@@ -79,20 +79,16 @@
                     <Label fx:id="atLeastOneCondWarning" text="%atLeastOneCondWarning" visible="false"/>
                 </HBox>
                 <Separator/>
-                <Label text="%conditionPropertiesTitle">
-                    <font>
-                        <Font size="18"/>
-                    </font>
-                </Label>
+                <Label text="%conditionPropertiesTitle" style="-fx-font-size: 150%; -fx-padding: 10 0 10 0" />
                 <VBox HBox.hgrow="ALWAYS" spacing="40" style="-fx-padding: 0 0 30 0">
-                    <JFXTextField fx:id="authObjectInput" promptText="%authObject" minWidth="150" maxWidth="350">
+                    <JFXTextField fx:id="authObjectInput" promptText="%authObject" minWidth="150" maxWidth="400">
                         <validators>
                             <RequiredFieldValidator message="%required">
                                 <MaterialDesignIconView glyphName="ALERT"/>
                             </RequiredFieldValidator>
                         </validators>
                     </JFXTextField>
-                    <JFXTextField fx:id="authFieldInput" promptText="%authField" minWidth="150" maxWidth="350">
+                    <JFXTextField fx:id="authFieldInput" promptText="%authField" minWidth="150" maxWidth="400">
                         <validators>
                             <RequiredFieldValidator message="%required">
                                 <MaterialDesignIconView glyphName="ALERT"/>

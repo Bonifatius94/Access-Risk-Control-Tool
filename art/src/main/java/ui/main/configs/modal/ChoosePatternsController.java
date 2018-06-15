@@ -213,7 +213,6 @@ public class ChoosePatternsController {
 
     }
 
-
     /**
      * Saves the changes to the previous window.
      */

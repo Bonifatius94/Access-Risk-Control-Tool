@@ -8,6 +8,7 @@ import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 import data.entities.Configuration;
 
+import data.entities.Whitelist;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import io.msoffice.excel.AccessPatternImportHelper;
@@ -45,7 +46,7 @@ public class ConfigsFormController {
     private JFXTextField descriptionInput;
 
     @FXML
-    private JFXComboBox whitelistChooser;
+    private JFXComboBox<Whitelist> whitelistChooser;
 
     @FXML
     private JFXComboBox patternChooser;
@@ -140,10 +141,14 @@ public class ConfigsFormController {
 
     /**
      * Validates all relevant inputs before saving.
+     *
      * @return if the inputs are all valid
      */
     private boolean validateBeforeSave() {
-        return nameInput.validate() && descriptionInput.validate() && patternsTable.getItems() != null && whitelistChooser.getSelectionModel().getSelectedItem() != null;
+        return nameInput.validate()
+            && descriptionInput.validate()
+            && patternsTable.getItems() != null
+            && whitelistChooser.getSelectionModel().getSelectedItem() != null;
     }
 
     /**
@@ -170,8 +175,37 @@ public class ConfigsFormController {
 
     }
 
+    /**
+     * Opens a modal window where a whitelist can be selected.
+     */
     public void chooseWhitelist() {
+        try {
+            // create a new FXML loader with the SapSettingsEditDialogController
+            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ChooseWhitelistView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
 
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow);
+            scene.getStylesheets().add("css/dark-theme.css");
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
+            customWindow.initStage(stage);
+
+            // set stage name
+            customWindow.setTitle(bundle.getString("selectWhitelistTitle"));
+
+            stage.show();
+
+            // give the dialog the controller
+            ChooseWhitelistController chooseWhitelist = loader.getController();
+            chooseWhitelist.setParentController(this);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -210,9 +244,24 @@ public class ConfigsFormController {
         }
     }
 
+    /**
+     * Sets the patternTable items to the given items.
+     *
+     * @param patterns the given patterns
+     */
     public void setPatterns(List<AccessPattern> patterns) {
         ObservableList<AccessPattern> items = FXCollections.observableList(patterns);
         this.patternsTable.setItems(items);
+    }
+
+    /**
+     * Set the whitelist input to the given Whitelist.
+     *
+     * @param whitelist the given whitelist
+     */
+    public void setWhitelist(Whitelist whitelist) {
+        this.whitelistChooser.getItems().add(whitelist);
+        this.whitelistChooser.getSelectionModel().select(whitelist);
     }
 
     public void importPatterns() {
@@ -237,7 +286,7 @@ public class ConfigsFormController {
 
             this.configuration.setPatterns(patternsTable.getItems());
 
-            // this.configuration.setWhitelist();
+            this.configuration.setWhitelist(whitelistChooser.getSelectionModel().getSelectedItem());
 
             System.out.println(this.configuration);
         }
