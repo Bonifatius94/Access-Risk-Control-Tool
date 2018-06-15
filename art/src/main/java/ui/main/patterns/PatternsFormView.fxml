@@ -135,7 +135,7 @@
                             <MaterialDesignIconView glyphName="CHECK"/>
                         </graphic>
                         <tooltip>
-                            <Tooltip text="%apply"/>
+                            <Tooltip text="%applyChanges"/>
                         </tooltip>
                     </JFXButton>
                 </HBox>

@@ -78,6 +78,7 @@ public class ConfigsFormController {
         fillPatternsTable();
 
         initializeValidation();
+
     }
 
     /**
@@ -138,6 +139,14 @@ public class ConfigsFormController {
     }
 
     /**
+     * Validates all relevant inputs before saving.
+     * @return if the inputs are all valid
+     */
+    private boolean validateBeforeSave() {
+        return nameInput.validate() && descriptionInput.validate() && patternsTable.getItems() != null && whitelistChooser.getSelectionModel().getSelectedItem() != null;
+    }
+
+    /**
      * Fills the detail form with the selected Configuration.
      *
      * @param configuration the selected Configuration
@@ -152,6 +161,7 @@ public class ConfigsFormController {
 
             // TODO: prefill patterns, prefill whitelist input
         } else {
+            this.configuration = new Configuration();
             resetFormButton.setVisible(false);
         }
     }
@@ -176,7 +186,7 @@ public class ConfigsFormController {
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 1200, 500);
+            Scene scene = new Scene(customWindow, 1200, 550);
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
@@ -192,9 +202,17 @@ public class ConfigsFormController {
             // give the dialog the currently selected items
             ChoosePatternsController choosePatterns = loader.getController();
             choosePatterns.giveSelectedPatterns(patternsTable.getItems());
+            choosePatterns.setParentController(this);
+
+            // choosePatterns.selectedPatternsTable.itemsProperty().bind(this.patternsTable.itemsProperty());
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void setPatterns(List<AccessPattern> patterns) {
+        ObservableList<AccessPattern> items = FXCollections.observableList(patterns);
+        this.patternsTable.setItems(items);
     }
 
     public void importPatterns() {
@@ -212,14 +230,17 @@ public class ConfigsFormController {
      * Saves the changes to the database.
      */
     public void saveChanges() {
-        this.configuration.setName(this.nameInput.getText());
-        this.configuration.setDescription(this.descriptionInput.getText());
 
-        this.configuration.setPatterns(patternsTable.getItems());
+        if (validateBeforeSave()) {
+            this.configuration.setName(this.nameInput.getText());
+            this.configuration.setDescription(this.descriptionInput.getText());
 
-        // this.configuration.setWhitelist();
+            this.configuration.setPatterns(patternsTable.getItems());
 
-        System.out.println(this.configuration);
+            // this.configuration.setWhitelist();
+
+            System.out.println(this.configuration);
+        }
     }
 
     /**

@@ -16,7 +16,9 @@ import java.util.stream.Collectors;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -51,6 +53,7 @@ public class ChoosePatternsController {
     @FXML
     public JFXButton removeFromSelectedButton;
 
+    private ConfigsFormController parentController;
     private List<AccessPattern> alreadySelectedPatterns;
 
     @FXML
@@ -133,6 +136,7 @@ public class ChoosePatternsController {
             List<AccessPattern> selectedPatterns = selectedPatternsTable.getSelectionModel().getSelectedItems();
             allPatternsTable.getItems().addAll(selectedPatterns);
             selectedPatternsTable.getItems().removeAll(selectedPatterns);
+            selectedPatternsTable.getSelectionModel().clearSelection();
             allPatternsTable.refresh();
             selectedPatternsTable.refresh();
         }
@@ -146,6 +150,7 @@ public class ChoosePatternsController {
             List<AccessPattern> selectedPatterns = allPatternsTable.getSelectionModel().getSelectedItems();
             selectedPatternsTable.getItems().addAll(selectedPatterns);
             allPatternsTable.getItems().removeAll(selectedPatterns);
+            allPatternsTable.getSelectionModel().clearSelection();
             allPatternsTable.refresh();
             selectedPatternsTable.refresh();
         }
@@ -206,5 +211,31 @@ public class ChoosePatternsController {
             e.printStackTrace();
         }
 
+    }
+
+
+    /**
+     * Saves the changes to the previous window.
+     */
+    public void saveChanges(ActionEvent event) {
+        this.parentController.setPatterns(this.selectedPatternsTable.getItems());
+        this.close(event);
+    }
+
+    /**
+     * Sets the parent controller so we can give it some data.
+     * @param controller the parent controller
+     */
+    public void setParentController(ConfigsFormController controller) {
+        this.parentController = controller;
+    }
+
+    /**
+     * Hides the stage.
+     *
+     * @param event the given ActionEvent
+     */
+    public void close(ActionEvent event) {
+        (((Button) event.getSource()).getScene().getWindow()).hide();
     }
 }
