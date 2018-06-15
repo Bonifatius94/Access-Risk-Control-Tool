@@ -162,7 +162,7 @@
     -fx-text-fill: -fx-text !important;
 }
 
-.jfx-combo-box .cell {
+.jfx-combo-box .cell, .jfx-combo-box .text-field {
     -fx-text-fill: -fx-text !important;
 }
 

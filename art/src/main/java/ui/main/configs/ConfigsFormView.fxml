@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -11,11 +8,14 @@
 <?import com.jfoenix.validation.RequiredFieldValidator?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import com.jfoenix.controls.JFXComboBox?>
+<?import ui.custom.controls.PTableColumn?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import com.jfoenix.controls.JFXButton?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.main.configs.ConfigsFormController" windowState="NoResize">
     <VBox spacing="20" HBox.hgrow="ALWAYS" style="-fx-padding: 20">
-        <VBox alignment="BASELINE_LEFT" spacing="40" HBox.hgrow="ALWAYS">
+        <VBox alignment="BASELINE_LEFT" spacing="40" HBox.hgrow="ALWAYS"  style="-fx-padding: 0 0 10 0">
             <JFXTextField fx:id="nameInput" promptText="%configName" maxWidth="250">
                 <validators>
                     <RequiredFieldValidator message="%required">
@@ -31,5 +31,86 @@
                 </validators>
             </JFXTextField>
         </VBox>
+        <Separator/>
+        <VBox HBox.hgrow="ALWAYS" spacing="20">
+            <HBox alignment="BASELINE_LEFT" spacing="40">
+                <HBox alignment="BASELINE_LEFT" spacing="20">
+                    <Label text="%addPattern"/>
+                    <JFXComboBox fx:id="patternChooser" minWidth="250"/>
+                    <JFXButton onAction="#choosePattern" styleClass="round-button" minHeight="30">
+                        <tooltip>
+                            <Tooltip text="%choosePattern"/>
+                        </tooltip>
+                        <graphic>
+                            <MaterialDesignIconView glyphName="PLAYLIST_PLUS"/>
+                        </graphic>
+                    </JFXButton>
+                </HBox>
+                <JFXButton text="%import" onAction="#importPatterns">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="IMPORT"/>
+                    </graphic>
+                </JFXButton>
+            </HBox>
+            <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable">
+                <columns>
+                    <PTableColumn text="Description" percentageWidth="0.8" styleClass="align-left">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="description"/>
+                        </cellValueFactory>
+                    </PTableColumn>
+                    <PTableColumn text="#" fx:id="useCaseCountColumn" percentageWidth="0.1" resizable="false">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="conditions"/>
+                        </cellValueFactory>
+                    </PTableColumn>
+                    <PTableColumn percentageWidth="0.1" fx:id="deletePatternColumn" resizable="false" sortable="false">
+                    </PTableColumn>
+                </columns>
+            </TableView>
+        </VBox>
+        <Separator/>
+        <HBox alignment="BASELINE_LEFT" spacing="40">
+            <HBox alignment="BASELINE_LEFT" spacing="20">
+                <Label text="%whitelist"/>
+                <JFXComboBox fx:id="whitelistChooser" minWidth="250"/>
+                <JFXButton onAction="#chooseWhitelist" styleClass="round-button" minHeight="30">
+                    <tooltip>
+                        <Tooltip text="%chooseWhitelist"/>
+                    </tooltip>
+                    <graphic>
+                        <MaterialDesignIconView glyphName="PLAYLIST_PLUS"/>
+                    </graphic>
+                </JFXButton>
+            </HBox>
+            <JFXButton text="%import" onAction="#importWhitelist">
+                <graphic>
+                    <MaterialDesignIconView glyphName="IMPORT"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
+
+        <Separator/>
+        <HBox HBox.hgrow="ALWAYS">
+            <HBox alignment="BASELINE_LEFT" HBox.hgrow="ALWAYS">
+                <JFXButton text="%revert" onAction="#resetForm">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="UNDO_VARIANT"/>
+                    </graphic>
+                </JFXButton>
+            </HBox>
+            <HBox spacing="20" alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS">
+                <JFXButton onAction="#saveChanges" prefWidth="120" text="%save">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
+                    </graphic>
+                </JFXButton>
+                <JFXButton onAction="#close" prefWidth="120" text="%cancel">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="CLOSE"/>
+                    </graphic>
+                </JFXButton>
+            </HBox>
+        </HBox>
     </VBox>
 </CustomWindow>
