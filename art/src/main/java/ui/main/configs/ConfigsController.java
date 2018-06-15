@@ -25,6 +25,7 @@ import javafx.stage.Stage;
 import ui.App;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
+import ui.main.configs.modal.ConfigsFormController;
 
 
 public class ConfigsController {
@@ -178,7 +179,7 @@ public class ConfigsController {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ConfigsFormView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/ConfigsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage

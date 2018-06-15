@@ -1,4 +1,4 @@
-package ui.main.configs;
+package ui.main.configs.modal;
 
 import com.jfoenix.controls.JFXButton;
 

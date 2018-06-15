@@ -1,4 +1,4 @@
-package ui.main.patterns;
+package ui.main.patterns.modal;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;

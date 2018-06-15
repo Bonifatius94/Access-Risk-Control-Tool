@@ -19,7 +19,7 @@
 <?import com.jfoenix.controls.JFXTabPane?>
 <?import javafx.scene.control.Tooltip?>
 <CustomWindow windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
-              xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.patterns.PatternsFormController">
+              xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.patterns.modal.PatternsFormController">
     <VBox spacing="20" HBox.hgrow="ALWAYS" style="-fx-padding: 20">
         <VBox alignment="BASELINE_LEFT" spacing="40" HBox.hgrow="ALWAYS" style="-fx-padding: 0 0 10 0">
             <JFXTextField fx:id="useCaseIdInput" promptText="%useCaseID" maxWidth="250">
