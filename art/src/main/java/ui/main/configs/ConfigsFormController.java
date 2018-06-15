@@ -10,9 +10,14 @@ import data.entities.Configuration;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import io.msoffice.excel.AccessPatternImportHelper;
+
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,8 +34,6 @@ import ui.App;
 import ui.custom.controls.AutoCompleteComboBoxListener;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
-
-
 
 
 public class ConfigsFormController {
@@ -67,6 +70,8 @@ public class ConfigsFormController {
         new AutoCompleteComboBoxListener<>(patternChooser);
 
         initializePatternsTable();
+
+        fillPatternsTable();
     }
 
     /**
@@ -188,5 +193,32 @@ public class ConfigsFormController {
      */
     public void close(ActionEvent event) {
         (((Button) event.getSource()).getScene().getWindow()).hide();
+    }
+
+    /**
+     * Provides the data for the patternTable.
+     */
+    private void fillPatternsTable() {
+
+        // test the table with data from the Example - Zugriffsmuster.xlsx file
+        try {
+            AccessPatternImportHelper helper = new AccessPatternImportHelper();
+
+            List<AccessPattern> patterns = helper.importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
+            patterns.get(0).setId(0);
+            patterns.get(1).setId(1);
+            patterns.get(2).setId(2);
+            patterns.remove(3);
+            patterns.remove(4);
+
+            ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
+
+            patternsTable.setItems(list);
+            patternsTable.refresh();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

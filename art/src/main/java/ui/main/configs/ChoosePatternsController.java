@@ -11,6 +11,7 @@ import io.msoffice.excel.AccessPatternImportHelper;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -102,6 +103,7 @@ public class ChoosePatternsController {
     private void initializeSelectedPatternsTable() {
         // Add the delete column
         selectedPatternsTableDeleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPattern accessPattern) -> {
+            allPatternsTable.getItems().add(accessPattern);
             selectedPatternsTable.getItems().remove(accessPattern);
             return accessPattern;
         }));
@@ -129,7 +131,6 @@ public class ChoosePatternsController {
     public void removeFromSelected() {
         if (selectedPatternsTable.getSelectionModel().getSelectedItems() != null) {
             List<AccessPattern> selectedPatterns = selectedPatternsTable.getSelectionModel().getSelectedItems();
-            System.out.println(selectedPatterns);
             allPatternsTable.getItems().addAll(selectedPatterns);
             selectedPatternsTable.getItems().removeAll(selectedPatterns);
             allPatternsTable.refresh();
@@ -179,6 +180,23 @@ public class ChoosePatternsController {
             AccessPatternImportHelper helper = new AccessPatternImportHelper();
 
             List<AccessPattern> patterns = helper.importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
+
+            patterns.get(0).setId(0);
+            patterns.get(1).setId(1);
+            patterns.get(2).setId(2);
+            patterns.get(3).setId(3);
+            patterns.get(4).setId(4);
+
+            // remove all entries that are already in the selectedList
+            patterns = patterns.stream().filter(x -> {
+                for (AccessPattern pattern : this.alreadySelectedPatterns) {
+                    if (x.getId() == pattern.getId()) {
+                        return false;
+                    }
+                }
+                return true;
+            }).collect(Collectors.toList());
+
             ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
 
             allPatternsTable.setItems(list);
