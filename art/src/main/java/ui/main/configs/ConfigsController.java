@@ -11,6 +11,8 @@ import java.util.ResourceBundle;
 
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -18,7 +20,11 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import ui.App;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.CustomWindow;
 
 
 public class ConfigsController {
@@ -84,7 +90,7 @@ public class ConfigsController {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Configuration configuration = row.getItem();
-                    editConfig(configuration);
+                    openConfigurationForm(configuration);
                 }
             });
             return row;
@@ -110,7 +116,7 @@ public class ConfigsController {
 
         // Add the edit column
         editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (Configuration configuration) -> {
-            editConfig(configuration);
+            openConfigurationForm(configuration);
             return configuration;
         }));
 
@@ -121,7 +127,7 @@ public class ConfigsController {
      * Clones the selected entry and adds it to the table.
      */
     public void cloneAction() {
-        if (configsTable.getFocusModel().getFocusedItem().equals(configsTable.getSelectionModel().getSelectedItem())) {
+        if (configsTable.getSelectionModel().getSelectedItems().size() != 0 && configsTable.getFocusModel().getFocusedItem().equals(configsTable.getSelectionModel().getSelectedItem())) {
 
             // clone the currently selected item and add it to the table
             Configuration clonedConfiguration = configsTable.getSelectionModel().getSelectedItem();
@@ -139,8 +145,8 @@ public class ConfigsController {
      * Opens the edit dialog with the selected item.
      */
     public void editAction() {
-        if (configsTable.getFocusModel().getFocusedItem().equals(configsTable.getSelectionModel().getSelectedItem())) {
-            editConfig(configsTable.getSelectionModel().getSelectedItem());
+        if (configsTable.getSelectionModel().getSelectedItems().size() != 0 && configsTable.getFocusModel().getFocusedItem().equals(configsTable.getSelectionModel().getSelectedItem())) {
+            openConfigurationForm(configsTable.getSelectionModel().getSelectedItem());
         }
     }
 
@@ -148,7 +154,7 @@ public class ConfigsController {
      * Deletes the item from the table.
      */
     public void deleteAction() {
-        if (configsTable.getSelectionModel().getSelectedItems() != null && configsTable.getFocusModel().getFocusedItem().equals(configsTable.getSelectionModel().getSelectedItem())) {
+        if (configsTable.getSelectionModel().getSelectedItems().size() != 0 && configsTable.getFocusModel().getFocusedItem().equals(configsTable.getSelectionModel().getSelectedItem())) {
 
             // remove all selected items
             configsTable.getItems().removeAll(configsTable.getSelectionModel().getSelectedItems());
@@ -160,15 +166,44 @@ public class ConfigsController {
      * Opens the modal dialog to create a new item.
      */
     public void addAction() {
-        editConfig(null);
+        openConfigurationForm(null);
     }
 
     /**
      * Edits the given configuration.
      *
-     * @param configuration the given config
+     * @param configuration the given config to edit, or null if a new one is created
      */
-    private void editConfig(Configuration configuration) {
+    private void openConfigurationForm(Configuration configuration) {
+        try {
+            // create a new FXML loader with the SapSettingsEditDialogController
+            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ConfigsFormView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
 
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow, 1050, 750);
+            scene.getStylesheets().add("css/dark-theme.css");
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
+            customWindow.initStage(stage);
+
+            // set stage name
+            if (configuration == null) {
+                customWindow.setTitle(bundle.getString("newConfigTitle"));
+            } else {
+                customWindow.setTitle(bundle.getString("editConfigTitle"));
+            }
+
+            stage.show();
+
+            // give the dialog the sapConfiguration
+            ConfigsFormController configEdit = loader.getController();
+            configEdit.giveSelectedConfiguration(configuration);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

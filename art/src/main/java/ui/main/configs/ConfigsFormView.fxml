@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import ui.custom.controls.CustomWindow?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.validation.RequiredFieldValidator?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<CustomWindow xmlns="http://javafx.com/javafx"
+              xmlns:fx="http://javafx.com/fxml"
+              fx:controller="ui.main.configs.ConfigsFormController" windowState="NoResize">
+    <VBox spacing="20" HBox.hgrow="ALWAYS" style="-fx-padding: 20">
+        <VBox alignment="BASELINE_LEFT" spacing="40" HBox.hgrow="ALWAYS">
+            <JFXTextField fx:id="nameInput" promptText="%configName" maxWidth="250">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+            <JFXTextField fx:id="descriptionInput" promptText="%description" maxWidth="500">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+        </VBox>
+    </VBox>
+</CustomWindow>
