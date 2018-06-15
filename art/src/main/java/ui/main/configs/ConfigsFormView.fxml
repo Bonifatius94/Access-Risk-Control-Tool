@@ -100,7 +100,7 @@
         <Separator/>
         <HBox HBox.hgrow="ALWAYS">
             <HBox alignment="BASELINE_LEFT" HBox.hgrow="ALWAYS">
-                <JFXButton text="%revert" onAction="#resetForm">
+                <JFXButton fx:id="resetFormButton" text="%revert" onAction="#resetForm">
                     <graphic>
                         <MaterialDesignIconView glyphName="UNDO_VARIANT"/>
                     </graphic>

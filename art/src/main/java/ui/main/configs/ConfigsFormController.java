@@ -59,6 +59,10 @@ public class ConfigsFormController {
     @FXML
     public TableColumn<AccessPattern, Set<AccessCondition>> conditionCountColumn;
 
+    @FXML
+    private JFXButton resetFormButton;
+
+
     private Configuration configuration;
 
     /**
@@ -147,6 +151,8 @@ public class ConfigsFormController {
             descriptionInput.setText(configuration.getDescription());
 
             // TODO: prefill patterns, prefill whitelist input
+        } else {
+            resetFormButton.setVisible(false);
         }
     }
 
@@ -206,7 +212,14 @@ public class ConfigsFormController {
      * Saves the changes to the database.
      */
     public void saveChanges() {
+        this.configuration.setName(this.nameInput.getText());
+        this.configuration.setDescription(this.descriptionInput.getText());
 
+        this.configuration.setPatterns(patternsTable.getItems());
+
+        // this.configuration.setWhitelist();
+
+        System.out.println(this.configuration);
     }
 
     /**

@@ -181,7 +181,6 @@ public class PatternsController {
         }
     }
 
-
     /**
      * Clones the selected entry and adds it to the table.
      */

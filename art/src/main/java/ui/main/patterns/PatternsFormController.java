@@ -100,6 +100,9 @@ public class PatternsFormController {
     private JFXButton deleteSelectedTableTabButton;
 
     @FXML
+    private JFXButton resetFormButton;
+
+    @FXML
     private Label atLeastOneCondWarning;
 
 
@@ -273,6 +276,8 @@ public class PatternsFormController {
 
         if (pattern == null) {
             this.accessPattern = new AccessPattern();
+
+            this.resetFormButton.setVisible(false);
         } else {
 
             // prefill the inputs
