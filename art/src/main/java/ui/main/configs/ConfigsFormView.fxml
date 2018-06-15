@@ -54,12 +54,17 @@
             </HBox>
             <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable">
                 <columns>
-                    <PTableColumn text="Description" percentageWidth="0.8" styleClass="align-left">
+                    <PTableColumn text="UseCaseID" percentageWidth="0.15">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="usecaseId"/>
+                        </cellValueFactory>
+                    </PTableColumn>
+                    <PTableColumn text="Description" percentageWidth="0.65" styleClass="align-left">
                         <cellValueFactory>
                             <PropertyValueFactory property="description"/>
                         </cellValueFactory>
                     </PTableColumn>
-                    <PTableColumn text="#" fx:id="useCaseCountColumn" percentageWidth="0.1" resizable="false">
+                    <PTableColumn text="#" fx:id="conditionCountColumn" percentageWidth="0.1" resizable="false">
                         <cellValueFactory>
                             <PropertyValueFactory property="conditions"/>
                         </cellValueFactory>

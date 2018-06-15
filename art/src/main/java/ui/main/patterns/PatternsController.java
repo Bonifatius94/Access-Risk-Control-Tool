@@ -40,7 +40,7 @@ public class PatternsController {
     public TableView<AccessPattern> patternsTable;
 
     @FXML
-    public TableColumn<AccessPattern, Set<AccessCondition>> useCaseCountColumn;
+    public TableColumn<AccessPattern, Set<AccessCondition>> conditionCountColumn;
 
     @FXML
     public TableColumn<AccessPattern, JFXButton> deleteColumn;
@@ -138,7 +138,7 @@ public class PatternsController {
         }));
 
         // overwrite the column in which the number of useCases is displayed
-        useCaseCountColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
+        conditionCountColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
 
             @Override
             protected void updateItem(Set<AccessCondition> items, boolean empty) {
@@ -150,8 +150,8 @@ public class PatternsController {
 
         });
 
-        // custom comparator for the useCaseCountColumn
-        useCaseCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
+        // custom comparator for the conditionCountColumn
+        conditionCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
     }
 
     /**

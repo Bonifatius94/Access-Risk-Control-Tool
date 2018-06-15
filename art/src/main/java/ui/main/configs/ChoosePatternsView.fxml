@@ -6,9 +6,73 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ui.main.configs.ChoosePatternsController"
-            prefHeight="400.0" prefWidth="600.0">
+<?import ui.custom.controls.CustomWindow?>
+<?import ui.custom.controls.PTableColumn?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<CustomWindow xmlns="http://javafx.com/javafx"
+              xmlns:fx="http://javafx.com/fxml"
+              fx:controller="ui.main.configs.ChoosePatternsController">
 
-</AnchorPane>
+    <HBox HBox.hgrow="ALWAYS" style="-fx-padding: 20" spacing="20">
+        <TableView VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" fx:id="allPatternsTable">
+            <columns>
+                <PTableColumn text="UseCaseID" percentageWidth="0.2">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="usecaseId"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn text="Description" percentageWidth="0.7" styleClass="align-left">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="description"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn text="#" fx:id="allPatternsTableConditionCountColumn" percentageWidth="0.1" resizable="false" >
+                    <cellValueFactory>
+                        <PropertyValueFactory property="conditions"/>
+                    </cellValueFactory>
+                </PTableColumn>
+            </columns>
+        </TableView>
+        <VBox spacing="50" alignment="CENTER">
+            <JFXButton onAction="#addToSelected" styleClass="round-button" minHeight="30">
+                <tooltip>
+                    <Tooltip text="%addToList"/>
+                </tooltip>
+                <graphic>
+                    <MaterialDesignIconView glyphName="ARROW_RIGHT"/>
+                </graphic>
+            </JFXButton>
+            <JFXButton onAction="#removeFromSelected" styleClass="round-button" minHeight="30">
+                <tooltip>
+                    <Tooltip text="%removeFromList"/>
+                </tooltip>
+                <graphic>
+                    <MaterialDesignIconView glyphName="ARROW_LEFT"/>
+                </graphic>
+            </JFXButton>
+        </VBox>
+        <TableView VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" fx:id="selectedPatternsTable">
+            <columns>
+                <PTableColumn text="UseCaseID" percentageWidth="0.15">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="usecaseId"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn text="Description" percentageWidth="0.65" styleClass="align-left">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="description"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn text="#" fx:id="selectedPatternsTableConditionCountColumn" percentageWidth="0.1" resizable="false" >
+                    <cellValueFactory>
+                        <PropertyValueFactory property="conditions"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn percentageWidth="0.1" fx:id="selectedPatternsTableDeleteColumn" resizable="false" sortable="false">
+                </PTableColumn>
+            </columns>
+        </TableView>
+    </HBox>
+</CustomWindow>

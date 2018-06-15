@@ -9,14 +9,21 @@ import data.entities.Configuration;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import ui.App;
 import ui.custom.controls.AutoCompleteComboBoxListener;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.CustomWindow;
 
+import java.util.ResourceBundle;
 import java.util.Set;
 
 
@@ -44,12 +51,14 @@ public class ConfigsFormController {
     public TableColumn<AccessPattern, JFXButton> deletePatternColumn;
 
     @FXML
-    public TableColumn<AccessPattern, Set<AccessCondition>> useCaseCountColumn;
+    public TableColumn<AccessPattern, Set<AccessCondition>> conditionCountColumn;
 
     @FXML
     public void initialize() {
         new AutoCompleteComboBoxListener<>(whitelistChooser);
         new AutoCompleteComboBoxListener<>(patternChooser);
+
+        initializePatternsTable();
     }
 
     /**
@@ -74,7 +83,7 @@ public class ConfigsFormController {
         }));
 
         // overwrite the column in which the number of useCases is displayed
-        useCaseCountColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
+        conditionCountColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
 
             @Override
             protected void updateItem(Set<AccessCondition> items, boolean empty) {
@@ -86,8 +95,8 @@ public class ConfigsFormController {
 
         });
 
-        // custom comparator for the useCaseCountColumn
-        useCaseCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
+        // custom comparator for the conditionCountColumn
+        conditionCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
     }
 
     /**
@@ -113,8 +122,37 @@ public class ConfigsFormController {
 
     }
 
-    public void choosePattern() {
 
+    /**
+     * Opens a modal window where patterns can be selected.
+     */
+    public void choosePattern() {
+    try {
+                // create a new FXML loader with the SapSettingsEditDialogController
+                ResourceBundle bundle = ResourceBundle.getBundle("lang");
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("ChoosePatternsView.fxml"), bundle);
+                CustomWindow customWindow = loader.load();
+
+                // build the scene and add it to the stage
+                Scene scene = new Scene(customWindow, 1200, 500);
+                scene.getStylesheets().add("css/dark-theme.css");
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.initModality(Modality.WINDOW_MODAL);
+                stage.initOwner(App.primaryStage);
+                customWindow.initStage(stage);
+
+                // set stage name
+                customWindow.setTitle(bundle.getString("selectPatternsTitle"));
+
+                stage.show();
+
+                // give the dialog the currently selected items
+                ChoosePatternsController choosePatterns = loader.getController();
+                choosePatterns.giveSelectedPatterns(patternsTable.getItems());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
     }
 
     public void importPatterns() {
