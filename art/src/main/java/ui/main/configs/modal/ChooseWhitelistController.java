@@ -45,6 +45,9 @@ public class ChooseWhitelistController {
     private ConfigsFormController parentController;
 
 
+    /**
+     * Initializes the view.
+     */
     @FXML
     public void initialize() {
 

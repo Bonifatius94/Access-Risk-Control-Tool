@@ -171,10 +171,6 @@ public class ConfigsFormController {
         }
     }
 
-    public void importWhitelist() {
-
-    }
-
     /**
      * Opens a modal window where a whitelist can be selected.
      */
@@ -264,6 +260,17 @@ public class ConfigsFormController {
         this.whitelistChooser.getSelectionModel().select(whitelist);
     }
 
+
+    /**
+     * Opens a dialog which lets you choose a Whitelist file to import and imports that into the application.
+     */
+    public void importWhitelist() {
+
+    }
+
+    /**
+     * Opens a dialog which lets you choose an AccessPattern file to import and imports that into the application.
+     */
     public void importPatterns() {
 
     }
