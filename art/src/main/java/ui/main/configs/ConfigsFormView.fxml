@@ -15,7 +15,7 @@
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.main.configs.ConfigsFormController" windowState="NoResize">
     <VBox spacing="20" HBox.hgrow="ALWAYS" style="-fx-padding: 20">
-        <VBox alignment="BASELINE_LEFT" spacing="40" HBox.hgrow="ALWAYS"  style="-fx-padding: 0 0 10 0">
+        <VBox alignment="BASELINE_LEFT" spacing="40" HBox.hgrow="ALWAYS"  style="-fx-padding: 0 0 20 0">
             <JFXTextField fx:id="nameInput" promptText="%configName" maxWidth="250">
                 <validators>
                     <RequiredFieldValidator message="%required">
@@ -46,6 +46,7 @@
                         </graphic>
                     </JFXButton>
                 </HBox>
+                <Region HBox.hgrow="ALWAYS"/>
                 <JFXButton text="%import" onAction="#importPatterns">
                     <graphic>
                         <MaterialDesignIconView glyphName="IMPORT"/>
@@ -88,6 +89,7 @@
                     </graphic>
                 </JFXButton>
             </HBox>
+            <Region HBox.hgrow="ALWAYS"/>
             <JFXButton text="%import" onAction="#importWhitelist">
                 <graphic>
                     <MaterialDesignIconView glyphName="IMPORT"/>

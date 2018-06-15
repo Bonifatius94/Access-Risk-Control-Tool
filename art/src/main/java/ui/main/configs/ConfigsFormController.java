@@ -72,6 +72,8 @@ public class ConfigsFormController {
         initializePatternsTable();
 
         fillPatternsTable();
+
+        initializeValidation();
     }
 
     /**
@@ -113,6 +115,25 @@ public class ConfigsFormController {
     }
 
     /**
+     * Initializes the validation for certain text inputs in order to display an error message (e.g. required).
+     */
+    private void initializeValidation() {
+
+        nameInput.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                nameInput.validate();
+            }
+        });
+
+        descriptionInput.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                descriptionInput.validate();
+            }
+        });
+
+    }
+
+    /**
      * Fills the detail form with the selected Configuration.
      *
      * @param configuration the selected Configuration
@@ -124,6 +145,8 @@ public class ConfigsFormController {
 
             nameInput.setText(configuration.getName());
             descriptionInput.setText(configuration.getDescription());
+
+            // TODO: prefill patterns, prefill whitelist input
         }
     }
 
