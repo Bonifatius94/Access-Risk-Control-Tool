@@ -77,13 +77,13 @@ public class PatternsController {
             patternsTable.setItems(list);
             patternsTable.refresh();
 
-            // show an item count (+ selected)
-            itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "),
-                Bindings.size(patternsTable.getItems()).asString("%s " + bundle.getString("selected"))));
-
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        // show an item count (+ selected)
+        itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "),
+            Bindings.size(patternsTable.getItems()).asString("%s " + bundle.getString("selected"))));
     }
 
     /**
@@ -219,7 +219,7 @@ public class PatternsController {
      * Deletes the item from the table.
      */
     public void deleteAction() {
-        if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
+        if (patternsTable.getSelectionModel().getSelectedItems() != null) {
 
             // remove all selected items
             patternsTable.getItems().removeAll(patternsTable.getSelectionModel().getSelectedItems());
