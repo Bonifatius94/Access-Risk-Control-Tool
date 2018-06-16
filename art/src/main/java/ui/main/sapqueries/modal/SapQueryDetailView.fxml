@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import ui.custom.controls.CustomWindow?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<CustomWindow xmlns="http://javafx.com/javafx"
+              xmlns:fx="http://javafx.com/fxml"
+              fx:controller="ui.main.sapqueries.modal.SapQueryDetailController" windowState="NoResize">
+    <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
+        <HBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" alignment="BASELINE_LEFT" spacing="70">
+            <Label text="%sapQuery" style="-fx-font-size: 300%"/>
+            <VBox spacing="30" style="-fx-padding: 20 0 0 0">
+                <JFXTextField fx:id="dateField" promptText="%createdAt" editable="false" focusTraversable="false" minWidth="200"/>
+                <JFXTextField fx:id="createdByField" promptText="%createdBy" editable="false" focusTraversable="false" minWidth="200"/>
+            </VBox>
+        </HBox>
+        <Separator/>
+        <VBox HBox.hgrow="ALWAYS" spacing="30">
+            <HBox HBox.hgrow="ALWAYS">
+                <Label text="%configuration" style="-fx-font-size: 150%"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <JFXButton text="%details" onAction="#openConfigDetails" focusTraversable="false">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="OPEN_IN_NEW"/>
+                    </graphic>
+                </JFXButton>
+            </HBox>
+            <HBox HBox.hgrow="ALWAYS" spacing="40">
+                <JFXTextField fx:id="configNameField" promptText="%configName" editable="false" focusTraversable="false" minWidth="200"/>
+                <JFXTextField fx:id="configDescriptionField" promptText="%configDescription" editable="false" focusTraversable="false" minWidth="200"/>
+            </HBox>
+        </VBox>
+        <Separator/>
+        <VBox HBox.hgrow="ALWAYS" spacing="30">
+            <HBox HBox.hgrow="ALWAYS">
+                <Label text="%sapSettings" style="-fx-font-size: 150%"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <JFXButton text="%details" onAction="#openSapConfigDetails" focusTraversable="false">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="OPEN_IN_NEW"/>
+                    </graphic>
+                </JFXButton>
+            </HBox>
+            <HBox HBox.hgrow="ALWAYS" spacing="40">
+                <JFXTextField fx:id="sapConfigurationNameField" promptText="%hostName" editable="false" focusTraversable="false" minWidth="200"/>
+                <JFXTextField fx:id="sapConfigurationDescriptionField" promptText="%sapDescription" editable="false" focusTraversable="false" minWidth="200"/>
+            </HBox>
+        </VBox>
+        <Separator/>
+        <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="10">
+            <JFXButton text="%rerun" onAction="#rerunQuery">
+                <graphic>
+                    <MaterialDesignIconView glyphName="REFRESH"/>
+                </graphic>
+            </JFXButton>
+            <JFXButton text="%cancel" onAction="#close">
+                <graphic>
+                    <MaterialDesignIconView glyphName="CLOSE"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
+    </VBox>
+</CustomWindow>
