@@ -15,6 +15,7 @@ import io.msoffice.excel.AccessPatternImportHelper;
 import io.msoffice.excel.WhitelistImportHelper;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -49,6 +50,9 @@ public class SapQueriesController {
 
     @FXML
     public TableColumn<CriticalAccessQuery, SapConfiguration> sapConfigurationColumn;
+
+    @FXML
+    public TableColumn<CriticalAccessQuery, ZonedDateTime> createdAtColumn;
 
     @FXML
     public TableColumn<CriticalAccessQuery, JFXButton> deleteColumn;
@@ -153,6 +157,17 @@ public class SapQueriesController {
 
                 // display nothing if the row is empty, otherwise the item count
                 setText((empty || configuration == null) ? "" : "" + configuration.getDescription());
+            }
+        });
+
+        // overwrite the column in which the date is displayed for formatting
+        createdAtColumn.setCellFactory(col -> new TableCell<CriticalAccessQuery, ZonedDateTime>() {
+
+            @Override
+            protected void updateItem(ZonedDateTime time, boolean empty) {
+
+                // display nothing if the row is empty, otherwise the item count
+                setText((empty || time == null) ? "" : "" + time.format(DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")));
             }
         });
     }

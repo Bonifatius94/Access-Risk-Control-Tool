@@ -11,17 +11,17 @@
       spacing="10">
     <TableView VBox.vgrow="ALWAYS" fx:id="queriesTable">
         <columns>
-            <PTableColumn text="%configuration" percentageWidth="0.3" fx:id="configurationColumn">
+            <PTableColumn text="%configuration" percentageWidth="0.3" fx:id="configurationColumn" styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="config" />
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="%sapSettings" percentageWidth="0.33" fx:id="sapConfigurationColumn">
+            <PTableColumn text="%sapSettings" percentageWidth="0.33" fx:id="sapConfigurationColumn" styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="sapConfig" />
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="%createdAt" percentageWidth="0.2">
+            <PTableColumn text="%createdAt" percentageWidth="0.2" fx:id="createdAtColumn">
                 <cellValueFactory>
                     <PropertyValueFactory property="createdAt" />
                 </cellValueFactory>
