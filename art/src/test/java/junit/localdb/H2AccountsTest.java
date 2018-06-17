@@ -4,9 +4,13 @@ import data.entities.DbUser;
 import data.entities.DbUserRole;
 import data.localdb.ArtDbContext;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("all")
@@ -25,9 +29,9 @@ public class H2AccountsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // create new database accounts
-            context.createDatabaseUser("FooAdmin", "foobar", DbUserRole.Admin);
-            context.createDatabaseUser("FooDataAnalyst", "foobar", DbUserRole.DataAnalyst);
-            context.createDatabaseUser("FooViewer", "foobar", DbUserRole.Viewer);
+            context.createDatabaseUser(new DbUser("FooAdmin", new HashSet(Arrays.asList(DbUserRole.Admin, DbUserRole.DataAnalyst))), "foobar");
+            context.createDatabaseUser(new DbUser("FooDataAnalyst", new HashSet(Arrays.asList(DbUserRole.Viewer, DbUserRole.DataAnalyst))), "foobar");
+            context.createDatabaseUser(new DbUser("FooViewer", new HashSet(Arrays.asList(DbUserRole.Viewer))), "foobar");
 
             // query accounts
             List<DbUser> users = context.getDatabaseUsers();
@@ -48,21 +52,26 @@ public class H2AccountsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // create new user as viewer
-            context.createDatabaseUser("Foo", "foobar", DbUserRole.Viewer);
+            String username = "FOO";
+            DbUser foo = new DbUser(username, new HashSet(Arrays.asList(DbUserRole.Viewer)));
+            context.createDatabaseUser(foo, "foobar");
 
             // check if an additional user was created
             List<DbUser> users = context.getDatabaseUsers();
-            boolean roleOk = users.stream().filter(x -> x.getUsername().toUpperCase().equals("FOO")).findFirst().get().getRole() == DbUserRole.Viewer;
+            boolean roleOk = users.stream().filter(x -> x.getUsername().toUpperCase().equals(username)).findFirst().get().getRoles().contains(DbUserRole.Viewer);
             assert(roleOk);
 
-            // change role to data analyst
-            context.changeUserRole("Foo", DbUserRole.DataAnalyst);
+            // apply changes to roles
+            foo.getRoles().remove(DbUserRole.Viewer);
+            foo.getRoles().add(DbUserRole.DataAnalyst);
+            foo.getRoles().add(DbUserRole.Admin);
+            context.updateUserRoles(foo);
 
             // check if the role was changed
             users = context.getDatabaseUsers();
-            roleOk = users.stream().filter(x -> x.getUsername().toUpperCase().equals("FOO")).findFirst().get().getRole() == DbUserRole.DataAnalyst;
+            Set<DbUserRole> roles = users.stream().filter(x -> x.getUsername().toUpperCase().equals(username)).findFirst().get().getRoles();
 
-            ret = roleOk;
+            ret = roles.containsAll(Arrays.asList(DbUserRole.DataAnalyst));
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -72,9 +81,11 @@ public class H2AccountsTest {
     }
 
     @Test
+    @Disabled
     public void testChangePassword() {
 
         // TODO: implement test
+        assert(false);
     }
 
     @Test
@@ -85,18 +96,20 @@ public class H2AccountsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // create new user as viewer
-            context.createDatabaseUser("Foo", "foobar", DbUserRole.Viewer);
+            String username = "FOO";
+            DbUser foo = new DbUser(username, new HashSet(Arrays.asList(DbUserRole.Viewer)));
+            context.createDatabaseUser(foo, "foobar");
 
             // query new user
-            DbUser user = context.getDatabaseUsers().stream().filter(x -> x.getUsername().equals("FOO")).findFirst().get();
+            DbUser user = context.getDatabaseUsers().stream().filter(x -> x.getUsername().equals(username)).findFirst().get();
 
             // test delete role
             context.deleteDatabaseUser("Foo");
 
             // check if user was deleted
-            user = context.getDatabaseUsers().stream().filter(x -> x.getUsername().equals("FOO")).findFirst().orElse(null);
+            user = context.getDatabaseUsers().stream().filter(x -> x.getUsername().equals(username)).findFirst().orElse(null);
 
-            ret = user == null;
+            ret = (user == null);
 
         } catch (Exception ex) {
             ex.printStackTrace();
