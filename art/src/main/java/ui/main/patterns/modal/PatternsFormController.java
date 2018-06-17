@@ -4,19 +4,20 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.JFXTextField;
+
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 import data.entities.AccessPatternCondition;
 import data.entities.AccessPatternConditionProperty;
 import data.entities.AccessProfileCondition;
 import data.entities.ConditionLinkage;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
@@ -25,10 +26,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -38,11 +37,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import ui.App;
 import ui.custom.controls.ButtonCell;
-import ui.custom.controls.CustomWindow;
 import ui.custom.controls.PTableColumn;
 
 
@@ -109,7 +104,7 @@ public class PatternsFormController {
     private AccessPattern accessPattern;
     private AccessPattern originalPattern;
 
-    private List<TableView> conditionTables;
+    private List<TableView<AccessPatternConditionProperty>> conditionTables;
     private TableView<AccessPatternConditionProperty> selectedTable;
     private AccessPatternConditionProperty selectedProperty;
 
@@ -323,7 +318,7 @@ public class PatternsFormController {
      *
      * @param accessPatternConditionProperty the selected AccessConditionProperty
      */
-    private void editSelectedAccessConditionProperty(AccessPatternConditionProperty accessPatternConditionProperty, TableView table) {
+    private void editSelectedAccessConditionProperty(AccessPatternConditionProperty accessPatternConditionProperty, TableView<AccessPatternConditionProperty> table) {
 
         if (accessPatternConditionProperty != null) {
 
@@ -457,6 +452,7 @@ public class PatternsFormController {
      *
      * @param condition the condition which items are displayed in the tableView
      */
+    @SuppressWarnings("unchecked") // TODO: remove this annotation if possible
     public void addConditionTableTab(AccessCondition condition) {
 
         // get the resource bundle for internationalization
@@ -499,7 +495,7 @@ public class PatternsFormController {
         value4.setText("4");
 
         // create a new TableView of type AccessPatternConditionProperty
-        TableView<AccessPatternConditionProperty> conditionTable = new TableView();
+        TableView<AccessPatternConditionProperty> conditionTable = new TableView<>();
 
         // add the delete column
         PTableColumn<AccessPatternConditionProperty, JFXButton> deleteColumn = new PTableColumn<>();
