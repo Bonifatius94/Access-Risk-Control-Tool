@@ -20,6 +20,7 @@ import sap.SapConnector;
 public class SapTest {
 
     @Test
+    @Disabled
     public void testLogin() {
 
         boolean ret = false;
