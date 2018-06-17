@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("all")
@@ -41,6 +42,7 @@ public class WhitelistTest {
     }
 
     @Test
+    @Disabled
     public void testCreateWhitelist() {
 
         boolean ret = false;
@@ -73,6 +75,7 @@ public class WhitelistTest {
     }
 
     @Test
+    @Disabled
     public void testUpdateWhitelist() {
 
         boolean ret = false;
