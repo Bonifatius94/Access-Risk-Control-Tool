@@ -260,6 +260,86 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     }
 
     // ============================================
+    //               F I L T E R S
+    // ============================================
+
+    /**
+     * This method applies the given filter options to an access pattern query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    public List<AccessPattern> getFilteredPatterns(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+        return null;
+    }
+
+    /**
+     * This method applies the given filter options to a whitelist query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    public List<Whitelist> getFilteredWhitelists(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+        return null;
+    }
+
+    /**
+     * This method applies the given filter options to a sap configs query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    public List<SapConfiguration> getFilteredSapConfigs(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+        return null;
+    }
+
+    /**
+     * This method applies the given filter options to a configs query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    public List<Configuration> getFilteredConfigs(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+        return null;
+    }
+
+    /**
+     * This method applies the given filter options to a sap query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    public List<Configuration> getFilteredSapQueries(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+        return null;
+    }
+
+
+    // ============================================
     //                 U P D A T E
     // ============================================
 
