@@ -1,4 +1,4 @@
-package ui.main.sapqueries.modal;
+package ui.main.sapqueries.modal.details;
 
 import com.jfoenix.controls.JFXTextField;
 
@@ -16,7 +16,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
 import ui.custom.controls.CustomWindow;
-import ui.main.patterns.PatternsFormController;
 
 
 public class SapQueryDetailController {

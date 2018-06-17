@@ -424,3 +424,8 @@ alternative design with separators left and right of complete header bar
 .windowLabel {
     -fx-font-weight: bold;
 }
+
+/* error */
+.error-text {
+    -fx-text-fill: -fx-error;
+}

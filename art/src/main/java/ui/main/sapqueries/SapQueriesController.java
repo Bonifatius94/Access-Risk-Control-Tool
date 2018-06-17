@@ -38,7 +38,7 @@ import javafx.stage.Stage;
 import ui.App;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
-import ui.main.sapqueries.modal.SapQueryDetailController;
+import ui.main.sapqueries.modal.details.SapQueryDetailController;
 
 public class SapQueriesController {
 
@@ -180,7 +180,7 @@ public class SapQueriesController {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/SapQueryDetailView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/details/SapQueryDetailView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
@@ -275,7 +275,7 @@ public class SapQueriesController {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/NewSapQueryView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/newquery/NewSapQueryView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage

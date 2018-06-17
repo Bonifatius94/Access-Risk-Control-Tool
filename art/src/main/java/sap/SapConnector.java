@@ -48,7 +48,9 @@ public class SapConnector implements ISapConnector {
         this.password = password;
 
         // overwrite the JCo SAP DestinationDataProvider so we don't need to create a file
-        com.sap.conn.jco.ext.Environment.registerDestinationDataProvider(new CustomDestinationDataProvider(sapConfig, username, password));
+        if (!com.sap.conn.jco.ext.Environment.isDestinationDataProviderRegistered()) {
+            com.sap.conn.jco.ext.Environment.registerDestinationDataProvider(new CustomDestinationDataProvider(sapConfig, username, password));
+        }
 
         TraceOut.leave();
     }

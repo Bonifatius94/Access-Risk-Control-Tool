@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import ui.custom.controls.CustomWindow?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXPasswordField?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXSpinner?>
+<?import com.jfoenix.validation.RequiredFieldValidator?>
+<CustomWindow xmlns="http://javafx.com/javafx"
+              xmlns:fx="http://javafx.com/fxml"
+              fx:controller="ui.main.sapqueries.modal.newquery.SapLoginController">
+    <!-- login credentials input -->
+    <VBox HBox.hgrow="ALWAYS" alignment="CENTER" style="-fx-padding: 50 20 20 20" spacing="20">
+        <!-- username input -->
+        <VBox HBox.hgrow="ALWAYS" fx:id="loginPane" spacing="40">
+            <HBox alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS">
+                <MaterialDesignIconView glyphName="ACCOUNT" size="20"/>
+                <JFXTextField fx:id="usernameInput" promptText="%username" prefWidth="200">
+                    <validators>
+                        <RequiredFieldValidator message="%required">
+                            <MaterialDesignIconView glyphName="ALERT"/>
+                        </RequiredFieldValidator>
+                    </validators>
+                </JFXTextField>
+            </HBox>
+
+            <!-- password input -->
+            <HBox alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS">
+                <MaterialDesignIconView glyphName="KEY" size="20"/>
+                <JFXPasswordField fx:id="passwordInput" promptText="%password" prefWidth="200">
+                    <validators>
+                        <RequiredFieldValidator message="%required">
+                            <MaterialDesignIconView glyphName="ALERT"/>
+                        </RequiredFieldValidator>
+                    </validators>
+                </JFXPasswordField>
+            </HBox>
+        </VBox>
+
+        <Label visible="false" fx:id="errorLabel" text="%loginError" wrapText="true">
+            <graphic>
+                <MaterialDesignIconView glyphName="ALERT"/>
+            </graphic>
+        </Label>
+
+        <!-- buttons ok / cancel -->
+        <HBox alignment="CENTER" spacing="10" style="-fx-padding: 10 0 0 0">
+            <JFXButton onAction="#close" text="%back">
+                <graphic>
+                    <MaterialDesignIconView glyphName="ARROW_LEFT"/>
+                </graphic>
+            </JFXButton>
+            <Region HBox.hgrow="ALWAYS"/>
+            <JFXButton onAction="#login" text="%login">
+                <graphic>
+                    <MaterialDesignIconView glyphName="LOGIN"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
+    </VBox>
+</CustomWindow>

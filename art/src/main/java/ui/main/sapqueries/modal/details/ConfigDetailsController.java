@@ -1,4 +1,4 @@
-package ui.main.sapqueries.modal;
+package ui.main.sapqueries.modal.details;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
@@ -131,7 +131,7 @@ public class ConfigDetailsController {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../patterns/PatternsFormView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../../patterns/PatternsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage

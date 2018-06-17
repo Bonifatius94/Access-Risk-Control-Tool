@@ -10,7 +10,7 @@
 <?import javafx.scene.control.Label?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
-              fx:controller="ui.main.sapqueries.modal.NewSapQueryController" windowState="NoResize">
+              fx:controller="ui.main.sapqueries.modal.newquery.NewSapQueryController" windowState="NoResize">
     <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-padding: 20" spacing="40">
         <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="30">
             <Label text="%configuration"/>
@@ -26,7 +26,7 @@
         </HBox>
         <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="30">
             <Label text="%sapSettings"/>
-            <JFXComboBox fx:id="sapSettingsAutocomplete" promptText="HUNA" minWidth="250"/>
+            <JFXComboBox fx:id="sapSettingsAutocomplete" minWidth="250"/>
             <JFXButton onAction="#chooseSapSettings" styleClass="round-button" minHeight="30">
                 <tooltip>
                     <Tooltip text="%chooseSapSettings"/>
@@ -37,7 +37,7 @@
             </JFXButton>
         </HBox>
         <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT">
-            <JFXButton text="%runAnalysis">
+            <JFXButton text="%runAnalysis" onAction="#openLoginDialog">
                 <graphic>
                     <MaterialDesignIconView glyphName="PLAY"/>
                 </graphic>
