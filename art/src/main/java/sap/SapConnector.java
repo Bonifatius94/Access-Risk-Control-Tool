@@ -17,6 +17,8 @@ import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,11 +26,11 @@ import java.util.stream.Collectors;
 import tools.tracing.TraceOut;
 
 @SuppressWarnings("WeakerAccess")
-public class SapConnector implements ISapConnector {
+public class SapConnector implements ISapConnector, Closeable {
 
-    private SapConfiguration sapConfig;
-    private String username;
-    private String password;
+    // =============================
+    //          constructor
+    // =============================
 
     /**
      * Creates a new SapConnector with the given configuration, username and password.
@@ -48,12 +50,24 @@ public class SapConnector implements ISapConnector {
         this.password = password;
 
         // overwrite the JCo SAP DestinationDataProvider so we don't need to create a file
-        if (!com.sap.conn.jco.ext.Environment.isDestinationDataProviderRegistered()) {
-            com.sap.conn.jco.ext.Environment.registerDestinationDataProvider(new CustomDestinationDataProvider(sapConfig, username, password));
-        }
+        sessionKey = CustomDestinationDataProvider.getInstance().openSession(sapConfig, username, password);
 
         TraceOut.leave();
     }
+
+    // =============================
+    //           members
+    // =============================
+
+    private String sessionKey;
+
+    private SapConfiguration sapConfig;
+    private String username;
+    private String password;
+
+    // =============================
+    //            ping
+    // =============================
 
     /**
     /** This method pings the sap server specified in the sap server config.
@@ -69,7 +83,7 @@ public class SapConnector implements ISapConnector {
         try {
 
             // try to ping the sap server (if the ping fails an exception is thrown -> program enters catch block and returns false)
-            JCoDestination destination = JCoDestinationManager.getDestination(sapConfig.getServerDestination());
+            JCoDestination destination = JCoDestinationManager.getDestination(sessionKey);
             destination.ping();
 
         } catch (JCoException ex) {
@@ -82,9 +96,9 @@ public class SapConnector implements ISapConnector {
         return ret;
     }
 
-    // ===================================
-    //              QUERY LOGIC
-    // ===================================
+    // =============================
+    //         query logic
+    // =============================
 
     /**
      * This method runs a SAP analysis for the given config.
@@ -134,7 +148,7 @@ public class SapConnector implements ISapConnector {
 
         TraceOut.enter();
 
-        JCoDestination destination = JCoDestinationManager.getDestination(sapConfig.getServerDestination());
+        JCoDestination destination = JCoDestinationManager.getDestination(sessionKey);
         JCoFunction function = destination.getRepository().getFunction("SUSR_SUIM_API_RSUSR002");
 
         JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");
@@ -245,7 +259,7 @@ public class SapConnector implements ISapConnector {
         TraceOut.enter();
 
         JCoTable results = null;
-        JCoDestination destination = JCoDestinationManager.getDestination(sapConfig.getServerDestination());
+        JCoDestination destination = JCoDestinationManager.getDestination(sessionKey);
 
         /*if (canPingServer()) {*/
 
@@ -291,6 +305,15 @@ public class SapConnector implements ISapConnector {
 
         TraceOut.leave();
         return usernames;
+    }
+
+    // =============================
+    //          overrides
+    // =============================
+
+    @Override
+    public void close() throws IOException {
+        CustomDestinationDataProvider.getInstance().closeSession(sessionKey);
     }
 
 }
