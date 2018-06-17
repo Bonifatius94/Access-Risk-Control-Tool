@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+
+<?import ui.custom.controls.CustomWindow?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.Label?>
+<CustomWindow xmlns="http://javafx.com/javafx"
+              xmlns:fx="http://javafx.com/fxml"
+              fx:controller="ui.main.sapqueries.modal.NewSapQueryController" windowState="NoResize">
+    <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-padding: 20" spacing="40">
+        <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="30">
+            <Label text="%configuration"/>
+            <JFXComboBox fx:id="configAutocomplete" minWidth="250"/>
+            <JFXButton onAction="#chooseConfig" styleClass="round-button" minHeight="30">
+                <tooltip>
+                    <Tooltip text="%chooseConfig"/>
+                </tooltip>
+                <graphic>
+                    <MaterialDesignIconView glyphName="PLAYLIST_PLUS"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
+        <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="30">
+            <Label text="%sapSettings"/>
+            <JFXComboBox fx:id="sapSettingsAutocomplete" promptText="HUNA" minWidth="250"/>
+            <JFXButton onAction="#chooseSapSettings" styleClass="round-button" minHeight="30">
+                <tooltip>
+                    <Tooltip text="%chooseSapSettings"/>
+                </tooltip>
+                <graphic>
+                    <MaterialDesignIconView glyphName="PLAYLIST_PLUS"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
+        <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT">
+            <JFXButton text="%runAnalysis">
+                <graphic>
+                    <MaterialDesignIconView glyphName="PLAY"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
+    </VBox>
+</CustomWindow>

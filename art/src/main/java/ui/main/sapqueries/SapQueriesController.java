@@ -272,6 +272,26 @@ public class SapQueriesController {
      * Opens the modal dialog to create a new item.
      */
     public void addAction() {
-        openQuery(null);
+        try {
+            // create a new FXML loader with the SapSettingsEditDialogController
+            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/NewSapQueryView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
+
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow);
+            scene.getStylesheets().add("css/dark-theme.css");
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
+            customWindow.initStage(stage);
+
+            customWindow.setTitle(bundle.getString("newAnalysis"));
+
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
