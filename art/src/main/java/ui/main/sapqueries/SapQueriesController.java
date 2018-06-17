@@ -192,6 +192,8 @@ public class SapQueriesController {
             stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
 
+            customWindow.setTitle(bundle.getString("queryDetails"));
+
             stage.show();
 
             // give the dialog the query

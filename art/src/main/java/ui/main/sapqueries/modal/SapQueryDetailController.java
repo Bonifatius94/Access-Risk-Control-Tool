@@ -88,6 +88,8 @@ public class SapQueryDetailController {
             stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
 
+            customWindow.setTitle(bundle.getString("configDetails"));
+
             stage.show();
 
             // give the dialog the sapConfiguration
