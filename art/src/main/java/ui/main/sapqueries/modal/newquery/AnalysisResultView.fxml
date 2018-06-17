@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import ui.custom.controls.CustomWindow?>
+<?import ui.custom.controls.PTableColumn?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<CustomWindow xmlns="http://javafx.com/javafx"
+              xmlns:fx="http://javafx.com/fxml"
+              fx:controller="ui.main.sapqueries.modal.newquery.AnalysisResultController">
+    <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
+        <TableView fx:id="resultTable" minWidth="400" VBox.vgrow="ALWAYS">
+            <columns>
+                <PTableColumn text="%violatedUseCaseID" percentageWidth="0.5">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="accessPattern"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn text="%username" percentageWidth="0.5">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="username"/>
+                    </cellValueFactory>
+                </PTableColumn>
+            </columns>
+        </TableView>
+        <HBox alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS" spacing="40">
+            <HBox alignment="BASELINE_LEFT" spacing="20">
+                <Label text="%format"/>
+                <JFXComboBox fx:id="exportFormatChooser"/>
+            </HBox>
+            <JFXButton onAction="#exportResults" text="%export">
+                <graphic>
+                    <MaterialDesignIconView glyphName="EXPORT"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
+    </VBox>
+</CustomWindow>

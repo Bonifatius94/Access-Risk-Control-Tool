@@ -16,6 +16,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
 import ui.custom.controls.CustomWindow;
+import ui.main.sapqueries.modal.newquery.NewSapQueryController;
 
 
 public class SapQueryDetailController {
@@ -103,8 +104,35 @@ public class SapQueryDetailController {
         // TODO: open a modal window with SAPConfig Details
     }
 
+    /**
+     * Opens the window for running the query with preselected values.
+     */
     public void rerunQuery() {
+        try {
+            // create a new FXML loader with the SapSettingsEditDialogController
+            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../newquery/NewSapQueryView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
 
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow, 1050, 650);
+            scene.getStylesheets().add("css/dark-theme.css");
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
+            customWindow.initStage(stage);
+
+            customWindow.setTitle(bundle.getString("newAnalysis"));
+
+            stage.show();
+
+            // give the dialog the sapConfiguration
+            NewSapQueryController newQuery = loader.getController();
+            newQuery.giveQuery(query);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
