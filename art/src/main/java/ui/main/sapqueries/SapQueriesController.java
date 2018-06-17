@@ -228,11 +228,13 @@ public class SapQueriesController {
      */
     private void fillQueriesTable() {
         try {
-            // parsing test patterns from excel file
-            List<AccessPattern> patterns = new AccessPatternImportHelper().importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
-
             // parsing test whitelist from excel file
             Whitelist whitelist = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");
+            whitelist.setName("Whitelist-Name");
+            whitelist.setDescription("Whitelist-Description");
+
+            // parsing test patterns from excel file
+            List<AccessPattern> patterns = new AccessPatternImportHelper().importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
 
             Configuration configuration = new Configuration();
             configuration.setWhitelist(whitelist);

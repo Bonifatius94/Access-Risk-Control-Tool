@@ -61,9 +61,9 @@
                     <MaterialDesignIconView glyphName="REFRESH"/>
                 </graphic>
             </JFXButton>
-            <JFXButton text="%cancel" onAction="#close">
+            <JFXButton text="%back" onAction="#close">
                 <graphic>
-                    <MaterialDesignIconView glyphName="CLOSE"/>
+                    <MaterialDesignIconView glyphName="ARROW_LEFT"/>
                 </graphic>
             </JFXButton>
         </HBox>

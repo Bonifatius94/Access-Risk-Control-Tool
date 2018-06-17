@@ -16,7 +16,6 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
@@ -25,24 +24,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import ui.App;
 import ui.custom.controls.ButtonCell;
-import ui.custom.controls.CustomWindow;
 import ui.custom.controls.PTableColumn;
 
 
@@ -100,6 +94,18 @@ public class PatternsFormController {
     private JFXButton deleteSelectedTableTabButton;
 
     @FXML
+    private JFXButton addConditionButton;
+
+    @FXML
+    private JFXButton applyPopertyChangesButton;
+
+    @FXML
+    private JFXButton revertButton;
+
+    @FXML
+    private JFXButton saveButton;
+
+    @FXML
     private Label atLeastOneCondWarning;
 
 
@@ -108,6 +114,8 @@ public class PatternsFormController {
 
     private List<TableView> conditionTables;
     private TableView<AccessPatternConditionProperty> selectedTable;
+    private List<PTableColumn<AccessPatternConditionProperty, JFXButton>> deleteColumns;
+    private List<JFXButton> addPropertyButtons;
     private AccessPatternConditionProperty selectedProperty;
 
 
@@ -119,6 +127,12 @@ public class PatternsFormController {
 
         // initialize conditionTables
         this.conditionTables = new ArrayList<>();
+
+        // initialize delete columns
+        this.deleteColumns = new ArrayList<>();
+
+        // initialize addProperty buttons
+        this.addPropertyButtons = new ArrayList<>();
 
         // set condition input items
         this.conditionTypeInput.getItems().setAll("Condition", "Profile");
@@ -305,6 +319,7 @@ public class PatternsFormController {
 
     /**
      * Hides the stage.
+     *
      * @param event the given ActionEvent
      */
     public void close(ActionEvent event) {
@@ -501,6 +516,7 @@ public class PatternsFormController {
             conditionTable.getItems().remove(accessPatternConditionProperty);
             return accessPatternConditionProperty;
         }));
+        deleteColumns.add(deleteColumn);
 
         // listen to selects on conditionPropertiesTable
         conditionTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -523,8 +539,8 @@ public class PatternsFormController {
         }
 
         // create add button
-        JFXButton addButton = new JFXButton();
-        addButton.setOnAction(event -> {
+        JFXButton addPropertyButton = new JFXButton();
+        addPropertyButton.setOnAction(event -> {
             conditionTable.getItems().add(new AccessPatternConditionProperty());
             conditionTable.requestFocus();
             conditionTable.getSelectionModel().selectLast();
@@ -532,14 +548,16 @@ public class PatternsFormController {
             conditionTable.scrollTo(conditionTable.getItems().size() - 1);
         });
         MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.PLUS);
-        addButton.setGraphic(view);
-        addButton.setTooltip(new Tooltip(bundle.getString("addProperty")));
-        addButton.getStyleClass().add("round-button");
-        addButton.setMinHeight(30);
-        addButton.setPrefHeight(30);
+        addPropertyButton.setGraphic(view);
+        addPropertyButton.setTooltip(new Tooltip(bundle.getString("addProperty")));
+        addPropertyButton.getStyleClass().add("round-button");
+        addPropertyButton.setMinHeight(30);
+        addPropertyButton.setPrefHeight(30);
 
         // disable button on 10 entries
-        addButton.disableProperty().bind(Bindings.size(conditionTable.getItems()).isEqualTo(10));
+        addPropertyButton.disableProperty().bind(Bindings.size(conditionTable.getItems()).isEqualTo(10));
+
+        addPropertyButtons.add(addPropertyButton);
 
         // add warning label on 10 entries
         Label warningTextItemLimit = new Label(bundle.getString("warningTextItemLimit"));
@@ -548,7 +566,7 @@ public class PatternsFormController {
         // box for the button
         HBox buttonBox = new HBox();
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
-        buttonBox.getChildren().addAll(warningTextItemLimit, addButton);
+        buttonBox.getChildren().addAll(warningTextItemLimit, addPropertyButton);
         buttonBox.setSpacing(20);
         buttonBox.setPadding(new Insets(0, 20, 0, 0));
         HBox.setHgrow(buttonBox, Priority.ALWAYS);
@@ -589,6 +607,47 @@ public class PatternsFormController {
 
             this.selectedTable.refresh();
 
+        }
+    }
+
+
+    /**
+     * Makes all inputs not editable and hides the buttons.
+     *
+     * @param editable whether the components should be editable
+     */
+    public void setEditable(boolean editable) {
+
+        // disable everything
+        if (!editable) {
+
+            // make text fields uneditable
+            authObjectInput.setEditable(false);
+            authFieldInput.setEditable(false);
+            authFieldValue1Input.setEditable(false);
+            authFieldValue3Input.setEditable(false);
+            authFieldValue4Input.setEditable(false);
+            profileInput.setEditable(false);
+
+            // disable combo boxes
+            linkageInput.setDisable(true);
+            conditionTypeInput.setDisable(true);
+
+            // remove buttons
+            addConditionButton.setVisible(false);
+            deleteSelectedTableTabButton.setVisible(false);
+            saveButton.setVisible(false);
+            applyPopertyChangesButton.setVisible(false);
+            revertButton.setVisible(false);
+
+            for (JFXButton addPropertyButton : addPropertyButtons) {
+                addPropertyButton.setVisible(false);
+            }
+
+            // remove delete column
+            for (PTableColumn column : deleteColumns) {
+                column.setVisible(false);
+            }
         }
     }
 }

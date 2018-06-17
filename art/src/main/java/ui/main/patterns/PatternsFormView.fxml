@@ -59,7 +59,7 @@
             <JFXTabPane fx:id="conditionTabs" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"/>
             <VBox spacing="20" alignment="TOP_CENTER">
                 <HBox fx:id="editConditionBox" visible="false" alignment="BASELINE_LEFT" spacing="20">
-                    <JFXButton onAction="#addEmptyConditionTableTab" prefHeight="30" styleClass="round-button">
+                    <JFXButton onAction="#addEmptyConditionTableTab" prefHeight="30" styleClass="round-button" fx:id="addConditionButton">
                         <graphic>
                             <MaterialDesignIconView glyphName="PLUS"/>
                         </graphic>
@@ -130,7 +130,7 @@
                 </VBox>
                 <HBox alignment="CENTER_RIGHT">
                     <JFXButton onAction="#editConditionProperty" prefHeight="30" prefWidth="30"
-                               styleClass="round-button">
+                               styleClass="round-button" fx:id="applyPopertyChangesButton">
                         <graphic>
                             <MaterialDesignIconView glyphName="CHECK"/>
                         </graphic>
@@ -144,14 +144,14 @@
         <Separator/>
         <HBox HBox.hgrow="ALWAYS">
             <HBox alignment="BASELINE_LEFT" HBox.hgrow="ALWAYS">
-                <JFXButton text="%revert" onAction="#resetForm">
+                <JFXButton text="%revert" onAction="#resetForm" fx:id="revertButton">
                     <graphic>
                         <MaterialDesignIconView glyphName="UNDO_VARIANT"/>
                     </graphic>
                 </JFXButton>
             </HBox>
             <HBox spacing="20" alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS">
-                <JFXButton onAction="#saveChanges" prefWidth="120" text="%save">
+                <JFXButton onAction="#saveChanges" prefWidth="120" text="%save" fx:id="saveButton">
                     <graphic>
                         <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
                     </graphic>
