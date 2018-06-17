@@ -19,7 +19,9 @@ import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
@@ -250,7 +252,14 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         try (Session session = getSessionFactory().openSession()) {
 
             List<Object[]> results = session.createNativeQuery("SELECT * FROM DbUsers").getResultList();
-            users = results.stream().map(x -> new DbUser((String)x[0], DbUserRole.parseRole((String)x[1]))).collect(Collectors.toList());
+            users = results.stream().map(x -> {
+
+                String username = (String)x[0];
+                Set<DbUserRole> roles = Arrays.stream(((String) x[1]).split(",")).map(y -> DbUserRole.parseRole(y)).collect(Collectors.toSet());
+
+                return new DbUser(username, roles);
+
+            }).collect(Collectors.toList());
 
         } catch (Exception ex) {
             throw new Exception("Unknown error while executing local database query. (see log file for more details)");
@@ -671,75 +680,33 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     /**
      * This method adds a new database user with rights according to the given role.
      *
-     * @param username the name of the new database user
+     * @param user     the account data of the new database user
      * @param password the password of the new database user
-     * @param role     the role of the new database user
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
     @Override
-    public void createDatabaseUser(String username, String password, DbUserRole role) throws Exception {
-
-        Transaction transaction = null;
+    public void createDatabaseUser(DbUser user, String password) throws Exception {
 
         try (Session session = getSessionFactory().openSession()) {
 
-            // avoid sql injection with username
-            if (username.contains(" ")) {
-                // TODO: implement this as custom exception
-                throw new Exception("Invalid username! No whitespaces allowed!");
-            }
-
-            transaction = session.beginTransaction();
-
-            // create a new database account
-            String sql = "CREATE USER " + username + " PASSWORD :password " + ((role == DbUserRole.Admin) ? "ADMIN" : "");
-            session.createNativeQuery(sql).setParameter("password", password).executeUpdate();
-
-            // grant privileges to account accordingly
-            session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
-
-            session.flush();
-            transaction.commit();
-
-        } catch (Exception ex) {
-
-            if (transaction != null) {
-                transaction.rollback();
-            }
-
-            throw ex;
-        }
-    }
-
-    /**
-     * This method changes the role of an existing user.
-     *
-     * @param username the name of an existing database user
-     * @param role     the new role of the user
-     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
-     */
-    @Override
-    public void changeUserRole(String username, DbUserRole role) throws Exception {
-
-        // get original database user and role
-        DbUser original =
-            getDatabaseUsers()
-            .stream().filter(x -> x.getUsername().toUpperCase().equals(username.toUpperCase()))
-            .findFirst().orElse(null);
-
-        if (original != null) {
-
             Transaction transaction = null;
 
-            try (Session session = getSessionFactory().openSession()) {
+            try {
+
+                // avoid sql injection with username
+                if (user.getUsername().contains(" ")) {
+                    // TODO: implement this as custom exception
+                    throw new Exception("Invalid username! No whitespaces allowed!");
+                }
 
                 transaction = session.beginTransaction();
 
-                // remove old privileges from database account
-                session.createNativeQuery("REVOKE " + original.getRole().toString() + " FROM " + username).executeUpdate();
+                // create a new database account
+                String sql = "CREATE USER " + user.getUsername() + " PASSWORD :password " + ((user.getRoles().contains(DbUserRole.Admin)) ? "ADMIN" : "");
+                session.createNativeQuery(sql).setParameter("password", password).executeUpdate();
 
-                // grant new privileges to database account
-                session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
+                // grant privileges to the database account according to given roles
+                user.getRoles().forEach(role -> addDbRole(session, user.getUsername(), role));
 
                 session.flush();
                 transaction.commit();
@@ -752,9 +719,75 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 throw ex;
             }
+        }
+    }
 
-        } else {
-            throw new Exception("User " + username + " does not exist.");
+    /**
+     * This method changes the roles of an existing user.
+     *
+     * @param user the database user to be updated
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    @Override
+    public void updateUserRoles(DbUser user) throws Exception {
+
+        try (Session session = getSessionFactory().openSession()) {
+
+            Transaction transaction = null;
+
+            try {
+
+                // create a new database account
+                DbUser original = getDatabaseUsers().stream().filter(x -> x.getUsername().equals(user.getUsername().toUpperCase())).findFirst().orElse(null);
+
+                if (original != null) {
+
+                    transaction = session.beginTransaction();
+
+                    // grant privileges that were added by admin
+                    user.getRoles().stream().filter(x -> !original.getRoles().contains(x)).forEach(role -> addDbRole(session, user.getUsername(), role));
+
+                    // revoke privileges that were removed by admin
+                    original.getRoles().stream().filter(x -> !user.getRoles().contains(x)).forEach(role -> removeDbRole(session, user.getUsername(), role));
+
+                    session.flush();
+                    transaction.commit();
+
+                } else {
+                    // TODO: replace this exception with a custom exception
+                    throw new IllegalArgumentException("Database user does not exist.");
+                }
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
+            }
+        }
+    }
+
+    private void addDbRole(Session session, String username, DbUserRole role) {
+
+        // grant privileges to database account
+        session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
+
+        // grant database admin rights
+        if (role == DbUserRole.Admin) {
+            session.createNativeQuery("ALTER USER " + username + " ADMIN TRUE").executeUpdate();
+        }
+    }
+
+    private void removeDbRole(Session session, String username, DbUserRole role) {
+
+        // revoke privileges from database account
+        session.createNativeQuery("REVOKE " + role.toString() + " FROM " + username).executeUpdate();
+
+        // revoke database admin rights
+        if (role == DbUserRole.Admin) {
+            session.createNativeQuery("ALTER USER " + username + " ADMIN FALSE").executeUpdate();
         }
     }
 
@@ -768,31 +801,34 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void changePassword(String username, String password) throws Exception {
 
-        Transaction transaction = null;
-
         try (Session session = getSessionFactory().openSession()) {
 
-            // avoid sql injection with username
-            if (username.contains(" ")) {
-                // TODO: implement this as custom exception
-                throw new Exception("Invalid username! No whitespaces allowed!");
+            Transaction transaction = null;
+
+            try {
+
+                // avoid sql injection with username
+                if (username.contains(" ")) {
+                    // TODO: implement this as custom exception
+                    throw new Exception("Invalid username! No whitespaces allowed!");
+                }
+
+                transaction = session.beginTransaction();
+
+                // change password for database account
+                session.createNativeQuery("ALTER USER " + username + " SET PASSWORD :password").setParameter("password", password).executeUpdate();
+
+                session.flush();
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
             }
-
-            transaction = session.beginTransaction();
-
-            // change password for database account
-            session.createNativeQuery("ALTER USER " + username + " SET PASSWORD :password").setParameter("password", password).executeUpdate();
-
-            session.flush();
-            transaction.commit();
-
-        } catch (Exception ex) {
-
-            if (transaction != null) {
-                transaction.rollback();
-            }
-
-            throw ex;
         }
     }
 
@@ -805,31 +841,34 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void deleteDatabaseUser(String username) throws Exception {
 
-        Transaction transaction = null;
-
         try (Session session = getSessionFactory().openSession()) {
 
-            // avoid sql injection with username
-            if (username.contains(" ")) {
-                // TODO: implement this as custom exception
-                throw new Exception("Invalid username! No whitespaces allowed!");
+            Transaction transaction = null;
+
+            try {
+
+                // avoid sql injection with username
+                if (username.contains(" ")) {
+                    // TODO: implement this as custom exception
+                    throw new Exception("Invalid username! No whitespaces allowed!");
+                }
+
+                transaction = session.beginTransaction();
+
+                // delete database account
+                session.createNativeQuery("DROP USER " + username).executeUpdate();
+
+                session.flush();
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
             }
-
-            transaction = session.beginTransaction();
-
-            // delete database account
-            session.createNativeQuery("DROP USER " + username).executeUpdate();
-
-            session.flush();
-            transaction.commit();
-
-        } catch (Exception ex) {
-
-            if (transaction != null) {
-                transaction.rollback();
-            }
-
-            throw ex;
         }
     }
 
@@ -862,5 +901,97 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         //    throw new ArtException(ArtException.ErrorCode.WrongLocalDatabaseLoginCredentials, null);
         //}
     }
+
+    // old implementations that are obsolete
+
+    ///**
+    // * This method adds a new database user with rights according to the given role.
+    // *
+    // * @param username the name of the new database user
+    // * @param password the password of the new database user
+    // * @param role     the role of the new database user
+    // * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+    // */
+    //@Override
+    //public void createDatabaseUser(String username, String password, DbUserRole role) throws Exception {
+    //
+    //    Transaction transaction = null;
+    //
+    //    try (Session session = getSessionFactory().openSession()) {
+    //
+    //        // avoid sql injection with username
+    //        if (username.contains(" ")) {
+    //            // TODO: implement this as custom exception
+    //            throw new Exception("Invalid username! No whitespaces allowed!");
+    //        }
+    //
+    //        transaction = session.beginTransaction();
+    //
+    //        // create a new database account
+    //        String sql = "CREATE USER " + username + " PASSWORD :password " + ((role == DbUserRole.Admin) ? "ADMIN" : "");
+    //        session.createNativeQuery(sql).setParameter("password", password).executeUpdate();
+    //
+    //        // grant privileges to account accordingly
+    //        session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
+    //
+    //        session.flush();
+    //        transaction.commit();
+    //
+    //    } catch (Exception ex) {
+    //
+    //        if (transaction != null) {
+    //            transaction.rollback();
+    //        }
+    //
+    //        throw ex;
+    //    }
+    //}
+
+    ///**
+    // * This method changes the role of an existing user.
+    // *
+    // * @param username the name of an existing database user
+    // * @param role     the new role of the user
+    // * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+    // */
+    //@Override
+    //public void changeUserRole(String username, DbUserRole role) throws Exception {
+    //
+    //    // get original database user and role
+    //    DbUser original =
+    //        getDatabaseUsers()
+    //        .stream().filter(x -> x.getUsername().toUpperCase().equals(username.toUpperCase()))
+    //        .findFirst().orElse(null);
+    //
+    //    if (original != null) {
+    //
+    //        Transaction transaction = null;
+    //
+    //        try (Session session = getSessionFactory().openSession()) {
+    //
+    //            transaction = session.beginTransaction();
+    //
+    //            // remove old privileges from database account
+    //            session.createNativeQuery("REVOKE " + original.getRole().toString() + " FROM " + username).executeUpdate();
+    //
+    //            // grant new privileges to database account
+    //            session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
+    //
+    //            session.flush();
+    //            transaction.commit();
+    //
+    //        } catch (Exception ex) {
+    //
+    //            if (transaction != null) {
+    //                transaction.rollback();
+    //            }
+    //
+    //            throw ex;
+    //        }
+    //
+    //    } else {
+    //        throw new Exception("User " + username + " does not exist.");
+    //    }
+    //}
 
 }

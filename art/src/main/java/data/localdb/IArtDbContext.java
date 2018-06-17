@@ -265,21 +265,19 @@ public interface IArtDbContext {
     /**
      * This method adds a new database user with rights according to the given role.
      *
-     * @param username the name of the new database user
+     * @param user the account data of the new database user
      * @param password the password of the new database user
-     * @param role the role of the new database user
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    void createDatabaseUser(String username, String password, DbUserRole role) throws Exception;
+    void createDatabaseUser(DbUser user, String password) throws Exception;
 
     /**
-     * This method changes the role of an existing user.
+     * This method changes the roles of an existing user.
      *
-     * @param username the name of an existing database user
-     * @param role the new role of the user
+     * @param user the database user to be updated
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    void changeUserRole(String username, DbUserRole role) throws Exception;
+    void updateUserRoles(DbUser user) throws Exception;
 
     /**
      * This method changes the password of an existing user.
