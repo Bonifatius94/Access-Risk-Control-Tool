@@ -29,14 +29,13 @@ public class SapLoginController {
     private SapConfiguration configuration;
     private NewSapQueryController parentController;
 
-
     @FXML
     public void initialize() {
         initializeValidation();
     }
 
     /**
-     * Handles the SAP login
+     * Handles the SAP login.
      */
     public void login(ActionEvent event) {
         if (validateBeforeSubmit()) {
@@ -45,6 +44,7 @@ public class SapLoginController {
 
                 if (connector.canPingServer()) {
                     close(event);
+                    parentController.runAnalysis();
                 } else {
                     errorLabel.setVisible(true);
                 }

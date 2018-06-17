@@ -1,18 +1,25 @@
 package ui.main.sapqueries.modal.newquery;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXSpinner;
 import data.entities.Configuration;
 import data.entities.SapConfiguration;
+
+import java.util.ResourceBundle;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.effect.BoxBlur;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import ui.App;
 import ui.custom.controls.CustomWindow;
-import ui.main.patterns.PatternsFormController;
 
-import java.util.ResourceBundle;
 
 public class NewSapQueryController {
 
@@ -21,6 +28,16 @@ public class NewSapQueryController {
 
     @FXML
     public JFXComboBox<SapConfiguration> sapSettingsAutocomplete;
+
+    @FXML
+    public VBox inputBox;
+
+    @FXML
+    public VBox spinner;
+
+    @FXML
+    private JFXButton runAnalysisButton;
+
 
     private Configuration configuration;
     private SapConfiguration sapConfiguration;
@@ -69,5 +86,19 @@ public class NewSapQueryController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * Runs the analysis.
+     */
+    public void runAnalysis() {
+        inputBox.setEffect(new BoxBlur());
+        spinner.setVisible(true);
+
+    }
+
+    public void cancel() {
+
     }
 }
