@@ -1,6 +1,7 @@
 package ui;
 
 import data.localdb.ArtDbContext;
+import tools.tracing.TraceOut;
 
 public class AppComponents {
 
@@ -19,19 +20,33 @@ public class AppComponents {
      *
      * @param username the username of the new database context
      * @param password the password of the new database context
-     * @return a new instance of ArtDbContext
+     * @return a boolean that indicates whether the user credentials are valid and db context initialization worked fine
      */
-    public static ArtDbContext initDbContext(String username, String password) {
+    public static boolean tryInitDbContext(String username, String password) {
+
+        TraceOut.enter();
 
         // close old context
         if (dbContext != null) {
             dbContext.close();
         }
 
-        // create a new context instance
-        dbContext = new ArtDbContext(username, password);
+        boolean ret = true;
 
-        return dbContext;
+        try {
+
+            // create a new db context instance (if username or password is invalid an exception is thrown which results into returning false)
+            dbContext = new ArtDbContext(username, password);
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+            TraceOut.writeException(ex);
+            ret = false;
+        }
+
+        TraceOut.leave();
+        return ret;
     }
 
 }
