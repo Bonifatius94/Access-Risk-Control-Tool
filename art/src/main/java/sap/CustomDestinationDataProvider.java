@@ -6,8 +6,6 @@ import com.sap.conn.jco.ext.DestinationDataProvider;
 
 import data.entities.SapConfiguration;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -39,6 +37,7 @@ public class CustomDestinationDataProvider implements DestinationDataProvider {
 
     private DestinationDataEventListener destinationDataEventListener;
     private HashMap<String, Properties> settingsOfSessions = new HashMap<>();
+    private int sessionCount = 0;
 
     // =============================
     //     register / unregister
@@ -50,16 +49,15 @@ public class CustomDestinationDataProvider implements DestinationDataProvider {
      * @param config the configuration
      * @param username the username
      * @param password the password
-     * @return the destination name of the new connection
+     * @return the session key of the new connection
      */
-    public String openSession(SapConfiguration config, String username, String password) {
+    public synchronized String openSession(SapConfiguration config, String username, String password) {
 
         // generate session key
-        String sessionKey = config.getServerDestination() + "_" + ZonedDateTime.now(ZoneOffset.UTC);
+        final String sessionKey = String.valueOf(sessionCount++) + "_" + config.getServerDestination();
 
         // create settings instance with given data
         final Properties settings = new Properties();
-        settings.setProperty(DestinationDataProvider.JCO_DEST, sessionKey);
         settings.setProperty(DestinationDataProvider.JCO_ASHOST, config.getServerDestination());
         settings.setProperty(DestinationDataProvider.JCO_SYSNR, config.getSysNr());
         settings.setProperty(DestinationDataProvider.JCO_CLIENT, config.getClient());
@@ -85,7 +83,12 @@ public class CustomDestinationDataProvider implements DestinationDataProvider {
             throw new IllegalArgumentException("Unknown session key: " + sessionKey);
         }
 
+        // make sure that the connection data is no longer referenced
+        settingsOfSessions.get(sessionKey).clear();
         settingsOfSessions.remove(sessionKey);
+
+        // run garbage collector to delete connection data
+        System.gc();
     }
 
     // =============================
