@@ -1,6 +1,7 @@
 package ui;
 
 import data.localdb.ArtDbContext;
+import tools.tracing.TraceOut;
 
 public class AppComponents {
 
@@ -23,14 +24,25 @@ public class AppComponents {
      */
     public static ArtDbContext initDbContext(String username, String password) {
 
+        TraceOut.enter();
+
         // close old context
         if (dbContext != null) {
             dbContext.close();
         }
 
-        // create a new context instance
-        dbContext = new ArtDbContext(username, password);
+        try {
 
+            // create a new db context instance (if username or password is invalid an exception is thrown)
+            dbContext = new ArtDbContext(username, password);
+
+        } catch (Exception ex) {
+
+            // TODO: implement custom exception
+            throw new IllegalArgumentException("Username or password is invalid.");
+        }
+
+        TraceOut.leave();
         return dbContext;
     }
 
