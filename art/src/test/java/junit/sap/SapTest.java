@@ -21,6 +21,30 @@ public class SapTest {
 
     @Test
     @Disabled
+    public void testLogin() {
+
+        boolean ret = false;
+
+        try {
+
+            String username = "GROUP_11";
+            String password = "Wir sind das beste Team!";
+            SapConfiguration sapConfig = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "some description", "00", "001", "EN", "0");
+
+            SapConnector conn1 = new SapConnector(sapConfig, username, password);
+            SapConnector conn2 = new SapConnector(sapConfig, username, password);
+
+            ret = conn1.canPingServer() && conn2.canPingServer();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert(ret);
+    }
+
+    @Test
+    @Disabled
     public void testSapQuery() {
 
         boolean ret = false;
