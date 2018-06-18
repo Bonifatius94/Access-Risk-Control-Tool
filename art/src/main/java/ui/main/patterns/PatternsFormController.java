@@ -625,9 +625,13 @@ public class PatternsFormController {
         if (!editable) {
 
             // make text fields uneditable
+            useCaseIdInput.setEditable(false);
+            descriptionInput.setEditable(false);
+
             authObjectInput.setEditable(false);
             authFieldInput.setEditable(false);
             authFieldValue1Input.setEditable(false);
+            authFieldValue2Input.setEditable(false);
             authFieldValue3Input.setEditable(false);
             authFieldValue4Input.setEditable(false);
             profileInput.setEditable(false);

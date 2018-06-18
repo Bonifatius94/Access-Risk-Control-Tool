@@ -18,8 +18,8 @@
             <VBox spacing="20">
                 <Label text="%usedWhitelist" style="-fx-font-size: 150%; -fx-padding: 0 0 10 0"/>
                 <VBox HBox.hgrow="ALWAYS" spacing="30">
-                    <JFXTextField fx:id="whitelistNameField" promptText="%name" maxWidth="500"/>
-                    <JFXTextField fx:id="whitelistDescriptionField" promptText="%description" maxWidth="500"/>
+                    <JFXTextField fx:id="whitelistNameField" promptText="%name" maxWidth="500" editable="false"/>
+                    <JFXTextField fx:id="whitelistDescriptionField" promptText="%description" maxWidth="500" editable="false"/>
                 </VBox>
                 <Separator/>
                 <Label text="%whitelistEntryTitle" style="-fx-font-size: 130%;"/>
