@@ -20,4 +20,20 @@ public enum DbUserRole {
             default: throw new IllegalArgumentException("Unknown user role");
         }
     }
+
+    /**
+     * This method converts the given String to a user role type (if it fits).
+     *
+     * @param value the user role as String
+     * @return the parsed user role type
+     */
+    public static DbUserRole parseRole(String value) {
+
+        switch (value.toUpperCase()) {
+            case "ADMIN": return Admin;
+            case "DATAANALYST": return DataAnalyst;
+            case "VIEWER": return Viewer;
+            default: throw new IllegalArgumentException("Unknown user role");
+        }
+    }
 }
