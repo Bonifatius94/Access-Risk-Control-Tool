@@ -59,6 +59,24 @@ public class FilterController {
         searchStringProperty.bind(searchStringInput.textProperty());
         showArchivedProperty.bind(showArchivedToggle.selectedProperty());
         shouldFilterProperty.bind(applyFilterButton.pressedProperty());
+
+        // startDate not after endDate
+        startDatePicker.valueProperty().addListener((ol, oldValue, newValue) -> {
+            if (endDatePicker.getValue() != null) {
+                if (newValue != null && endDatePicker.getValue().toEpochDay() < newValue.toEpochDay()) {
+                    startDatePicker.setValue(endDatePicker.getValue());
+                }
+            }
+        });
+
+        // endDate not before startDate
+        endDatePicker.valueProperty().addListener((ol, oldValue, newValue) -> {
+            if (startDatePicker.getValue() != null) {
+                if (newValue != null && startDatePicker.getValue().toEpochDay() > newValue.toEpochDay()) {
+                    endDatePicker.setValue(startDatePicker.getValue());
+                }
+            }
+        });
     }
 
     /**
