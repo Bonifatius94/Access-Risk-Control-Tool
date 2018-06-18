@@ -405,6 +405,41 @@ alternative design with separators left and right of complete header bar
 
 /*******************************************************************************
  *                                                                             *
+ * Material DatePicker                                                         *
+ *                                                                             *
+ ******************************************************************************/
+
+.jfx-date-picker {
+    -jfx-default-color: -fx-primary;
+}
+
+.jfx-date-picker .date-cell:hover {
+    -fx-cursor: hand;
+    -fx-background-color: -fx-primary-lighter;
+}
+
+/*
+.jfx-date-picker .date-picker-popup {
+    -fx-background-color: -fx-background;
+}
+*/
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Material ToggleButton                                                       *
+ *                                                                             *
+ ******************************************************************************/
+
+.jfx-toggle-button {
+    -jfx-toggle-color: -fx-primary;
+    -jfx-untoggle-color: -fx-light;
+    -fx-text-fill: -fx-text;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
  * Material Icons                                                              *
  *                                                                             *
  ******************************************************************************/
@@ -423,21 +458,4 @@ alternative design with separators left and right of complete header bar
 
 .windowLabel {
     -fx-font-weight: bold;
-}
-
-/* DatePicker */
-.jfx-date-picker {
-    -jfx-default-color: -fx-primary;
-}
-
-/*
-.jfx-date-picker .date-picker-popup {
-    -fx-background-color: -fx-background;
-}
-*/
-
-.jfx-toggle-button {
-    -jfx-toggle-color: -fx-primary;
-    -jfx-untoggle-color: -fx-light;
-    -fx-text-fill: -fx-text;
 }
