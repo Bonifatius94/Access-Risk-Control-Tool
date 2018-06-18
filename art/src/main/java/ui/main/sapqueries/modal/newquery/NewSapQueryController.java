@@ -2,9 +2,7 @@ package ui.main.sapqueries.modal.newquery;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXSpinner;
 import data.entities.Configuration;
-import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
 
@@ -15,7 +13,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -49,6 +46,8 @@ public class NewSapQueryController {
 
     @FXML
     public void initialize() {
+        // TODO: register AutoCompletes
+
         // init sap settings (here: test server data)
         this.sapConfiguration = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "some description", "00", "001", "EN", "0");
     }
@@ -83,8 +82,34 @@ public class NewSapQueryController {
         }
     }
 
+    /**
+     * Opens modal window in which a sapConfig can be chosen.
+     */
     public void chooseSapSettings() {
+        try {
+            // create a new FXML loader with the SapSettingsEditDialogController
+            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("SapConfigChooserView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
 
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow, 800, 600);
+            scene.getStylesheets().add("css/dark-theme.css");
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
+            customWindow.initStage(stage);
+
+            customWindow.setTitle(bundle.getString("chooseSapSettings"));
+
+            stage.show();
+
+            SapConfigChooserController sapSettingsChooser = loader.getController();
+            sapSettingsChooser.setParentController(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -192,7 +217,7 @@ public class NewSapQueryController {
     }
 
     /**
-     * Sets the config input to the given sapConfig.
+     * Sets the sapConfig input to the given sapConfig.
      * @param sapConfig the given sapConfig
      */
     public void setSapConfig(SapConfiguration sapConfig) {
