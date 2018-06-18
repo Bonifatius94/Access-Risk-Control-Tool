@@ -6,36 +6,33 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import ui.custom.controls.PTableColumn?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <VBox spacing="10" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="ui.main.sapsettings.SapSettingsController">
     <TableView VBox.vgrow="ALWAYS" fx:id="sapConnectionTable">
         <columns>
-            <PTableColumn percentageWidth="0.35" resizable="false" text="Server">
+            <PTableColumn percentageWidth="0.35" resizable="false" text="%hostServer">
                 <cellValueFactory>
                     <PropertyValueFactory property="serverDestination"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" resizable="false" text="Sys Nr">
+            <PTableColumn percentageWidth="0.1" resizable="false" text="%sysNR">
                 <cellValueFactory>
                     <PropertyValueFactory property="sysNr"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" resizable="false" text="JCO Client">
+            <PTableColumn percentageWidth="0.1" resizable="false" text="%jcoClient">
                 <cellValueFactory>
                     <PropertyValueFactory property="client"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" resizable="false" text="Language">
+            <PTableColumn percentageWidth="0.2" resizable="false" text="%creationDate">
                 <cellValueFactory>
-                    <PropertyValueFactory property="language"/>
+                    <PropertyValueFactory property="createdAt"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" resizable="false" text="Pool Capacity">
-                <cellValueFactory>
-                    <PropertyValueFactory property="poolCapacity"/>
-                </cellValueFactory>
-            </PTableColumn>
-            <!-- TODO: additional Columns for creationDate , Author,  ???? -->
+
+            <!-- TODO: additional Columns for Author,  ???? -->
             <PTableColumn percentageWidth="0.1" resizable="false" fx:id="editConfigColumn">
             </PTableColumn>
             <PTableColumn percentageWidth="0.1" resizable="false" fx:id="deleteConfigColumn">
@@ -45,12 +42,32 @@
 
     <HBox alignment="BOTTOM_RIGHT" spacing="15">
         <HBox alignment="BOTTOM_LEFT" spacing="10">
-            <JFXButton prefWidth="150" prefHeight="40" text="New Sap Connection" onAction="#newSapConnectionAction"/>
-            <JFXButton prefWidth="150" prefHeight="40" text="Connect" onAction="#connectAction"/>
+            <JFXButton prefWidth="120" text="%newConnection" onAction="#newSapConnectionAction">
+                <graphic>
+                    <MaterialDesignIconView glyphName="PLUS"/>
+                </graphic>
+            </JFXButton>
+            <JFXButton prefWidth="100" text="%testConnect" onAction="#connectAction">
+                <graphic>
+                    <MaterialDesignIconView glyphName="ACCESS_POINT"/>
+                </graphic>
+            </JFXButton>
         </HBox>
-        <JFXButton prefWidth="100" text="Clone ..." onAction="#cloneAction"/>
-        <JFXButton prefWidth="100" text="Edit ..." onAction="#editAction"/>
-        <JFXButton prefWidth="100" text="Delete" onAction="#deleteAction"/>
+        <JFXButton prefWidth="100" text="%clone" onAction="#cloneAction">
+            <graphic>
+                <MaterialDesignIconView glyphName="CONTENT_COPY"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton prefWidth="100" text="%edit" onAction="#editAction">
+            <graphic>
+                <MaterialDesignIconView glyphName="PENCIL"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton prefWidth="100" text="Delete" onAction="#deleteAction" styleClass="warning-button">
+            <graphic>
+                <MaterialDesignIconView glyphName="DELETE"/>
+            </graphic>
+        </JFXButton>
     </HBox>
 </VBox>
 

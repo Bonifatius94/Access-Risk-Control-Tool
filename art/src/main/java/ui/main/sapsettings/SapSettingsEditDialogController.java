@@ -7,6 +7,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import sap.ISapConnector;
+import sap.SapConnector;
 import ui.custom.controls.CustomAlert;
 
 public class SapSettingsEditDialogController {
@@ -21,9 +23,10 @@ public class SapSettingsEditDialogController {
     public JFXTextField userNameField;
 
     public JFXPasswordField passwordField;
-    public JFXTextField jcoLanguageField;
+    public JFXTextField descriptionField;
     @SuppressWarnings("all")
     private SapConfiguration sapConfig;
+    private SapConfiguration oldsapConfig;
 
     /**
      * Initializes the view.
@@ -52,11 +55,7 @@ public class SapSettingsEditDialogController {
                 passwordField.validate();
             }
         });
-        jcoLanguageField.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
-                jcoLanguageField.validate();
-            }
-        });
+
     }
 
     /**
@@ -80,31 +79,70 @@ public class SapSettingsEditDialogController {
             if (alert.showAndWait().get() == ButtonType.OK) {
                 System.out.println("ok");
             }
-        } else if (jcoClientField.getText().equals("")) {
+        } else if (userNameField.getText().equals("")) {
             CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "WARNING No JCO Language", "If you want to save SAP Configuration/n you need to set a valid JCO Language", "OK", "Cancel");
             if (alert.showAndWait().get() == ButtonType.OK) {
                 System.out.println("ok");
             }
         } else {
             //TODO: Save changes
+            this.sapConfig.setDescription(descriptionField.getText());
+            this.sapConfig.setSysNr(sysNrField.getText());
+            this.sapConfig.setServerDestination(hostServerField.getText());
+            this.sapConfig.setClient(jcoClientField.getText());
+            //SapSettingsController sapSettingsController = new SapSettingsController();
+            //sapSettingsController.giveSavedSapSettings(this.sapConfig);
         }
     }
 
+    /**
+     * Establishes a test connection to SAP.
+     */
     public void connect() {
-        //TODO:test if input is valid , Establish connection to Sap
+        try {
+            //further Testing
+            ISapConnector sapConnector = new SapConnector(this.sapConfig, userNameField.getText(), passwordField.getText());
+            Boolean pingServer = sapConnector.canPingServer();
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, "Ping was start", "Connection Status: " + pingServer);
+            customAlert.showAndWait();
+        } catch (Exception e) {
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "SAP Connection Error", "Connection Status: Failed");
+            customAlert.showAndWait();
+            e.printStackTrace();
+        }
     }
 
     /**
      * Prefills the inputs with the given SapConfig.
+     *
      * @param sapConfig the given SapConfig
      */
     void giveSelectedSapConfig(SapConfiguration sapConfig) {
         this.sapConfig = sapConfig;
+        this.oldsapConfig = new SapConfiguration();
+        this.oldsapConfig.setId(sapConfig.getId());
+        this.oldsapConfig.setCreatedBy(sapConfig.getCreatedBy());
+        this.oldsapConfig.setPoolCapacity(sapConfig.getPoolCapacity());
+        this.oldsapConfig.setLanguage(sapConfig.getLanguage());
+        this.oldsapConfig.setClient(sapConfig.getClient());
+        this.oldsapConfig.setServerDestination(sapConfig.getServerDestination());
+        this.oldsapConfig.setSysNr(sapConfig.getSysNr());
+        this.oldsapConfig.setArchived(sapConfig.isArchived());
+        this.oldsapConfig.setCreatedAt(sapConfig.getCreatedAt());
+        this.oldsapConfig.setDescription(sapConfig.getDescription());
 
         hostServerField.setText(sapConfig.getServerDestination());
         sysNrField.setText(sapConfig.getSysNr());
         jcoClientField.setText(sapConfig.getClient());
-        userNameField.setText(sapConfig.getCreatedBy());
-        jcoLanguageField.setText(sapConfig.getLanguage());
+
+        //TODO: Entfernen echten test hinzufügen
+        userNameField.setText("GROUP_11");
+        passwordField.setText("Wir sind das beste Team!");
+
+    }
+
+    public void revertChanges() {
+        this.sapConfig = oldsapConfig;
+        //TODO: further implementation
     }
 }

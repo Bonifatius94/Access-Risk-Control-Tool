@@ -35,6 +35,8 @@ public class SapSettingsController {
     @FXML
     private TableColumn<SapConfiguration, JFXButton> deleteConfigColumn;
 
+    private static SapConfiguration sapConfiguration;
+
     /**
      * Initialized the view and sets a dummy SapConfig.
      */
@@ -43,11 +45,12 @@ public class SapSettingsController {
         initializeTableColumn();
         SapConfiguration sapConfig = new SapConfiguration();
         sapConfig.setSysNr("00");
-        sapConfig.setServerDestination("Pertersserver");
-        sapConfig.setClient("100");
+        sapConfig.setServerDestination("ec2-54-209-137-85.compute-1.amazonaws.com");
+        sapConfig.setClient("001");
         sapConfig.setLanguage("EN");
-        sapConfig.setPoolCapacity("3");
+        sapConfig.setPoolCapacity("0");
         sapConfig.setCreatedBy("Hans");
+        sapConfig.setDescription("this is a tryout");
         List<SapConfiguration> sapConfigList = new ArrayList<>();
         sapConfigList.add(sapConfig);
         sapConfigList.add(sapConfig);
@@ -65,6 +68,7 @@ public class SapSettingsController {
         // Add the delete column
         deleteConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (SapConfiguration sapConfiguration) -> {
             sapConnectionTable.getItems().remove(sapConfiguration);
+            sapConnectionTable.refresh();
             return sapConfiguration;
         }));
 
@@ -105,6 +109,7 @@ public class SapSettingsController {
             SapSettingsEditDialogController sapEdit = loader.getController();
             sapEdit.giveSelectedSapConfig(sapConfiguration);
 
+
         } catch (IOException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getClass().toString());
@@ -121,7 +126,7 @@ public class SapSettingsController {
     public void connectAction() {
         if (sapConnectionTable.getFocusModel().getFocusedItem().equals(sapConnectionTable.getSelectionModel().getSelectedItem())) {
 
-            SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
+            //SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
             //TODO: Saplogin Dialog
         }
     }
@@ -145,6 +150,7 @@ public class SapSettingsController {
             stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
             stage.show();
+
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -190,5 +196,18 @@ public class SapSettingsController {
             sapConnectionTable.refresh();
         }
     }
+
+    /**
+     * should give new Sap setting to table. TODO: further implementations
+     * @param sapConfig is the new or changed Sap Configuration.
+     */
+    public void giveSavedSapSettings(SapConfiguration sapConfig) {
+
+        sapConnectionTable.getItems().add(sapConfig);
+        sapConnectionTable.refresh();
+    }
+    //TODO: is not needed(i think)
+    //private void addToTable() {
+    //}
 
 }

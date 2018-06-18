@@ -9,74 +9,86 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import ui.custom.controls.CustomWindow?>
-<CustomWindow spacing="30" style="-fx-border-color: White;"
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<CustomWindow spacing="30" style="-fx-padding: 10"
               title="            Edit Sap Configuration" windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
               xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.sapsettings.SapSettingsEditDialogController">
-    <HBox alignment="TOP_CENTER" spacing="30" VBox.vgrow="ALWAYS">
+    <HBox alignment="TOP_CENTER" spacing="20" VBox.vgrow="ALWAYS">
         <VBox alignment="BASELINE_CENTER" spacing="35">
-            <JFXTextField fx:id="hostServerField" prefWidth="300" promptText="Host Server">
+            <JFXTextField fx:id="descriptionField" prefWidth="300" promptText="%description">
+                <font>
+                    <Font size="14.0"/>
+                </font>
+            </JFXTextField>
+            <JFXTextField fx:id="hostServerField" prefWidth="300" promptText="%hostServer">
                 <font>
                     <Font size="14.0"/>
                 </font>
                 <validators>
-                    <RequiredFieldValidator message="Input Required!">
-                        <FontAwesomeIconView glyphName="WARNING" style="-fx-font-family: FontAwesome;"/>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
                     </RequiredFieldValidator>
                 </validators>
             </JFXTextField>
-            <JFXTextField fx:id="sysNrField" prefWidth="300" promptText="System Nr.">
+
+            <JFXTextField fx:id="sysNrField" prefWidth="100" promptText="%sysNR">
                 <font>
                     <Font size="14.0"/>
                 </font>
                 <validators>
-                    <RequiredFieldValidator message="Input Required!">
-                        <FontAwesomeIconView glyphName="WARNING" style="-fx-font-family: FontAwesome;"/>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT" />
                     </RequiredFieldValidator>
                 </validators>
             </JFXTextField>
-            <JFXTextField fx:id="jcoClientField" prefWidth="75" promptText="JCO Client">
+            <JFXTextField fx:id="jcoClientField" prefWidth="75" promptText="%jcoClient">
                 <font>
                     <Font size="14.0"/>
                 </font>
                 <validators>
-                    <RequiredFieldValidator message="Input Required!">
-                        <FontAwesomeIconView glyphName="WARNING" style="-fx-font-family: FontAwesome;"/>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT" />
                     </RequiredFieldValidator>
                 </validators>
             </JFXTextField>
-            <JFXTextField fx:id="jcoLanguageField" prefWidth="75" promptText="JCO Language">
+            <JFXTextField fx:id="userNameField" prefWidth="200" promptText="%username">
                 <font>
                     <Font size="14.0"/>
                 </font>
                 <validators>
-                    <RequiredFieldValidator message="Input Required!">
-                        <FontAwesomeIconView glyphName="WARNING" style="-fx-font-family: FontAwesome;"/>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT" />
                     </RequiredFieldValidator>
                 </validators>
             </JFXTextField>
-            <JFXTextField fx:id="userNameField" prefWidth="200" promptText="Username">
+            <JFXPasswordField fx:id="passwordField" prefWidth="200" promptText="%password">
                 <font>
                     <Font size="14.0"/>
                 </font>
                 <validators>
-                    <RequiredFieldValidator message="Input Required!">
-                        <FontAwesomeIconView glyphName="WARNING" style="-fx-font-family: FontAwesome;"/>
-                    </RequiredFieldValidator>
-                </validators>
-            </JFXTextField>
-            <JFXPasswordField fx:id="passwordField" prefWidth="200" promptText="Password">
-                <font>
-                    <Font size="14.0"/>
-                </font>
-                <validators>
-                    <RequiredFieldValidator message="Input Required!">
-                        <FontAwesomeIconView glyphName="WARNING" style="-fx-font-family: FontAwesome;"/>
+                    <RequiredFieldValidator message="Eingabe erforderlich(nur für Testverbindung)">
+                        <MaterialDesignIconView glyphName="ALERT"/>
                     </RequiredFieldValidator>
                 </validators>
             </JFXPasswordField>
             <HBox spacing="20" alignment="BASELINE_CENTER">
-                <JFXButton onAction="#connect" prefHeight="35" prefWidth="75" text="Connect"/>
-                <JFXButton onAction="#saveConnection" prefHeight="35" prefWidth="75" text="Save Changes"/>
+                <HBox alignment="BASELINE_LEFT" >
+                    <JFXButton onAction="#revertChanges" prefWidth="100" text="%revertChange">
+                        <graphic>
+                            <MaterialDesignIconView glyphName="UNDO_VARIANT"/>
+                        </graphic>
+                    </JFXButton>
+                </HBox>
+                <JFXButton onAction="#connect" prefHeight="35" prefWidth="100" text="%testConnect">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="ACCESS_POINT"/>
+                    </graphic>
+                </JFXButton>
+                <JFXButton onAction="#saveConnection" prefHeight="35" prefWidth="100" text="%save">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
+                    </graphic>
+                </JFXButton>
             </HBox>
         </VBox>
 
