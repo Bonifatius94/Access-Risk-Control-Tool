@@ -71,6 +71,16 @@ public class PatternsController {
         // initialize the table
         initializePatternsTable();
 
+        // check if the filters are applied
+        filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
+            if (newValue) {
+                System.out.println(filterController.searchStringProperty.getValue());
+                System.out.println(filterController.startDateProperty.getValue());
+                System.out.println(filterController.endDateProperty.getValue());
+                System.out.println(filterController.showArchivedProperty.getValue());
+            }
+        });
+
         // test the table with data from the Example - Zugriffsmuster.xlsx file
         try {
             AccessPatternImportHelper helper = new AccessPatternImportHelper();
