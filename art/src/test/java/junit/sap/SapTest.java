@@ -20,6 +20,7 @@ import sap.SapConnector;
 public class SapTest {
 
     @Test
+    @Disabled
     public void testLogin() {
 
         boolean ret = false;
@@ -30,10 +31,13 @@ public class SapTest {
             String password = "Wir sind das beste Team!";
             SapConfiguration sapConfig = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "some description", "00", "001", "EN", "0");
 
-            SapConnector conn1 = new SapConnector(sapConfig, username, password);
-            SapConnector conn2 = new SapConnector(sapConfig, username, password);
+            try (SapConnector conn1 = new SapConnector(sapConfig, username, password)) {
 
-            ret = conn1.canPingServer() && conn2.canPingServer();
+                try (SapConnector conn2 = new SapConnector(sapConfig, username, password)) {
+
+                    ret = conn1.canPingServer() && conn2.canPingServer();
+                }
+            }
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -92,36 +96,6 @@ public class SapTest {
     }
 
     /**
-     * Expected results of the sap query (with duplicates):
-     * ===================================================
-     * ViolatedUseCaseID: 1.A, UserName: ZT2112_F
-     * ViolatedUseCaseID: 1.A, UserName: ZT2113_1_P
-     * ViolatedUseCaseID: 1.A, UserName: ZT3222_1_P
-     * ViolatedUseCaseID: 1.A, UserName: ZT3223_1_P
-     * ViolatedUseCaseID: 1.A, UserName: ZT3223_F
-     * ViolatedUseCaseID: 1.A, UserName: ZT3224_1_P
-     * ViolatedUseCaseID: 1.A, UserName: ZT3224_F
-     * ViolatedUseCaseID: 2.A, UserName: ZT1415_P
-     * ViolatedUseCaseID: 2.A, UserName: ZT2113_1_P
-     * ViolatedUseCaseID: 2.B, UserName: ZT2112_F
-     * ViolatedUseCaseID: 2.B, UserName: ZT2113_1_P
-     * ViolatedUseCaseID: 2.B, UserName: ZT2113_2_P
-     * ViolatedUseCaseID: 2.B, UserName: ZT2211_1_P
-     * ViolatedUseCaseID: 2.B, UserName: ZT2211_2_P
-     * ViolatedUseCaseID: 2.B, UserName: ZT4212_P
-     * ViolatedUseCaseID: 2.B, UserName: ZT2112_F
-     * ViolatedUseCaseID: 2.B, UserName: ZT2211_2_P
-     * ViolatedUseCaseID: 2.B, UserName: ZT4212_P
-     * ViolatedUseCaseID: 2.C, UserName: ZT2112_F
-     * ViolatedUseCaseID: 2.C, UserName: ZT2113_1_P
-     * ViolatedUseCaseID: 2.C, UserName: ZT2112_F
-     * ViolatedUseCaseID: 2.C, UserName: ZT2113_1_P
-     * ViolatedUseCaseID: 2.C, UserName: ZT2313_2_P
-     * ViolatedUseCaseID: 3.A, UserName: ZT2112_F
-     * ViolatedUseCaseID: 3.B, UserName: ZT2111_F
-     * ViolatedUseCaseID: 3.B, UserName: ZT2112_P
-     * ViolatedUseCaseID: 3.B, UserName: ZT2113_1_F
-     *
      * Expected results of the sap query (without duplicates):
      * ======================================================
      * ViolatedUseCaseID: 1.A, Username: ZT2112_F
