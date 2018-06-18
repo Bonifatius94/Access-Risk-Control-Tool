@@ -15,31 +15,33 @@
               fx:controller="ui.main.sapqueries.modal.newquery.NewSapQueryController" windowState="NoResize">
     <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-padding: 20" spacing="10">
         <StackPane>
-            <VBox HBox.hgrow="ALWAYS" fx:id="inputBox" spacing="40">
-                <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="30">
-                    <Label text="%configuration"/>
-                    <JFXComboBox fx:id="configAutocomplete" minWidth="250"/>
-                    <JFXButton onAction="#chooseConfig" styleClass="round-button" minHeight="30">
-                        <tooltip>
-                            <Tooltip text="%chooseConfig"/>
-                        </tooltip>
-                        <graphic>
-                            <MaterialDesignIconView glyphName="PLAYLIST_PLUS"/>
-                        </graphic>
-                    </JFXButton>
-                </HBox>
-                <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="30">
-                    <Label text="%sapSettings"/>
-                    <JFXComboBox fx:id="sapSettingsAutocomplete" minWidth="250"/>
-                    <JFXButton onAction="#chooseSapSettings" styleClass="round-button" minHeight="30">
-                        <tooltip>
-                            <Tooltip text="%chooseSapSettings"/>
-                        </tooltip>
-                        <graphic>
-                            <MaterialDesignIconView glyphName="PLAYLIST_PLUS"/>
-                        </graphic>
-                    </JFXButton>
-                </HBox>
+            <VBox HBox.hgrow="ALWAYS" spacing="20">
+                <VBox HBox.hgrow="ALWAYS" fx:id="inputBox" spacing="35">
+                    <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="30">
+                        <Label text="%configuration"/>
+                        <JFXComboBox fx:id="configAutocomplete" minWidth="250"/>
+                        <JFXButton onAction="#chooseConfig" styleClass="round-button" minHeight="30">
+                            <tooltip>
+                                <Tooltip text="%chooseConfig"/>
+                            </tooltip>
+                            <graphic>
+                                <MaterialDesignIconView glyphName="PLAYLIST_PLUS"/>
+                            </graphic>
+                        </JFXButton>
+                    </HBox>
+                    <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="30">
+                        <Label text="%sapSettings"/>
+                        <JFXComboBox fx:id="sapSettingsAutocomplete" minWidth="250"/>
+                        <JFXButton onAction="#chooseSapSettings" styleClass="round-button" minHeight="30">
+                            <tooltip>
+                                <Tooltip text="%chooseSapSettings"/>
+                            </tooltip>
+                            <graphic>
+                                <MaterialDesignIconView glyphName="PLAYLIST_PLUS"/>
+                            </graphic>
+                        </JFXButton>
+                    </HBox>
+                </VBox>
                 <Separator/>
                 <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT">
                     <Region HBox.hgrow="ALWAYS"/>
@@ -50,7 +52,8 @@
                     </JFXButton>
                 </HBox>
             </VBox>
-            <VBox fx:id="spinner" alignment="CENTER" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" visible="false" spacing="20">
+            <VBox fx:id="spinner" alignment="CENTER" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" visible="false"
+                  spacing="20">
                 <JFXSpinner maxWidth="50"/>
                 <Label text="%analysisInProgress"/>
             </VBox>

@@ -18,11 +18,11 @@
               fx:controller="ui.main.sapqueries.modal.newquery.SapLoginController">
     <!-- login credentials input -->
     <VBox HBox.hgrow="ALWAYS" alignment="CENTER" style="-fx-padding: 50 20 20 20" spacing="20">
-        <!-- username input -->
-        <VBox HBox.hgrow="ALWAYS" fx:id="loginPane" spacing="40">
+        <VBox HBox.hgrow="ALWAYS" spacing="35">
+            <!-- username input -->
             <HBox alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS">
                 <MaterialDesignIconView glyphName="ACCOUNT" size="20"/>
-                <JFXTextField fx:id="usernameInput" promptText="%username" prefWidth="200">
+                <JFXTextField fx:id="usernameInput" promptText="%username" prefWidth="250">
                     <validators>
                         <RequiredFieldValidator message="%required">
                             <MaterialDesignIconView glyphName="ALERT"/>
@@ -34,7 +34,7 @@
             <!-- password input -->
             <HBox alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS">
                 <MaterialDesignIconView glyphName="KEY" size="20"/>
-                <JFXPasswordField fx:id="passwordInput" promptText="%password" prefWidth="200">
+                <JFXPasswordField fx:id="passwordInput" promptText="%password" prefWidth="250">
                     <validators>
                         <RequiredFieldValidator message="%required">
                             <MaterialDesignIconView glyphName="ALERT"/>
@@ -51,7 +51,7 @@
         </Label>
 
         <!-- buttons ok / cancel -->
-        <HBox alignment="CENTER" spacing="10" style="-fx-padding: 10 0 0 0">
+        <HBox alignment="CENTER" spacing="10">
             <JFXButton onAction="#close" text="%back">
                 <graphic>
                     <MaterialDesignIconView glyphName="ARROW_LEFT"/>

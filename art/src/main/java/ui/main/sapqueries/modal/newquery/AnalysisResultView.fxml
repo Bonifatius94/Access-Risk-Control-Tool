@@ -16,18 +16,20 @@
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.main.sapqueries.modal.newquery.AnalysisResultController">
     <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
-        <TableView fx:id="resultTable" minWidth="400" VBox.vgrow="ALWAYS">
+        <Label fx:id="resultLabel" />
+        <TableView fx:id="resultTable" minWidth="500" VBox.vgrow="ALWAYS">
             <columns>
-                <PTableColumn text="%violatedUseCaseID" percentageWidth="0.5">
+                <PTableColumn text="%violatedUseCaseID" percentageWidth="0.45">
                     <cellValueFactory>
                         <PropertyValueFactory property="accessPattern"/>
                     </cellValueFactory>
                 </PTableColumn>
-                <PTableColumn text="%username" percentageWidth="0.5">
+                <PTableColumn text="%username" percentageWidth="0.45">
                     <cellValueFactory>
                         <PropertyValueFactory property="username"/>
                     </cellValueFactory>
                 </PTableColumn>
+                <PTableColumn percentageWidth="0.1" fx:id="viewPatternDetailsColumn"/>
             </columns>
         </TableView>
         <HBox alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS" spacing="40">

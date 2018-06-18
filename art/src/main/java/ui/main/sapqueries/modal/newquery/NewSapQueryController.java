@@ -6,6 +6,7 @@ import data.entities.Configuration;
 import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
 
+import java.time.ZonedDateTime;
 import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
@@ -126,7 +127,7 @@ public class NewSapQueryController {
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 250, 300);
+            Scene scene = new Scene(customWindow, 300, 280);
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
@@ -173,6 +174,11 @@ public class NewSapQueryController {
         inputBox.setEffect(new BoxBlur());
         spinner.setVisible(true);
 
+        CriticalAccessQuery query = new CriticalAccessQuery();
+        query.setConfig(this.configuration);
+        query.setSapConfig(this.sapConfiguration);
+        query.setCreatedAt(ZonedDateTime.now());
+
         // TODO: run sap query here and wait for it to finish, maybe even with a little progress status
 
 
@@ -199,6 +205,9 @@ public class NewSapQueryController {
             customWindow.setTitle(bundle.getString("analysisResultTitle"));
 
             stage.show();
+
+            AnalysisResultController resultController = loader.getController();
+            resultController.giveResultQuery(query);
         } catch (Exception e) {
             e.printStackTrace();
         }
