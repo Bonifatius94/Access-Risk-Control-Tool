@@ -2,6 +2,7 @@ package ui.main.sapqueries.modal.newquery;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXProgressBar;
 import data.entities.Configuration;
 import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
@@ -14,13 +15,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import sap.SapConnector;
 import ui.App;
 import ui.custom.controls.CustomWindow;
+import ui.main.sapqueries.modal.choosers.ConfigChooserController;
+import ui.main.sapqueries.modal.choosers.SapConfigChooserController;
 
 
 public class NewSapQueryController {
@@ -40,9 +45,15 @@ public class NewSapQueryController {
     @FXML
     private JFXButton runAnalysisButton;
 
+    @FXML
+    private JFXProgressBar progressBar;
+
+    @FXML
+    private Label progressLabel;
 
     private Configuration configuration;
     private SapConfiguration sapConfiguration;
+    private ResourceBundle bundle;
 
 
     /**
@@ -50,7 +61,10 @@ public class NewSapQueryController {
      */
     @FXML
     public void initialize() {
+        bundle = ResourceBundle.getBundle("lang");
+
         // TODO: register AutoCompletes
+
 
         // init sap settings (here: test server data)
         this.sapConfiguration = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "some description", "00", "001", "EN", "0");
@@ -62,8 +76,7 @@ public class NewSapQueryController {
     public void chooseConfig() {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ConfigChooserView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../choosers/ConfigChooserView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
@@ -92,8 +105,7 @@ public class NewSapQueryController {
     public void chooseSapSettings() {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("SapConfigChooserView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../choosers/SapConfigChooserView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
@@ -122,7 +134,6 @@ public class NewSapQueryController {
     public void openLoginDialog() {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("SapLoginView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
@@ -170,26 +181,33 @@ public class NewSapQueryController {
     /**
      * Runs the analysis.
      */
-    public void runAnalysis() {
+    public void runAnalysis(String username, String password) {
         inputBox.setEffect(new BoxBlur());
         spinner.setVisible(true);
+        progressLabel.setText(bundle.getString("connectingToSap"));
 
         CriticalAccessQuery query = new CriticalAccessQuery();
         query.setConfig(this.configuration);
         query.setSapConfig(this.sapConfiguration);
         query.setCreatedAt(ZonedDateTime.now());
 
-        // TODO: run sap query here and wait for it to finish, maybe even with a little progress status
+        // run sap query with config and sap settings
+        try (SapConnector connector = new SapConnector(this.sapConfiguration, username, password)) {
 
+            // show progress
+            connector.register(percentage -> {
+                this.progressBar.setSecondaryProgress(percentage);
+                this.progressLabel.setText("Running... Progress " + (int)(percentage * 100) + "%");
+            });
 
-        // remove the spinner and blur effect
-        inputBox.setEffect(null);
-        spinner.setVisible(false);
+            // TODO: run analysis in own thread
+            query = connector.runAnalysis(this.configuration);
 
-        // open the analysisResultView and give it the results
-        try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            // remove the spinner and blur effect
+            inputBox.setEffect(null);
+            spinner.setVisible(false);
+
+            // open the analysisResultView and give it the results
             FXMLLoader loader = new FXMLLoader(getClass().getResource("AnalysisResultView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 

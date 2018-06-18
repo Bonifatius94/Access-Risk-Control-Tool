@@ -1,10 +1,11 @@
-package ui.main.sapqueries.modal.newquery;
+package ui.main.sapqueries.modal.choosers;
 
 import data.entities.SapConfiguration;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
+import ui.main.sapqueries.modal.newquery.NewSapQueryController;
 
 
 public class SapConfigChooserController {

@@ -1,4 +1,4 @@
-package ui.main.sapqueries.modal.newquery;
+package ui.main.sapqueries.modal.choosers;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
@@ -27,7 +27,7 @@ import ui.App;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
 import ui.main.sapqueries.modal.details.ConfigDetailsController;
-
+import ui.main.sapqueries.modal.newquery.NewSapQueryController;
 
 
 public class ConfigChooserController {
@@ -133,7 +133,7 @@ public class ConfigChooserController {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../details/ConfigDetailsView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ui/main/sapqueries/modal/details/ConfigDetailsView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage

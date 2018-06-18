@@ -44,7 +44,7 @@ public class SapLoginController {
 
                 if (connector.canPingServer()) {
                     close(event);
-                    parentController.runAnalysis();
+                    parentController.runAnalysis(usernameInput.getText(), passwordInput.getText());
                 } else {
                     errorLabel.setVisible(true);
                 }

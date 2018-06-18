@@ -37,7 +37,7 @@ public class AnalysisResultController {
     private JFXComboBox exportFormatChooser;
 
     @FXML
-    public TableColumn<AccessPattern, JFXButton> viewPatternDetailsColumn;
+    public TableColumn<CriticalAccessEntry, JFXButton> viewPatternDetailsColumn;
 
     private  CriticalAccessQuery resultQuery;
 
@@ -47,9 +47,9 @@ public class AnalysisResultController {
     @FXML
     public void initialize() {
         // Add the detail column
-        viewPatternDetailsColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.OPEN_IN_NEW, (AccessPattern pattern) -> {
-            viewAccessPatternDetails(pattern);
-            return pattern;
+        viewPatternDetailsColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.OPEN_IN_NEW, (CriticalAccessEntry entry) -> {
+            viewAccessPatternDetails(entry.getAccessPattern());
+            return entry;
         }));
     }
 
@@ -64,6 +64,7 @@ public class AnalysisResultController {
     public void giveResultQuery(CriticalAccessQuery query) {
         resultQuery = query;
 
+        this.resultLabel.setText(query.getEntries().size() + " CriticalAccessEntries were found.");
         this.resultTable.setItems(FXCollections.observableList(new ArrayList<>(query.getEntries())));
     }
 
