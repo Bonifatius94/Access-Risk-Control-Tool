@@ -34,6 +34,7 @@ import javafx.stage.Stage;
 import ui.App;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
+import ui.custom.controls.filter.FilterController;
 
 
 public class PatternsController {
@@ -52,6 +53,9 @@ public class PatternsController {
 
     @FXML
     public Label itemCount;
+
+    @FXML
+    public FilterController filterController;
 
     private ResourceBundle bundle;
 
@@ -186,7 +190,6 @@ public class PatternsController {
             e.printStackTrace();
         }
     }
-
 
     /**
      * Clones the selected entry and adds it to the table.
