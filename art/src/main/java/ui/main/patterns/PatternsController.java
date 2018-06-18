@@ -32,6 +32,7 @@ import javafx.stage.Stage;
 import ui.App;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
+import ui.custom.controls.filter.FilterController;
 import ui.main.patterns.modal.PatternsFormController;
 
 
@@ -52,6 +53,9 @@ public class PatternsController {
     @FXML
     public Label itemCount;
 
+    @FXML
+    public FilterController filterController;
+
     private ResourceBundle bundle;
 
     /**
@@ -65,6 +69,16 @@ public class PatternsController {
 
         // initialize the table
         initializePatternsTable();
+
+        // check if the filters are applied
+        filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
+            if (newValue) {
+                System.out.println(filterController.searchStringProperty.getValue());
+                System.out.println(filterController.startDateProperty.getValue());
+                System.out.println(filterController.endDateProperty.getValue());
+                System.out.println(filterController.showArchivedProperty.getValue());
+            }
+        });
 
         // fill in table data
         fillPatternsTable();
