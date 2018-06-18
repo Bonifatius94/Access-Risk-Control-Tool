@@ -158,7 +158,9 @@ public class AccessPatternTest {
             List<AccessPattern> patterns = context.getPatterns(false);
             AccessPattern profilePattern = patterns.stream().filter(x -> x.getConditions().size() == 1).findFirst().get();
             AccessProfileCondition profileCondition = profilePattern.getConditions().stream().findFirst().get().getProfileCondition();
+            AccessPattern multiConditionPattern = patterns.stream().filter(x -> x.getConditions().size() == 2).findFirst().get();
             Integer profilePatternId = profilePattern.getId();
+            Integer multiConditionPatternId = multiConditionPattern.getId();
 
             // apply changes to profile condition
             final String newProfile = "SAP_NEW";

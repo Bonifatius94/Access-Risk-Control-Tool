@@ -19,6 +19,7 @@ import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -26,6 +27,8 @@ import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 
 public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
@@ -175,8 +178,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     //                   R E A D
     // ============================================
 
-    // TODO: add filter options (e.g. by time: today, last week, last month, last year, all)
-
     /**
      * This method selects all already executed sap queries from the local database.
      *
@@ -257,13 +258,464 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         try (Session session = getSessionFactory().openSession()) {
 
             List<Object[]> results = session.createNativeQuery("SELECT * FROM DbUsers").getResultList();
-            users = results.stream().map(x -> new DbUser((String)x[0], DbUserRole.parseRole((String)x[1]))).collect(Collectors.toList());
+
+            users = results.stream().map(x -> {
+
+                String username = (String)x[0];
+                Set<DbUserRole> roles = Arrays.stream(((String) x[1]).split(",")).map(y -> DbUserRole.parseRole(y)).collect(Collectors.toSet());
+
+                return new DbUser(username, roles);
+
+            }).collect(Collectors.toList());
 
         } catch (Exception ex) {
             throw new Exception("Unknown error while executing local database query. (see log file for more details)");
         }
 
         return users;
+    }
+
+    // ============================================
+    //               F I L T E R S
+    // ============================================
+
+    /**
+     * This method applies the given filter options to an access pattern query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<AccessPattern> getFilteredPatterns(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+
+        List<AccessPattern> results;
+
+        try (Session session = openSession()) {
+
+            // prepare query
+            String sql = getFilteredPatternsQuerySql(includeArchived, wildcard, start, end, limit);
+            NativeQuery query = session.createNativeQuery(sql);
+
+            // set parameters
+            if (wildcard != null && !wildcard.isEmpty()) {
+                query.setParameter("wildcard", "%" + wildcard + "%");
+            }
+
+            if (start != null) {
+                query.setParameter("start", start.toLocalDate());
+            }
+
+            if (end != null) {
+                query.setParameter("end", end.toLocalDate());
+            }
+
+            if (limit != null && limit > 0) {
+                query.setMaxResults(limit);
+            }
+
+            // execute query
+            query.addEntity(AccessPattern.class);
+            results = query.list();
+
+        } catch (Exception ex) {
+            // TODO: implement custom exception
+            throw ex;
+        }
+
+        return results;
+    }
+
+    private String getFilteredPatternsQuerySql(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) {
+
+        String sql =
+              "SELECT DISTINCT Pattern.* "
+            + "FROM AccessPatterns AS Pattern "
+            + "INNER JOIN AccessConditions AS Condition ON Condition.PatternId = Pattern.id "
+            + "LEFT OUTER JOIN AccessPatternConditions AS PatternCondition ON PatternCondition.Condition_Id = Condition.id "
+            + "LEFT OUTER JOIN AccessPatternConditionProperties AS PatternConditionProperty ON PatternConditionProperty.ConditionId = Condition.id "
+            + "LEFT OUTER JOIN AccessProfileConditions AS ProfileCondition ON ProfileCondition.Condition_Id = Condition.id ";
+
+        List<String> conditions = new ArrayList<>();
+
+        if (!includeArchived) {
+            conditions.add("Pattern.isArchived = 0");
+        }
+
+        if (wildcard != null && !wildcard.isEmpty()) {
+
+            conditions.add("LOWER(Pattern.usecaseId) LIKE LOWER(:wildcard) OR LOWER(Pattern.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(PatternConditionProperty.authObject) LIKE LOWER(:wildcard) OR LOWER(ProfileCondition.profile) LIKE LOWER(:wildcard)");
+        }
+
+        if (start != null) {
+            conditions.add("Pattern.createdAt >= :start");
+        }
+
+        if (end != null) {
+            conditions.add("Pattern.createdAt <= :end");
+        }
+
+        if (conditions.size() > 0) {
+            sql += "WHERE " + conditions.stream().map(x -> "(" + x + ")").reduce((x, y) -> x + " AND " + y).get() + " ";
+        }
+
+        sql += "ORDER BY Pattern.usecaseId";
+
+        return sql;
+    }
+
+    /**
+     * This method applies the given filter options to a whitelist query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Whitelist> getFilteredWhitelists(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+
+        List<Whitelist> results;
+
+        try (Session session = openSession()) {
+
+            // prepare query
+            String sql = getFilteredWhitelistQuerySql(includeArchived, wildcard, start, end, limit);
+            NativeQuery query = session.createNativeQuery(sql);
+
+            // set parameters
+            if (wildcard != null && !wildcard.isEmpty()) {
+                query.setParameter("wildcard", "%" + wildcard + "%");
+            }
+
+            if (start != null) {
+                query.setParameter("start", start.toLocalDate());
+            }
+
+            if (end != null) {
+                query.setParameter("end", end.toLocalDate());
+            }
+
+            if (limit != null && limit > 0) {
+                query.setMaxResults(limit);
+            }
+
+            // execute query
+            query.addEntity(Whitelist.class);
+            results = query.list();
+
+        } catch (Exception ex) {
+            // TODO: implement custom exception
+            throw ex;
+        }
+
+        return results;
+    }
+
+    private String getFilteredWhitelistQuerySql(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) {
+
+        String sql =
+            "SELECT DISTINCT Whitelist.* "
+                + "FROM Whitelists AS Whitelist "
+                + "INNER JOIN WhitelistEntries AS Entries ON Entries.WhitelistId = Whitelist.id ";
+
+        List<String> conditions = new ArrayList<>();
+
+        if (!includeArchived) {
+            conditions.add("Whitelist.isArchived = 0");
+        }
+
+        if (wildcard != null && !wildcard.isEmpty()) {
+
+            conditions.add("LOWER(Whitelist.name) LIKE LOWER(:wildcard) OR LOWER(Whitelist.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(Entries.usecaseId) LIKE LOWER(:wildcard) OR LOWER(Entries.username) LIKE LOWER(:wildcard)");
+        }
+
+        if (start != null) {
+            conditions.add("Whitelist.createdAt >= :start");
+        }
+
+        if (end != null) {
+            conditions.add("Whitelist.createdAt <= :end");
+        }
+
+        if (conditions.size() > 0) {
+            sql += "WHERE " + conditions.stream().map(x -> "(" + x + ")").reduce((x, y) -> x + " AND " + y).get() + " ";
+        }
+
+        sql += "ORDER BY Whitelist.name";
+
+        return sql;
+    }
+
+    /**
+     * This method applies the given filter options to a sap configs query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<SapConfiguration> getFilteredSapConfigs(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+
+        List<SapConfiguration> results;
+
+        try (Session session = openSession()) {
+
+            // prepare query
+            String sql = getFilteredSapConfigQuerySql(includeArchived, wildcard, start, end, limit);
+            NativeQuery query = session.createNativeQuery(sql);
+
+            // set parameters
+            if (wildcard != null && !wildcard.isEmpty()) {
+                query.setParameter("wildcard", "%" + wildcard + "%");
+            }
+
+            if (start != null) {
+                query.setParameter("start", start.toLocalDate());
+            }
+
+            if (end != null) {
+                query.setParameter("end", end.toLocalDate());
+            }
+
+            if (limit != null && limit > 0) {
+                query.setMaxResults(limit);
+            }
+
+            // execute query
+            query.addEntity(SapConfiguration.class);
+            results = query.list();
+
+        } catch (Exception ex) {
+            // TODO: implement custom exception
+            throw ex;
+        }
+
+        return results;
+    }
+
+    private String getFilteredSapConfigQuerySql(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) {
+
+        String sql = "SELECT * FROM SapConfigurations AS SapConfig ";
+        List<String> conditions = new ArrayList<>();
+
+        if (!includeArchived) {
+            conditions.add("SapConfig.isArchived = 0");
+        }
+
+        if (wildcard != null && !wildcard.isEmpty()) {
+            conditions.add("LOWER(SapConfig.serverDestination) LIKE LOWER(:wildcard) OR LOWER(SapConfig.description) LIKE LOWER(:wildcard)");
+        }
+
+        if (start != null) {
+            conditions.add("SapConfig.createdAt >= :start");
+        }
+
+        if (end != null) {
+            conditions.add("SapConfig.createdAt <= :end");
+        }
+
+        if (conditions.size() > 0) {
+            sql += "WHERE " + conditions.stream().map(x -> "(" + x + ")").reduce((x, y) -> x + " AND " + y).get() + " ";
+        }
+
+        sql += "ORDER BY SapConfig.serverDestination";
+
+        return sql;
+    }
+
+    /**
+     * This method applies the given filter options to a configs query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Configuration> getFilteredConfigs(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+
+        List<Configuration> results;
+
+        try (Session session = openSession()) {
+
+            // prepare query
+            String sql = getFilteredConfigQuerySql(includeArchived, wildcard, start, end, limit);
+            NativeQuery query = session.createNativeQuery(sql);
+
+            // set parameters
+            if (wildcard != null && !wildcard.isEmpty()) {
+                query.setParameter("wildcard", "%" + wildcard + "%");
+            }
+
+            if (start != null) {
+                query.setParameter("start", start.toLocalDate());
+            }
+
+            if (end != null) {
+                query.setParameter("end", end.toLocalDate());
+            }
+
+            if (limit != null && limit > 0) {
+                query.setMaxResults(limit);
+            }
+
+            // execute query
+            query.addEntity(Configuration.class);
+            results = query.list();
+
+        } catch (Exception ex) {
+            // TODO: implement custom exception
+            throw ex;
+        }
+
+        return results;
+    }
+
+    private String getFilteredConfigQuerySql(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) {
+
+        String sql =
+            "SELECT DISTINCT Config.* "
+                + "FROM Configurations AS Config "
+                + "LEFT OUTER JOIN Whitelists AS Whitelist ON Whitelist.id = Config.WhitelistId "
+                + "LEFT OUTER JOIN nm_Configuration_AccessPattern AS Map ON Map.ConfigId = Config.id "
+                + "LEFT OUTER JOIN AccessPatterns AS Pattern ON Pattern.id = Map.AccessPatternId ";
+
+        List<String> conditions = new ArrayList<>();
+
+        if (!includeArchived) {
+            conditions.add("Config.isArchived = 0");
+        }
+
+        if (wildcard != null && !wildcard.isEmpty()) {
+
+            conditions.add("LOWER(Config.name) LIKE LOWER(:wildcard) OR LOWER(Config.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(Whitelist.name) LIKE LOWER(:wildcard) OR LOWER(Pattern.usecaseId) LIKE LOWER(:wildcard)");
+        }
+
+        if (start != null) {
+            conditions.add("Config.createdAt >= :start");
+        }
+
+        if (end != null) {
+            conditions.add("Config.createdAt <= :end");
+        }
+
+        if (conditions.size() > 0) {
+            sql += "WHERE " + conditions.stream().map(x -> "(" + x + ")").reduce((x, y) -> x + " AND " + y).get() + " ";
+        }
+
+        sql += "ORDER BY Config.name";
+
+        return sql;
+    }
+
+    /**
+     * This method applies the given filter options to a sap query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<CriticalAccessQuery> getFilteredCriticalAccessQueries(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+
+        List<CriticalAccessQuery> results;
+
+        try (Session session = openSession()) {
+
+            // prepare query
+            String sql = getFilteredCriticalAccessQuerySql(includeArchived, wildcard, start, end, limit);
+            NativeQuery query = session.createNativeQuery(sql);
+
+            // set parameters
+            if (wildcard != null && !wildcard.isEmpty()) {
+                query.setParameter("wildcard", "%" + wildcard + "%");
+            }
+
+            if (start != null) {
+                query.setParameter("start", start.toLocalDate());
+            }
+
+            if (end != null) {
+                query.setParameter("end", end.toLocalDate());
+            }
+
+            if (limit != null && limit > 0) {
+                query.setMaxResults(limit);
+            }
+
+            // execute query
+            query.addEntity(CriticalAccessQuery.class);
+            results = query.list();
+
+        } catch (Exception ex) {
+            // TODO: implement custom exception
+            throw ex;
+        }
+
+        return results;
+    }
+
+    private String getFilteredCriticalAccessQuerySql(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) {
+
+        String sql =
+              "SELECT DISTINCT Query.* "
+            + "FROM CriticalAccessQueries AS Query "
+            + "INNER JOIN CriticalAccessEntries AS Entries ON Entries.queryId = Query.id "
+            + "INNER JOIN AccessPatterns AS ViolatedPattern ON ViolatedPattern.id = Entries.violatedPatternId "
+            + "INNER JOIN SapConfigurations AS SapConfig ON SapConfig.id = Query.sapConfigId "
+            + "INNER JOIN Configurations AS Config ON Config.id = Query.configId ";
+
+        List<String> conditions = new ArrayList<>();
+
+        if (!includeArchived) {
+            conditions.add("Query.isArchived = 0");
+        }
+
+        if (wildcard != null && !wildcard.isEmpty()) {
+
+            conditions.add(
+                  "LOWER(Config.name) LIKE LOWER(:wildcard) OR LOWER(Config.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(SapConfig.serverDestination) LIKE LOWER(:wildcard) OR LOWER(SapConfig.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(Entries.username) LIKE LOWER(:wildcard) OR LOWER(ViolatedPattern.usecaseId) LIKE LOWER(:wildcard)");
+        }
+
+        if (start != null) {
+            conditions.add("Query.createdAt >= :start");
+        }
+
+        if (end != null) {
+            conditions.add("Query.createdAt <= :end");
+        }
+
+        if (conditions.size() > 0) {
+            sql += "WHERE " + conditions.stream().map(x -> "(" + x + ")").reduce((x, y) -> x + " AND " + y).get() + " ";
+        }
+
+        sql += "ORDER BY Query.createdAt DESC";
+
+        return sql;
     }
 
     // ============================================
@@ -379,7 +831,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         if (archive) {
 
-            // get the id of the original pattern
+            // get the id of the original whitelist
             Integer originalId = whitelist.getId();
             Whitelist original = getWhitelists(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
 
@@ -572,75 +1024,33 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     /**
      * This method adds a new database user with rights according to the given role.
      *
-     * @param username the name of the new database user
+     * @param user     the account data of the new database user
      * @param password the password of the new database user
-     * @param role     the role of the new database user
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
     @Override
-    public void createDatabaseUser(String username, String password, DbUserRole role) throws Exception {
-
-        Transaction transaction = null;
+    public void createDatabaseUser(DbUser user, String password) throws Exception {
 
         try (Session session = getSessionFactory().openSession()) {
 
-            // avoid sql injection with username
-            if (username.contains(" ")) {
-                // TODO: implement this as custom exception
-                throw new Exception("Invalid username! No whitespaces allowed!");
-            }
-
-            transaction = session.beginTransaction();
-
-            // create a new database account
-            String sql = "CREATE USER " + username + " PASSWORD :password " + ((role == DbUserRole.Admin) ? "ADMIN" : "");
-            session.createNativeQuery(sql).setParameter("password", password).executeUpdate();
-
-            // grant privileges to account accordingly
-            session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
-
-            session.flush();
-            transaction.commit();
-
-        } catch (Exception ex) {
-
-            if (transaction != null) {
-                transaction.rollback();
-            }
-
-            throw ex;
-        }
-    }
-
-    /**
-     * This method changes the role of an existing user.
-     *
-     * @param username the name of an existing database user
-     * @param role     the new role of the user
-     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
-     */
-    @Override
-    public void changeUserRole(String username, DbUserRole role) throws Exception {
-
-        // get original database user and role
-        DbUser original =
-            getDatabaseUsers()
-            .stream().filter(x -> x.getUsername().toUpperCase().equals(username.toUpperCase()))
-            .findFirst().orElse(null);
-
-        if (original != null) {
-
             Transaction transaction = null;
 
-            try (Session session = getSessionFactory().openSession()) {
+            try {
+
+                // avoid sql injection with username
+                if (user.getUsername().contains(" ")) {
+                    // TODO: implement this as custom exception
+                    throw new Exception("Invalid username! No whitespaces allowed!");
+                }
 
                 transaction = session.beginTransaction();
 
-                // remove old privileges from database account
-                session.createNativeQuery("REVOKE " + original.getRole().toString() + " FROM " + username).executeUpdate();
+                // create a new database account
+                String sql = "CREATE USER " + user.getUsername() + " PASSWORD :password " + ((user.getRoles().contains(DbUserRole.Admin)) ? "ADMIN" : "");
+                session.createNativeQuery(sql).setParameter("password", password).executeUpdate();
 
-                // grant new privileges to database account
-                session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
+                // grant privileges to the database account according to given roles
+                user.getRoles().forEach(role -> addDbRole(session, user.getUsername(), role));
 
                 session.flush();
                 transaction.commit();
@@ -653,9 +1063,75 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 throw ex;
             }
+        }
+    }
 
-        } else {
-            throw new Exception("User " + username + " does not exist.");
+    /**
+     * This method changes the roles of an existing user.
+     *
+     * @param user the database user to be updated
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    @Override
+    public void updateUserRoles(DbUser user) throws Exception {
+
+        try (Session session = getSessionFactory().openSession()) {
+
+            Transaction transaction = null;
+
+            try {
+
+                // create a new database account
+                DbUser original = getDatabaseUsers().stream().filter(x -> x.getUsername().equals(user.getUsername().toUpperCase())).findFirst().orElse(null);
+
+                if (original != null) {
+
+                    transaction = session.beginTransaction();
+
+                    // grant privileges that were added by admin
+                    user.getRoles().stream().filter(x -> !original.getRoles().contains(x)).forEach(role -> addDbRole(session, user.getUsername(), role));
+
+                    // revoke privileges that were removed by admin
+                    original.getRoles().stream().filter(x -> !user.getRoles().contains(x)).forEach(role -> removeDbRole(session, user.getUsername(), role));
+
+                    session.flush();
+                    transaction.commit();
+
+                } else {
+                    // TODO: replace this exception with a custom exception
+                    throw new IllegalArgumentException("Database user does not exist.");
+                }
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
+            }
+        }
+    }
+
+    private void addDbRole(Session session, String username, DbUserRole role) {
+
+        // grant privileges to database account
+        session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
+
+        // grant database admin rights
+        if (role == DbUserRole.Admin) {
+            session.createNativeQuery("ALTER USER " + username + " ADMIN TRUE").executeUpdate();
+        }
+    }
+
+    private void removeDbRole(Session session, String username, DbUserRole role) {
+
+        // revoke privileges from database account
+        session.createNativeQuery("REVOKE " + role.toString() + " FROM " + username).executeUpdate();
+
+        // revoke database admin rights
+        if (role == DbUserRole.Admin) {
+            session.createNativeQuery("ALTER USER " + username + " ADMIN FALSE").executeUpdate();
         }
     }
 
@@ -669,31 +1145,34 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void changePassword(String username, String password) throws Exception {
 
-        Transaction transaction = null;
-
         try (Session session = getSessionFactory().openSession()) {
 
-            // avoid sql injection with username
-            if (username.contains(" ")) {
-                // TODO: implement this as custom exception
-                throw new Exception("Invalid username! No whitespaces allowed!");
+            Transaction transaction = null;
+
+            try {
+
+                // avoid sql injection with username
+                if (username.contains(" ")) {
+                    // TODO: implement this as custom exception
+                    throw new Exception("Invalid username! No whitespaces allowed!");
+                }
+
+                transaction = session.beginTransaction();
+
+                // change password for database account
+                session.createNativeQuery("ALTER USER " + username + " SET PASSWORD :password").setParameter("password", password).executeUpdate();
+
+                session.flush();
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
             }
-
-            transaction = session.beginTransaction();
-
-            // change password for database account
-            session.createNativeQuery("ALTER USER " + username + " SET PASSWORD :password").setParameter("password", password).executeUpdate();
-
-            session.flush();
-            transaction.commit();
-
-        } catch (Exception ex) {
-
-            if (transaction != null) {
-                transaction.rollback();
-            }
-
-            throw ex;
         }
     }
 
@@ -706,31 +1185,34 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void deleteDatabaseUser(String username) throws Exception {
 
-        Transaction transaction = null;
-
         try (Session session = getSessionFactory().openSession()) {
 
-            // avoid sql injection with username
-            if (username.contains(" ")) {
-                // TODO: implement this as custom exception
-                throw new Exception("Invalid username! No whitespaces allowed!");
+            Transaction transaction = null;
+
+            try {
+
+                // avoid sql injection with username
+                if (username.contains(" ")) {
+                    // TODO: implement this as custom exception
+                    throw new Exception("Invalid username! No whitespaces allowed!");
+                }
+
+                transaction = session.beginTransaction();
+
+                // delete database account
+                session.createNativeQuery("DROP USER " + username).executeUpdate();
+
+                session.flush();
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
             }
-
-            transaction = session.beginTransaction();
-
-            // delete database account
-            session.createNativeQuery("DROP USER " + username).executeUpdate();
-
-            session.flush();
-            transaction.commit();
-
-        } catch (Exception ex) {
-
-            if (transaction != null) {
-                transaction.rollback();
-            }
-
-            throw ex;
         }
     }
 
@@ -763,5 +1245,97 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         //    throw new ArtException(ArtException.ErrorCode.WrongLocalDatabaseLoginCredentials, null);
         //}
     }
+
+    // old implementations that are obsolete
+
+    ///**
+    // * This method adds a new database user with rights according to the given role.
+    // *
+    // * @param username the name of the new database user
+    // * @param password the password of the new database user
+    // * @param role     the role of the new database user
+    // * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+    // */
+    //@Override
+    //public void createDatabaseUser(String username, String password, DbUserRole role) throws Exception {
+    //
+    //    Transaction transaction = null;
+    //
+    //    try (Session session = getSessionFactory().openSession()) {
+    //
+    //        // avoid sql injection with username
+    //        if (username.contains(" ")) {
+    //            // TODO: implement this as custom exception
+    //            throw new Exception("Invalid username! No whitespaces allowed!");
+    //        }
+    //
+    //        transaction = session.beginTransaction();
+    //
+    //        // create a new database account
+    //        String sql = "CREATE USER " + username + " PASSWORD :password " + ((role == DbUserRole.Admin) ? "ADMIN" : "");
+    //        session.createNativeQuery(sql).setParameter("password", password).executeUpdate();
+    //
+    //        // grant privileges to account accordingly
+    //        session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
+    //
+    //        session.flush();
+    //        transaction.commit();
+    //
+    //    } catch (Exception ex) {
+    //
+    //        if (transaction != null) {
+    //            transaction.rollback();
+    //        }
+    //
+    //        throw ex;
+    //    }
+    //}
+
+    ///**
+    // * This method changes the role of an existing user.
+    // *
+    // * @param username the name of an existing database user
+    // * @param role     the new role of the user
+    // * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+    // */
+    //@Override
+    //public void changeUserRole(String username, DbUserRole role) throws Exception {
+    //
+    //    // get original database user and role
+    //    DbUser original =
+    //        getDatabaseUsers()
+    //        .stream().filter(x -> x.getUsername().toUpperCase().equals(username.toUpperCase()))
+    //        .findFirst().orElse(null);
+    //
+    //    if (original != null) {
+    //
+    //        Transaction transaction = null;
+    //
+    //        try (Session session = getSessionFactory().openSession()) {
+    //
+    //            transaction = session.beginTransaction();
+    //
+    //            // remove old privileges from database account
+    //            session.createNativeQuery("REVOKE " + original.getRole().toString() + " FROM " + username).executeUpdate();
+    //
+    //            // grant new privileges to database account
+    //            session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
+    //
+    //            session.flush();
+    //            transaction.commit();
+    //
+    //        } catch (Exception ex) {
+    //
+    //            if (transaction != null) {
+    //                transaction.rollback();
+    //            }
+    //
+    //            throw ex;
+    //        }
+    //
+    //    } else {
+    //        throw new Exception("User " + username + " does not exist.");
+    //    }
+    //}
 
 }

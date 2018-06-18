@@ -1,13 +1,10 @@
 package ui;
 
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
@@ -15,11 +12,12 @@ import tools.tracing.TraceLevel;
 import tools.tracing.TraceMode;
 import tools.tracing.TraceOut;
 
-import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
-import ui.main.MainController;
+
 
 public class App extends Application {
+
+    public static Stage primaryStage;
 
     public static void main(String[] args) {
         launch(args);
@@ -63,7 +61,7 @@ public class App extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main/MainView.fxml"), bundle);
         CustomWindow window = loader.load();
 
-        Scene scene = new Scene(window, 1000, 600);
+        Scene scene = new Scene(window);
         scene.getStylesheets().add("css/dark-theme.css");
         primaryStage.setScene(scene);
 
@@ -76,6 +74,8 @@ public class App extends Application {
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_128.png")));
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_256.png")));
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_512.png")));
+
+        this.primaryStage = primaryStage;
 
         TraceOut.leave();
     }

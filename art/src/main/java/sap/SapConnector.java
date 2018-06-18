@@ -17,6 +17,10 @@ import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 
+import extensions.progess.ProgressableBase;
+
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,11 +28,11 @@ import java.util.stream.Collectors;
 import tools.tracing.TraceOut;
 
 @SuppressWarnings("WeakerAccess")
-public class SapConnector implements ISapConnector {
+public class SapConnector extends ProgressableBase implements ISapConnector, Closeable {
 
-    private SapConfiguration sapConfig;
-    private String username;
-    private String password;
+    // =============================
+    //          constructor
+    // =============================
 
     /**
      * Creates a new SapConnector with the given configuration, username and password.
@@ -44,14 +48,23 @@ public class SapConnector implements ISapConnector {
 
         // init this instance with sap config
         this.sapConfig = sapConfig;
-        this.username = username;
-        this.password = password;
 
         // overwrite the JCo SAP DestinationDataProvider so we don't need to create a file
-        com.sap.conn.jco.ext.Environment.registerDestinationDataProvider(new CustomDestinationDataProvider(sapConfig, username, password));
+        sessionKey = CustomDestinationDataProvider.getInstance().openSession(sapConfig, username, password);
 
         TraceOut.leave();
     }
+
+    // =============================
+    //           members
+    // =============================
+
+    private String sessionKey;
+    private SapConfiguration sapConfig;
+
+    // =============================
+    //            ping
+    // =============================
 
     /**
     /** This method pings the sap server specified in the sap server config.
@@ -67,7 +80,7 @@ public class SapConnector implements ISapConnector {
         try {
 
             // try to ping the sap server (if the ping fails an exception is thrown -> program enters catch block and returns false)
-            JCoDestination destination = JCoDestinationManager.getDestination(sapConfig.getServerDestination());
+            JCoDestination destination = JCoDestinationManager.getDestination(sessionKey);
             destination.ping();
 
         } catch (JCoException ex) {
@@ -80,9 +93,9 @@ public class SapConnector implements ISapConnector {
         return ret;
     }
 
-    // ===================================
-    //              QUERY LOGIC
-    // ===================================
+    // =============================
+    //         query logic
+    // =============================
 
     /**
      * This method runs a SAP analysis for the given config.
@@ -99,12 +112,13 @@ public class SapConnector implements ISapConnector {
 
         if (canPingServer()) {
 
+            setTotalProgressSteps(config.getPatterns().stream().mapToInt(x -> x.getConditions().size()).sum());
             Set<CriticalAccessEntry> entries = new HashSet<>();
 
             for (AccessPattern pattern : config.getPatterns()) {
 
                 // executing query for pattern
-                Set<CriticalAccessEntry> resultsOfPattern = runSapQuery(pattern, config.getWhitelist());
+                Set<CriticalAccessEntry> resultsOfPattern = runPatternAnalysis(pattern, config.getWhitelist());
                 entries.addAll(resultsOfPattern);
 
                 TraceOut.writeInfo("Pattern: " + pattern.getUsecaseId() + ", results count: " + resultsOfPattern.size());
@@ -112,6 +126,9 @@ public class SapConnector implements ISapConnector {
 
             // write results to critical access query (ready for insertion into database)
             query = new CriticalAccessQuery(config, sapConfig, entries);
+
+            resetProgress();
+
         }
 
         TraceOut.leave();
@@ -125,11 +142,11 @@ public class SapConnector implements ISapConnector {
      * @param whitelist the whitelist to be applied to query results
      * @return the list of CriticalAccesses (users)
      */
-    private Set<CriticalAccessEntry> runSapQuery(AccessPattern pattern, Whitelist whitelist) throws Exception {
+    private Set<CriticalAccessEntry> runPatternAnalysis(AccessPattern pattern, Whitelist whitelist) throws Exception {
 
         TraceOut.enter();
 
-        JCoDestination destination = JCoDestinationManager.getDestination(sapConfig.getServerDestination());
+        JCoDestination destination = JCoDestinationManager.getDestination(sessionKey);
         JCoFunction function = destination.getRepository().getFunction("SUSR_SUIM_API_RSUSR002");
 
         JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");
@@ -159,6 +176,9 @@ public class SapConnector implements ISapConnector {
             // clear sap input tables
             inputTable.clear();
             profileTable.clear();
+
+            // notify progress
+            stepProgress();
         }
 
         if (whitelist != null) {
@@ -240,9 +260,7 @@ public class SapConnector implements ISapConnector {
         TraceOut.enter();
 
         JCoTable results = null;
-        JCoDestination destination = JCoDestinationManager.getDestination(sapConfig.getServerDestination());
-
-        /*if (canPingServer()) {*/
+        JCoDestination destination = JCoDestinationManager.getDestination(sessionKey);
 
         if (function != null) {
 
@@ -253,10 +271,6 @@ public class SapConnector implements ISapConnector {
         } else {
             throw new Exception("Function could not be initialized!");
         }
-
-        /*} else {
-            throw new Exception("Can't connect to the server!");
-        }*/
 
         TraceOut.leave();
         return results;
@@ -286,6 +300,20 @@ public class SapConnector implements ISapConnector {
 
         TraceOut.leave();
         return usernames;
+    }
+
+    // =============================
+    //          overrides
+    // =============================
+
+    @Override
+    public void close() throws IOException {
+
+        TraceOut.enter();
+
+        CustomDestinationDataProvider.getInstance().closeSession(sessionKey);
+
+        TraceOut.leave();
     }
 
 }

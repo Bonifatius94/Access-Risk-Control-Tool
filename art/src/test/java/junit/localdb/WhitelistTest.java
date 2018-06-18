@@ -42,6 +42,7 @@ public class WhitelistTest {
     }
 
     @Test
+    @Disabled
     public void testCreateWhitelist() {
 
         boolean ret = false;
@@ -75,6 +76,7 @@ public class WhitelistTest {
     }
 
     @Test
+    @Disabled
     public void testUpdateWhitelist() {
 
         boolean ret = false;

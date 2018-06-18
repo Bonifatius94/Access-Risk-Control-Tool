@@ -13,6 +13,7 @@
     -fx-alternatetext: #303030;
     -fx-background: #484848;
     -fx-light: #AAAAAA;
+    -fx-select: derive(-fx-background, -50%);
     -fx-primary-darker: derive(-fx-primary, -30%);
     -fx-primary-lighter: derive(-fx-primary, 30%);
 }
@@ -25,7 +26,7 @@
     -fx-font-family: "Roboto";
     -fx-font-smoothing-type: gray;
     -fx-background-color: -fx-background;
-
+    -fx-border-color: derive(-fx-background, -30%);
 }
 
 /*******************************************************************************
@@ -39,13 +40,10 @@
     -fx-text-fill: -fx-text;
     -fx-cursor: hand;
     -jfx-disable-visual-focus: false;
+    -jfx-button-type: RAISED;
 }
 
-.jfx-button:hover {
-    -fx-background-color: -fx-primary-lighter;
-}
-
-.jfx-button:focused {
+.jfx-button:hover, .jfx-button:focused  {
     -fx-background-color: -fx-primary-lighter;
 }
 
@@ -54,15 +52,29 @@
     -fx-background-color: -fx-background;
     -fx-text-fill: white;
     -jfx-disable-visual-focus: true;
+    -jfx-button-type: FLAT;
 }
 
-.closeWindowButton:hover {
+.warning-button {
     -fx-background-color: -fx-error;
 }
 
-.closeWindowButton:focused {
+.round-button {
+    -fx-background-radius: 100%;
+}
+
+.round-button .glyph-icon {
+    -fx-font-size: 15;
+}
+
+.warning-button:hover, .warning-button:focused {
+    -fx-background-color: derive(-fx-error, 30%);
+}
+
+.closeWindowButton:hover, .closeWindowButton:focused {
     -fx-background-color: -fx-error;
 }
+
 
 /*******************************************************************************
  *                                                                             *
@@ -78,6 +90,7 @@
     -jfx-label-float: true;
 }
 
+
 /*******************************************************************************
 *                                                                              *
 * Material TabPane                                                             *
@@ -91,6 +104,11 @@
 .jfx-tab-pane .headers-region {
     -fx-background-color: -fx-primary;
     -fx-cursor: hand;
+}
+
+/* have to set the disabled opacity manually */
+.jfx-tab-pane:disabled > * {
+    -fx-opacity: 0.6;
 }
 
 .jfx-tab-pane .headers-region .tab {
@@ -117,6 +135,7 @@
     -fx-padding: 15 5 5 5;
 }
 
+
 /*******************************************************************************
  *                                                                             *
  * Material CheckBox                                                           *
@@ -129,6 +148,7 @@
     -fx-cursor: hand;
 }
 
+
 /*******************************************************************************
 *                                                                             *
 * Material ComboBox                                                           *
@@ -139,12 +159,30 @@
     -jfx-focus-color: -fx-primary;
     -jfx-unfocus-color: -fx-light;
     -fx-cursor: hand;
+    -fx-text-fill: -fx-text !important;
+}
+
+.jfx-combo-box .cell {
+    -fx-text-fill: -fx-text !important;
 }
 
 .combo-box-popup .list-view {
     -fx-background-color: -fx-background !important;
     -fx-border-color: -fx-light !important;
 }
+
+.combo-box-popup .list-view .list-cell:filled {
+    -fx-background-color: -fx-background !important;
+}
+
+.combo-box-popup .list-view .list-cell:filled:focused {
+    -fx-background-color: -fx-primary !important;
+}
+
+.combo-box-popup .list-view .list-cell:filled:hover {
+    -fx-background-color: -fx-primary !important;
+}
+
 
 /*******************************************************************************
 *                                                                             *
@@ -157,6 +195,7 @@
     -jfx-unchecked-color: -fx-light;
     -fx-cursor: hand;
 }
+
 
 /*******************************************************************************
 *                                                                             *
@@ -223,6 +262,7 @@ alternative design with separators left and right of complete header bar
     -fx-border-width: 0 0 0 0;
 }
 
+
 /*******************************************************************************
 *                                                                             *
 * Material TableView                                                          *
@@ -236,6 +276,8 @@ alternative design with separators left and right of complete header bar
 .table-view {
     -fx-background-color: -fx-background;
     -fx-table-rippler-color: -fx-text;
+    -fx-shadow: derive(-fx-background, -30%);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow, 5, 0, 3, 3);
 }
 
 .table-view .column-header,
@@ -291,14 +333,12 @@ alternative design with separators left and right of complete header bar
 }
 
 .table-view .table-row-cell {
-    -fx-padding: 5 0 5 0;
     -fx-border-color: TRANSPARENT;
     -fx-table-cell-border-color: TRANSPARENT;
 }
 
 .table-view .jfx-button {
-    -fx-padding: 8;
-    -fx-background-radius: 50%;
+    -fx-background-radius: 100%;
 }
 
 /* odd rows */
@@ -306,19 +346,18 @@ alternative design with separators left and right of complete header bar
     -fx-background-color: derive(-fx-background, 10%);
 }
 
-.table-view:focused .table-row-cell:selected {
-    -fx-background-color: derive(-fx-background, -50%);
+.table-view .table-row-cell:selected {
+    -fx-background-color: -fx-select !important;
     -fx-table-cell-border-color: -fx-primary;
     -fx-text-fill: -fx-text;
 }
 
 /* remove blue border from first entry of tableView on focus */
 .table-view:focused .table-row-cell:focused {
-    -fx-background-color: -fx-table-cell-border-color, -fx-background;
     -fx-background-insets: 0, 0 0 1 0;
 }
 
-.table-view:focused .table-row-cell:selected .table-cell {
+.table-view .table-row-cell:selected .table-cell {
     -fx-text-fill: -fx-text;
 }
 
@@ -362,6 +401,42 @@ alternative design with separators left and right of complete header bar
     -fx-padding: 0;
     -fx-shape: null;
 }
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Material DatePicker                                                         *
+ *                                                                             *
+ ******************************************************************************/
+
+.jfx-date-picker {
+    -jfx-default-color: -fx-primary;
+}
+
+.jfx-date-picker .date-cell:hover {
+    -fx-cursor: hand;
+    -fx-background-color: -fx-primary-lighter;
+}
+
+/*
+.jfx-date-picker .date-picker-popup {
+    -fx-background-color: -fx-background;
+}
+*/
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Material ToggleButton                                                       *
+ *                                                                             *
+ ******************************************************************************/
+
+.jfx-toggle-button {
+    -jfx-toggle-color: -fx-primary;
+    -jfx-untoggle-color: -fx-light;
+    -fx-text-fill: -fx-text;
+}
+
 
 /*******************************************************************************
  *                                                                             *
