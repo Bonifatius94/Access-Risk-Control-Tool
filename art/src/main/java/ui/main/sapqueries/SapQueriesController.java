@@ -133,7 +133,7 @@ public class SapQueriesController {
         }));
 
         // Add the edit column
-        editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (CriticalAccessQuery query) -> {
+        editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.OPEN_IN_NEW, bundle.getString("details"), (CriticalAccessQuery query) -> {
             openQuery(query);
             return query;
         }));

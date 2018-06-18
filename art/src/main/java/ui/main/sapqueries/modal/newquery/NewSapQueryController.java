@@ -186,10 +186,10 @@ public class NewSapQueryController {
     }
 
     /**
-     * Runs the analysis.
+     * Runs the analysis by creating a new SapTask.
      */
     public void runAnalysis(String username, String password) {
-        inputBox.setEffect(new BoxBlur());
+        inputBox.setEffect(new BoxBlur(15, 15, 10));
         spinner.setVisible(true);
         connectionLabel.setText(bundle.getString("connectingToSap"));
 
@@ -201,6 +201,12 @@ public class NewSapQueryController {
         startSapTask(query, username, password);
     }
 
+    /**
+     * Starts a new SapTask with the given parameters.
+     * @param query the given query parameters
+     * @param username the username
+     * @param password the password
+     */
     private void startSapTask(final CriticalAccessQuery query, final String username, final String password) {
         Task<CriticalAccessQuery> runQueryTask = new Task<CriticalAccessQuery>() {
             @Override
@@ -252,22 +258,16 @@ public class NewSapQueryController {
             }
         );
 
-        runQueryTask.setOnFailed(e -> {
-            Throwable problem = runQueryTask.getException();
-            /* code to execute if task throws exception */
-        });
 
-        runQueryTask.setOnCancelled(e -> {
-            /* task was cancelled */
-        });
-
+        // bind progress display to the task progressProperty
         progressBar.progressProperty().bind(runQueryTask.progressProperty());
-
         progressLabel.managedProperty().bind(progressLabel.visibleProperty());
         progressLabel.visibleProperty().bind(runQueryTask.progressProperty().greaterThan(0));
         connectionLabel.visibleProperty().bind(Bindings.not(progressLabel.visibleProperty()));
+        connectionLabel.managedProperty().bind(connectionLabel.visibleProperty());
         progressLabel.textProperty().bind(runQueryTask.progressProperty().multiply(100).asString("Analyse läuft... Fortschritt %.0f%%"));
 
+        // start a new thread with the task
         Thread thread = new Thread(runQueryTask);
         thread.start();
     }
