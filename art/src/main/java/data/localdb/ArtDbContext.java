@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import sun.security.krb5.Config;
 
 public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 

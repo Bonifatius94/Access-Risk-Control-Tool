@@ -3,6 +3,7 @@ package junit.localdb;
 import data.entities.SapConfiguration;
 import data.localdb.ArtDbContext;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -63,6 +64,7 @@ public class SapSettingsTest {
     }
 
     @Test
+    @Disabled
     public void testUpdateSapConfig() {
 
         boolean ret = false;
@@ -96,6 +98,7 @@ public class SapSettingsTest {
     }
 
     @Test
+    @Disabled
     public void testUpdateSapConfigWithArchiving() {
 
         boolean ret = false;
@@ -156,6 +159,7 @@ public class SapSettingsTest {
     }
 
     @Test
+    @Disabled
     public void testDeleteSapConfigWithArchiving() {
 
         boolean ret = false;

@@ -4,6 +4,7 @@ import data.entities.DbUser;
 import data.localdb.ArtDbContext;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class PrivilegesTest {
     }
 
     @Test
+    @Disabled
     public void testPrivileges() {
 
         // IArtDbContext.getDatabaseUsers()

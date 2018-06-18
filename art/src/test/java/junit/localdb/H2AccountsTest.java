@@ -7,6 +7,7 @@ import data.localdb.ArtDbContext;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("all")
@@ -72,6 +73,7 @@ public class H2AccountsTest {
     }
 
     @Test
+    @Disabled
     public void testChangePassword() {
 
         // TODO: implement test

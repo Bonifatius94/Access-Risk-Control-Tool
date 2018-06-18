@@ -6,6 +6,7 @@ import data.entities.Whitelist;
 import data.localdb.ArtDbContext;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -82,6 +83,7 @@ public class ConfigurationTest {
     }
 
     @Test
+    @Disabled
     public void testUpdateConfiguration() {
 
         boolean ret = false;
@@ -113,6 +115,7 @@ public class ConfigurationTest {
     }
 
     @Test
+    @Disabled
     public void testUpdateConfigurationWithArchiving() {
 
         boolean ret = false;
@@ -144,6 +147,7 @@ public class ConfigurationTest {
     }
 
     @Test
+    @Disabled
     public void testDeleteConfiguration() {
 
         boolean ret = false;
@@ -175,6 +179,7 @@ public class ConfigurationTest {
     }
 
     @Test
+    @Disabled
     public void testDeleteConfigurationWithArchiving() {
 
         boolean ret = false;
