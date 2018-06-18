@@ -10,6 +10,8 @@ import data.entities.SapConfiguration;
 import java.time.ZonedDateTime;
 import java.util.ResourceBundle;
 
+import javafx.beans.binding.Bindings;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -50,6 +52,10 @@ public class NewSapQueryController {
 
     @FXML
     private Label progressLabel;
+
+    @FXML
+    private Label connectionLabel;
+
 
     private Configuration configuration;
     private SapConfiguration sapConfiguration;
@@ -160,6 +166,7 @@ public class NewSapQueryController {
 
     /**
      * Prefills the inputs with the given query.
+     *
      * @param query the given query
      */
     public void giveQuery(CriticalAccessQuery query) {
@@ -184,58 +191,90 @@ public class NewSapQueryController {
     public void runAnalysis(String username, String password) {
         inputBox.setEffect(new BoxBlur());
         spinner.setVisible(true);
-        progressLabel.setText(bundle.getString("connectingToSap"));
+        connectionLabel.setText(bundle.getString("connectingToSap"));
 
         CriticalAccessQuery query = new CriticalAccessQuery();
         query.setConfig(this.configuration);
         query.setSapConfig(this.sapConfiguration);
         query.setCreatedAt(ZonedDateTime.now());
 
-        // run sap query with config and sap settings
-        try (SapConnector connector = new SapConnector(this.sapConfiguration, username, password)) {
+        startSapTask(query, username, password);
+    }
 
-            // show progress
-            connector.register(percentage -> {
-                this.progressBar.setSecondaryProgress(percentage);
-                this.progressLabel.setText("Running... Progress " + (int)(percentage * 100) + "%");
-            });
+    private void startSapTask(final CriticalAccessQuery query, final String username, final String password) {
+        Task<CriticalAccessQuery> runQueryTask = new Task<CriticalAccessQuery>() {
+            @Override
+            protected CriticalAccessQuery call() {
+                // run sap query with config and sap settings
+                try (SapConnector connector = new SapConnector(query.getSapConfig(), username, password)) {
 
-            // TODO: run analysis in own thread
-            query = connector.runAnalysis(this.configuration);
+                    // show progress
+                    connector.register(percentage -> {
+                        this.updateProgress(percentage, 1);
+                    });
 
-            // remove the spinner and blur effect
-            inputBox.setEffect(null);
-            spinner.setVisible(false);
+                    return connector.runAnalysis(configuration);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-            // open the analysisResultView and give it the results
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("AnalysisResultView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
+                return null;
+            }
+        };
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
 
-            customWindow.setTitle(bundle.getString("analysisResultTitle"));
+        runQueryTask.setOnSucceeded(e -> {
+                try {
+                    // open the analysisResultView and give it the results
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("AnalysisResultView.fxml"), bundle);
+                    CustomWindow customWindow = loader.load();
 
-            stage.show();
+                    // build the scene and add it to the stage
+                    Scene scene = new Scene(customWindow);
+                    scene.getStylesheets().add("css/dark-theme.css");
+                    Stage stage = new Stage();
+                    stage.setScene(scene);
+                    stage.initModality(Modality.WINDOW_MODAL);
+                    stage.initOwner(App.primaryStage);
+                    customWindow.initStage(stage);
 
-            AnalysisResultController resultController = loader.getController();
-            resultController.giveResultQuery(query);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                    customWindow.setTitle(bundle.getString("analysisResultTitle"));
 
-        // close this window
-        runAnalysisButton.getScene().getWindow().hide();
+                    stage.show();
+
+                    AnalysisResultController resultController = loader.getController();
+                    resultController.giveResultQuery(runQueryTask.getValue());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                // close this window
+                runAnalysisButton.getScene().getWindow().hide();
+            }
+        );
+
+        runQueryTask.setOnFailed(e -> {
+            Throwable problem = runQueryTask.getException();
+            /* code to execute if task throws exception */
+        });
+
+        runQueryTask.setOnCancelled(e -> {
+            /* task was cancelled */
+        });
+
+        progressBar.progressProperty().bind(runQueryTask.progressProperty());
+
+        progressLabel.managedProperty().bind(progressLabel.visibleProperty());
+        progressLabel.visibleProperty().bind(runQueryTask.progressProperty().greaterThan(0));
+        connectionLabel.visibleProperty().bind(Bindings.not(progressLabel.visibleProperty()));
+        progressLabel.textProperty().bind(runQueryTask.progressProperty().multiply(100).asString("Analyse läuft... Fortschritt %.0f%%"));
+
+        Thread thread = new Thread(runQueryTask);
+        thread.start();
     }
 
     /**
      * Sets the config input to the given config.
+     *
      * @param config the given config
      */
     public void setConfig(Configuration config) {
@@ -248,6 +287,7 @@ public class NewSapQueryController {
 
     /**
      * Sets the sapConfig input to the given sapConfig.
+     *
      * @param sapConfig the given sapConfig
      */
     public void setSapConfig(SapConfiguration sapConfig) {

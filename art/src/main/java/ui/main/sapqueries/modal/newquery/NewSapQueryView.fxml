@@ -58,7 +58,8 @@
                 <JFXSpinner maxWidth="50"/>
                 <Label text="%analysisInProgress"/>
                 <JFXProgressBar fx:id="progressBar"/>
-                <Label fx:id="progressLabel" />
+                <Label fx:id="progressLabel" visible="false"/>
+                <Label fx:id="connectionLabel" />
             </VBox>
         </StackPane>
     </VBox>
