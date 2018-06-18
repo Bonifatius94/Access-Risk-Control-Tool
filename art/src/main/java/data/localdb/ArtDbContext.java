@@ -172,8 +172,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     //                   R E A D
     // ============================================
 
-    // TODO: add filter options (e.g. by time: today, last week, last month, last year, all)
-
     /**
      * This method selects all already executed sap queries from the local database.
      *
@@ -254,6 +252,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         try (Session session = getSessionFactory().openSession()) {
 
             List<Object[]> results = session.createNativeQuery("SELECT * FROM DbUsers").getResultList();
+
             users = results.stream().map(x -> {
 
                 String username = (String)x[0];
@@ -342,7 +341,9 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (wildcard != null && !wildcard.isEmpty()) {
-            conditions.add("Pattern.usecaseId LIKE :wildcard OR Pattern.description LIKE :wildcard OR PatternConditionProperty.authObject LIKE :wildcard OR ProfileCondition.profile LIKE :wildcard");
+
+            conditions.add("LOWER(Pattern.usecaseId) LIKE LOWER(:wildcard) OR LOWER(Pattern.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(PatternConditionProperty.authObject) LIKE LOWER(:wildcard) OR LOWER(ProfileCondition.profile) LIKE LOWER(:wildcard)");
         }
 
         if (start != null) {
@@ -427,7 +428,9 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (wildcard != null && !wildcard.isEmpty()) {
-            conditions.add("Whitelist.name LIKE :wildcard OR Whitelist.description LIKE :wildcard OR Entries.usecaseId LIKE :wildcard OR Entries.username LIKE :wildcard");
+
+            conditions.add("LOWER(Whitelist.name) LIKE LOWER(:wildcard) OR LOWER(Whitelist.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(Entries.usecaseId) LIKE LOWER(:wildcard) OR LOWER(Entries.username) LIKE LOWER(:wildcard)");
         }
 
         if (start != null) {
@@ -508,7 +511,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (wildcard != null && !wildcard.isEmpty()) {
-            conditions.add("SapConfig.serverDestination LIKE :wildcard OR SapConfig.description LIKE :wildcard");
+            conditions.add("LOWER(SapConfig.serverDestination) LIKE LOWER(:wildcard) OR LOWER(SapConfig.description) LIKE LOWER(:wildcard)");
         }
 
         if (start != null) {
@@ -586,16 +589,18 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                 + "FROM Configurations AS Config "
                 + "LEFT OUTER JOIN Whitelists AS Whitelist ON Whitelist.id = Config.WhitelistId "
                 + "LEFT OUTER JOIN nm_Configuration_AccessPattern AS Map ON Map.ConfigId = Config.id "
-                + "LEFT OUTER JOIN AccessPatterns AS Pattern ON Pattern.id = Map.PatternId ";
+                + "LEFT OUTER JOIN AccessPatterns AS Pattern ON Pattern.id = Map.AccessPatternId ";
 
         List<String> conditions = new ArrayList<>();
 
         if (!includeArchived) {
-            conditions.add("Whitelist.isArchived = 0");
+            conditions.add("Config.isArchived = 0");
         }
 
         if (wildcard != null && !wildcard.isEmpty()) {
-            conditions.add("Config.name LIKE :wildcard OR Config.description LIKE :wildcard OR Whitelist.name LIKE :wildcard OR Pattern.name LIKE :wildcard");
+
+            conditions.add("LOWER(Config.name) LIKE LOWER(:wildcard) OR LOWER(Config.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(Whitelist.name) LIKE LOWER(:wildcard) OR LOWER(Pattern.usecaseId) LIKE LOWER(:wildcard)");
         }
 
         if (start != null) {
@@ -679,23 +684,23 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         List<String> conditions = new ArrayList<>();
 
         if (!includeArchived) {
-            conditions.add("Whitelist.isArchived = 0");
+            conditions.add("Query.isArchived = 0");
         }
 
         if (wildcard != null && !wildcard.isEmpty()) {
 
             conditions.add(
-                  "Config.name LIKE :wildcard OR Config.description LIKE :wildcard "
-                + "OR SapConfig.name LIKE :wildcard OR SapConfig.description LIKE :wildcard "
-                + "OR Entries.username LIKE :wildcard OR ViolatedPattern.usecaseId LIKE :wildcard");
+                  "LOWER(Config.name) LIKE LOWER(:wildcard) OR LOWER(Config.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(SapConfig.serverDestination) LIKE LOWER(:wildcard) OR LOWER(SapConfig.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(Entries.username) LIKE LOWER(:wildcard) OR LOWER(ViolatedPattern.usecaseId) LIKE LOWER(:wildcard)");
         }
 
         if (start != null) {
-            conditions.add("Whitelist.createdAt >= :start");
+            conditions.add("Query.createdAt >= :start");
         }
 
         if (end != null) {
-            conditions.add("Whitelist.createdAt <= :end");
+            conditions.add("Query.createdAt <= :end");
         }
 
         if (conditions.size() > 0) {
