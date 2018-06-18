@@ -1216,6 +1216,10 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
     }
 
+    public DbUser getCurrentUser() throws Exception {
+        return getDatabaseUsers().stream().filter(x -> x.getUsername().toUpperCase().equals(getUsername().toUpperCase())).findFirst().get();
+    }
+
     /**
      * This method switches the logged in user. (it also works for first login)
      *
