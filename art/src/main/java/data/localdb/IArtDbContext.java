@@ -177,7 +177,7 @@ public interface IArtDbContext {
      * @param limit the limit of records returned
      * @return a list of whitelist matching the given filter options
      */
-    List<Configuration> getFilteredSapQueries(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception;
+    List<CriticalAccessQuery> getFilteredCriticalAccessQueries(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception;
 
     // ============================================
     //                 U P D A T E
