@@ -54,7 +54,7 @@ public class CustomDestinationDataProvider implements DestinationDataProvider {
     public synchronized String openSession(SapConfiguration config, String username, String password) {
 
         // generate session key
-        String sessionKey = String.valueOf(sessionCount++) + "_" + config.getServerDestination();
+        final String sessionKey = String.valueOf(sessionCount++) + "_" + config.getServerDestination();
 
         // create settings instance with given data
         final Properties settings = new Properties();

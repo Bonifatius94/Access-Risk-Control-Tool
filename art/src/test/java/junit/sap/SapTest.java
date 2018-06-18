@@ -6,6 +6,7 @@ import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 
+import extensions.progess.IProgressListener;
 import io.msoffice.excel.AccessPatternImportHelper;
 import io.msoffice.excel.WhitelistImportHelper;
 
@@ -76,17 +77,26 @@ public class SapTest {
             System.out.println(config);
 
             // run sap query with config and sap settings
-            SapConnector connector = new SapConnector(sapConfig, username, password);
-            CriticalAccessQuery query = connector.runAnalysis(config);
-            System.out.println("SAP query results:");
-            query.getEntries().forEach(x -> System.out.println(x));
+            try (SapConnector connector = new SapConnector(sapConfig, username, password)) {
 
-            ret =
-                query.getSapConfig().equals(sapConfig)
-                && query.getConfig().equals(config)
-                && query.getConfig().getWhitelist().equals(whitelist)
-                && query.getConfig().getPatterns().containsAll(patterns)
-                && query.getEntries().size() == 24;
+                connector.register(new IProgressListener() {
+                    @Override
+                    public void onProgressChanged(double percentage) {
+                        System.out.println("Progress at " + (int)(percentage * 100) + "%");
+                    }
+                });
+
+                CriticalAccessQuery query = connector.runAnalysis(config);
+                System.out.println("SAP query results (" + query.getEntries().size() + "):");
+                query.getEntries().forEach(x -> System.out.println(x));
+
+                ret =
+                    query.getSapConfig().equals(sapConfig)
+                    && query.getConfig().equals(config)
+                    && query.getConfig().getWhitelist().equals(whitelist)
+                    && query.getConfig().getPatterns().containsAll(patterns)
+                    && query.getEntries().size() == 24;
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
