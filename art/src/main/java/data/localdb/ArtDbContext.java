@@ -47,7 +47,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     private static String getDefaultDatabaseFilePath() {
 
         String currentExeFolder = System.getProperty("user.dir");
-        return Paths.get(currentExeFolder, "foo.h2").toAbsolutePath().toString();
+        return Paths.get(currentExeFolder, "art.h2").toAbsolutePath().toString();
     }
 
     // ===================================
