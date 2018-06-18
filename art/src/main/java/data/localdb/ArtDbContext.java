@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 
 public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
@@ -170,8 +172,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     //                   R E A D
     // ============================================
 
-    // TODO: add filter options (e.g. by time: today, last week, last month, last year, all)
-
     /**
      * This method selects all already executed sap queries from the local database.
      *
@@ -252,6 +252,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         try (Session session = getSessionFactory().openSession()) {
 
             List<Object[]> results = session.createNativeQuery("SELECT * FROM DbUsers").getResultList();
+
             users = results.stream().map(x -> {
 
                 String username = (String)x[0];
@@ -266,6 +267,449 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         return users;
+    }
+
+    // ============================================
+    //               F I L T E R S
+    // ============================================
+
+    /**
+     * This method applies the given filter options to an access pattern query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<AccessPattern> getFilteredPatterns(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+
+        List<AccessPattern> results;
+
+        try (Session session = openSession()) {
+
+            // prepare query
+            String sql = getFilteredPatternsQuerySql(includeArchived, wildcard, start, end, limit);
+            NativeQuery query = session.createNativeQuery(sql);
+
+            // set parameters
+            if (wildcard != null && !wildcard.isEmpty()) {
+                query.setParameter("wildcard", "%" + wildcard + "%");
+            }
+
+            if (start != null) {
+                query.setParameter("start", start.toLocalDate());
+            }
+
+            if (end != null) {
+                query.setParameter("end", end.toLocalDate());
+            }
+
+            if (limit != null && limit > 0) {
+                query.setMaxResults(limit);
+            }
+
+            // execute query
+            query.addEntity(AccessPattern.class);
+            results = query.list();
+
+        } catch (Exception ex) {
+            // TODO: implement custom exception
+            throw ex;
+        }
+
+        return results;
+    }
+
+    private String getFilteredPatternsQuerySql(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) {
+
+        String sql =
+              "SELECT DISTINCT Pattern.* "
+            + "FROM AccessPatterns AS Pattern "
+            + "INNER JOIN AccessConditions AS Condition ON Condition.PatternId = Pattern.id "
+            + "LEFT OUTER JOIN AccessPatternConditions AS PatternCondition ON PatternCondition.Condition_Id = Condition.id "
+            + "LEFT OUTER JOIN AccessPatternConditionProperties AS PatternConditionProperty ON PatternConditionProperty.ConditionId = Condition.id "
+            + "LEFT OUTER JOIN AccessProfileConditions AS ProfileCondition ON ProfileCondition.Condition_Id = Condition.id ";
+
+        List<String> conditions = new ArrayList<>();
+
+        if (!includeArchived) {
+            conditions.add("Pattern.isArchived = 0");
+        }
+
+        if (wildcard != null && !wildcard.isEmpty()) {
+
+            conditions.add("LOWER(Pattern.usecaseId) LIKE LOWER(:wildcard) OR LOWER(Pattern.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(PatternConditionProperty.authObject) LIKE LOWER(:wildcard) OR LOWER(ProfileCondition.profile) LIKE LOWER(:wildcard)");
+        }
+
+        if (start != null) {
+            conditions.add("Pattern.createdAt >= :start");
+        }
+
+        if (end != null) {
+            conditions.add("Pattern.createdAt <= :end");
+        }
+
+        if (conditions.size() > 0) {
+            sql += "WHERE " + conditions.stream().map(x -> "(" + x + ")").reduce((x, y) -> x + " AND " + y).get() + " ";
+        }
+
+        sql += "ORDER BY Pattern.usecaseId";
+
+        return sql;
+    }
+
+    /**
+     * This method applies the given filter options to a whitelist query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Whitelist> getFilteredWhitelists(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+
+        List<Whitelist> results;
+
+        try (Session session = openSession()) {
+
+            // prepare query
+            String sql = getFilteredWhitelistQuerySql(includeArchived, wildcard, start, end, limit);
+            NativeQuery query = session.createNativeQuery(sql);
+
+            // set parameters
+            if (wildcard != null && !wildcard.isEmpty()) {
+                query.setParameter("wildcard", "%" + wildcard + "%");
+            }
+
+            if (start != null) {
+                query.setParameter("start", start.toLocalDate());
+            }
+
+            if (end != null) {
+                query.setParameter("end", end.toLocalDate());
+            }
+
+            if (limit != null && limit > 0) {
+                query.setMaxResults(limit);
+            }
+
+            // execute query
+            query.addEntity(Whitelist.class);
+            results = query.list();
+
+        } catch (Exception ex) {
+            // TODO: implement custom exception
+            throw ex;
+        }
+
+        return results;
+    }
+
+    private String getFilteredWhitelistQuerySql(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) {
+
+        String sql =
+            "SELECT DISTINCT Whitelist.* "
+                + "FROM Whitelists AS Whitelist "
+                + "INNER JOIN WhitelistEntries AS Entries ON Entries.WhitelistId = Whitelist.id ";
+
+        List<String> conditions = new ArrayList<>();
+
+        if (!includeArchived) {
+            conditions.add("Whitelist.isArchived = 0");
+        }
+
+        if (wildcard != null && !wildcard.isEmpty()) {
+
+            conditions.add("LOWER(Whitelist.name) LIKE LOWER(:wildcard) OR LOWER(Whitelist.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(Entries.usecaseId) LIKE LOWER(:wildcard) OR LOWER(Entries.username) LIKE LOWER(:wildcard)");
+        }
+
+        if (start != null) {
+            conditions.add("Whitelist.createdAt >= :start");
+        }
+
+        if (end != null) {
+            conditions.add("Whitelist.createdAt <= :end");
+        }
+
+        if (conditions.size() > 0) {
+            sql += "WHERE " + conditions.stream().map(x -> "(" + x + ")").reduce((x, y) -> x + " AND " + y).get() + " ";
+        }
+
+        sql += "ORDER BY Whitelist.name";
+
+        return sql;
+    }
+
+    /**
+     * This method applies the given filter options to a sap configs query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<SapConfiguration> getFilteredSapConfigs(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+
+        List<SapConfiguration> results;
+
+        try (Session session = openSession()) {
+
+            // prepare query
+            String sql = getFilteredSapConfigQuerySql(includeArchived, wildcard, start, end, limit);
+            NativeQuery query = session.createNativeQuery(sql);
+
+            // set parameters
+            if (wildcard != null && !wildcard.isEmpty()) {
+                query.setParameter("wildcard", "%" + wildcard + "%");
+            }
+
+            if (start != null) {
+                query.setParameter("start", start.toLocalDate());
+            }
+
+            if (end != null) {
+                query.setParameter("end", end.toLocalDate());
+            }
+
+            if (limit != null && limit > 0) {
+                query.setMaxResults(limit);
+            }
+
+            // execute query
+            query.addEntity(SapConfiguration.class);
+            results = query.list();
+
+        } catch (Exception ex) {
+            // TODO: implement custom exception
+            throw ex;
+        }
+
+        return results;
+    }
+
+    private String getFilteredSapConfigQuerySql(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) {
+
+        String sql = "SELECT * FROM SapConfigurations AS SapConfig ";
+        List<String> conditions = new ArrayList<>();
+
+        if (!includeArchived) {
+            conditions.add("SapConfig.isArchived = 0");
+        }
+
+        if (wildcard != null && !wildcard.isEmpty()) {
+            conditions.add("LOWER(SapConfig.serverDestination) LIKE LOWER(:wildcard) OR LOWER(SapConfig.description) LIKE LOWER(:wildcard)");
+        }
+
+        if (start != null) {
+            conditions.add("SapConfig.createdAt >= :start");
+        }
+
+        if (end != null) {
+            conditions.add("SapConfig.createdAt <= :end");
+        }
+
+        if (conditions.size() > 0) {
+            sql += "WHERE " + conditions.stream().map(x -> "(" + x + ")").reduce((x, y) -> x + " AND " + y).get() + " ";
+        }
+
+        sql += "ORDER BY SapConfig.serverDestination";
+
+        return sql;
+    }
+
+    /**
+     * This method applies the given filter options to a configs query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Configuration> getFilteredConfigs(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+
+        List<Configuration> results;
+
+        try (Session session = openSession()) {
+
+            // prepare query
+            String sql = getFilteredConfigQuerySql(includeArchived, wildcard, start, end, limit);
+            NativeQuery query = session.createNativeQuery(sql);
+
+            // set parameters
+            if (wildcard != null && !wildcard.isEmpty()) {
+                query.setParameter("wildcard", "%" + wildcard + "%");
+            }
+
+            if (start != null) {
+                query.setParameter("start", start.toLocalDate());
+            }
+
+            if (end != null) {
+                query.setParameter("end", end.toLocalDate());
+            }
+
+            if (limit != null && limit > 0) {
+                query.setMaxResults(limit);
+            }
+
+            // execute query
+            query.addEntity(Configuration.class);
+            results = query.list();
+
+        } catch (Exception ex) {
+            // TODO: implement custom exception
+            throw ex;
+        }
+
+        return results;
+    }
+
+    private String getFilteredConfigQuerySql(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) {
+
+        String sql =
+            "SELECT DISTINCT Config.* "
+                + "FROM Configurations AS Config "
+                + "LEFT OUTER JOIN Whitelists AS Whitelist ON Whitelist.id = Config.WhitelistId "
+                + "LEFT OUTER JOIN nm_Configuration_AccessPattern AS Map ON Map.ConfigId = Config.id "
+                + "LEFT OUTER JOIN AccessPatterns AS Pattern ON Pattern.id = Map.AccessPatternId ";
+
+        List<String> conditions = new ArrayList<>();
+
+        if (!includeArchived) {
+            conditions.add("Config.isArchived = 0");
+        }
+
+        if (wildcard != null && !wildcard.isEmpty()) {
+
+            conditions.add("LOWER(Config.name) LIKE LOWER(:wildcard) OR LOWER(Config.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(Whitelist.name) LIKE LOWER(:wildcard) OR LOWER(Pattern.usecaseId) LIKE LOWER(:wildcard)");
+        }
+
+        if (start != null) {
+            conditions.add("Config.createdAt >= :start");
+        }
+
+        if (end != null) {
+            conditions.add("Config.createdAt <= :end");
+        }
+
+        if (conditions.size() > 0) {
+            sql += "WHERE " + conditions.stream().map(x -> "(" + x + ")").reduce((x, y) -> x + " AND " + y).get() + " ";
+        }
+
+        sql += "ORDER BY Config.name";
+
+        return sql;
+    }
+
+    /**
+     * This method applies the given filter options to a sap query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<CriticalAccessQuery> getFilteredCriticalAccessQueries(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+
+        List<CriticalAccessQuery> results;
+
+        try (Session session = openSession()) {
+
+            // prepare query
+            String sql = getFilteredCriticalAccessQuerySql(includeArchived, wildcard, start, end, limit);
+            NativeQuery query = session.createNativeQuery(sql);
+
+            // set parameters
+            if (wildcard != null && !wildcard.isEmpty()) {
+                query.setParameter("wildcard", "%" + wildcard + "%");
+            }
+
+            if (start != null) {
+                query.setParameter("start", start.toLocalDate());
+            }
+
+            if (end != null) {
+                query.setParameter("end", end.toLocalDate());
+            }
+
+            if (limit != null && limit > 0) {
+                query.setMaxResults(limit);
+            }
+
+            // execute query
+            query.addEntity(CriticalAccessQuery.class);
+            results = query.list();
+
+        } catch (Exception ex) {
+            // TODO: implement custom exception
+            throw ex;
+        }
+
+        return results;
+    }
+
+    private String getFilteredCriticalAccessQuerySql(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) {
+
+        String sql =
+              "SELECT DISTINCT Query.* "
+            + "FROM CriticalAccessQueries AS Query "
+            + "INNER JOIN CriticalAccessEntries AS Entries ON Entries.queryId = Query.id "
+            + "INNER JOIN AccessPatterns AS ViolatedPattern ON ViolatedPattern.id = Entries.violatedPatternId "
+            + "INNER JOIN SapConfigurations AS SapConfig ON SapConfig.id = Query.sapConfigId "
+            + "INNER JOIN Configurations AS Config ON Config.id = Query.configId ";
+
+        List<String> conditions = new ArrayList<>();
+
+        if (!includeArchived) {
+            conditions.add("Query.isArchived = 0");
+        }
+
+        if (wildcard != null && !wildcard.isEmpty()) {
+
+            conditions.add(
+                  "LOWER(Config.name) LIKE LOWER(:wildcard) OR LOWER(Config.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(SapConfig.serverDestination) LIKE LOWER(:wildcard) OR LOWER(SapConfig.description) LIKE LOWER(:wildcard) "
+                + "OR LOWER(Entries.username) LIKE LOWER(:wildcard) OR LOWER(ViolatedPattern.usecaseId) LIKE LOWER(:wildcard)");
+        }
+
+        if (start != null) {
+            conditions.add("Query.createdAt >= :start");
+        }
+
+        if (end != null) {
+            conditions.add("Query.createdAt <= :end");
+        }
+
+        if (conditions.size() > 0) {
+            sql += "WHERE " + conditions.stream().map(x -> "(" + x + ")").reduce((x, y) -> x + " AND " + y).get() + " ";
+        }
+
+        sql += "ORDER BY Query.createdAt DESC";
+
+        return sql;
     }
 
     // ============================================
