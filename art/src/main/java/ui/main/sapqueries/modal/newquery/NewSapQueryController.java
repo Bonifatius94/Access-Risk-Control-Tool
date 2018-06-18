@@ -44,6 +44,9 @@ public class NewSapQueryController {
     private SapConfiguration sapConfiguration;
 
 
+    /**
+     * Initializes the view.
+     */
     @FXML
     public void initialize() {
         // TODO: register AutoCompletes
