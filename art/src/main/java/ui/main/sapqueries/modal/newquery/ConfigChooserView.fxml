@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import ui.custom.controls.CustomWindow?>
+<?import ui.custom.controls.PTableColumn?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<CustomWindow xmlns="http://javafx.com/javafx"
+              xmlns:fx="http://javafx.com/fxml"
+              fx:controller="ui.main.sapqueries.modal.newquery.ConfigChooserController"
+              prefHeight="400.0" prefWidth="600.0">
+    <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
+        <HBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" spacing="30">
+            <TableView VBox.vgrow="ALWAYS" fx:id="configsTable" minWidth="500" maxWidth="500">
+                <columns>
+                    <PTableColumn text="%name" percentageWidth="0.3" resizable="false" styleClass="align-left">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="name"/>
+                        </cellValueFactory>
+                    </PTableColumn>
+                    <PTableColumn text="%description" percentageWidth="0.6" styleClass="align-left">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="description"/>
+                        </cellValueFactory>
+                    </PTableColumn>
+                    <PTableColumn percentageWidth="0.1" styleClass="align-left" fx:id="viewDetailsColumn"/>
+                </columns>
+            </TableView>
+            <VBox VBox.vgrow="ALWAYS" spacing="20" HBox.hgrow="ALWAYS">
+                <Label text="%whitelist" style="-fx-font-size: 140%"/>
+                <VBox spacing="35">
+                    <JFXTextField promptText="%name" fx:id="whitelistName" editable="false"/>
+                    <JFXTextField promptText="%description" fx:id="whitelistDescription" editable="false"/>
+                </VBox>
+                <Separator/>
+                <VBox VBox.vgrow="ALWAYS" spacing="20">
+                    <Label text="%usedPatterns" style="-fx-font-size: 140%"/>
+                    <TableView fx:id="patternsTable">
+                        <columns>
+                            <PTableColumn text="%useCaseID" percentageWidth="0.2" styleClass="align-left">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="usecaseId"/>
+                                </cellValueFactory>
+                            </PTableColumn>
+                            <PTableColumn text="%description" percentageWidth="0.7" styleClass="align-left">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="description"/>
+                                </cellValueFactory>
+                            </PTableColumn>
+                            <PTableColumn text="#" fx:id="useCaseCountColumn" percentageWidth="0.1" resizable="false">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="conditions"/>
+                                </cellValueFactory>
+                            </PTableColumn>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </VBox>
+        </HBox>
+        <Separator />
+        <HBox alignment="BASELINE_RIGHT">
+            <JFXButton text="%ok" onAction="#chooseConfig" prefWidth="100">
+                <graphic>
+                    <MaterialDesignIconView glyphName="CHECK"/>
+                </graphic>
+            </JFXButton>
+            <JFXButton text="%cancel" onAction="#close" prefWidth="100">
+                <graphic>
+                    <MaterialDesignIconView glyphName="CLOSE"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
+    </VBox>
+</CustomWindow>

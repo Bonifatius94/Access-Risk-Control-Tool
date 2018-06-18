@@ -53,8 +53,34 @@ public class NewSapQueryController {
         this.sapConfiguration = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "some description", "00", "001", "EN", "0");
     }
 
+    /**
+     * Opens modal window in which a config can be chosen.
+     */
     public void chooseConfig() {
+        try {
+            // create a new FXML loader with the SapSettingsEditDialogController
+            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ConfigChooserView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
 
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow, 1000, 700);
+            scene.getStylesheets().add("css/dark-theme.css");
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
+            customWindow.initStage(stage);
+
+            customWindow.setTitle(bundle.getString("chooseConfig"));
+
+            stage.show();
+
+            ConfigChooserController configChooser = loader.getController();
+            configChooser.setParentController(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void chooseSapSettings() {
@@ -151,6 +177,30 @@ public class NewSapQueryController {
 
         // close this window
         runAnalysisButton.getScene().getWindow().hide();
+    }
+
+    /**
+     * Sets the config input to the given config.
+     * @param config the given config
+     */
+    public void setConfig(Configuration config) {
+
+        if (config != null) {
+            this.configAutocomplete.getItems().add(config);
+            this.configAutocomplete.getSelectionModel().select(config);
+        }
+    }
+
+    /**
+     * Sets the config input to the given sapConfig.
+     * @param sapConfig the given sapConfig
+     */
+    public void setSapConfig(SapConfiguration sapConfig) {
+
+        if (sapConfig != null) {
+            this.sapSettingsAutocomplete.getItems().add(sapConfig);
+            this.sapSettingsAutocomplete.getSelectionModel().select(sapConfig);
+        }
     }
 
     /**
