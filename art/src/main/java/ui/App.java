@@ -58,7 +58,7 @@ public class App extends Application {
         TraceOut.enter();
 
         ResourceBundle bundle = ResourceBundle.getBundle("lang");
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("main/MainView.fxml"), bundle);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("login/firstuse/FirstUseWizardView.fxml"), bundle);
         CustomWindow window = loader.load();
 
         Scene scene = new Scene(window);
