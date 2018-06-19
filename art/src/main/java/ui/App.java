@@ -44,7 +44,7 @@ public class App extends Application {
 
         // show view according to existence of the database file
         if (databaseFileExists()) {
-            showMainView(primaryStage);
+            showLoginView(primaryStage);
         } else {
             showFirstUseWizardView(primaryStage);
         }
@@ -90,7 +90,7 @@ public class App extends Application {
         TraceOut.leave();
     }
 
-    private void showMainView(Stage primaryStage) throws Exception {
+    private void showLoginView(Stage primaryStage) throws Exception {
 
         TraceOut.enter();
 
@@ -103,7 +103,6 @@ public class App extends Application {
         primaryStage.setScene(scene);
 
         window.initStage(primaryStage);
-        window.setTitle("Access Risk Control Tool");
         primaryStage.show();
 
         TraceOut.leave();

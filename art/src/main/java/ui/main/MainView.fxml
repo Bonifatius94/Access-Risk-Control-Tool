@@ -5,7 +5,7 @@
 <?import ui.custom.controls.*?>
 <?import javafx.geometry.*?>
 
-<CustomWindow fx:id="mainWindow" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.MainController" windowState="CanResize">
+<CustomWindow fx:id="mainWindow" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.MainController" windowState="CanResize" title="%art">
     <JFXTabPane CustomWindow.vgrow="ALWAYS">
         <padding>
             <Insets topRightBottomLeft="10" />
