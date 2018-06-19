@@ -4,7 +4,9 @@ import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+
 import java.util.ResourceBundle;
+
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -15,8 +17,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
+import ui.AppComponents;
 import ui.custom.controls.CustomWindow;
-
 
 
 public class FirstUseWizardController {
@@ -58,6 +60,8 @@ public class FirstUseWizardController {
         // bind password inputs
         passwordInputPlain.visibleProperty().bind(Bindings.not(passwordInput.visibleProperty()));
         passwordInput.textProperty().bindBidirectional(passwordInputPlain.textProperty());
+
+        initializeValidation();
     }
 
     /**
@@ -100,6 +104,7 @@ public class FirstUseWizardController {
 
     /**
      * Validates the userCreation inputs.
+     *
      * @return if the inputs are valid
      */
     private boolean validateBeforeCreate() {
@@ -120,14 +125,17 @@ public class FirstUseWizardController {
      */
     public void createUserAndGoToFinish() {
         if (validateBeforeCreate()) {
-            welcomeBox.setVisible(false);
-            createUserBox.setVisible(false);
-            finishBox.setVisible(true);
+            if (AppComponents.tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
+                welcomeBox.setVisible(false);
+                createUserBox.setVisible(false);
+                finishBox.setVisible(true);
+            }
         }
     }
 
     /**
      * Closes the window and start the real application.
+     *
      * @param event the action event of the clicked button
      */
     public void closeAndStartApp(ActionEvent event) {
@@ -154,6 +162,7 @@ public class FirstUseWizardController {
 
     /**
      * Hides the stage.
+     *
      * @param event the given ActionEvent
      */
     public void close(ActionEvent event) {
