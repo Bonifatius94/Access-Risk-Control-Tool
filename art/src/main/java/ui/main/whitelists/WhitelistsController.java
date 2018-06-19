@@ -64,7 +64,8 @@ public class WhitelistsController {
         try {
             //Test code
 
-            Whitelist whitelist1 = WhitelistImportHelper.importWhitelist("Example - Whitelist.xlsx");
+            WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
+            Whitelist whitelist1 = whitelistImportHelper.importWhitelist("Example - Whitelist.xlsx");
             whitelist1.setDescription("test");
             whitelist1.setArchived(true);
             whitelist1.setName("bla");
@@ -262,7 +263,9 @@ public class WhitelistsController {
             String path = file.getPath();
             Whitelist whitelist;
             try {
-                whitelist = WhitelistImportHelper.importWhitelist(path);
+                WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
+                whitelist = whitelistImportHelper.importWhitelist(path);
+
                 //enfernen dies ist nur ein test TODO: entfernen
                 whitelist.setDescription("neue Whitelist");
                 whitelist.setId(5);
