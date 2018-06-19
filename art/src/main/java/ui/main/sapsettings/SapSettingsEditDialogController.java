@@ -90,8 +90,8 @@ public class SapSettingsEditDialogController {
             this.sapConfig.setSysNr(sysNrField.getText());
             this.sapConfig.setServerDestination(hostServerField.getText());
             this.sapConfig.setClient(jcoClientField.getText());
-            //SapSettingsController sapSettingsController = new SapSettingsController();
-            //sapSettingsController.giveSavedSapSettings(this.sapConfig);
+            SapSettingsController sapSettingsController = null;
+            sapSettingsController.giveSavedSapSettings(this.sapConfig);
         }
     }
 

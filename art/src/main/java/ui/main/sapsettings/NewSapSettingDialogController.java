@@ -24,7 +24,7 @@ public class NewSapSettingDialogController {
     public JFXPasswordField passwordField;
     public JFXTextField descriptionField;
 
-    private SapConfiguration sapConfiguration;
+    private SapConfiguration sapConfiguration = new SapConfiguration();
     //private StringProperty userName = new SimpleStringProperty();
 
 
@@ -88,10 +88,9 @@ public class NewSapSettingDialogController {
             sapConfiguration.setServerDestination(hostServerField.getText());
             sapConfiguration.setSysNr(sysNrField.getText());
             sapConfiguration.setCreatedBy(userNameField.getText());
-            //TODO: save data in Table doesn
-            //SapSettingsController sapSettingsController = new SapSettingsController();
-            //sapSettingsController.giveSavedSapSettings(this.sapConfiguration);
+            //TODO: save data in Table doesnt work
 
+            SapSettingsController.sapConfiguration = this.sapConfiguration;
         }
 
     }

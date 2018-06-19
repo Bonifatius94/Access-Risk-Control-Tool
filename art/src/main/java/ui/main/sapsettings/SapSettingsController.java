@@ -15,14 +15,19 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import javafx.stage.WindowEvent;
+import sap.ISapConnector;
+import sap.SapConnector;
 import ui.App;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 
 
@@ -35,7 +40,7 @@ public class SapSettingsController {
     @FXML
     private TableColumn<SapConfiguration, JFXButton> deleteConfigColumn;
 
-    private static SapConfiguration sapConfiguration;
+    public static SapConfiguration sapConfiguration;
 
     /**
      * Initialized the view and sets a dummy SapConfig.
@@ -104,11 +109,14 @@ public class SapSettingsController {
 
 
             stage.show();
-
+            customWindow.isVisible();
             // give the dialog the sapConfiguration
             SapSettingsEditDialogController sapEdit = loader.getController();
             sapEdit.giveSelectedSapConfig(sapConfiguration);
 
+            stage.setOnCloseRequest((WindowEvent event) -> {
+                System.out.println("Was geht jetzt?");
+            } );
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -125,6 +133,23 @@ public class SapSettingsController {
      */
     public void connectAction() {
         if (sapConnectionTable.getFocusModel().getFocusedItem().equals(sapConnectionTable.getSelectionModel().getSelectedItem())) {
+
+            sapConfiguration.setLanguage("EN");
+            sapConfiguration.setPoolCapacity("0");
+
+            try {
+                //test Code TODO: real implementation
+                String username = "GROUP_11";
+                String password = "Wir sind das beste Team!";
+                ISapConnector sapConnector = new SapConnector(sapConfiguration, username, password);
+                Boolean pingServer = sapConnector.canPingServer();
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, "Ping was start", "Connection Status: " + pingServer);
+                customAlert.showAndWait();
+            } catch (Exception e) {
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "SAP Connection Error", "Connection Status: Failed");
+                customAlert.showAndWait();
+                e.printStackTrace();
+            }
 
             //SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
             //TODO: Saplogin Dialog
@@ -150,7 +175,10 @@ public class SapSettingsController {
             stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
             stage.show();
-
+            if(!stage.isShowing()){
+                //saveInTable();
+                sapConnectionTable.refresh();
+            }
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -199,11 +227,11 @@ public class SapSettingsController {
 
     /**
      * should give new Sap setting to table. TODO: further implementations
-     * @param sapConfig is the new or changed Sap Configuration.
+     *
      */
-    public void giveSavedSapSettings(SapConfiguration sapConfig) {
+    public void giveSavedSapSettings(SapConfiguration sapConfiguration) {
 
-        sapConnectionTable.getItems().add(sapConfig);
+        sapConnectionTable.getItems().add(sapConfiguration);
         sapConnectionTable.refresh();
     }
     //TODO: is not needed(i think)
