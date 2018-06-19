@@ -4,7 +4,7 @@ import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
-import javafx.application.Platform;
+import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,7 +17,7 @@ import javafx.stage.Stage;
 import ui.App;
 import ui.custom.controls.CustomWindow;
 
-import java.util.ResourceBundle;
+
 
 public class FirstUseWizardController {
 
@@ -37,11 +37,14 @@ public class FirstUseWizardController {
     private JFXPasswordField passwordInput;
 
     @FXML
-    private JFXTextField passwordInput_plain;
+    private JFXTextField passwordInputPlain;
 
     @FXML
     private MaterialDesignIconView showPasswordIconView;
 
+    /**
+     * Initializes the view with all needed bindings.
+     */
     @FXML
     public void initialize() {
 
@@ -50,13 +53,16 @@ public class FirstUseWizardController {
         createUserBox.managedProperty().bind(createUserBox.visibleProperty());
         finishBox.managedProperty().bind(finishBox.visibleProperty());
         passwordInput.managedProperty().bind(passwordInput.visibleProperty());
-        passwordInput_plain.managedProperty().bind(passwordInput_plain.visibleProperty());
+        passwordInputPlain.managedProperty().bind(passwordInputPlain.visibleProperty());
 
         // bind password inputs
-        passwordInput_plain.visibleProperty().bind(Bindings.not(passwordInput.visibleProperty()));
-        passwordInput.textProperty().bindBidirectional(passwordInput_plain.textProperty());
+        passwordInputPlain.visibleProperty().bind(Bindings.not(passwordInput.visibleProperty()));
+        passwordInput.textProperty().bindBidirectional(passwordInputPlain.textProperty());
     }
 
+    /**
+     * Toggles the password visibility.
+     */
     public void togglePasswordDisplay() {
         if (passwordInput.isVisible()) {
             showPasswordIconView.setIcon(MaterialDesignIcon.EYE);
@@ -67,18 +73,63 @@ public class FirstUseWizardController {
         }
     }
 
+    /**
+     * Initializes the validation for userCreation inputs.
+     */
+    private void initializeValidation() {
+
+        usernameInput.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                usernameInput.validate();
+            }
+        });
+
+        passwordInput.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                passwordInput.validate();
+            }
+        });
+
+        passwordInputPlain.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                passwordInputPlain.validate();
+            }
+        });
+
+    }
+
+    /**
+     * Validates the userCreation inputs.
+     * @return if the inputs are valid
+     */
+    private boolean validateBeforeCreate() {
+        return usernameInput.validate() && passwordInput.validate() && passwordInputPlain.validate();
+    }
+
+    /**
+     * Advances to the userCreation.
+     */
     public void goToUserCreation() {
         welcomeBox.setVisible(false);
         createUserBox.setVisible(true);
         finishBox.setVisible(false);
     }
 
+    /**
+     * Validates the inputs and advances to finish.
+     */
     public void createUserAndGoToFinish() {
-        welcomeBox.setVisible(false);
-        createUserBox.setVisible(false);
-        finishBox.setVisible(true);
+        if (validateBeforeCreate()) {
+            welcomeBox.setVisible(false);
+            createUserBox.setVisible(false);
+            finishBox.setVisible(true);
+        }
     }
 
+    /**
+     * Closes the window and start the real application.
+     * @param event the action event of the clicked button
+     */
     public void closeAndStartApp(ActionEvent event) {
         try {
             ResourceBundle bundle = ResourceBundle.getBundle("lang");

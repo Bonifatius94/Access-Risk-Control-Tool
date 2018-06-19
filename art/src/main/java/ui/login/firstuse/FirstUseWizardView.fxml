@@ -13,6 +13,7 @@
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import com.jfoenix.controls.JFXPasswordField?>
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.validation.RequiredFieldValidator?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.login.firstuse.FirstUseWizardController" windowState="NoResize">
@@ -40,12 +41,30 @@
                 <Label wrapText="true" text="%userCreationText"/>
                 <HBox alignment="BASELINE_LEFT" spacing="10">
                     <MaterialDesignIconView glyphName="ACCOUNT"/>
-                    <JFXTextField fx:id="usernameInput" prefWidth="240" promptText="%username"/>
+                    <JFXTextField fx:id="usernameInput" prefWidth="240" promptText="%username">
+                        <validators>
+                            <RequiredFieldValidator message="%required">
+                                <MaterialDesignIconView glyphName="ALERT"/>
+                            </RequiredFieldValidator>
+                        </validators>
+                    </JFXTextField>
                 </HBox>
                 <HBox alignment="BASELINE_LEFT" spacing="10">
                     <MaterialDesignIconView glyphName="KEY"/>
-                    <JFXPasswordField fx:id="passwordInput" prefWidth="240" promptText="%password"/>
-                    <JFXTextField fx:id="passwordInput_plain" prefWidth="240" promptText="%password"/>
+                    <JFXPasswordField fx:id="passwordInput" prefWidth="240" promptText="%password">
+                        <validators>
+                            <RequiredFieldValidator message="%required">
+                                <MaterialDesignIconView glyphName="ALERT"/>
+                            </RequiredFieldValidator>
+                        </validators>
+                    </JFXPasswordField>
+                    <JFXTextField fx:id="passwordInputPlain" prefWidth="240" promptText="%password">
+                        <validators>
+                            <RequiredFieldValidator message="%required">
+                                <MaterialDesignIconView glyphName="ALERT"/>
+                            </RequiredFieldValidator>
+                        </validators>
+                    </JFXTextField>
                     <MaterialDesignIconView fx:id="showPasswordIconView" glyphName="EYE_OFF"
                                             onMouseClicked="#togglePasswordDisplay" size="20"/>
                 </HBox>
