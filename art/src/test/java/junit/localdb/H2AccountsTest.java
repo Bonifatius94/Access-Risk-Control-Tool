@@ -41,7 +41,7 @@ public class H2AccountsTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class H2AccountsTest {
             // check if an additional user was created
             List<DbUser> users = context.getDatabaseUsers();
             boolean roleOk = users.stream().filter(x -> x.getUsername().toUpperCase().equals(username)).findFirst().get().getRoles().contains(DbUserRole.Viewer);
-            assert(roleOk);
+            assert (roleOk);
 
             // apply changes to roles
             foo.getRoles().remove(DbUserRole.Viewer);
@@ -77,15 +77,39 @@ public class H2AccountsTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
     @Disabled
-    public void testChangePassword() {
+    public void changePassword() {
 
-        // TODO: implement test
-        assert(false);
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // create new user as viewer
+            String username = "FOO";
+            DbUser foo = new DbUser(username, new HashSet(Arrays.asList(DbUserRole.Viewer)));
+            context.createDatabaseUser(foo, "foobar");
+
+            // check if an additional user was created
+            List<DbUser> users = context.getDatabaseUsers();
+            boolean roleOk = users.stream().filter(x -> x.getUsername().toUpperCase().equals(username)).findFirst().get().getRoles().contains(DbUserRole.Viewer);
+            assert (roleOk);
+
+            // set new password
+            String newpassword = "raboof";
+            context.changePassword(username, newpassword);
+
+            // check if the password was changed
+            // ret = newpassword.equals(???);
+            //TODO: find a way to get the password
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert (ret);
     }
 
     @Test
@@ -115,7 +139,9 @@ public class H2AccountsTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
 }
+
+
