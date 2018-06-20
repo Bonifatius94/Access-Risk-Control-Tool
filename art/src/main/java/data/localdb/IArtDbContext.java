@@ -256,8 +256,6 @@ public interface IArtDbContext {
      */
     void deleteSapConfig(SapConfiguration config) throws Exception;
 
-    // TODO: add methods for archiving old sap queries
-
     // ============================================
     //          U S E R   A C C O U N T S
     // ============================================
@@ -296,18 +294,12 @@ public interface IArtDbContext {
      */
     void deleteDatabaseUser(String username) throws Exception;
 
-    // ============================================
-    //                  L O G I N
-    // ============================================
-
     /**
-     * This method switches the logged in user. (it also works for first login)
+     * This method gets the current logged-in database user.
      *
-     * @param username the name of the new user
-     * @param password the password of the new user
+     * @return the current logged-in user
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    @Deprecated
-    void switchUser(String username, String password) throws Exception;
+    DbUser getCurrentUser() throws Exception;
 
 }
