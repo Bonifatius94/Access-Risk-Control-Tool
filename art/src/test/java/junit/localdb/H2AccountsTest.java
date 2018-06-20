@@ -102,9 +102,14 @@ public class H2AccountsTest {
             String newpassword = "raboof";
             context.changePassword(username, newpassword);
 
+            // close context
+            context.close();
+
+            try
+
             // check if the password was changed
             // ret = newpassword.equals(???);
-            //TODO: find a way to get the password
+            //TODO: find a way to get the password.
         } catch (Exception ex) {
             ex.printStackTrace();
         }

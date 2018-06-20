@@ -219,7 +219,7 @@ public class WhitelistTest {
             // query whitelist again. check if everything was deleted
             whitelist = context.getWhitelists(false).stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
 
-            // check if test data was queried successfully
+            // check if test data was querried successfully
             ret = whitelist == null;
 
             // TODO: write a test for archiving logic (old whitelist was used by a sap query)
