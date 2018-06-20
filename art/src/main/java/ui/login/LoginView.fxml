@@ -60,7 +60,7 @@
                 </graphic>
             </Label>
             <Separator/>
-            <HBox alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS" style="-fx-padding: 10 0 0 0">
                 <JFXButton onAction="#close" text="%cancel">
                     <graphic>
                         <MaterialDesignIconView glyphName="CLOSE"/>

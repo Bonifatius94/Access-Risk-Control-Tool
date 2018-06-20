@@ -24,11 +24,11 @@
             </image>
         </ImageView>
         <Separator/>
-        <VBox fx:id="welcomeBox" HBox.hgrow="ALWAYS" maxWidth="300" minHeight="250" spacing="10">
+        <VBox fx:id="welcomeBox" HBox.hgrow="ALWAYS" maxWidth="300" minHeight="260" spacing="10">
             <Label wrapText="true" text="%welcomeText"/>
             <Region VBox.vgrow="ALWAYS"/>
             <Separator />
-            <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT">
+            <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" style="-fx-padding: 10 0 0 0">
                 <JFXButton text="%next" onAction="#goToUserCreation">
                     <graphic>
                         <MaterialDesignIconView glyphName="ARROW_RIGHT"/>
@@ -36,7 +36,7 @@
                 </JFXButton>
             </HBox>
         </VBox>
-        <VBox fx:id="createUserBox" HBox.hgrow="ALWAYS" visible="false" maxWidth="300" minHeight="250" spacing="10">
+        <VBox fx:id="createUserBox" HBox.hgrow="ALWAYS" visible="false" maxWidth="300" minHeight="260" spacing="10">
             <VBox spacing="35">
                 <Label wrapText="true" text="%userCreationText"/>
                 <HBox alignment="BASELINE_LEFT" spacing="10">
@@ -71,7 +71,7 @@
             </VBox>
             <Region VBox.vgrow="ALWAYS"/>
             <Separator />
-            <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT">
+            <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" style="-fx-padding: 10 0 0 0">
                 <JFXButton text="%createUser" onAction="#createUserAndGoToFinish">
                     <graphic>
                         <MaterialDesignIconView glyphName="ARROW_RIGHT"/>
@@ -79,11 +79,11 @@
                 </JFXButton>
             </HBox>
         </VBox>
-        <VBox fx:id="finishBox" HBox.hgrow="ALWAYS" visible="false" maxWidth="300" minHeight="250" spacing="10">
+        <VBox fx:id="finishBox" HBox.hgrow="ALWAYS" visible="false" maxWidth="300" minHeight="260" spacing="10">
             <Label wrapText="true" text="%firstUserSuccessText"/>
             <Region VBox.vgrow="ALWAYS"/>
             <Separator />
-            <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT">
+            <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" style="-fx-padding: 10 0 0 0">
                 <JFXButton text="%finish" onAction="#closeAndStartApp">
                     <graphic>
                         <MaterialDesignIconView glyphName="CHECK"/>
