@@ -67,7 +67,7 @@
                     </graphic>
                 </JFXButton>
                 <Region HBox.hgrow="ALWAYS"/>
-                <JFXButton onAction="#login" text="%login">
+                <JFXButton onAction="#login" text="%login" defaultButton="true">
                     <graphic>
                         <MaterialDesignIconView glyphName="LOGIN"/>
                     </graphic>

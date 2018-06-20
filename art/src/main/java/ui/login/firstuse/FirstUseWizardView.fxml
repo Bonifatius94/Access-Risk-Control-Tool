@@ -29,7 +29,7 @@
             <Region VBox.vgrow="ALWAYS"/>
             <Separator />
             <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" style="-fx-padding: 10 0 0 0">
-                <JFXButton text="%next" onAction="#goToUserCreation">
+                <JFXButton fx:id="nextButton" text="%next" onAction="#goToUserCreation">
                     <graphic>
                         <MaterialDesignIconView glyphName="ARROW_RIGHT"/>
                     </graphic>
@@ -72,7 +72,7 @@
             <Region VBox.vgrow="ALWAYS"/>
             <Separator />
             <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" style="-fx-padding: 10 0 0 0">
-                <JFXButton text="%createUser" onAction="#createUserAndGoToFinish">
+                <JFXButton fx:id="createUserButton" text="%createUser" onAction="#createUserAndGoToFinish">
                     <graphic>
                         <MaterialDesignIconView glyphName="ARROW_RIGHT"/>
                     </graphic>
@@ -84,7 +84,7 @@
             <Region VBox.vgrow="ALWAYS"/>
             <Separator />
             <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" style="-fx-padding: 10 0 0 0">
-                <JFXButton text="%finish" onAction="#closeAndStartApp">
+                <JFXButton fx:id="finishButton" text="%finish" onAction="#closeAndStartApp">
                     <graphic>
                         <MaterialDesignIconView glyphName="CHECK"/>
                     </graphic>

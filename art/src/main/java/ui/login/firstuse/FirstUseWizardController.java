@@ -1,5 +1,6 @@
 package ui.login.firstuse;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
@@ -44,6 +45,15 @@ public class FirstUseWizardController {
     @FXML
     private MaterialDesignIconView showPasswordIconView;
 
+    @FXML
+    private JFXButton nextButton;
+
+    @FXML
+    private JFXButton createUserButton;
+
+    @FXML
+    private JFXButton finishButton;
+
     /**
      * Initializes the view with all needed bindings.
      */
@@ -60,6 +70,11 @@ public class FirstUseWizardController {
         // bind password inputs
         passwordInputPlain.visibleProperty().bind(Bindings.not(passwordInput.visibleProperty()));
         passwordInput.textProperty().bindBidirectional(passwordInputPlain.textProperty());
+
+        // bind default button property
+        nextButton.defaultButtonProperty().bind(nextButton.focusedProperty());
+        createUserButton.defaultButtonProperty().bind(Bindings.isNotEmpty(usernameInput.textProperty()));
+        finishButton.defaultButtonProperty().bind(finishButton.focusedProperty());
 
         initializeValidation();
     }
