@@ -152,7 +152,7 @@ public class AccessPatternTest {
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
-            // TODO: create another whitelist in data seed that is not used by a critical access query
+            // TODO: create another whitelist in data seed that is not used by a critical access query. Done (still here to notice it later)
 
             // query patterns
             List<AccessPattern> patterns = context.getPatterns(false);

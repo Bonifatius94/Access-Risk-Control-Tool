@@ -202,7 +202,6 @@ public class WhitelistTest {
     }
 
     @Test
-    @Disabled
     public void testDeleteWhitelistWithArchiving() {
 
         boolean ret = false;
