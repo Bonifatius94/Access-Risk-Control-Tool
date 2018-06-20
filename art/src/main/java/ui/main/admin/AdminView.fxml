@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.*?>
+
+<?import javafx.scene.control.TableView?>
+<?import ui.custom.controls.PTableColumn?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import com.jfoenix.validation.RequiredFieldValidator?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.control.Tooltip?>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.admin.AdminController"
+      spacing="10">
+    <HBox VBox.vgrow="ALWAYS" spacing="30" style="-fx-padding: 20">
+        <TableView fx:id="userTable" HBox.hgrow="ALWAYS">
+
+            <!-- TODO: implement columns here ... -->
+            <columns>
+                <PTableColumn text="%dbUserName" percentageWidth="0.3">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="username"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn text="%dbUserRoles" percentageWidth="0.4">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="roles"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn text="%dbUserPassword" percentageWidth="0.3">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="username"/>
+                    </cellValueFactory>
+                </PTableColumn>
+            </columns>
+        </TableView>
+        <VBox VBox.vgrow="ALWAYS" spacing="20">
+            <JFXTextField promptText="%dbUserName" fx:id="tfDbUserName" prefWidth="250">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+            <JFXPasswordField promptText="%dbUserPassword" fx:id="tfDbUserPassword" prefWidth="250">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXPasswordField>
+            <JFXCheckBox fx:id="adminCheckbox" onAction="#adminSelected" text="%admin">
+            </JFXCheckBox>
+            <JFXCheckBox fx:id="viewerCheckbox" onAction="#viewerSelected" text="%viewer">
+            </JFXCheckBox>
+            <JFXCheckBox fx:id="dataAnalystCheckbox" onAction="#dataAnalystSelected" text="%dataAnalyst">
+            </JFXCheckBox>
+            <HBox spacing="10" HBox.hgrow="ALWAYS" >
+                <JFXButton styleClass="round-button"
+                           onAction="#addNewUser" prefHeight="30">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="PLUS"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%addUser"/>
+                    </tooltip>
+                </JFXButton>
+                <JFXButton styleClass="round-button"
+                           onAction="#saveUserChanges" prefHeight="30">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="CHECK"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%saveUserChanges"/>
+                    </tooltip>
+                </JFXButton>
+            </HBox>
+        </VBox>
+    </HBox>
+</VBox>

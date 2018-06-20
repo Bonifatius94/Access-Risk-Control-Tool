@@ -24,7 +24,12 @@
             <fx:include source="patterns/PatternsView.fxml" />
         </Tab>
         <Tab text="Whitelists">
+            <!-- TODO: whitelist view wieder hinzufügen-->
             <fx:include source="whitelists/WhitelistsView.fxml" />
+        </Tab>
+        <Tab text="%userManagement">
+            <!-- TODO: whitelist view wieder hinzufügen-->
+            <fx:include source="admin/AdminView.fxml" />
         </Tab>
     </JFXTabPane>
 </CustomWindow>
