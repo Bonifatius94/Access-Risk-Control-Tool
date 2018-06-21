@@ -96,6 +96,7 @@ public class CriticalAccessQueryTest {
             ret = queries.stream().anyMatch(x -> x.getConfig().equals(config) && x.getSapConfig().equals(sapconfig) && x.getCreatedBy().equals(author));
 
             //delete query
+            //TODO: find operation
 
             //check if query was deleted
 
