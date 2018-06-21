@@ -35,7 +35,7 @@ public class H2AccountsTest {
 
             // query accounts
             List<DbUser> users = context.getDatabaseUsers();
-            ret = users.size() == 6;
+            ret = users.size() == 7;
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -82,16 +82,19 @@ public class H2AccountsTest {
 
     @Test
     @Disabled
-    public void changePassword() {
+    public void testChangePassword() {
 
         boolean ret = false;
+
+        final String username = "FOO";
+        final String oldPassword = "foobar";
+        final String newPassword = "raboof";
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // create new user as viewer
-            String username = "FOO";
             DbUser foo = new DbUser(username, new HashSet(Arrays.asList(DbUserRole.Viewer)));
-            context.createDatabaseUser(foo, "foobar");
+            context.createDatabaseUser(foo, oldPassword);
 
             // check if an additional user was created
             List<DbUser> users = context.getDatabaseUsers();
@@ -99,17 +102,30 @@ public class H2AccountsTest {
             assert (roleOk);
 
             // set new password
-            String newpassword = "raboof";
-            context.changePassword(username, newpassword);
+            context.changePassword(username, newPassword);
 
-            // close context
-            context.close();
-
-            // check if the password was changed
-            // ret = newpassword.equals(???);
-            //TODO: find a way to get the password.
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+
+        // try to login with old password (should fail)
+        try (ArtDbContext context = new ArtDbContext(username, oldPassword)) {
+
+            // login with old password must not be successful
+            assert(false);
+
+        } catch (Exception ex) {
+            // nothing to do here ...
+        }
+
+        // try to login with old password (should work)
+        try (ArtDbContext context = new ArtDbContext(username, newPassword)) {
+
+            // login with new password successful
+            ret = true;
+
+        } catch (Exception ex) {
+            // nothing to do here ...
         }
 
         assert (ret);

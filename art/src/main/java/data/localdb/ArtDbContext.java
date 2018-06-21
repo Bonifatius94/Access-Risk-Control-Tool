@@ -20,6 +20,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -286,41 +287,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         TraceOut.leave();
         return configs;
-    }
-
-    /**
-     * This method selects all user names of existing local database accounts and their privileges.
-     *
-     * @return a list of local database users
-     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<DbUser> getDatabaseUsers() throws Exception {
-
-        TraceOut.enter();
-
-        List<DbUser> users;
-
-        try (Session session = getSessionFactory().openSession()) {
-
-            List<Object[]> results = session.createNativeQuery("SELECT * FROM DbUsers").getResultList();
-
-            users = results.stream().map(x -> {
-
-                String username = (String)x[0];
-                Set<DbUserRole> roles = Arrays.stream(((String) x[1]).split(",")).map(y -> DbUserRole.parseRole(y)).collect(Collectors.toSet());
-
-                return new DbUser(username, roles);
-
-            }).collect(Collectors.toList());
-
-        } catch (Exception ex) {
-            throw new Exception("Unknown error while executing local database query. (see log file for more details)");
-        }
-
-        TraceOut.leave();
-        return users;
     }
 
     // ============================================
@@ -1185,6 +1151,56 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     // ============================================
     //          U S E R   A C C O U N T S
     // ============================================
+
+    /**
+     * This method selects all user names of existing local database accounts and their privileges.
+     *
+     * @return a list of local database users
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<DbUser> getDatabaseUsers() throws Exception {
+
+        TraceOut.enter();
+
+        List<DbUser> users;
+
+        try (Session session = getSessionFactory().openSession()) {
+
+            /*String sql =
+                "SELECT DISTINCT "
+                + "    Users.Name AS User, "
+                + "    GROUP_CONCAT(Rights.GrantedRole) AS Roles "
+                + "FROM INFORMATION_SCHEMA.Users "
+                + "LEFT OUTER JOIN INFORMATION_SCHEMA.Rights "
+                + "    ON Users.Name = Rights.Grantee "
+                + "WHERE Rights.Grantee IS NULL OR GranteeType = 'USER' "
+                + "GROUP BY Users.Name";
+
+            List<Object[]> results = session.createNativeQuery(sql).getResultList();*/
+
+            List<Object[]> results = session.createNativeQuery("SELECT * FROM DbUsers").getResultList();
+
+            users = results.stream().map(x -> {
+
+                String username = (String)x[0];
+
+                Set<DbUserRole> roles = (((String) x[1]) != null && !((String) x[1]).isEmpty())
+                    ? Arrays.stream(((String) x[1]).split(",")).map(y -> DbUserRole.parseRole(y)).collect(Collectors.toSet())
+                    : new HashSet<>();
+
+                return new DbUser(username, roles);
+
+            }).collect(Collectors.toList());
+
+        } catch (Exception ex) {
+            throw new Exception("Unknown error while executing local database query. (see log file for more details)");
+        }
+
+        TraceOut.leave();
+        return users;
+    }
 
     /**
      * This method adds a new database user with rights according to the given role.
