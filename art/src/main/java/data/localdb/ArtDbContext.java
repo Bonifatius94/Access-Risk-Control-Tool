@@ -1,7 +1,6 @@
 package data.localdb;
 
 import data.entities.AccessCondition;
-import data.entities.AccessConditionType;
 import data.entities.AccessPattern;
 import data.entities.AccessPatternCondition;
 import data.entities.AccessPatternConditionProperty;
@@ -23,7 +22,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
@@ -37,11 +35,12 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     //             CONSTRUCTOR
     // ===================================
 
-    public ArtDbContext(String username, String password) {
+    public ArtDbContext(String username, String password) throws Exception {
         super(getDefaultDatabaseFilePath(), username, password);
     }
 
-    public ArtDbContext(String filePath, String username, String password) {
+    @Deprecated
+    public ArtDbContext(String filePath, String username, String password) throws Exception {
         super(filePath, username, password);
     }
 
@@ -85,17 +84,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     }
 
     @Override
-    protected void setAdditionalProperties(org.hibernate.cfg.Configuration config) {
+    protected void createNewDatabase() throws Exception {
 
-        super.setAdditionalProperties(config);
-
-        // apply scripts that are executed after a new database file has been created by hibernate
-        config.setProperty("hibernate.hbm2ddl.import_files", "scripts/create_views.sql, scripts/create_roles.sql");
-
-        // configure hibernate logging level
-        java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.SEVERE);
-
-        // TODO: remove all 'hibernate.hbm2ddl' settings in production builds
+        // execute sql scripts
+        executeScript(getClass().getClassLoader().getResource("scripts/create_schema.sql").getPath());
+        executeScript(getClass().getClassLoader().getResource("scripts/create_roles.sql").getPath());
     }
 
     // ============================================
