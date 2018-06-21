@@ -1093,7 +1093,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             if (!config.isArchived()) {
 
                 config.getPatterns().remove(pattern);
-                pattern.getConfigurations().remove(config);
+                config.adjustReferences();
                 updateRecord(config);
             }
         });

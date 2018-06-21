@@ -72,11 +72,11 @@ public class FiltersTest {
 
             // test wildcard filter: usecase id (entries)
             whitelists = context.getFilteredWhitelists(true, "2.b", null, ZonedDateTime.now(), 10);
-            ret = ret && whitelists.size() == 3 && whitelists.stream().map(x -> x.getId()).collect(Collectors.toList()).containsAll(Arrays.asList(1, 2));
+            ret = ret && whitelists.size() == 3 && whitelists.stream().map(x -> x.getId()).collect(Collectors.toList()).containsAll(Arrays.asList(1, 2, 3));
 
             // test wildcard filter: username (entries)
             whitelists = context.getFilteredWhitelists(false, "zt2111", null, ZonedDateTime.now(), 10);
-            ret = ret && whitelists.size() == 1 && whitelists.stream().anyMatch(x -> x.getId().equals(1));
+            ret = ret && whitelists.size() == 2 && whitelists.stream().map(x -> x.getId()).collect(Collectors.toList()).containsAll(Arrays.asList(1, 3));
 
             // TODO: add test for start / end of createdAt and limit
 

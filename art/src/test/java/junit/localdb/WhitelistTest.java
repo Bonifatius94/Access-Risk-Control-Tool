@@ -32,7 +32,7 @@ public class WhitelistTest {
             List<Whitelist> whitelists = context.getWhitelists(false);
 
             // check if test data was queried successfully
-            ret = whitelists.size() == 1 && whitelists.stream().allMatch(x -> x.getEntries().size() == 7);
+            ret = whitelists.size() == 2 && whitelists.stream().allMatch(x -> x.getEntries().size() == 7);
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -202,6 +202,7 @@ public class WhitelistTest {
     }
 
     @Test
+    @Disabled
     public void testDeleteWhitelistWithArchiving() {
 
         boolean ret = false;

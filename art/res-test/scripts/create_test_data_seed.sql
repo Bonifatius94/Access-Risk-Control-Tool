@@ -39,8 +39,8 @@ INSERT INTO WhitelistEntries (id, whitelistId, username, usecaseId) VALUES (12, 
 INSERT INTO WhitelistEntries (id, whitelistId, username, usecaseId) VALUES (13, 2, '3.A', 'ZT2111_P');
 INSERT INTO WhitelistEntries (id, whitelistId, username, usecaseId) VALUES (14, 2, '3.B', 'ZT2111_P');
 
--- second archived whitelist that is not used
-INSERT INTO Whitelists (id, name, description, createdBy, createdAt, isArchived) VALUES (3, 'whitelist 3', 'test description', 'test', '2018-06-08T15:09:15', 1);
+-- second active whitelist that is not used
+INSERT INTO Whitelists (id, name, description, createdBy, createdAt, isArchived) VALUES (3, 'whitelist 3', 'foobar', 'test', '2018-06-08T15:09:15', 0);
 INSERT INTO WhitelistEntries (id, whitelistId, username, usecaseId) VALUES (15, 3, '2.A', 'ZT2111_P');
 INSERT INTO WhitelistEntries (id, whitelistId, username, usecaseId) VALUES (16, 3, '2.A', 'ZT2112_F');
 INSERT INTO WhitelistEntries (id, whitelistId, username, usecaseId) VALUES (17, 3, '1.A', 'ZT2111_P');
@@ -160,12 +160,12 @@ INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (2
 
 -- archived configs
 INSERT INTO Configurations (ID, CREATEDAT, CREATEDBY, DESCRIPTION, ISARCHIVED, NAME, WHITELISTID) VALUES (3, '2018-06-08T15:09:15', 'test', 'a test description', 1, 'foo config 1', 1);
-INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (3, 1);
-INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (3, 3);
+INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (3, 4);
+INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (3, 6);
 
 INSERT INTO Configurations (ID, CREATEDAT, CREATEDBY, DESCRIPTION, ISARCHIVED, NAME, WHITELISTID) VALUES (4, '2018-06-08T15:09:15', 'test', 'a test description', 1, 'foo config 2', 2);
-INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (4, 1);
-INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (4, 2);
+INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (4, 4);
+INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (4, 5);
 
 -- ==============================
 --    critical access queries
