@@ -1,10 +1,12 @@
 package ui.main.admin;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import data.entities.DbUser;
 import data.entities.DbUserRole;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,6 +17,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableView;
+
+import ui.custom.controls.ButtonCell;
+import ui.custom.controls.PTableColumn;
 
 
 public class AdminController {
@@ -30,7 +35,13 @@ public class AdminController {
     public JFXCheckBox viewerCheckbox;
     @FXML
     public JFXCheckBox dataAnalystCheckbox;
+    @FXML
+    public PTableColumn<DbUser, JFXButton> deleteColumn;
+    @FXML
+    public PTableColumn<DbUser, String> passwordColumn;
+    @FXML
     private Set<DbUserRole> dbUserRolesSet = new HashSet<>();
+    @FXML
     private Set<DbUserRole> dbUserRolesSet2 = new HashSet<>();
 
     /**
@@ -39,15 +50,12 @@ public class AdminController {
      */
     @FXML
     public void adminSelected() {
+        DbUser user = userTable.getSelectionModel().getSelectedItem();
         if (adminCheckbox.isSelected()) {
-            if (!dbUserRolesSet.contains(DbUserRole.Admin)) {
-                dbUserRolesSet.add(DbUserRole.Admin);
-            }
+            user.addRole(DbUserRole.Admin);
 
         } else if (!adminCheckbox.isSelected()) {
-            if (dbUserRolesSet.contains(DbUserRole.Admin)) {
-                dbUserRolesSet.remove(DbUserRole.Admin);
-            }
+            user.removeRole(DbUserRole.Admin);
         }
     }
 
@@ -57,15 +65,12 @@ public class AdminController {
      */
     @FXML
     public void viewerSelected() {
+        DbUser user = userTable.getSelectionModel().getSelectedItem();
         if (viewerCheckbox.isSelected()) {
-            if (!dbUserRolesSet.contains(DbUserRole.Viewer)) {
-                dbUserRolesSet.add(DbUserRole.Viewer);
-            }
+            user.addRole(DbUserRole.Viewer);
 
         } else if (!viewerCheckbox.isSelected()) {
-            if (dbUserRolesSet.contains(DbUserRole.Viewer)) {
-                dbUserRolesSet.remove(DbUserRole.Viewer);
-            }
+            user.removeRole(DbUserRole.Viewer);
         }
     }
 
@@ -75,30 +80,35 @@ public class AdminController {
      */
     @FXML
     public void dataAnalystSelected() {
+        DbUser user = userTable.getSelectionModel().getSelectedItem();
         if (dataAnalystCheckbox.isSelected()) {
-            if (!dbUserRolesSet.contains(DbUserRole.DataAnalyst)) {
-                dbUserRolesSet.add(DbUserRole.DataAnalyst);
-            }
+            user.addRole(DbUserRole.DataAnalyst);
 
         } else if (!dataAnalystCheckbox.isSelected()) {
-            if (dbUserRolesSet.contains(DbUserRole.DataAnalyst)) {
-                dbUserRolesSet.remove(DbUserRole.DataAnalyst);
-            }
+            user.removeRole(DbUserRole.DataAnalyst);
         }
     }
 
     /**
      * adds new User with a initial password , that password should be changed by this user.
-     * TODO: Implementations
+     * TODO: further Implementations
      */
     public void addNewUser() {
+        initializeCheckboxes();
+        //Set<DbUserRole> userRoles
+        //DbUser newDbUser = new DbUser(tfDbUserName.getText(), )
+        userTable.getItems().add(new DbUser("", new HashSet<>()));
+
     }
 
     /**
      * Save user Changes to the table and the db.
-     * TODO: Implementations
      */
     public void saveUserChanges() {
+
+        userTable.getSelectionModel().getSelectedItem().setUsername(tfDbUserName.getText());
+        userTable.refresh();
+
     }
 
     /**
@@ -118,13 +128,27 @@ public class AdminController {
         List<DbUser> dbUsersSet = new ArrayList<DbUser>();
         dbUsersSet.add(dbUser1);
         dbUsersSet.add(dbUser2);
-        ObservableList<DbUser> list = FXCollections.observableList(dbUsersSet);
 
+        ObservableList<DbUser> list = FXCollections.observableList(dbUsersSet);
+        userTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                editUser(newValue);
+            }
+        }));
         userTable.setItems(list);
+        dbUserRolesSet.clear();
         userTable.refresh();
         //userTable.
         initializeColumns();
         initializeCheckboxes();
+    }
+
+    private void editUser(DbUser newValue) {
+        tfDbUserName.setText(newValue.getUsername());
+        tfDbUserPassword.setDisable(true);
+        adminCheckbox.setSelected(newValue.getRoles().contains(DbUserRole.Admin));
+        viewerCheckbox.setSelected(newValue.getRoles().contains(DbUserRole.Viewer));
+        dataAnalystCheckbox.setSelected(newValue.getRoles().contains(DbUserRole.DataAnalyst));
     }
 
     /**
@@ -140,7 +164,17 @@ public class AdminController {
      * Intiliazes the Columns.
      */
     private void initializeColumns() {
+        //TODO: initialPassword column initialization
+        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (DbUser user) -> {
+            if (userTable.getSelectionModel().getSelectedItem() == user) {
+                userTable.getItems().remove(user);
+                initializeCheckboxes();
+            } else {
+                userTable.getItems().remove(user);
+            }
 
+            return user;
+        }));
 
     }
 }

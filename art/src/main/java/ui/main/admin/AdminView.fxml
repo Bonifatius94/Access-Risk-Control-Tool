@@ -21,19 +21,21 @@
                         <PropertyValueFactory property="username"/>
                     </cellValueFactory>
                 </PTableColumn>
-                <PTableColumn text="%dbUserRoles" percentageWidth="0.4">
+                <PTableColumn text="%dbUserRoles" percentageWidth="0.3">
                     <cellValueFactory>
                         <PropertyValueFactory property="roles"/>
                     </cellValueFactory>
                 </PTableColumn>
-                <PTableColumn text="%dbUserPassword" percentageWidth="0.3">
+                <PTableColumn text="%dbUserPassword" percentageWidth="0.3" fx:id="passwordColumn">
                     <cellValueFactory>
-                        <PropertyValueFactory property="username"/>
+                        <PropertyValueFactory property="password"/>
                     </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn percentageWidth="0.1" fx:id="deleteColumn" resizable="false" sortable="false">
                 </PTableColumn>
             </columns>
         </TableView>
-        <VBox VBox.vgrow="ALWAYS" spacing="20">
+        <VBox VBox.vgrow="ALWAYS" spacing="20" >
             <JFXTextField promptText="%dbUserName" fx:id="tfDbUserName" prefWidth="250">
                 <validators>
                     <RequiredFieldValidator message="%required">
