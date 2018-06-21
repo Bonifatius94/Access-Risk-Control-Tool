@@ -42,7 +42,6 @@ public class WhitelistTest {
     }
 
     @Test
-    @Disabled
     public void testCreateWhitelist() {
 
         boolean ret = false;

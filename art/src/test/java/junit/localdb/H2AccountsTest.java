@@ -81,7 +81,6 @@ public class H2AccountsTest {
     }
 
     @Test
-    @Disabled
     public void testChangePassword() {
 
         boolean ret = false;
