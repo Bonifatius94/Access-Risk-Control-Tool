@@ -3,6 +3,8 @@ package ui.login.firstuse;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
+import data.entities.DbUser;
+import data.entities.DbUserRole;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
@@ -139,8 +141,23 @@ public class FirstUseWizardController {
      * Validates the inputs and advances to finish.
      */
     public void createUserAndGoToFinish() {
+
         if (validateBeforeCreate()) {
+
             if (AppComponents.tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
+
+                try {
+
+                    // give the first user the Admin user role
+                    DbUser currentUser = AppComponents.getDbContext().getCurrentUser();
+                    currentUser.addRole(DbUserRole.Admin);
+                    AppComponents.getDbContext().updateUserRoles(currentUser);
+                    AppComponents.getDbContext().close();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 welcomeBox.setVisible(false);
                 createUserBox.setVisible(false);
                 finishBox.setVisible(true);
