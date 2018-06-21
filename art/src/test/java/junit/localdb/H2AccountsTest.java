@@ -105,8 +105,6 @@ public class H2AccountsTest {
             // close context
             context.close();
 
-            try
-
             // check if the password was changed
             // ret = newpassword.equals(???);
             //TODO: find a way to get the password.
