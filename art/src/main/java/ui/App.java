@@ -50,6 +50,11 @@ public class App extends Application {
         // make the primaryStage available from other classes
         this.primaryStage = primaryStage;
 
+        // close the database connection if the primaryStage (MainView) is closed
+        primaryStage.setOnHidden(event -> {
+            AppComponents.getDbContext().close();
+        });
+
         TraceOut.leave();
     }
 
@@ -58,7 +63,7 @@ public class App extends Application {
     }
 
     /**
-     * Handles the main error throws.
+     * Global error handling.
      * @param thread the thread the error occurred in
      * @param e the error
      */
