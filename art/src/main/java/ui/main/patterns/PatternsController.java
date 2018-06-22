@@ -4,13 +4,10 @@ import com.jfoenix.controls.JFXButton;
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 
-import data.entities.AccessPatternConditionProperty;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
-import io.msoffice.excel.AccessPatternImportHelper;
 
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -29,7 +26,6 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
@@ -37,6 +33,7 @@ import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.filter.FilterController;
+import ui.main.patterns.modal.PatternsFormController;
 
 
 public class PatternsController {
@@ -45,7 +42,7 @@ public class PatternsController {
     public TableView<AccessPattern> patternsTable;
 
     @FXML
-    public TableColumn<AccessPattern, Set<AccessCondition>> useCaseCountColumn;
+    public TableColumn<AccessPattern, Set<AccessCondition>> conditionCountColumn;
 
     @FXML
     public TableColumn<AccessPattern, JFXButton> deleteColumn;
@@ -83,9 +80,6 @@ public class PatternsController {
         // fill table with all entries from the database
         updatePatternsTable();
 
-        // show an item count (+ selected)
-        itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "),
-            Bindings.size(patternsTable.getItems()).asString("%s " + bundle.getString("selected"))));
 
     }
 
@@ -142,6 +136,10 @@ public class PatternsController {
         // set selection mode to MULTIPLE
         patternsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+        // show an item count (+ selected)
+        itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "),
+            Bindings.size(patternsTable.getItems()).asString("%s " + bundle.getString("selected"))));
+
         initializeTableColumns();
     }
 
@@ -162,7 +160,7 @@ public class PatternsController {
         }));
 
         // overwrite the column in which the number of useCases is displayed
-        useCaseCountColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
+        conditionCountColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
 
             @Override
             protected void updateItem(Set<AccessCondition> items, boolean empty) {
@@ -174,8 +172,8 @@ public class PatternsController {
 
         });
 
-        // custom comparator for the useCaseCountColumn
-        useCaseCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
+        // custom comparator for the conditionCountColumn
+        conditionCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
     }
 
     /**
@@ -187,7 +185,7 @@ public class PatternsController {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("PatternsFormView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/PatternsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
@@ -198,6 +196,13 @@ public class PatternsController {
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
+
+            // set stage name
+            if (accessPattern == null) {
+                customWindow.setTitle(bundle.getString("newPatternTitle"));
+            } else {
+                customWindow.setTitle(bundle.getString("editPatternTitle"));
+            }
 
             stage.show();
 

@@ -1,4 +1,4 @@
-package ui.main.patterns;
+package ui.main.patterns.modal;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -124,7 +124,6 @@ public class PatternsFormController {
         this.conditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
         this.linkageBox.managedProperty().bind(Bindings.not(this.conditionBox.disableProperty()));
         this.linkageBox.visibleProperty().bind(Bindings.not(this.conditionBox.disableProperty()));
-        this.editConditionBox.managedProperty().bind(this.conditionBox.disableProperty());
         this.editConditionBox.disableProperty().bind(this.conditionBox.disableProperty());
 
         // deselect on tab change
@@ -290,6 +289,9 @@ public class PatternsFormController {
                 this.linkageInput.getSelectionModel().select(pattern.getLinkage());
             } else {
                 this.conditionTypeInput.getSelectionModel().select("Profile");
+
+                // disable condition box
+                this.conditionBox.setDisable(true);
 
                 this.profileInput.setText(pattern.getConditions().stream().findFirst().get().getProfileCondition().getProfile());
             }
