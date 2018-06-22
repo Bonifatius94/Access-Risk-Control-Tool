@@ -32,7 +32,7 @@ public class WhitelistTest {
             List<Whitelist> whitelists = context.getWhitelists(false);
 
             // check if test data was queried successfully
-            ret = whitelists.size() == 1 && whitelists.stream().allMatch(x -> x.getEntries().size() == 7);
+            ret = whitelists.size() == 2 && whitelists.stream().allMatch(x -> x.getEntries().size() == 7);
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -220,7 +220,7 @@ public class WhitelistTest {
             // query whitelist again. check if everything was deleted
             whitelist = context.getWhitelists(false).stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
 
-            // check if test data was queried successfully
+            // check if test data was querried successfully
             ret = whitelist == null;
 
             // TODO: write a test for archiving logic (old whitelist was used by a sap query)

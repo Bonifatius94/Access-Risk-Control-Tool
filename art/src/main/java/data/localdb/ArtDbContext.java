@@ -20,6 +20,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.NativeQuery;
-import org.hibernate.query.Query;
+import tools.tracing.TraceOut;
 
 public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
@@ -114,9 +115,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void createSapQuery(CriticalAccessQuery query) throws Exception {
 
+        TraceOut.enter();
+
         query.adjustReferences();
         query.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
         insertRecord(query);
+
+        TraceOut.leave();
     }
 
     /**
@@ -128,9 +133,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void createConfig(Configuration config) throws Exception {
 
+        TraceOut.enter();
+
         config.adjustReferences();
         config.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
         insertRecord(config);
+
+        TraceOut.leave();
     }
 
     /**
@@ -142,9 +151,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void createPattern(AccessPattern pattern) throws Exception {
 
+        TraceOut.enter();
+
         pattern.adjustReferences();
         pattern.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
         insertRecord(pattern);
+
+        TraceOut.leave();
     }
 
     /**
@@ -156,9 +169,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void createWhitelist(Whitelist whitelist) throws Exception {
 
+        TraceOut.enter();
+
         whitelist.adjustReferences();
         whitelist.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
         insertRecord(whitelist);
+
+        TraceOut.leave();
     }
 
     /**
@@ -170,8 +187,12 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void createSapConfig(SapConfiguration config) throws Exception {
 
+        TraceOut.enter();
+
         config.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
         insertRecord(config);
+
+        TraceOut.leave();
     }
 
     // ============================================
@@ -188,7 +209,12 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public List<CriticalAccessQuery> getSapQueries(boolean includeArchived) throws Exception {
 
-        return queryDataset("FROM CriticalAccessQuery" + (includeArchived ? "" : " WHERE IsArchived = 0"));
+        TraceOut.enter();
+
+        List<CriticalAccessQuery> queries = queryDataset("FROM CriticalAccessQuery" + (includeArchived ? "" : " WHERE IsArchived = 0"));
+
+        TraceOut.leave();
+        return queries;
     }
 
     /**
@@ -201,7 +227,12 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public List<Configuration> getConfigs(boolean includeArchived) throws Exception {
 
-        return queryDataset("FROM Configuration" + (includeArchived ? "" : " WHERE IsArchived = 0"));
+        TraceOut.enter();
+
+        List<Configuration> configs =  queryDataset("FROM Configuration" + (includeArchived ? "" : " WHERE IsArchived = 0"));
+
+        TraceOut.leave();
+        return configs;
     }
 
     /**
@@ -214,7 +245,12 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public List<AccessPattern> getPatterns(boolean includeArchived) throws Exception {
 
-        return queryDataset("FROM AccessPattern" + (includeArchived ? "" : " WHERE IsArchived = 0"));
+        TraceOut.enter();
+
+        List<AccessPattern> patterns = queryDataset("FROM AccessPattern" + (includeArchived ? "" : " WHERE IsArchived = 0"));
+
+        TraceOut.leave();
+        return patterns;
     }
 
     /**
@@ -227,7 +263,12 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public List<Whitelist> getWhitelists(boolean includeArchived) throws Exception {
 
-        return queryDataset("FROM Whitelist" + (includeArchived ? "" : " WHERE IsArchived = 0"));
+        TraceOut.enter();
+
+        List<Whitelist> whitelists = queryDataset("FROM Whitelist" + (includeArchived ? "" : " WHERE IsArchived = 0"));
+
+        TraceOut.leave();
+        return whitelists;
     }
 
     /**
@@ -240,39 +281,12 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public List<SapConfiguration> getSapConfigs(boolean includeArchived) throws Exception {
 
-        return queryDataset("FROM SapConfiguration" + (includeArchived ? "" : " WHERE IsArchived = 0"));
-    }
+        TraceOut.enter();
 
-    /**
-     * This method selects all user names of existing local database accounts and their privileges.
-     *
-     * @return a list of local database users
-     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<DbUser> getDatabaseUsers() throws Exception {
+        List<SapConfiguration> configs = queryDataset("FROM SapConfiguration" + (includeArchived ? "" : " WHERE IsArchived = 0"));
 
-        List<DbUser> users;
-
-        try (Session session = getSessionFactory().openSession()) {
-
-            List<Object[]> results = session.createNativeQuery("SELECT * FROM DbUsers").getResultList();
-
-            users = results.stream().map(x -> {
-
-                String username = (String)x[0];
-                Set<DbUserRole> roles = Arrays.stream(((String) x[1]).split(",")).map(y -> DbUserRole.parseRole(y)).collect(Collectors.toSet());
-
-                return new DbUser(username, roles);
-
-            }).collect(Collectors.toList());
-
-        } catch (Exception ex) {
-            throw new Exception("Unknown error while executing local database query. (see log file for more details)");
-        }
-
-        return users;
+        TraceOut.leave();
+        return configs;
     }
 
     // ============================================
@@ -292,6 +306,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     @SuppressWarnings("unchecked")
     public List<AccessPattern> getFilteredPatterns(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+
+        TraceOut.enter();
 
         List<AccessPattern> results;
 
@@ -327,6 +343,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             throw ex;
         }
 
+        TraceOut.leave();
         return results;
     }
 
@@ -383,6 +400,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @SuppressWarnings("unchecked")
     public List<Whitelist> getFilteredWhitelists(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
 
+        TraceOut.enter();
+
         List<Whitelist> results;
 
         try (Session session = openSession()) {
@@ -417,6 +436,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             throw ex;
         }
 
+        TraceOut.leave();
         return results;
     }
 
@@ -470,6 +490,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @SuppressWarnings("unchecked")
     public List<SapConfiguration> getFilteredSapConfigs(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
 
+        TraceOut.enter();
+
         List<SapConfiguration> results;
 
         try (Session session = openSession()) {
@@ -504,6 +526,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             throw ex;
         }
 
+        TraceOut.leave();
         return results;
     }
 
@@ -551,6 +574,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @SuppressWarnings("unchecked")
     public List<Configuration> getFilteredConfigs(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
 
+        TraceOut.enter();
+
         List<Configuration> results;
 
         try (Session session = openSession()) {
@@ -585,6 +610,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             throw ex;
         }
 
+        TraceOut.leave();
         return results;
     }
 
@@ -640,6 +666,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @SuppressWarnings("unchecked")
     public List<CriticalAccessQuery> getFilteredCriticalAccessQueries(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
 
+        TraceOut.enter();
         List<CriticalAccessQuery> results;
 
         try (Session session = openSession()) {
@@ -674,6 +701,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             throw ex;
         }
 
+        TraceOut.leave();
         return results;
     }
 
@@ -732,6 +760,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void updateConfig(Configuration config) throws Exception {
 
+        TraceOut.enter();
+
         config.adjustReferences();
 
         // check if the config has already been used by a critical access query
@@ -739,25 +769,34 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         if (archive) {
 
-            // get the id of the original config
-            Integer originalId = config.getId();
-            Configuration original = getConfigs(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
-
-            // set archived flag to original and update it
-            original.setArchived(true);
-            updateRecord(original);
-
-            // request new id for config to update
-            Configuration newConfig = new Configuration(config);
-
-            // TODO: update references (foreign keys ...)
-
-            // insert new config into database
-            insertRecord(config);
-
-        } else {
-            updateRecord(config);
+            archiveConfig(config);
         }
+
+        updateRecord(config);
+
+        TraceOut.leave();
+    }
+
+    private void archiveConfig(Configuration config) throws Exception {
+
+        // get the id of the original config
+        Integer originalId = config.getId();
+        Configuration original = getConfigs(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
+
+        // create copy of original and insert it
+        Configuration archived = new Configuration(original);
+        archived.setWhitelist(original.getWhitelist());
+        archived.setPatterns(original.getPatterns());
+        archived.setArchived(true);
+        archived.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
+        insertRecord(archived);
+
+        // reference the copy of the original in critical access queries instead of the config to update
+        getSapQueries(true).stream().filter(x -> x.getConfig().getId().equals(originalId)).forEach(query -> {
+
+            query.setConfig(archived);
+            updateRecord(query);
+        });
     }
 
     /**
@@ -769,6 +808,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void updatePattern(AccessPattern pattern) throws Exception {
 
+        TraceOut.enter();
+
         pattern.adjustReferences();
 
         // check if the pattern has already been used by a critical access query
@@ -776,43 +817,71 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         if (archive) {
 
-            // get the id of the original pattern
-            Integer originalId = pattern.getId();
-            AccessPattern original = getPatterns(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
-
-            // set archived flag to original and update it
-            original.setArchived(true);
-            updateRecord(original);
-
-            // copy pattern (without copying references)
-            AccessPattern newPattern = new AccessPattern(pattern);
-            createPattern(newPattern);
-
-            // create new configs (where the original was not already archived) referencing the new pattern
-            Set<Configuration> newConfigs = pattern.getConfigurations().stream().filter(x -> !x.isArchived()).map(x -> {
-
-                Configuration copy = new Configuration(x);
-
-                copy.setWhitelist(x.getWhitelist());
-                Set<AccessPattern> patterns = x.getPatterns();
-                patterns.remove(pattern);
-                patterns.add(newPattern);
-                copy.setPatterns(patterns);
-                copy.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
-
-                return copy;
-
-            }).collect(Collectors.toSet());
-
-            // apply new configs to pattern
-            newPattern.getConfigurations().addAll(newConfigs);
-
-            // create new configs and update mapping table
-            newConfigs.forEach(x -> insertRecord(x));
-
-        } else {
-            updateRecord(pattern);
+            archivePattern(pattern);
         }
+
+        updateRecord(pattern);
+
+        TraceOut.leave();
+    }
+
+    private void archivePattern(AccessPattern pattern) throws Exception {
+
+        // get the id of the original pattern
+        Integer originalId = pattern.getId();
+        AccessPattern original = getPatterns(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
+
+        // create copy of original and insert it
+        AccessPattern archived = new AccessPattern(original);
+        archived.setArchived(true);
+        archived.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
+        insertRecord(archived);
+
+        // get configs referencing the original pattern
+        Set<Configuration> originalConfigs =
+            getConfigs(true).stream()
+                .filter(x -> x.getPatterns().stream().anyMatch(y -> x.getId().equals(y.getId())))
+                .collect(Collectors.toSet());
+
+        // get critical access queries referencing a config that references the original pattern
+        Set<CriticalAccessQuery> queries =
+            getSapQueries(true).stream()
+                .filter(x -> originalConfigs.stream().anyMatch(y -> y.getId().equals(x.getConfig().getId())))
+                .collect(Collectors.toSet());
+
+        // copy configs where the original pattern is referenced
+        originalConfigs.forEach(originalConfig -> {
+
+            // switch pattern references
+            Set<AccessPattern> patterns = originalConfig.getPatterns();
+            patterns.remove(pattern);
+            patterns.add(archived);
+
+            if (originalConfig.isArchived()) {
+
+                // reference new archived pattern
+                originalConfig.setPatterns(patterns);
+                updateRecord(originalConfig);
+
+            } else {
+
+                Configuration copy = new Configuration(originalConfig);
+
+                // prepare and insert copy
+                copy.setWhitelist(originalConfig.getWhitelist());
+                copy.setPatterns(patterns);
+                copy.setArchived(true);
+                copy.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
+                insertRecord(copy);
+
+                // reference the new config on all critical access queries
+                queries.stream().filter(x -> x.getConfig().getId().equals(originalConfig.getId())).forEach(query -> {
+
+                    query.setConfig(copy);
+                    updateRecord(query);
+                });
+            }
+        });
     }
 
     /**
@@ -824,6 +893,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void updateWhitelist(Whitelist whitelist) throws Exception {
 
+        TraceOut.enter();
+
         whitelist.adjustReferences();
 
         // check if the whitelist has already been used by a critical access query
@@ -831,34 +902,60 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         if (archive) {
 
-            // get the id of the original whitelist
-            Integer originalId = whitelist.getId();
-            Whitelist original = getWhitelists(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
-
-            // set archived flag to original and update it
-            original.setArchived(true);
-            updateRecord(original);
-
-            // copy whitelist (without copying references)
-            Whitelist newWhitelist = new Whitelist(whitelist);
-            createWhitelist(newWhitelist);
-
-            // create new configs (where the original was not already archived) referencing the new whitelist
-            Set<Configuration> newConfigs = getConfigs(true).stream().filter(x -> x.getWhitelist().getId().equals(originalId)).map(x -> {
-
-                Configuration copy = new Configuration(x);
-                copy.setWhitelist(whitelist);
-                copy.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
-
-                return copy;
-
-            }).collect(Collectors.toSet());
-
-            // create new configs and update mapping table
-            newConfigs.forEach(x -> insertRecord(x));
+            archiveWhitelist(whitelist);
         }
 
         updateRecord(whitelist);
+
+        TraceOut.leave();
+    }
+
+    private void archiveWhitelist(Whitelist whitelist) throws Exception {
+
+        // get the id of the original whitelist
+        Integer originalId = whitelist.getId();
+        Whitelist original = getWhitelists(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
+
+        // create copy of original and insert it
+        Whitelist archived = new Whitelist(original);
+        archived.setArchived(true);
+        archived.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
+        insertRecord(archived);
+
+        // get critical access queries referencing a config that references the original pattern
+        Set<CriticalAccessQuery> queries =
+            getSapQueries(true).stream()
+                .filter(x -> x.getConfig().getWhitelist().getId().equals(originalId))
+                .collect(Collectors.toSet());
+
+        // copy configs where the original whitelist is referenced
+        getConfigs(true).stream().filter(x -> x.getWhitelist().getId().equals(originalId)).forEach(originalConfig -> {
+
+            if (originalConfig.isArchived()) {
+
+                // reference archived whitelist
+                originalConfig.setWhitelist(archived);
+                updateRecord(originalConfig);
+
+            } else {
+
+                Configuration copy = new Configuration(originalConfig);
+
+                // prepare and insert copy
+                copy.setWhitelist(archived);
+                copy.setPatterns(originalConfig.getPatterns());
+                copy.setArchived(true);
+                copy.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
+                insertRecord(copy);
+
+                // reference the new config on all critical access queries
+                queries.stream().filter(x -> x.getConfig().getId().equals(originalConfig.getId())).forEach(query -> {
+
+                    query.setConfig(copy);
+                    updateRecord(query);
+                });
+            }
+        });
     }
 
     /**
@@ -870,26 +967,39 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void updateSapConfig(SapConfiguration config) throws Exception {
 
+        TraceOut.enter();
+
         // check if the sap config has already been used by a critical access query
         boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getSapConfig().getId().equals(config.getId()));
 
         if (archive) {
 
-            // get the id of the original whitelist
-            Integer originalId = config.getId();
-            SapConfiguration original = getSapConfigs(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
-
-            // set archived flag to original and update it
-            original.setArchived(true);
-            updateRecord(original);
-
-            // copy sap config (without copying references)
-            SapConfiguration newConfig = new SapConfiguration(config);
-            createSapConfig(newConfig);
-
-        } else {
-            updateRecord(config);
+            archiveSapConfig(config);
         }
+
+        updateRecord(config);
+
+        TraceOut.leave();
+    }
+
+    private void archiveSapConfig(SapConfiguration config) throws Exception {
+
+        // get the id of the original whitelist
+        Integer originalId = config.getId();
+        SapConfiguration original = getSapConfigs(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
+
+        // create copy of original and insert it
+        SapConfiguration archived = new SapConfiguration(original);
+        archived.setArchived(true);
+        archived.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
+        insertRecord(archived);
+
+        // reference the new sap config on all critical access queries
+        getSapQueries(true).stream().filter(x -> x.getSapConfig().getId().equals(originalId)).forEach(query -> {
+
+            query.setSapConfig(archived);
+            updateRecord(query);
+        });
     }
 
     // ============================================
@@ -906,6 +1016,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void deleteConfig(Configuration config) throws Exception {
 
+        TraceOut.enter();
+
         config.adjustReferences();
 
         // check if the config has already been used by a critical access query
@@ -920,6 +1032,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
             deleteRecord(config);
         }
+
+        TraceOut.leave();
     }
 
     /**
@@ -932,10 +1046,23 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void deletePattern(AccessPattern pattern) throws Exception {
 
+        TraceOut.enter();
+
         pattern.adjustReferences();
 
         // check if the pattern has already been used by a critical access query
         boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getPatterns().stream().anyMatch(y -> y.getId().equals(pattern.getId())));
+
+        // remove pattern from active configs referencing it
+        pattern.getConfigurations().forEach(config -> {
+
+            if (!config.isArchived()) {
+
+                config.getPatterns().remove(pattern);
+                config.adjustReferences();
+                updateRecord(config);
+            }
+        });
 
         if (archive) {
 
@@ -943,20 +1070,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             pattern.setArchived(true);
             updateRecord(pattern);
 
-            // TODO: copy non-archived configs referencing the pattern and remove pattern there
-
         } else {
-
-            // remove pattern references on configs and update configs to remove entries on mapping table
-            pattern.getConfigurations().stream().filter(x -> x.getPatterns().contains(pattern))
-                .forEach(x -> {
-                    x.getPatterns().remove(pattern);
-                    updateRecord(x);
-                });
 
             // delete pattern
             deleteRecord(pattern);
         }
+
+        TraceOut.leave();
     }
 
     /**
@@ -969,28 +1089,33 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void deleteWhitelist(Whitelist whitelist) throws Exception {
 
+        TraceOut.enter();
+
         whitelist.adjustReferences();
 
         // check if the whitelist has already been used by a critical access query
         boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
 
+        // remove whitelist from active configs referencing it
+        getConfigs(false).forEach(config -> {
+
+            config.setWhitelist(null);
+            updateRecord(config);
+        });
+
         if (archive) {
 
+            // archive whitelist
             whitelist.setArchived(true);
             updateRecord(whitelist);
 
         } else {
 
-            // remove whitelist references on configs and update configs to remove entries on mapping table
-            getConfigs(true).stream().filter(x -> x.getWhitelist().getId().equals(whitelist.getId()))
-                .forEach(x -> {
-                    x.setWhitelist(null);
-                    updateRecord(x);
-                });
-
             // delete whitelist
             deleteRecord(whitelist);
         }
+
+        TraceOut.leave();
     }
 
     /**
@@ -1003,23 +1128,79 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     public void deleteSapConfig(SapConfiguration config) throws Exception {
 
+        TraceOut.enter();
+
         // check if the sap config has already been used by a critical access query
         boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getSapConfig().getId().equals(config.getId()));
 
         if (archive) {
 
+            // archive sap config
             config.setArchived(true);
             updateRecord(config);
 
         } else {
 
+            // delete sap config
             deleteRecord(config);
         }
+
+        TraceOut.leave();
     }
 
     // ============================================
     //          U S E R   A C C O U N T S
     // ============================================
+
+    /**
+     * This method selects all user names of existing local database accounts and their privileges.
+     *
+     * @return a list of local database users
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<DbUser> getDatabaseUsers() throws Exception {
+
+        TraceOut.enter();
+
+        List<DbUser> users;
+
+        try (Session session = getSessionFactory().openSession()) {
+
+            /*String sql =
+                "SELECT DISTINCT "
+                + "    Users.Name AS User, "
+                + "    GROUP_CONCAT(Rights.GrantedRole) AS Roles "
+                + "FROM INFORMATION_SCHEMA.Users "
+                + "LEFT OUTER JOIN INFORMATION_SCHEMA.Rights "
+                + "    ON Users.Name = Rights.Grantee "
+                + "WHERE Rights.Grantee IS NULL OR GranteeType = 'USER' "
+                + "GROUP BY Users.Name";
+
+            List<Object[]> results = session.createNativeQuery(sql).getResultList();*/
+
+            List<Object[]> results = session.createNativeQuery("SELECT * FROM DbUsers").getResultList();
+
+            users = results.stream().map(x -> {
+
+                String username = (String)x[0];
+
+                Set<DbUserRole> roles = (((String) x[1]) != null && !((String) x[1]).isEmpty())
+                    ? Arrays.stream(((String) x[1]).split(",")).map(y -> DbUserRole.parseRole(y)).collect(Collectors.toSet())
+                    : new HashSet<>();
+
+                return new DbUser(username, roles);
+
+            }).collect(Collectors.toList());
+
+        } catch (Exception ex) {
+            throw new Exception("Unknown error while executing local database query. (see log file for more details)");
+        }
+
+        TraceOut.leave();
+        return users;
+    }
 
     /**
      * This method adds a new database user with rights according to the given role.
@@ -1030,6 +1211,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void createDatabaseUser(DbUser user, String password) throws Exception {
+
+        TraceOut.enter();
 
         try (Session session = getSessionFactory().openSession()) {
 
@@ -1064,6 +1247,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                 throw ex;
             }
         }
+
+        TraceOut.leave();
     }
 
     /**
@@ -1074,6 +1259,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void updateUserRoles(DbUser user) throws Exception {
+
+        TraceOut.enter();
 
         try (Session session = getSessionFactory().openSession()) {
 
@@ -1111,9 +1298,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                 throw ex;
             }
         }
+
+        TraceOut.leave();
     }
 
     private void addDbRole(Session session, String username, DbUserRole role) {
+
+        TraceOut.enter();
 
         // grant privileges to database account
         session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
@@ -1122,9 +1313,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         if (role == DbUserRole.Admin) {
             session.createNativeQuery("ALTER USER " + username + " ADMIN TRUE").executeUpdate();
         }
+
+        TraceOut.leave();
     }
 
     private void removeDbRole(Session session, String username, DbUserRole role) {
+
+        TraceOut.enter();
 
         // revoke privileges from database account
         session.createNativeQuery("REVOKE " + role.toString() + " FROM " + username).executeUpdate();
@@ -1133,6 +1328,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         if (role == DbUserRole.Admin) {
             session.createNativeQuery("ALTER USER " + username + " ADMIN FALSE").executeUpdate();
         }
+
+        TraceOut.leave();
     }
 
     /**
@@ -1144,6 +1341,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void changePassword(String username, String password) throws Exception {
+
+        TraceOut.enter();
 
         try (Session session = getSessionFactory().openSession()) {
 
@@ -1174,6 +1373,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                 throw ex;
             }
         }
+
+        TraceOut.leave();
     }
 
     /**
@@ -1184,6 +1385,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
      */
     @Override
     public void deleteDatabaseUser(String username) throws Exception {
+
+        TraceOut.enter();
 
         try (Session session = getSessionFactory().openSession()) {
 
@@ -1214,132 +1417,27 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                 throw ex;
             }
         }
-    }
 
-    public DbUser getCurrentUser() throws Exception {
-        return getDatabaseUsers().stream().filter(x -> x.getUsername().toUpperCase().equals(getUsername().toUpperCase())).findFirst().get();
+        TraceOut.leave();
     }
 
     /**
-     * This method switches the logged in user. (it also works for first login)
+     * This method gets the current logged-in database user.
      *
-     * @param username the name of the new user
-     * @param password the password of the new user
+     * @return the current logged-in user
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    @Override
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    public void switchUser(String username, String password) throws Exception {
+    public DbUser getCurrentUser() throws Exception {
 
-        // TODO: remove this operation because it is obsolete. close application and login with other user after restart instead.
-        throw new Exception("Operation is obsolete. Please do not use it!");
+        TraceOut.enter();
 
-        //try (Session session = sessionFactory.openSession()) {
-        //
-        //    List<DbUser> registeredUsers = getDatabaseUsers();
-        //
-        //    if (registeredUsers.stream().anyMatch(x -> x.getUsername().toUpperCase().equals(username.toUpperCase()))) {
-        //        super.changeUser(username, password);
-        //    } else {
-        //        throw new ArtException(ArtException.ErrorCode.UnregisteredLocalDatabaseUser, null);
-        //    }
-        //
-        //} catch (Exception ex) {
-        //    throw new ArtException(ArtException.ErrorCode.WrongLocalDatabaseLoginCredentials, null);
-        //}
+        DbUser user =
+            getDatabaseUsers().stream()
+            .filter(x -> x.getUsername().toUpperCase().equals(getUsername().toUpperCase()))
+            .findFirst().get();
+
+        TraceOut.leave();
+        return user;
     }
-
-    // old implementations that are obsolete
-
-    ///**
-    // * This method adds a new database user with rights according to the given role.
-    // *
-    // * @param username the name of the new database user
-    // * @param password the password of the new database user
-    // * @param role     the role of the new database user
-    // * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
-    // */
-    //@Override
-    //public void createDatabaseUser(String username, String password, DbUserRole role) throws Exception {
-    //
-    //    Transaction transaction = null;
-    //
-    //    try (Session session = getSessionFactory().openSession()) {
-    //
-    //        // avoid sql injection with username
-    //        if (username.contains(" ")) {
-    //            // TODO: implement this as custom exception
-    //            throw new Exception("Invalid username! No whitespaces allowed!");
-    //        }
-    //
-    //        transaction = session.beginTransaction();
-    //
-    //        // create a new database account
-    //        String sql = "CREATE USER " + username + " PASSWORD :password " + ((role == DbUserRole.Admin) ? "ADMIN" : "");
-    //        session.createNativeQuery(sql).setParameter("password", password).executeUpdate();
-    //
-    //        // grant privileges to account accordingly
-    //        session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
-    //
-    //        session.flush();
-    //        transaction.commit();
-    //
-    //    } catch (Exception ex) {
-    //
-    //        if (transaction != null) {
-    //            transaction.rollback();
-    //        }
-    //
-    //        throw ex;
-    //    }
-    //}
-
-    ///**
-    // * This method changes the role of an existing user.
-    // *
-    // * @param username the name of an existing database user
-    // * @param role     the new role of the user
-    // * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
-    // */
-    //@Override
-    //public void changeUserRole(String username, DbUserRole role) throws Exception {
-    //
-    //    // get original database user and role
-    //    DbUser original =
-    //        getDatabaseUsers()
-    //        .stream().filter(x -> x.getUsername().toUpperCase().equals(username.toUpperCase()))
-    //        .findFirst().orElse(null);
-    //
-    //    if (original != null) {
-    //
-    //        Transaction transaction = null;
-    //
-    //        try (Session session = getSessionFactory().openSession()) {
-    //
-    //            transaction = session.beginTransaction();
-    //
-    //            // remove old privileges from database account
-    //            session.createNativeQuery("REVOKE " + original.getRole().toString() + " FROM " + username).executeUpdate();
-    //
-    //            // grant new privileges to database account
-    //            session.createNativeQuery("GRANT " + role.toString() + " TO " + username).executeUpdate();
-    //
-    //            session.flush();
-    //            transaction.commit();
-    //
-    //        } catch (Exception ex) {
-    //
-    //            if (transaction != null) {
-    //                transaction.rollback();
-    //            }
-    //
-    //            throw ex;
-    //        }
-    //
-    //    } else {
-    //        throw new Exception("User " + username + " does not exist.");
-    //    }
-    //}
 
 }
