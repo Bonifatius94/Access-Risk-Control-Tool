@@ -172,21 +172,20 @@ public class FirstUseWizardController {
      */
     public void closeAndStartApp(ActionEvent event) {
         try {
+            // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../LoginView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../main/MainView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
+            Scene scene = new Scene(customWindow, 1050, 750);
             scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
+            App.primaryStage.setScene(scene);
+            App.primaryStage.setTitle(bundle.getString("art"));
+            customWindow.initStage(App.primaryStage);
 
             close(event);
-            stage.show();
+            App.primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
