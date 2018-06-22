@@ -149,7 +149,11 @@ public class PatternsController {
     private void initializeTableColumns() {
         // Add the delete column
         deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPattern accessPattern) -> {
-            patternsTable.getItems().remove(accessPattern);
+            try {
+                AppComponents.getDbContext().deletePattern(accessPattern);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return accessPattern;
         }));
 
@@ -219,16 +223,7 @@ public class PatternsController {
      */
     public void cloneAction() {
         if (patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
-
-            // clone the currently selected item and add it to the table
-            AccessPattern clonedPattern = patternsTable.getSelectionModel().getSelectedItem();
-            patternsTable.getItems().add(0, clonedPattern);
-
-            // select the clone
-            patternsTable.getSelectionModel().clearSelection();
-            patternsTable.getSelectionModel().select(clonedPattern);
-            patternsTable.scrollTo(clonedPattern);
-            patternsTable.refresh();
+            // TODO clone item and save the clone to the database
         }
     }
 
@@ -247,9 +242,17 @@ public class PatternsController {
     public void deleteAction() {
         if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
 
-            // remove all selected items
-            patternsTable.getItems().removeAll(patternsTable.getSelectionModel().getSelectedItems());
-            patternsTable.refresh();
+            try {
+
+                for (AccessPattern pattern : patternsTable.getSelectionModel().getSelectedItems()) {
+                    AppComponents.getDbContext().deletePattern(pattern);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            updatePatternsTable();
         }
     }
 
