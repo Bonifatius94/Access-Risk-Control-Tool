@@ -487,6 +487,7 @@ alternative design with separators left and right of complete header bar
 .status-bar {
     -fx-padding: 10;
     -fx-background-color: derive(-fx-background, -30%);
+    -fx-font-size: 110%;
 }
 
 .status-bar .database-icon {

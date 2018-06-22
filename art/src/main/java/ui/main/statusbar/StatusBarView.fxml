@@ -8,7 +8,10 @@
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="ui.main.statusbar.StatusBarController" styleClass="status-bar">
     <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
-        <Label fx:id="loggedInUserLabel" text="PETER_HANS - Admin"/>
+        <Label fx:id="loggedInUserLabel"/>
+    </HBox>
+    <HBox HBox.hgrow="ALWAYS" alignment="CENTER">
+        <Label text="%copyright"/>
     </HBox>
     <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT" spacing="20">
         <Label>
