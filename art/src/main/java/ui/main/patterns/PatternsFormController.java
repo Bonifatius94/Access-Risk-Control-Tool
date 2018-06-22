@@ -37,6 +37,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.PTableColumn;
 
@@ -436,8 +437,16 @@ public class PatternsFormController {
         // add the list to the AccessPattern
         this.accessPattern.setConditions(newConditions);
 
-        System.out.println(this.accessPattern);
-
+        try {
+            // new pattern, id is null
+            if (accessPattern.getId() == null) {
+                AppComponents.getDbContext().createPattern(accessPattern);
+            } else {
+                AppComponents.getDbContext().updatePattern(accessPattern);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
