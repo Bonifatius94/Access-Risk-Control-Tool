@@ -170,6 +170,7 @@ public class ConfigurationTest {
     }
 
     @Test
+    @Disabled
     public void testDeleteConfigurationWithArchiving() {
 
         boolean ret = false;
