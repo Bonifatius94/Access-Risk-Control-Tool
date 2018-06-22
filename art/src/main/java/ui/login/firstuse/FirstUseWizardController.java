@@ -152,7 +152,6 @@ public class FirstUseWizardController {
                     DbUser currentUser = AppComponents.getDbContext().getCurrentUser();
                     currentUser.addRole(DbUserRole.Admin);
                     AppComponents.getDbContext().updateUserRoles(currentUser);
-                    AppComponents.getDbContext().close();
 
                 } catch (Exception e) {
                     e.printStackTrace();
