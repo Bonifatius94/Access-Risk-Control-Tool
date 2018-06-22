@@ -98,6 +98,40 @@ public class SapSettingsTest {
     }
 
     @Test
+    @Disabled
+    public void testUpdateSapConfigWithArchiving() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query sap config
+            SapConfiguration config = context.getSapConfigs(false).stream().findFirst().get();
+            Integer id = config.getId();
+
+            // apply changes to sap config
+            final String newLanguage = "DE";
+            config.setLanguage(newLanguage);
+
+            // insert into database
+            context.updateSapConfig(config);
+
+            // query updated data
+            config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(id)).findFirst().get();
+
+            // check if config was inserted successfully
+            ret = config.getLanguage().equals(newLanguage);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        // TODO: test logic for archiving sap config on update
+
+        assert(false);
+    }
+
+    @Test
     public void testDeleteSapConfig() {
 
         boolean ret = false;
@@ -122,6 +156,34 @@ public class SapSettingsTest {
         }
 
         assert(ret);
+    }
+
+    @Test
+    @Disabled
+    public void testDeleteSapConfigWithArchiving() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query sap config
+            SapConfiguration config = context.getSapConfigs(false).stream().findFirst().get();
+            Integer id = config.getId();
+
+            // insert into database
+            context.deleteSapConfig(config);
+
+            // query updated data
+            config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
+
+            // check if config was inserted successfully
+            ret = config == null;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert(false);
     }
 
 }

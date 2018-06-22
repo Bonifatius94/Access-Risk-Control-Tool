@@ -33,7 +33,7 @@ public class AccessPatternTest {
             // query patterns
             List<AccessPattern> patterns = context.getPatterns(false);
 
-            AccessPattern profileAccessPattern = patterns.stream().filter(x -> x.getConditions().size() == 1).findFirst().get();
+            AccessPattern profileAccessPattern = patterns.stream().filter(x -> x.getId().equals(1)).findFirst().get();
             AccessProfileCondition profileCondition = profileAccessPattern.getConditions().stream().findFirst().get().getProfileCondition();
 
             // check if test data was queried successfully
@@ -145,8 +145,7 @@ public class AccessPatternTest {
     }
 
     @Test
-    @Disabled
-    public void testUpdatePattern() {
+    public void testUpdatePatternWithProfileCondition() {
 
         boolean ret = false;
 
@@ -167,36 +166,153 @@ public class AccessPatternTest {
             profilePattern.setDescription(newDescription);
             profileCondition.setProfile(newProfile);
 
-            // apply changes to complex conditions
-            List<AccessCondition> patternConditions = new ArrayList<>(multiConditionPattern.getConditions());
-            patternConditions.remove(0);
-            AccessCondition condition = patternConditions.get(0);
-            AccessPatternConditionProperty property = condition.getPatternCondition().getProperties().stream().findFirst().get();
-            final String newValue4 = "foobar";
-            property.setValue4(newValue4);
-            multiConditionPattern.setConditions(patternConditions);
-            Integer propertyId = property.getId();
-            Integer conditionId = condition.getId();
-
             // update database
             context.updatePattern(profilePattern);
-            context.updatePattern(multiConditionPattern);
 
             // query data again
             patterns = context.getPatterns(false);
             profilePattern = patterns.stream().filter(x -> x.getId().equals(profilePatternId)).findFirst().get();
             profileCondition = profilePattern.getConditions().stream().findFirst().get().getProfileCondition();
-            multiConditionPattern = patterns.stream().filter(x -> x.getId().equals(multiConditionPatternId)).findFirst().get();
 
             // check if test data was queried successfully
             ret = patterns.size() == 3
-                && multiConditionPattern.getConditions().size() == 1
-                && multiConditionPattern.getConditions().stream().anyMatch(x ->
-                       x.getId().equals(conditionId)
-                    && x.getPatternCondition().getProperties().stream().anyMatch(y -> y.getId().equals(propertyId) && newValue4.equals(y.getValue4()))
-                )
                 && profilePattern.getDescription().equals(newDescription) && profilePattern.getLinkage() == ConditionLinkage.Or
                 && profileCondition.getProfile().equals(newProfile);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert(ret);
+    }
+
+    @Test
+    @Disabled
+    public void testUpdatePatternWithProfileConditionWithArchiving() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query patterns
+            List<AccessPattern> patterns = context.getPatterns(false);
+            AccessPattern profilePattern = patterns.stream().filter(x -> x.getConditions().size() == 1).findFirst().get();
+            AccessProfileCondition profileCondition = profilePattern.getConditions().stream().findFirst().get().getProfileCondition();
+            Integer profilePatternId = profilePattern.getId();
+
+            // apply changes to profile condition
+            final String newProfile = "SAP_NEW";
+            final String newDescription = "another description";
+            profilePattern.setLinkage(ConditionLinkage.Or);
+            profilePattern.setDescription(newDescription);
+            profileCondition.setProfile(newProfile);
+
+            // update database
+            context.updatePattern(profilePattern);
+
+            // query data again
+            patterns = context.getPatterns(false);
+            profilePattern = patterns.stream().filter(x -> x.getId().equals(profilePatternId)).findFirst().get();
+            profileCondition = profilePattern.getConditions().stream().findFirst().get().getProfileCondition();
+
+            // TODO: change success condition (this case goes into archiving logic)
+
+            // check if test data was queried successfully
+            ret = patterns.size() == 3
+                && profilePattern.getDescription().equals(newDescription) && profilePattern.getLinkage() == ConditionLinkage.Or
+                && profileCondition.getProfile().equals(newProfile);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert(ret);
+    }
+
+    @Test
+    public void testUpdatePatternWithPatternCondition() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query patterns
+            List<AccessPattern> patterns = context.getPatterns(false);
+            AccessPattern pattern = patterns.stream().filter(x -> x.getConditions().size() == 2).findFirst().get();
+            Integer patternId = pattern.getId();
+
+            // apply changes to conditions
+            List<AccessCondition> patternConditions = new ArrayList<>(pattern.getConditions());
+            patternConditions.remove(0);
+            AccessCondition condition = patternConditions.get(0);
+            AccessPatternConditionProperty property = condition.getPatternCondition().getProperties().stream().findFirst().get();
+            final String newValue4 = "foobar";
+            property.setValue4(newValue4);
+            pattern.setConditions(patternConditions);
+            Integer propertyId = property.getId();
+            Integer conditionId = condition.getId();
+
+            // update database
+            context.updatePattern(pattern);
+
+            // query data again
+            patterns = context.getPatterns(false);
+            pattern = patterns.stream().filter(x -> x.getId().equals(patternId)).findFirst().get();
+
+            // check if test data was queried successfully
+            ret = patterns.size() == 3
+                && pattern.getConditions().size() == 1
+                && pattern.getConditions().stream().anyMatch(x ->
+                    x.getId().equals(conditionId)
+                    && x.getPatternCondition().getProperties().stream().anyMatch(y -> y.getId().equals(propertyId) && newValue4.equals(y.getValue4()))
+                );
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        // TODO: add another test for evaluating archiving logic on update
+
+        assert(ret);
+    }
+
+    @Test
+    public void testUpdatePatternWithPatternConditionWithArchiving() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query patterns
+            List<AccessPattern> patterns = context.getPatterns(false);
+            AccessPattern pattern = patterns.stream().filter(x -> x.getConditions().size() == 2).findFirst().get();
+            Integer patternId = pattern.getId();
+
+            // apply changes to conditions
+            List<AccessCondition> patternConditions = new ArrayList<>(pattern.getConditions());
+            patternConditions.remove(0);
+            AccessCondition condition = patternConditions.get(0);
+            AccessPatternConditionProperty property = condition.getPatternCondition().getProperties().stream().findFirst().get();
+            final String newValue4 = "foobar";
+            property.setValue4(newValue4);
+            pattern.setConditions(patternConditions);
+            Integer propertyId = property.getId();
+            Integer conditionId = condition.getId();
+
+            // update database
+            context.updatePattern(pattern);
+
+            // query data again
+            patterns = context.getPatterns(false);
+            pattern = patterns.stream().filter(x -> x.getId().equals(patternId)).findFirst().get();
+
+            // check if test data was queried successfully
+            ret = patterns.size() == 3
+                && pattern.getConditions().size() == 1
+                && pattern.getConditions().stream().anyMatch(x ->
+                x.getId().equals(conditionId)
+                    && x.getPatternCondition().getProperties().stream().anyMatch(y -> y.getId().equals(propertyId) && newValue4.equals(y.getValue4()))
+            );
 
         } catch (Exception ex) {
             ex.printStackTrace();

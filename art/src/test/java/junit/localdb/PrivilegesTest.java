@@ -4,6 +4,7 @@ import data.entities.DbUser;
 import data.localdb.ArtDbContext;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class PrivilegesTest {
     }
 
     @Test
+    @Disabled
     public void testPrivileges() {
 
         // IArtDbContext.getDatabaseUsers()
@@ -24,7 +26,9 @@ public class PrivilegesTest {
         assert(testPrivilegesGetDatabaseUsers("TestDataAnalyst", "foobar", false));
         assert(testPrivilegesGetDatabaseUsers("TestViewer", "foobar", false));
 
-        // TODO: add calls for missing database operations here ...
+        assert(false);
+
+        // TODO: add calls for missing database operations here ......
     }
 
     private boolean testPrivilegesGetDatabaseUsers(String username, String password, boolean expectedResult) {

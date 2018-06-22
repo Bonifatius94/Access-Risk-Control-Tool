@@ -116,7 +116,7 @@ public class SapSettingsController {
 
             stage.setOnCloseRequest((WindowEvent event) -> {
                 System.out.println("Was geht jetzt?");
-            } );
+            });
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -175,7 +175,7 @@ public class SapSettingsController {
             stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
             stage.show();
-            if(!stage.isShowing()){
+            if (!stage.isShowing()) {
                 //saveInTable();
                 sapConnectionTable.refresh();
             }
@@ -227,7 +227,6 @@ public class SapSettingsController {
 
     /**
      * should give new Sap setting to table. TODO: further implementations
-     *
      */
     public void giveSavedSapSettings(SapConfiguration sapConfiguration) {
 
