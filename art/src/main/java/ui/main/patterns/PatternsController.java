@@ -10,6 +10,7 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import io.msoffice.excel.AccessPatternImportHelper;
 
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -32,6 +33,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
+import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.filter.FilterController;
@@ -74,26 +76,32 @@ public class PatternsController {
         // check if the filters are applied
         filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
             if (newValue) {
-                System.out.println(filterController.searchStringProperty.getValue());
-                System.out.println(filterController.startDateProperty.getValue());
-                System.out.println(filterController.endDateProperty.getValue());
-                System.out.println(filterController.showArchivedProperty.getValue());
+                updatePatternsTable();
             }
         });
 
-        // test the table with data from the Example - Zugriffsmuster.xlsx file
-        try {
-            AccessPatternImportHelper helper = new AccessPatternImportHelper();
+        // fill table with all entries from the database
+        updatePatternsTable();
 
-            List<AccessPattern> patterns = helper.importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
+        // show an item count (+ selected)
+        itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "),
+            Bindings.size(patternsTable.getItems()).asString("%s " + bundle.getString("selected"))));
+
+    }
+
+    /**
+     * Updates the patternsTable items with items from the database, taking filters into account.
+     */
+    private void updatePatternsTable() {
+        try {
+
+            List<AccessPattern> patterns = AppComponents.getDbContext().getFilteredPatterns(filterController.showArchivedProperty.getValue(),
+                filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
+                filterController.endDateProperty.getValue(), 0);
             ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
 
             patternsTable.setItems(list);
             patternsTable.refresh();
-
-            // show an item count (+ selected)
-            itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "),
-                Bindings.size(patternsTable.getItems()).asString("%s " + bundle.getString("selected"))));
 
         } catch (Exception e) {
             e.printStackTrace();
