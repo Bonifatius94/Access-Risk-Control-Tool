@@ -102,7 +102,7 @@ public class PatternsFormController {
     private AccessPattern accessPattern;
     private AccessPattern originalPattern;
 
-    private List<TableView<AccessPatternConditionProperty>> conditionTables;
+    private List<TableViewWithAccessCondition> conditionTables;
     private TableView<AccessPatternConditionProperty> selectedTable;
     private AccessPatternConditionProperty selectedProperty;
 
@@ -396,7 +396,7 @@ public class PatternsFormController {
     /**
      * Saves the changes to the database.
      */
-    public void saveChanges() {
+    public void saveChanges(ActionEvent event) {
 
         // replace the useCaseId and the description with the text field values
         this.accessPattern.setUsecaseId(this.useCaseIdInput.getText());
@@ -410,15 +410,26 @@ public class PatternsFormController {
         if (this.conditionTypeInput.getSelectionModel().getSelectedItem().equals("Condition")) {
 
             // copy conditions to the list
-            for (TableView<AccessPatternConditionProperty> condTable : conditionTables) {
+            for (TableViewWithAccessCondition tableViewWithAccessCondition : conditionTables) {
 
                 // add table if it is not empty
-                if (condTable.getItems() != null && condTable.getItems().size() != 0) {
+                if (tableViewWithAccessCondition.getTableView().getItems() != null && tableViewWithAccessCondition.getTableView().getItems().size() != 0) {
 
                     AccessPatternCondition patternCondition = new AccessPatternCondition();
                     AccessCondition accessCondition = new AccessCondition();
 
-                    patternCondition.setProperties(condTable.getItems());
+                    // set patternCondition Id
+                    if (tableViewWithAccessCondition.getAccessCondition().getPatternCondition() != null) {
+                        patternCondition.setId(tableViewWithAccessCondition.getAccessCondition().getPatternCondition().getId());
+                    }
+
+                    // set accessCondition Id
+                    accessCondition.setId(tableViewWithAccessCondition.getAccessCondition().getId());
+
+                    // add properties to patternCondition
+                    patternCondition.setProperties(tableViewWithAccessCondition.getTableView().getItems());
+
+                    // add patternConditon to accessCondition
                     accessCondition.setPatternCondition(patternCondition);
 
                     newConditions.add(accessCondition);
@@ -440,13 +451,17 @@ public class PatternsFormController {
         // add the list to the AccessPattern
         this.accessPattern.setConditions(newConditions);
 
+        // save the pattern to the database
         try {
+
             // new pattern, id is null
             if (accessPattern.getId() == null) {
                 AppComponents.getDbContext().createPattern(accessPattern);
             } else {
                 AppComponents.getDbContext().updatePattern(accessPattern);
             }
+
+            close(event);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -521,7 +536,7 @@ public class PatternsFormController {
         conditionTable.getColumns().addAll(authObject, authObjectProperty, value1, value2, value3, value4, deleteColumn);
 
         // table to all tables
-        this.conditionTables.add(conditionTable);
+        this.conditionTables.add(new TableViewWithAccessCondition(conditionTable, condition));
 
         // add entries to the table
         if (condition.getPatternCondition() != null) {
@@ -597,6 +612,37 @@ public class PatternsFormController {
 
             this.selectedTable.refresh();
 
+        }
+    }
+
+
+    /**
+     *  Stores a TableView and an AccessCondition which is needed for updating a pattern correctly.
+     */
+    public class TableViewWithAccessCondition {
+
+        private TableView<AccessPatternConditionProperty> tableView;
+        private AccessCondition accessCondition;
+
+        public TableViewWithAccessCondition(TableView<AccessPatternConditionProperty> tableView, AccessCondition accessCondition) {
+            this.tableView = tableView;
+            this.accessCondition = accessCondition;
+        }
+
+        public TableView<AccessPatternConditionProperty> getTableView() {
+            return tableView;
+        }
+
+        public void setTableView(TableView<AccessPatternConditionProperty> tableView) {
+            this.tableView = tableView;
+        }
+
+        public AccessCondition getAccessCondition() {
+            return accessCondition;
+        }
+
+        public void setAccessCondition(AccessCondition accessCondition) {
+            this.accessCondition = accessCondition;
         }
     }
 }
