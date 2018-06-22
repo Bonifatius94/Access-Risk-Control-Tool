@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ui.custom.controls.StatusBarController" styleClass="status-bar">
+    <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+        <Label fx:id="loggedInUserLabel" text="PETER_HANS - Admin"/>
+    </HBox>
+    <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT" spacing="20">
+        <Label>
+            <tooltip>
+                <Tooltip text="%databaseConnectionActive"/>
+            </tooltip>
+            <graphic>
+                <MaterialDesignIconView glyphName="ACCESS_POINT" size="20" styleClass="database-icon"/>
+            </graphic>
+        </Label>
+        <Label onMouseClicked="#openAboutView" style="-fx-cursor: hand">
+            <tooltip>
+                <Tooltip text="%about"/>
+            </tooltip>
+            <graphic>
+                <MaterialDesignIconView glyphName="HELP_CIRCLE" size="20"/>
+            </graphic>
+        </Label>
+    </HBox>
+</HBox>

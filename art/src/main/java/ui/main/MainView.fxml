@@ -27,4 +27,5 @@
             <fx:include source="whitelists/WhitelistsView.fxml" />
         </Tab>
     </JFXTabPane>
+    <fx:include source="../custom/controls/StatusBarView.fxml"/>
 </CustomWindow>

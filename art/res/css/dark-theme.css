@@ -476,3 +476,19 @@ alternative design with separators left and right of complete header bar
     -fx-font-size: 110%;
     -fx-line-spacing: 2;
 }
+
+
+/*******************************************************************************
+ *                                                                             *
+ * StatusBar Styling                                                           *
+ *                                                                             *
+ ******************************************************************************/
+
+.status-bar {
+    -fx-padding: 10;
+    -fx-background-color: derive(-fx-background, -30%);
+}
+
+.status-bar .database-icon {
+    -fx-fill: -fx-success;
+}
