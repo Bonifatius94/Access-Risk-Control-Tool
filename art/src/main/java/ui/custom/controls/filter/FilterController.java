@@ -57,7 +57,7 @@ public class FilterController {
         showArchivedProperty.bind(showArchivedToggle.selectedProperty());
         shouldFilterProperty.bind(applyFilterButton.pressedProperty());
 
-       // startDate binding
+        // startDate binding
         startDatePicker.valueProperty().addListener((ol, oldValue, newValue) -> {
 
             // startDate not after endDate

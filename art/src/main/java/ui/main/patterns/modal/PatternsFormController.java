@@ -303,6 +303,7 @@ public class PatternsFormController {
 
     /**
      * Hides the stage.
+     *
      * @param event the given ActionEvent
      */
     public void close(ActionEvent event) {
