@@ -1,4 +1,4 @@
-package ui.custom.controls;
+package ui.main.statusbar;
 
 import data.entities.DbUser;
 
@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 
 import ui.App;
 import ui.AppComponents;
+import ui.custom.controls.CustomWindow;
 
 
 public class StatusBarController {
@@ -41,7 +42,7 @@ public class StatusBarController {
         try {
             // load the AboutView
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../main/about/AboutView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ui/main/about/AboutView.fxml"), bundle);
             CustomWindow window = loader.load();
 
             // build the scene and add it to the stage
