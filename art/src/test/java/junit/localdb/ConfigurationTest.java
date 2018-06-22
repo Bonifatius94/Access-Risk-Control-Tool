@@ -170,7 +170,6 @@ public class ConfigurationTest {
     }
 
     @Test
-    @Disabled
     public void testDeleteConfigurationWithArchiving() {
 
         boolean ret = false;
@@ -178,26 +177,18 @@ public class ConfigurationTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query config
-            Configuration activeConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
             Configuration archivedConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
 
-            // apply changes to configs
-            AccessPattern patternToRemove = activeConfig.getPatterns().stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
-            activeConfig.getPatterns().remove(patternToRemove);
+            // delete config
+            context.deleteConfig(archivedConfig);
 
-            final String newName = "a new name";
-            final String newDescription = "a new description";
-            activeConfig.setName(newName);
-            activeConfig.setDescription(newDescription);
-
-            // update configs
-            context.updateConfig(activeConfig);
-            context.updateConfig(archivedConfig);
+            //test to see if the config is deleted
+            ret = !context.getConfigs(true).stream().anyMatch(x -> x.equals(archivedConfig));
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        assert (false);
+        assert (ret);
     }
 }
