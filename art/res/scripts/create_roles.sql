@@ -5,11 +5,7 @@ CREATE ROLE DataAnalyst;
 CREATE ROLE Viewer;
 
 -- grant privileges to admin role
-GRANT ALL ON DbUsers TO Admin;
-REVOKE ALL ON DbUsers FROM PUBLIC;
-
--- the admin account should only manage database accounts, so he just needs to have the admin flag set
--- therefore no more privileges are required
+GRANT SELECT ON DbUsers TO Admin;
 
 -- grant privileges to data analyst role
 GRANT ALL ON CriticalAccessQueries TO DataAnalyst;
@@ -24,10 +20,11 @@ GRANT ALL ON AccessPatternConditions TO DataAnalyst;
 GRANT ALL ON AccessProfileConditions TO DataAnalyst;
 GRANT ALL ON AccessPatternConditionProperties TO DataAnalyst;
 GRANT ALL ON SapConfigurations TO DataAnalyst;
+GRANT SELECT ON DbUsers TO DataAnalyst;
 
 -- grant privileges to viewer role
-GRANT SELECT ON CriticalAccessQueries TO Viewer;
-GRANT SELECT ON CriticalAccessEntries TO Viewer;
+GRANT ALL ON CriticalAccessQueries TO Viewer;
+GRANT ALL ON CriticalAccessEntries TO Viewer;
 GRANT SELECT ON Whitelists TO Viewer;
 GRANT SELECT ON WhitelistEntries TO Viewer;
 GRANT SELECT ON Configurations TO Viewer;
@@ -38,6 +35,7 @@ GRANT SELECT ON AccessPatternConditions TO Viewer;
 GRANT SELECT ON AccessProfileConditions TO Viewer;
 GRANT SELECT ON AccessPatternConditionProperties TO Viewer;
 GRANT SELECT ON SapConfigurations TO Viewer;
+GRANT SELECT ON DbUsers TO Viewer;
 
 -- remove privileges for public role (only registered users can access data)
 REVOKE ALL ON CriticalAccessQueries FROM PUBLIC;
@@ -52,3 +50,4 @@ REVOKE ALL ON AccessPatternConditions FROM PUBLIC;
 REVOKE ALL ON AccessProfileConditions FROM PUBLIC;
 REVOKE ALL ON AccessPatternConditionProperties FROM PUBLIC;
 REVOKE ALL ON SapConfigurations FROM PUBLIC;
+REVOKE ALL ON DbUsers FROM PUBLIC;
