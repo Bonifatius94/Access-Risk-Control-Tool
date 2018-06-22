@@ -42,7 +42,7 @@ public class StatusBarController {
         try {
             // load the AboutView
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ui/main/about/AboutView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../about/AboutView.fxml"), bundle);
             CustomWindow window = loader.load();
 
             // build the scene and add it to the stage
