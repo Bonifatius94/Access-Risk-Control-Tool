@@ -2,6 +2,8 @@ package junit.localdb;
 
 import data.entities.AccessPattern;
 import data.entities.Configuration;
+import data.entities.CriticalAccessQuery;
+import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 import data.localdb.ArtDbContext;
 
@@ -83,7 +85,6 @@ public class ConfigurationTest {
     }
 
     @Test
-    @Disabled
     public void testUpdateConfiguration() {
 
         boolean ret = false;
@@ -92,9 +93,8 @@ public class ConfigurationTest {
 
             // query config
             Configuration activeConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
-            Configuration archivedConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
 
-            // apply changes to configs
+            // apply changes to config
             AccessPattern patternToRemove = activeConfig.getPatterns().stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
             activeConfig.getPatterns().remove(patternToRemove);
 
@@ -105,7 +105,10 @@ public class ConfigurationTest {
 
             // update configs
             context.updateConfig(activeConfig);
-            context.updateConfig(archivedConfig);
+
+            // test to see if the update worked
+            Configuration testconfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
+            ret = !testconfig.getPatterns().stream().anyMatch(x -> x.getId().equals(new Integer(3)));
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -178,13 +181,29 @@ public class ConfigurationTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query config
+            Configuration activeConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
             Configuration archivedConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
 
+            // use activeConfig in query
+            // get  sapconfiguration
+            SapConfiguration sapconfig = context.getSapConfigs(false).stream().findFirst().get();
+
+            // create the query
+            CriticalAccessQuery query = new CriticalAccessQuery();
+            query.setConfig(activeConfig);
+            query.setSapConfig(sapconfig);
+            String author = "querytest";
+            query.setCreatedBy(author);
+
+            // insert query into database
+            context.createSapQuery(query);
+
             // delete config
+            context.deleteConfig(activeConfig);
             context.deleteConfig(archivedConfig);
 
-            //test to see if the config is deleted
-            ret = !context.getConfigs(true).stream().anyMatch(x -> x.equals(archivedConfig));
+            //test to see if the config was deleted correct
+            ret = !context.getConfigs(true).stream().anyMatch(x -> x.getId().equals(new Integer(1)));
 
         } catch (Exception ex) {
             ex.printStackTrace();
