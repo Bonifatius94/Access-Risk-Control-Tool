@@ -16,6 +16,7 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -287,7 +288,7 @@ public class PatternsFormController {
             if (pattern.getConditions().stream().findFirst().get().getProfileCondition() == null) {
                 this.conditionTypeInput.getSelectionModel().select("Condition");
 
-                for (AccessCondition condition : pattern.getConditions()) {
+                for (AccessCondition condition : pattern.getConditions().stream().sorted(Comparator.comparing(AccessCondition::getId)).collect(Collectors.toList())) {
                     addConditionTableTab(condition);
                 }
 
@@ -383,17 +384,6 @@ public class PatternsFormController {
     }
 
     /**
-     * Resets the form.
-     */
-    public void resetForm() {
-        this.conditionTabs.getTabs().clear();
-
-        this.giveSelectedAccessPattern(this.originalPattern);
-
-        this.validateInputs();
-    }
-
-    /**
      * Validates the main inputs once (e.g to remove errors).
      */
     private void validateInputs() {
@@ -405,7 +395,7 @@ public class PatternsFormController {
     /**
      * Saves the changes to the database.
      */
-    public void saveChanges(ActionEvent event) {
+    public void saveChanges(ActionEvent event) throws Exception {
 
         // replace the useCaseId and the description with the text field values
         this.accessPattern.setUsecaseId(this.useCaseIdInput.getText());
@@ -478,21 +468,18 @@ public class PatternsFormController {
         }
 
         // save the pattern to the database
-        try {
 
-            // new pattern, id is null
-            if (accessPattern.getId() == null) {
-                AppComponents.getDbContext().createPattern(accessPattern);
-            } else {
-                AppComponents.getDbContext().updatePattern(accessPattern);
-            }
-
-            // refresh the patternsTable in the parentController
-            parentController.updatePatternsTable();
-            close(event);
-        } catch (Exception e) {
-            e.printStackTrace();
+        // new pattern, id is null
+        if (accessPattern.getId() == null) {
+            AppComponents.getDbContext().createPattern(accessPattern);
+        } else {
+            AppComponents.getDbContext().updatePattern(accessPattern);
         }
+
+        // refresh the patternsTable in the parentController
+        parentController.updatePatternsTable();
+        close(event);
+
     }
 
     /**
@@ -651,7 +638,7 @@ public class PatternsFormController {
 
 
     /**
-     *  Stores a TableView and an AccessCondition which is needed for updating a pattern correctly.
+     * Stores a TableView and an AccessCondition which is needed for updating a pattern correctly.
      */
     public class TableViewWithAccessCondition {
 
@@ -682,6 +669,7 @@ public class PatternsFormController {
 
     /**
      * Sets the parent controller.
+     *
      * @param parentController the parent controller
      */
     public void setParentController(PatternsController parentController) {

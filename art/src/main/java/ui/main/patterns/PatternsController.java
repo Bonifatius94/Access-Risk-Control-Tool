@@ -68,7 +68,7 @@ public class PatternsController {
      * Initializes the controller.
      */
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
 
         // load the ResourceBundle
         bundle = ResourceBundle.getBundle("lang");
@@ -79,34 +79,31 @@ public class PatternsController {
         // check if the filters are applied
         filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
             if (newValue) {
-                updatePatternsTable();
+                try {
+                    updatePatternsTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
         // fill table with all entries from the database
         updatePatternsTable();
-
-
     }
 
     /**
      * Updates the patternsTable items from the database, taking filters into account.
      */
-    public void updatePatternsTable() {
+    public void updatePatternsTable() throws Exception {
 
-        try {
+        List<AccessPattern> patterns = AppComponents.getDbContext().getFilteredPatterns(filterController.showArchivedProperty.getValue(),
+            filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
+            filterController.endDateProperty.getValue(), 0);
+        ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
 
-            List<AccessPattern> patterns = AppComponents.getDbContext().getFilteredPatterns(filterController.showArchivedProperty.getValue(),
-                filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
-                filterController.endDateProperty.getValue(), 0);
-            ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
+        patternsTable.setItems(list);
+        patternsTable.refresh();
 
-            patternsTable.setItems(list);
-            patternsTable.refresh();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
 
@@ -160,6 +157,7 @@ public class PatternsController {
         deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPattern accessPattern) -> {
             try {
                 AppComponents.getDbContext().deletePattern(accessPattern);
+                updatePatternsTable();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -290,9 +288,13 @@ public class PatternsController {
     /**
      * Clones the selected entry and adds it to the table.
      */
-    public void cloneAction() {
+    public void cloneAction() throws Exception {
         if (patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
-            // TODO clone item and save the clone to the database
+            AccessPattern clonedPattern = new AccessPattern(patternsTable.getSelectionModel().getSelectedItem());
+
+            AppComponents.getDbContext().createPattern(clonedPattern);
+
+            updatePatternsTable();
         }
     }
 
@@ -308,19 +310,12 @@ public class PatternsController {
     /**
      * Deletes the item from the table.
      */
-    public void deleteAction() {
+    public void deleteAction() throws Exception {
         if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
 
-            try {
-
-                for (AccessPattern pattern : patternsTable.getSelectionModel().getSelectedItems()) {
-                    AppComponents.getDbContext().deletePattern(pattern);
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
+            for (AccessPattern pattern : patternsTable.getSelectionModel().getSelectedItems()) {
+                AppComponents.getDbContext().deletePattern(pattern);
             }
-
             updatePatternsTable();
         }
     }
