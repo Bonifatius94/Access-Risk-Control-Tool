@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -143,7 +144,7 @@ public class PatternsFormController {
 
         // don't allow less than 1 tab
         deleteSelectedTableTabButton.disableProperty().bind(Bindings.size(conditionTabs.getTabs()).isEqualTo(1));
-        atLeastOneCondWarning.visibleProperty().bind(Bindings.size(conditionTabs.getTabs()).isEqualTo(1));
+        atLeastOneCondWarning.visibleProperty().bind(Bindings.and(Bindings.size(conditionTabs.getTabs()).isEqualTo(1), Bindings.not(editConditionBox.disableProperty())));
 
         // initialize condition type combo box component
         initializeConditionTypeComboBox();
@@ -153,7 +154,6 @@ public class PatternsFormController {
 
         // initialize linkage type combo box component
         initializeLinkageInput();
-
     }
 
     /**
@@ -162,7 +162,7 @@ public class PatternsFormController {
     public void initializeLinkageInput() {
         linkageInput.getItems().setAll(ConditionLinkage.None, ConditionLinkage.And, ConditionLinkage.Or);
 
-        linkageInput.getSelectionModel().selectedItemProperty().addListener((ChangeListener<ConditionLinkage>) (selected, oldValue, newValue) -> {
+        linkageInput.getSelectionModel().selectedItemProperty().addListener((selected, oldValue, newValue) -> {
             if (newValue == ConditionLinkage.None) {
                 conditionTabs.getTabs().clear();
                 this.conditionTables.clear();
@@ -171,12 +171,10 @@ public class PatternsFormController {
                 } else {
                     addConditionTableTab(new AccessCondition());
                 }
-                this.editConditionBox.managedProperty().unbind();
-                this.editConditionBox.visibleProperty().unbind();
-                this.editConditionBox.setVisible(false);
+                this.editConditionBox.disableProperty().unbind();
+                this.editConditionBox.setDisable(true);
             } else {
-                this.editConditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
-                this.editConditionBox.visibleProperty().bind(this.conditionBox.visibleProperty());
+                this.editConditionBox.disableProperty().bind(this.conditionBox.disableProperty());
             }
         });
     }
@@ -269,6 +267,12 @@ public class PatternsFormController {
 
         if (pattern == null) {
             this.accessPattern = new AccessPattern();
+
+            // add one tab for correct display
+            addConditionTableTab(new AccessCondition());
+
+            // disable condition box
+            this.conditionBox.setDisable(true);
         } else {
 
             // prefill the inputs
@@ -289,6 +293,9 @@ public class PatternsFormController {
                 this.linkageInput.getSelectionModel().select(pattern.getLinkage());
             } else {
                 this.conditionTypeInput.getSelectionModel().select("Profile");
+
+                // add one tab for correct display
+                addConditionTableTab(new AccessCondition());
 
                 // disable condition box
                 this.conditionBox.setDisable(true);
@@ -368,7 +375,7 @@ public class PatternsFormController {
         // rename tabs after deleting so no numbers are left out
         int i = 0;
         for (Tab tab : this.conditionTabs.getTabs()) {
-            tab.setText("Condition " + ++i);
+            tab.setText("COND " + ++i);
         }
 
     }

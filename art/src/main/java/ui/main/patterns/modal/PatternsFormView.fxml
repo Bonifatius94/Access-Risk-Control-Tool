@@ -58,7 +58,7 @@
         <HBox HBox.hgrow="ALWAYS" fx:id="conditionBox" spacing="30" alignment="CENTER">
             <JFXTabPane fx:id="conditionTabs" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"/>
             <VBox spacing="20" alignment="TOP_CENTER">
-                <HBox fx:id="editConditionBox" visible="false" alignment="BASELINE_LEFT" spacing="20">
+                <HBox fx:id="editConditionBox" alignment="BASELINE_LEFT" spacing="20">
                     <JFXButton onAction="#addEmptyConditionTableTab" prefHeight="30" styleClass="round-button">
                         <graphic>
                             <MaterialDesignIconView glyphName="PLUS"/>
