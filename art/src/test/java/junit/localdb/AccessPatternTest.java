@@ -238,6 +238,56 @@ public class AccessPatternTest {
 
             // query patterns
             List<AccessPattern> patterns = context.getPatterns(false);
+            AccessPattern pattern = patterns.stream().filter(x -> x.getId().equals(2)).findFirst().get();
+            Integer patternId = pattern.getId();
+
+            // apply changes to conditions
+            List<AccessCondition> patternConditions = new ArrayList<>(pattern.getConditions());
+            AccessCondition conditionToDelete = patternConditions.stream().filter(x -> x.getId().equals(3)).findFirst().get();
+            AccessCondition conditionToUpdate = patternConditions.stream().filter(x -> x.getId().equals(2)).findFirst().get();
+            patternConditions.remove(conditionToDelete);
+            AccessPatternConditionProperty propertyToUpdate = conditionToUpdate.getPatternCondition().getProperties().stream().filter(x -> x.getId().equals(1)).findFirst().get();
+            AccessPatternConditionProperty propertyToDelete = conditionToUpdate.getPatternCondition().getProperties().stream().filter(x -> x.getId().equals(2)).findFirst().get();
+            final String newValue4 = "foobar";
+            propertyToUpdate.setValue4(newValue4);
+            conditionToUpdate.getPatternCondition().getProperties().remove(propertyToDelete);
+            pattern.setConditions(patternConditions);
+            Integer conditionId = conditionToUpdate.getId();
+
+            // update database
+            context.updatePattern(pattern);
+
+            // query data again
+            patterns = context.getPatterns(false);
+            pattern = patterns.stream().filter(x -> x.getId().equals(patternId)).findFirst().get();
+
+            // check if test data was queried successfully
+            ret = patterns.size() == 3
+                && pattern.getConditions().size() == 1
+                && pattern.getConditions().stream().anyMatch(x ->
+                x.getId().equals(conditionId)
+                    && x.getPatternCondition().getProperties().stream().anyMatch(y -> y.getId().equals(propertyToUpdate.getId()) && newValue4.equals(y.getValue4()))
+                    && x.getPatternCondition().getProperties().stream().noneMatch(y -> y.getId().equals(propertyToDelete.getId()))
+            );
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        // TODO: add another test for evaluating archiving logic on update
+
+        assert(ret);
+    }
+
+    /*@Test
+    public void testUpdatePatternWithPatternCondition() {
+
+        boolean ret = false;
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // query patterns
+            List<AccessPattern> patterns = context.getPatterns(false);
             AccessPattern pattern = patterns.stream().filter(x -> x.getConditions().size() == 2).findFirst().get();
             Integer patternId = pattern.getId();
 
@@ -274,7 +324,7 @@ public class AccessPatternTest {
         // TODO: add another test for evaluating archiving logic on update
 
         assert(ret);
-    }
+    }*/
 
     @Test
     public void testUpdatePatternWithPatternConditionWithArchiving() {
