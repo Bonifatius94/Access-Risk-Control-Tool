@@ -3,16 +3,17 @@ package ui.main.sapsettings;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import data.entities.SapConfiguration;
-import javafx.event.ActionEvent;
+import data.localdb.ArtDbContext;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+
 import sap.ISapConnector;
 import sap.SapConnector;
+import ui.AppComponents;
 import ui.custom.controls.CustomAlert;
 
 public class SapSettingsEditDialogController {
-
 
     public JFXTextField hostServerField;
 
@@ -28,71 +29,73 @@ public class SapSettingsEditDialogController {
     private SapConfiguration sapConfig;
     private SapConfiguration oldsapConfig;
 
+    ArtDbContext database = AppComponents.getDbContext();
+
+
     /**
      * Initializes the view.
      */
     @FXML
     @SuppressWarnings("all")
     public void initialize() {
-
-        jcoClientField.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
-                jcoClientField.validate();
-            }
-        });
-        sysNrField.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
-                sysNrField.validate();
-            }
-        });
-        hostServerField.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
-                hostServerField.validate();
-            }
-        });
-        passwordField.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
-                passwordField.validate();
-            }
-        });
+        startValidation();
 
     }
 
     /**
      * Saves the currently edited connection.
      */
+    @FXML
     public void saveConnection() {
-        //TODO: test if input is valid
 
-        if (hostServerField.getText().equals("")) {
-            CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "WARNING No Host Server", "If you want to save SAP Configuration/n you need to set a valid Host server", "Ok", "Cancel");
-            if (alert.showAndWait().get() == ButtonType.OK) {
-                System.out.println("ok");
-            }
-        } else if (sysNrField.getText().equals("")) {
-            CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "WARNING No Sys Nr", "If you want to save SAP Configuration/n you need to set a valid Sys NR", "OK", "Cancel");
-            if (alert.showAndWait().get() == ButtonType.OK) {
-                System.out.println("ok");
-            }
-        } else if (jcoClientField.getText().equals("")) {
-            CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "WARNING No JCO Client", "If you want to save SAP Configuration/n you need to set a valid JCO Client", "OK", "Cancel");
-            if (alert.showAndWait().get() == ButtonType.OK) {
-                System.out.println("ok");
-            }
-        } else if (userNameField.getText().equals("")) {
-            CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "WARNING No JCO Language", "If you want to save SAP Configuration/n you need to set a valid JCO Language", "OK", "Cancel");
-            if (alert.showAndWait().get() == ButtonType.OK) {
-                System.out.println("ok");
-            }
+        if (checkTextFieldsWithUsername()) {
+            CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "WARNING Some Input missing",
+                "If you want to save SAP Configuration/n you need Valid input in each of those Textfields", "Ok", "Cancel");
+            alert.showAndWait();
         } else {
-            //TODO: Save changes
             this.sapConfig.setDescription(descriptionField.getText());
             this.sapConfig.setSysNr(sysNrField.getText());
             this.sapConfig.setServerDestination(hostServerField.getText());
             this.sapConfig.setClient(jcoClientField.getText());
-            SapSettingsController sapSettingsController = null;
-            sapSettingsController.giveSavedSapSettings(this.sapConfig);
+            try {
+                if (this.sapConfig.isArchived()) {
+                    database.createSapConfig(this.sapConfig);
+
+                } else {
+                    database.updateSapConfig(this.sapConfig);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    /**
+     * Checks if the all Edit Window textfields are filled.
+     *
+     * @return false if any textfield is empty, everytime else it returns true.
+     */
+    private Boolean checkTextFieldsWithPasswordAndUsername() {
+        return (hostServerField.getText().equals("") || sysNrField.getText().equals("") || jcoClientField.getText().equals("") || userNameField.getText().equals("")
+            || passwordField.getText().equals(""));
+    }
+
+    /**
+     * Checks if the all Edit Window textfields are filled.
+     *
+     * @return false if any(except password and username) textfield is empty, everytime else it returns true.
+     */
+    private Boolean checkTextFields() {
+        return hostServerField.getText().equals("") || sysNrField.getText().equals("") || jcoClientField.getText().equals("");
+    }
+
+    /**
+     * Checks if the all Edit Window textfields are filled.
+     *
+     * @return false if any(except password) textfield is empty, everytime else it returns true.
+     */
+    private Boolean checkTextFieldsWithUsername() {
+        return hostServerField.getText().equals("") || sysNrField.getText().equals("") || jcoClientField.getText().equals("") || userNameField.getText().equals("");
     }
 
     /**
@@ -101,10 +104,12 @@ public class SapSettingsEditDialogController {
     public void connect() {
         try {
             //further Testing
-            ISapConnector sapConnector = new SapConnector(this.sapConfig, userNameField.getText(), passwordField.getText());
-            Boolean pingServer = sapConnector.canPingServer();
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, "Ping was start", "Connection Status: " + pingServer);
-            customAlert.showAndWait();
+            if (checkTextFieldsWithPasswordAndUsername()) {
+                ISapConnector sapConnector = new SapConnector(this.sapConfig, userNameField.getText(), passwordField.getText());
+                Boolean pingServer = sapConnector.canPingServer();
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, "Server Test Connection", "Connection Status: " + pingServer);
+                customAlert.showAndWait();
+            }
         } catch (Exception e) {
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "SAP Connection Error", "Connection Status: Failed");
             customAlert.showAndWait();
@@ -141,8 +146,42 @@ public class SapSettingsEditDialogController {
 
     }
 
+    /**
+     * reverts all changes of the SAP Configuration.
+     */
     public void revertChanges() {
         this.sapConfig = oldsapConfig;
-        //TODO: further implementation
+        hostServerField.setText(sapConfig.getServerDestination());
+        sysNrField.setText(sapConfig.getSysNr());
+        jcoClientField.setText(sapConfig.getClient());
+        descriptionField.setText(sapConfig.getDescription());
+
+        //TODO: still missing somethings??
+    }
+
+    /**
+     * starts validation of all Textfield.
+     */
+    private void startValidation() {
+        jcoClientField.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                jcoClientField.validate();
+            }
+        });
+        sysNrField.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                sysNrField.validate();
+            }
+        });
+        hostServerField.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                hostServerField.validate();
+            }
+        });
+        passwordField.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                passwordField.validate();
+            }
+        });
     }
 }
