@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 
+import data.localdb.ArtDbContext;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import io.msoffice.excel.WhitelistImportHelper;
 
@@ -31,6 +32,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import ui.App;
+import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
@@ -50,7 +52,7 @@ public class WhitelistsController {
     @SuppressWarnings("all")
     private PTableColumn<Whitelist, Set<WhitelistEntry>> entryCountColumn;
 
-    // private IArtDbContext database = new ArtDbContext("Test", "Test");
+    ArtDbContext database = AppComponents.getDbContext();
     //private Boolean includeArchivedData = true;
 
     /**
@@ -69,17 +71,17 @@ public class WhitelistsController {
             whitelist1.setDescription("test");
             whitelist1.setArchived(true);
             whitelist1.setName("bla");
-            //database.createWhitelist(whitelist1);
+            database.createWhitelist(whitelist1);
             whitelist1.setDescription("test2");
             whitelist1.setArchived(true);
-            //database.createWhitelist(whitelist1);
+            database.createWhitelist(whitelist1);
 
             whitelist1.setCreatedAt(ZonedDateTime.now());
             whitelist1.setId(2);
             whitelist1.setArchived(true);
             whitelist1.setDescription("testWhitelist");
-            List<Whitelist> whitelistList = new ArrayList<>();
-            //whitelistList = database.getWhitelists(true);
+            List<Whitelist> whitelistList;
+            whitelistList = database.getWhitelists(true);
             List<Whitelist> whitelists = new ArrayList<>();
             whitelists.add(whitelist1);
             ObservableList<Whitelist> obs = FXCollections.observableArrayList(whitelistList);
@@ -89,7 +91,7 @@ public class WhitelistsController {
             ObservableList<Whitelist> observableList = FXCollections.observableArrayList(whitelists);
             whitelistTable.getItems().addAll(observableList);
             whitelistTable.refresh();
-            //tableRefresh();
+            tableRefresh();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -101,8 +103,12 @@ public class WhitelistsController {
     private void initializeColumns() {
 
         deleteWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (Whitelist whitelist) -> {
-
-            whitelistTable.getItems().remove(whitelist);
+            try {
+                database.deleteWhitelist(whitelist);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            tableRefresh();
             return whitelist;
         }));
         deleteWhitelistColumn.setSortable(false);
@@ -163,15 +169,10 @@ public class WhitelistsController {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("WhitelistEditDialogView.fxml"), bundle);
+            // give the dialog the
             WhitelistEditDialogController.giveSelectedWhitelist(whitelist);
             CustomWindow customWindow = loader.load();
-
             System.out.println(whitelist == null);
-
-
-            // give the dialog the
-
-            //Dimension dimension = giveScreenDimension();
 
             // build the scene and add it to the stage
             Scene scene = new Scene(customWindow, 900, 650);
@@ -201,13 +202,12 @@ public class WhitelistsController {
             if (customAlert.showAndWait().isPresent() && customAlert.showAndWait().get() == ButtonType.OK) {
                 whitelistTable.getItems().remove(whitelist);
                 //deletes whitelist from DB
-                //try {
-                //database.deleteWhitelist(whitelist);
-                //} catch (Exception e) {
-                //    e.printStackTrace();
-                //}
-                // tableRefresh();
-                whitelistTable.refresh();
+                try {
+                    database.deleteWhitelist(whitelist);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                tableRefresh();
             } else if (customAlert.showAndWait().isPresent() && customAlert.showAndWait().get() == ButtonType.CANCEL) {
                 customAlert.close();
             }
@@ -231,21 +231,18 @@ public class WhitelistsController {
     }
 
     /**
-     * clones a selected Whitelist. TODO: needs some additional checking( on ID and stuff).
+     * clones a selected Whitelist. TODO: needs some additional checking( on ID and stuff) eventually??.
      */
     @FXML
     void cloneWhitelist() {
         if (whitelistTable.getSelectionModel().getSelectedItem().equals(whitelistTable.getFocusModel().getFocusedItem())) {
             Whitelist whitelist = whitelistTable.getSelectionModel().getSelectedItem();
-            whitelistTable.getItems().add(whitelist);
-            //TODO save new Whitelist in database
-            /*try {
-                //database.createWhitelist(whitelist);
+            try {
+                database.createWhitelist(whitelist);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            //tableRefresh();*/
-            whitelistTable.refresh();
+            tableRefresh();
         }
     }
 
@@ -266,18 +263,8 @@ public class WhitelistsController {
                 WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
                 whitelist = whitelistImportHelper.importWhitelist(path);
 
-                //enfernen dies ist nur ein test TODO: entfernen
-                whitelist.setDescription("neue Whitelist");
-                whitelist.setId(5);
-                whitelist.setCreatedAt(ZonedDateTime.now());
-                List<Whitelist> whitelistList = new ArrayList<>();
-                whitelistList.add(whitelist);
-                whitelistTable.getItems().addAll(whitelistList);
-                //database.createWhitelist(whitelist);
-                ObservableList<Whitelist> observableList = FXCollections.observableArrayList(whitelistList);
-                whitelistTable.getItems().addAll(observableList);
-                whitelistTable.refresh();
-                //tableRefresh();
+                database.createWhitelist(whitelist);
+                tableRefresh();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -288,19 +275,20 @@ public class WhitelistsController {
             customAlert.showAndWait();
         }
     }
+
     //TODO: reaktivate if database is ready
-    /* void tableRefresh() {
+    private void tableRefresh() {
 
         whitelistTable.getItems().clear();
         List<Whitelist> whitelists = null;
         try {
-            //whitelists = database.getWhitelists(includeArchivedData);
+            whitelists = database.getWhitelists(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
         ObservableList<Whitelist> observableList = FXCollections.observableArrayList(whitelists);
         whitelistTable.getItems().addAll(observableList);
         whitelistTable.refresh();
-    }*/
+    }
 }
 
