@@ -7,7 +7,6 @@ import data.entities.AccessPattern;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
-import io.msoffice.excel.AccessPatternImportHelper;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -30,6 +29,7 @@ import javafx.scene.control.Tooltip;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
+import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.filter.FilterController;
@@ -51,6 +51,9 @@ public class PatternsController {
     public TableColumn<AccessPattern, JFXButton> editColumn;
 
     @FXML
+    public TableColumn<AccessPattern, Set<AccessCondition>> conditionTypeColumn;
+
+    @FXML
     public Label itemCount;
 
     @FXML
@@ -62,7 +65,7 @@ public class PatternsController {
      * Initializes the controller.
      */
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
 
         // load the ResourceBundle
         bundle = ResourceBundle.getBundle("lang");
@@ -73,15 +76,32 @@ public class PatternsController {
         // check if the filters are applied
         filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
             if (newValue) {
-                System.out.println(filterController.searchStringProperty.getValue());
-                System.out.println(filterController.startDateProperty.getValue());
-                System.out.println(filterController.endDateProperty.getValue());
-                System.out.println(filterController.showArchivedProperty.getValue());
+                try {
+                    updatePatternsTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
-        // fill in table data
-        fillPatternsTable();
+        // fill table with all entries from the database
+        updatePatternsTable();
+    }
+
+    /**
+     * Updates the patternsTable items from the database, taking filters into account.
+     */
+    public void updatePatternsTable() throws Exception {
+
+        List<AccessPattern> patterns = AppComponents.getDbContext().getFilteredPatterns(filterController.showArchivedProperty.getValue(),
+            filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
+            filterController.endDateProperty.getValue(), 0);
+        ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
+
+        patternsTable.setItems(list);
+        patternsTable.refresh();
+
+
     }
 
     /**
@@ -129,9 +149,15 @@ public class PatternsController {
      * Initializes the table columns that need extra content.
      */
     private void initializeTableColumns() {
+
         // Add the delete column
         deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPattern accessPattern) -> {
-            patternsTable.getItems().remove(accessPattern);
+            try {
+                AppComponents.getDbContext().deletePattern(accessPattern);
+                updatePatternsTable();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return accessPattern;
         }));
 
@@ -141,6 +167,17 @@ public class PatternsController {
             return accessPattern;
         }));
 
+        initializeConditionCountColumn();
+
+        initializeConditionTypeColumn();
+
+    }
+
+
+    /**
+     * Initialize the ConditionCountColumn so it displays the number of conditions of the AccessPattern.
+     */
+    private void initializeConditionCountColumn() {
         // overwrite the column in which the number of useCases is displayed
         conditionCountColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
 
@@ -159,6 +196,54 @@ public class PatternsController {
     }
 
     /**
+     * Initialize ConditionTypeColumn to show the type of the condition as an icon.
+     */
+    private void initializeConditionTypeColumn() {
+
+        // sets the icon of the condition to pattern or profile
+        conditionTypeColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
+
+            @Override
+            protected void updateItem(Set<AccessCondition> items, boolean empty) {
+
+                // display nothing if the row is empty, otherwise the item count
+                if (empty || items == null) {
+
+                    // nothing to display
+                    setText("");
+
+                } else {
+
+                    // add the icon
+                    MaterialDesignIconView iconView = new MaterialDesignIconView();
+                    iconView.setStyle("-fx-font-size: 1.6em");
+
+                    // wrapper label for showing a tooltip
+                    Label wrapper = new Label();
+                    wrapper.setGraphic(iconView);
+
+                    if (items.stream().findFirst().get().getProfileCondition() == null) {
+
+                        // pattern
+                        iconView.setIcon(MaterialDesignIcon.VIEW_GRID);
+                        wrapper.setTooltip(new Tooltip(bundle.getString("patternCondition")));
+
+                    } else {
+
+                        // profile
+                        iconView.setIcon(MaterialDesignIcon.ACCOUNT_BOX_OUTLINE);
+                        wrapper.setTooltip(new Tooltip(bundle.getString("profileCondition")));
+
+                    }
+
+                    setGraphic(wrapper);
+
+                }
+            }
+        });
+    }
+
+    /**
      * Opens a modal edit dialog for the selected AccessPattern.
      *
      * @param accessPattern the selected AccessPattern to edit, or null if a new one is created
@@ -171,7 +256,7 @@ public class PatternsController {
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 1050, 750);
+            Scene scene = new Scene(customWindow, 1200, 750);
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
@@ -191,6 +276,7 @@ public class PatternsController {
             // give the dialog the sapConfiguration
             PatternsFormController patternEdit = loader.getController();
             patternEdit.giveSelectedAccessPattern(accessPattern);
+            patternEdit.setParentController(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -199,18 +285,13 @@ public class PatternsController {
     /**
      * Clones the selected entry and adds it to the table.
      */
-    public void cloneAction() {
-        if (patternsTable.getSelectionModel().getSelectedItems().size() != 0 && patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
+    public void cloneAction() throws Exception {
+        if (patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
+            AccessPattern clonedPattern = new AccessPattern(patternsTable.getSelectionModel().getSelectedItem());
 
-            // clone the currently selected item and add it to the table
-            AccessPattern clonedPattern = patternsTable.getSelectionModel().getSelectedItem();
-            patternsTable.getItems().add(0, clonedPattern);
+            AppComponents.getDbContext().createPattern(clonedPattern);
 
-            // select the clone
-            patternsTable.getSelectionModel().clearSelection();
-            patternsTable.getSelectionModel().select(clonedPattern);
-            patternsTable.scrollTo(clonedPattern);
-            patternsTable.refresh();
+            updatePatternsTable();
         }
     }
 
@@ -226,12 +307,13 @@ public class PatternsController {
     /**
      * Deletes the item from the table.
      */
-    public void deleteAction() {
+    public void deleteAction() throws Exception {
         if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
 
-            // remove all selected items
-            patternsTable.getItems().removeAll(patternsTable.getSelectionModel().getSelectedItems());
-            patternsTable.refresh();
+            for (AccessPattern pattern : patternsTable.getSelectionModel().getSelectedItems()) {
+                AppComponents.getDbContext().deletePattern(pattern);
+            }
+            updatePatternsTable();
         }
     }
 
@@ -240,25 +322,5 @@ public class PatternsController {
      */
     public void addAction() {
         openAccessPatternForm(null);
-    }
-
-    /**
-     * Provides the data for the patternTable.
-     */
-    private void fillPatternsTable() {
-
-        // test the table with data from the Example - Zugriffsmuster.xlsx file
-        try {
-            AccessPatternImportHelper helper = new AccessPatternImportHelper();
-
-            List<AccessPattern> patterns = helper.importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
-            ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
-
-            patternsTable.setItems(list);
-            patternsTable.refresh();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

@@ -14,12 +14,17 @@
     <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
     <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable">
         <columns>
-            <PTableColumn text="UseCaseID" percentageWidth="0.15">
+            <PTableColumn text="?" fx:id="conditionTypeColumn" percentageWidth="0.06" resizable="false" >
+                <cellValueFactory>
+                    <PropertyValueFactory property="conditions"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%useCaseID" percentageWidth="0.17">
                 <cellValueFactory>
                     <PropertyValueFactory property="usecaseId"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="Description" percentageWidth="0.58" styleClass="align-left">
+            <PTableColumn text="%description" percentageWidth="0.51" styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="description"/>
                 </cellValueFactory>

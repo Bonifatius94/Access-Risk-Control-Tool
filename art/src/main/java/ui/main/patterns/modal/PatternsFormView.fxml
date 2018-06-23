@@ -21,7 +21,7 @@
 <CustomWindow windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
               xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.patterns.modal.PatternsFormController">
     <VBox spacing="20" HBox.hgrow="ALWAYS" style="-fx-padding: 20">
-        <VBox alignment="BASELINE_LEFT" spacing="40" HBox.hgrow="ALWAYS" style="-fx-padding: 0 0 10 0">
+        <VBox alignment="BASELINE_LEFT" spacing="40" HBox.hgrow="ALWAYS">
             <JFXTextField fx:id="useCaseIdInput" promptText="%useCaseID" maxWidth="250">
                 <validators>
                     <RequiredFieldValidator message="%required">
@@ -138,26 +138,17 @@
             </VBox>
         </HBox>
         <Separator/>
-        <HBox HBox.hgrow="ALWAYS">
-            <HBox alignment="BASELINE_LEFT" HBox.hgrow="ALWAYS">
-                <JFXButton fx:id="resetFormButton" text="%revert" onAction="#resetForm">
-                    <graphic>
-                        <MaterialDesignIconView glyphName="UNDO_VARIANT"/>
-                    </graphic>
-                </JFXButton>
-            </HBox>
-            <HBox spacing="20" alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS">
-                <JFXButton onAction="#saveChanges" prefWidth="120" text="%save">
-                    <graphic>
-                        <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
-                    </graphic>
-                </JFXButton>
-                <JFXButton onAction="#close" prefWidth="120" text="%cancel">
-                    <graphic>
-                        <MaterialDesignIconView glyphName="CLOSE"/>
-                    </graphic>
-                </JFXButton>
-            </HBox>
+        <HBox spacing="20" alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS">
+            <JFXButton onAction="#saveChanges" prefWidth="120" text="%save">
+                <graphic>
+                    <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
+                </graphic>
+            </JFXButton>
+            <JFXButton onAction="#close" prefWidth="120" text="%cancel">
+                <graphic>
+                    <MaterialDesignIconView glyphName="CLOSE"/>
+                </graphic>
+            </JFXButton>
         </HBox>
     </VBox>
 </CustomWindow>
