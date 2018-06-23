@@ -3,6 +3,8 @@ package ui.login.firstuse;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
+import data.entities.DbUser;
+import data.entities.DbUserRole;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
@@ -139,8 +141,22 @@ public class FirstUseWizardController {
      * Validates the inputs and advances to finish.
      */
     public void createUserAndGoToFinish() {
+
         if (validateBeforeCreate()) {
+
             if (AppComponents.tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
+
+                try {
+
+                    // give the first user the Admin user role
+                    DbUser currentUser = AppComponents.getDbContext().getCurrentUser();
+                    currentUser.addRole(DbUserRole.Admin);
+                    AppComponents.getDbContext().updateUserRoles(currentUser);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 welcomeBox.setVisible(false);
                 createUserBox.setVisible(false);
                 finishBox.setVisible(true);
@@ -155,21 +171,20 @@ public class FirstUseWizardController {
      */
     public void closeAndStartApp(ActionEvent event) {
         try {
+            // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../LoginView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../main/MainView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
+            Scene scene = new Scene(customWindow, 1050, 750);
             scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
+            App.primaryStage.setScene(scene);
+            App.primaryStage.setTitle(bundle.getString("art"));
+            customWindow.initStage(App.primaryStage);
 
             close(event);
-            stage.show();
+            App.primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
