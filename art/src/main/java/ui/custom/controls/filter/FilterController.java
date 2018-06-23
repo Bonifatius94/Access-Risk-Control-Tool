@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -31,7 +32,6 @@ public class FilterController {
 
     @FXML
     private JFXButton applyFilterButton;
-
 
     public SimpleObjectProperty<ZonedDateTime> startDateProperty;
     public SimpleObjectProperty<ZonedDateTime> endDateProperty;
@@ -66,7 +66,9 @@ public class FilterController {
                     startDatePicker.setValue(endDatePicker.getValue());
                 }
             }
-            startDateProperty.setValue(startDatePicker.getValue().atStartOfDay(ZoneOffset.UTC));
+            if (startDatePicker.getValue() != null) {
+                startDateProperty.setValue(startDatePicker.getValue().atStartOfDay(ZoneOffset.UTC));
+            }
         });
 
         // endDate binding
@@ -78,18 +80,25 @@ public class FilterController {
                     endDatePicker.setValue(startDatePicker.getValue());
                 }
             }
-            endDateProperty.setValue(endDatePicker.getValue().atStartOfDay(ZoneOffset.UTC));
+            if (endDatePicker.getValue() != null) {
+                endDateProperty.setValue(endDatePicker.getValue().atStartOfDay(ZoneOffset.UTC));
+            }
         });
 
     }
 
     /**
-     * Resets the filters completely.
+     * Resets the filters completely and lets the parent know that it should filter.
      */
     public void resetFilter() {
         searchStringInput.setText("");
         startDatePicker.setValue(null);
         endDatePicker.setValue(null);
         showArchivedToggle.selectedProperty().set(false);
+
+        shouldFilterProperty.unbind();
+        shouldFilterProperty.setValue(true);
+        shouldFilterProperty.setValue(false);
+        shouldFilterProperty.bind(applyFilterButton.pressedProperty());
     }
 }
