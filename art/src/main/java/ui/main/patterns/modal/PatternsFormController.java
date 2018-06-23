@@ -412,9 +412,6 @@ public class PatternsFormController {
         this.accessPattern.setDescription(this.descriptionInput.getText());
         this.accessPattern.setLinkage(linkageInput.getValue());
 
-        // store the condition in here
-        List<AccessCondition> newConditions = new ArrayList<>();
-
         // execute only if the pattern is no profile
         if (this.conditionTypeInput.getSelectionModel().getSelectedItem().equals("Condition")) {
 
@@ -424,24 +421,44 @@ public class PatternsFormController {
                 // add table if it is not empty
                 if (tableViewWithAccessCondition.getTableView().getItems() != null && tableViewWithAccessCondition.getTableView().getItems().size() != 0) {
 
-                    AccessPatternCondition patternCondition = new AccessPatternCondition();
-                    AccessCondition accessCondition = new AccessCondition();
+                    if (tableViewWithAccessCondition.getAccessCondition().getId() == null) {
 
-                    // set patternCondition Id
-                    if (tableViewWithAccessCondition.getAccessCondition().getPatternCondition() != null) {
-                        patternCondition.setId(tableViewWithAccessCondition.getAccessCondition().getPatternCondition().getId());
+                        AccessPatternCondition patternCondition = new AccessPatternCondition();
+                        AccessCondition accessCondition = new AccessCondition();
+
+                        // set patternCondition Id
+                        if (tableViewWithAccessCondition.getAccessCondition().getPatternCondition() != null) {
+                            patternCondition.setId(tableViewWithAccessCondition.getAccessCondition().getPatternCondition().getId());
+                        }
+
+                        // set accessCondition Id
+                        accessCondition.setId(tableViewWithAccessCondition.getAccessCondition().getId());
+
+                        // add properties to patternCondition
+                        patternCondition.setProperties(tableViewWithAccessCondition.getTableView().getItems());
+
+                        // add patternConditon to accessCondition
+                        accessCondition.setPatternCondition(patternCondition);
+
+                        accessPattern.getConditions().add(accessCondition);
+
+                    } else {
+
+                        AccessCondition accessCondition = tableViewWithAccessCondition.getAccessCondition();
+                        AccessPatternCondition patternCondition = tableViewWithAccessCondition.getAccessCondition().getPatternCondition();
+
+                        List<AccessPatternConditionProperty> properties = new ArrayList<>();
+                        properties.addAll(tableViewWithAccessCondition.getTableView().getItems());
+
+                        patternCondition.setProperties(properties);
+                        accessCondition.setPatternCondition(patternCondition);
                     }
 
-                    // set accessCondition Id
-                    accessCondition.setId(tableViewWithAccessCondition.getAccessCondition().getId());
+                } else {
 
-                    // add properties to patternCondition
-                    patternCondition.setProperties(tableViewWithAccessCondition.getTableView().getItems());
-
-                    // add patternConditon to accessCondition
-                    accessCondition.setPatternCondition(patternCondition);
-
-                    newConditions.add(accessCondition);
+                    if (tableViewWithAccessCondition.getAccessCondition().getId() != null) {
+                        accessPattern.getConditions().remove(tableViewWithAccessCondition.getAccessCondition());
+                    }
 
                 }
             }
@@ -454,13 +471,11 @@ public class PatternsFormController {
             profileCond.setProfile(this.profileInput.getText());
             accessCondition.setProfileCondition(profileCond);
 
-            newConditions.add(accessCondition);
+            List<AccessCondition> conditions = new ArrayList<>();
+            conditions.add(accessCondition);
+
+            accessPattern.setConditions(conditions);
         }
-
-        // add the list to the AccessPattern
-        accessPattern.setConditions(newConditions);
-
-        System.out.println(newConditions);
 
         // save the pattern to the database
         try {
@@ -535,6 +550,9 @@ public class PatternsFormController {
         deleteColumn.setPercentageWidth(0.07);
         deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPatternConditionProperty accessPatternConditionProperty) -> {
             conditionTable.getItems().remove(accessPatternConditionProperty);
+
+            //remove the property from the condition (call by reference)
+            condition.getPatternCondition().getProperties().remove(accessPatternConditionProperty);
             return accessPatternConditionProperty;
         }));
 
