@@ -90,9 +90,10 @@ public class PatternsController {
     }
 
     /**
-     * Updates the patternsTable items with items from the database, taking filters into account.
+     * Updates the patternsTable items from the database, taking filters into account.
      */
     private void updatePatternsTable() {
+
         try {
 
             List<AccessPattern> patterns = AppComponents.getDbContext().getFilteredPatterns(filterController.showArchivedProperty.getValue(),
@@ -106,6 +107,7 @@ public class PatternsController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     /**
@@ -153,6 +155,7 @@ public class PatternsController {
      * Initializes the table columns that need extra content.
      */
     private void initializeTableColumns() {
+
         // Add the delete column
         deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPattern accessPattern) -> {
             try {
@@ -169,6 +172,17 @@ public class PatternsController {
             return accessPattern;
         }));
 
+        initializeConditionCountColumn();
+
+        initializeConditionTypeColumn();
+
+    }
+
+
+    /**
+     * Initialize the ConditionCountColumn so it displays the number of conditions of the AccessPattern.
+     */
+    private void initializeConditionCountColumn() {
         // overwrite the column in which the number of useCases is displayed
         conditionCountColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
 
@@ -184,6 +198,12 @@ public class PatternsController {
 
         // custom comparator for the conditionCountColumn
         conditionCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
+    }
+
+    /**
+     * Initialize ConditionTypeColumn to show the type of the condition as an icon.
+     */
+    private void initializeConditionTypeColumn() {
 
         // sets the icon of the condition to pattern or profile
         conditionTypeColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
@@ -196,26 +216,33 @@ public class PatternsController {
 
                     // nothing to display
                     setText("");
+
                 } else {
 
                     // add the icon
                     MaterialDesignIconView iconView = new MaterialDesignIconView();
+                    iconView.setStyle("-fx-font-size: 1.6em");
+
+                    // wrapper label for showing a tooltip
+                    Label wrapper = new Label();
+                    wrapper.setGraphic(iconView);
 
                     if (items.stream().findFirst().get().getProfileCondition() == null) {
 
                         // pattern
                         iconView.setIcon(MaterialDesignIcon.VIEW_GRID);
+                        wrapper.setTooltip(new Tooltip(bundle.getString("patternCondition")));
+
                     } else {
 
                         // profile
                         iconView.setIcon(MaterialDesignIcon.ACCOUNT_BOX_OUTLINE);
+                        wrapper.setTooltip(new Tooltip(bundle.getString("profileCondition")));
+
                     }
-                    Label wrapper = new Label();
-                    wrapper.setGraphic(iconView);
-                    wrapper.setTooltip(new Tooltip("Jaööp"));
-                    wrapper.setStyle("-fx-font-size: 160%");
-                    iconView.setSize("19");
+
                     setGraphic(wrapper);
+
                 }
             }
         });
