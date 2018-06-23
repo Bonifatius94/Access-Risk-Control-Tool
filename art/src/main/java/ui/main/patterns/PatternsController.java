@@ -26,6 +26,9 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Paint;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
@@ -49,6 +52,9 @@ public class PatternsController {
 
     @FXML
     public TableColumn<AccessPattern, JFXButton> editColumn;
+
+    @FXML
+    public TableColumn<AccessPattern, Set<AccessCondition>> conditionTypeColumn;
 
     @FXML
     public Label itemCount;
@@ -178,6 +184,41 @@ public class PatternsController {
 
         // custom comparator for the conditionCountColumn
         conditionCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
+
+        // sets the icon of the condition to pattern or profile
+        conditionTypeColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
+
+            @Override
+            protected void updateItem(Set<AccessCondition> items, boolean empty) {
+
+                // display nothing if the row is empty, otherwise the item count
+                if (empty || items == null) {
+
+                    // nothing to display
+                    setText("");
+                } else {
+
+                    // add the icon
+                    MaterialDesignIconView iconView = new MaterialDesignIconView();
+
+                    if (items.stream().findFirst().get().getProfileCondition() == null) {
+
+                        // pattern
+                        iconView.setIcon(MaterialDesignIcon.VIEW_GRID);
+                    } else {
+
+                        // profile
+                        iconView.setIcon(MaterialDesignIcon.ACCOUNT_BOX_OUTLINE);
+                    }
+                    Label wrapper = new Label();
+                    wrapper.setGraphic(iconView);
+                    wrapper.setTooltip(new Tooltip("Jaööp"));
+                    wrapper.setStyle("-fx-font-size: 160%");
+                    iconView.setSize("19");
+                    setGraphic(wrapper);
+                }
+            }
+        });
     }
 
     /**
