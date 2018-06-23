@@ -92,7 +92,7 @@ public class PatternsController {
     /**
      * Updates the patternsTable items from the database, taking filters into account.
      */
-    private void updatePatternsTable() {
+    public void updatePatternsTable() {
 
         try {
 
@@ -281,6 +281,7 @@ public class PatternsController {
             // give the dialog the sapConfiguration
             PatternsFormController patternEdit = loader.getController();
             patternEdit.giveSelectedAccessPattern(accessPattern);
+            patternEdit.setParentController(this);
         } catch (Exception e) {
             e.printStackTrace();
         }

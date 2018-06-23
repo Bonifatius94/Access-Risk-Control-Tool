@@ -41,6 +41,7 @@ import javafx.scene.layout.VBox;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.PTableColumn;
+import ui.main.patterns.PatternsController;
 
 
 public class PatternsFormController {
@@ -99,6 +100,7 @@ public class PatternsFormController {
     @FXML
     private Label atLeastOneCondWarning;
 
+    private PatternsController parentController;
 
     private AccessPattern accessPattern;
     private AccessPattern originalPattern;
@@ -456,7 +458,9 @@ public class PatternsFormController {
         }
 
         // add the list to the AccessPattern
-        this.accessPattern.setConditions(newConditions);
+        accessPattern.setConditions(newConditions);
+
+        System.out.println(newConditions);
 
         // save the pattern to the database
         try {
@@ -468,6 +472,8 @@ public class PatternsFormController {
                 AppComponents.getDbContext().updatePattern(accessPattern);
             }
 
+            // refresh the patternsTable in the parentController
+            parentController.updatePatternsTable();
             close(event);
         } catch (Exception e) {
             e.printStackTrace();
@@ -651,5 +657,13 @@ public class PatternsFormController {
         public void setAccessCondition(AccessCondition accessCondition) {
             this.accessCondition = accessCondition;
         }
+    }
+
+    /**
+     * Sets the parent controller.
+     * @param parentController the parent controller
+     */
+    public void setParentController(PatternsController parentController) {
+        this.parentController = parentController;
     }
 }
