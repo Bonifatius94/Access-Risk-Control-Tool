@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -38,6 +37,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.PTableColumn;
@@ -575,6 +575,9 @@ public class PatternsFormController {
             conditionTable.setItems(entries);
             conditionTable.refresh();
         }
+
+        // presort table
+        conditionTable.getSortOrder().addAll(authObject, authObjectProperty);
 
         // create add button
         JFXButton addButton = new JFXButton();
