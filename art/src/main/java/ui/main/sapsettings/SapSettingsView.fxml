@@ -9,6 +9,7 @@
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <VBox spacing="10" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="ui.main.sapsettings.SapSettingsController">
+    <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
     <TableView VBox.vgrow="ALWAYS" fx:id="sapConnectionTable">
         <columns>
             <PTableColumn percentageWidth="0.35" resizable="false" text="%hostServer">

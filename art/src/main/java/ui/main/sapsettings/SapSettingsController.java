@@ -32,6 +32,7 @@ import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
+import ui.custom.controls.filter.FilterController;
 
 
 public class SapSettingsController {
@@ -45,7 +46,10 @@ public class SapSettingsController {
 
     public static SapConfiguration sapConfiguration;
 
+    public FilterController filterController;
+
     ArtDbContext database = AppComponents.getDbContext();
+
 
     /**
      * Initialized the view and sets a dummy SapConfig.
@@ -63,6 +67,25 @@ public class SapSettingsController {
             e.printStackTrace();
         }
 
+        filterController.shouldFilterProperty.addListener((obs, oldValue, newValue) -> {
+            if (newValue) {
+                try {
+                    updateSapSettingsTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+    }
+
+    /**
+     * updates Sap Setting Table
+     */
+    public void updateSapSettingsTable() {
+        //List<SapConfiguration> sapConfigurationList = database.getFilteredSapConfigs(filterController.showArchivedProperty.getValue(),
+        //filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(), filterController.endDateProperty.getValue(), 0);
     }
 
 
