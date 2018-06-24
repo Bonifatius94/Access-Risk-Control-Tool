@@ -24,7 +24,7 @@
         <VBox HBox.hgrow="ALWAYS" maxWidth="300" spacing="10" style="-fx-padding: 10 0 0 0">
             <VBox spacing="35">
                 <HBox alignment="BASELINE_LEFT" spacing="10">
-                    <MaterialDesignIconView glyphName="ACCOUNT"/>
+                    <MaterialDesignIconView style="-fx-font-size: 1.6em" glyphName="ACCOUNT"/>
                     <JFXTextField fx:id="usernameInput" prefWidth="240" promptText="%username">
                         <validators>
                             <RequiredFieldValidator message="%required">
@@ -34,7 +34,7 @@
                     </JFXTextField>
                 </HBox>
                 <HBox alignment="BASELINE_LEFT" spacing="10">
-                    <MaterialDesignIconView glyphName="KEY"/>
+                    <MaterialDesignIconView style="-fx-font-size: 1.6em" glyphName="KEY"/>
                     <JFXPasswordField fx:id="passwordInput" prefWidth="240" promptText="%password">
                         <validators>
                             <RequiredFieldValidator message="%required">
