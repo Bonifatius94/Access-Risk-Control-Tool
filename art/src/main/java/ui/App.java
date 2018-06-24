@@ -90,7 +90,7 @@ public class App extends Application {
 
         // load the FirstUseWizwardView
         ResourceBundle bundle = ResourceBundle.getBundle("lang");
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("login/firstuse/FirstUseWizardView.fxml"), bundle);
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/login/firstuse/FirstUseWizardView.fxml"), bundle);
         CustomWindow window = loader.load();
 
         // build the scene and add it to the stage
@@ -121,7 +121,7 @@ public class App extends Application {
 
         // load the LoginView
         ResourceBundle bundle = ResourceBundle.getBundle("lang");
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("login/LoginView.fxml"), bundle);
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/login/LoginView.fxml"), bundle);
         CustomWindow window = loader.load();
 
         // build the scene and add it to the stage

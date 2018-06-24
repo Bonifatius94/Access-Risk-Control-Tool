@@ -1,12 +1,15 @@
 package data.localdb;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -248,16 +251,15 @@ public abstract class H2ContextBase implements Closeable {
     /**
      * This method executes a sql script. Therefore it gets all statement from the script and executes them in one transaction.
      *
-     * @param filePath the file path of the script to be executed
+     * @param resourcePath the file path of the script resource to be executed
      * @throws Exception caused by file errors while reading the script or while executing the sql commands
      */
-    public void executeScript(String filePath) throws Exception {
+    public void executeScript(String resourcePath) throws Exception {
 
         TraceOut.enter();
 
-        String path = new File(filePath).getAbsolutePath();
-        TraceOut.writeInfo("Script Path: '" + path + "'");
-        List<String> sqlCommands = getCommands(path);
+        TraceOut.writeInfo("Script Path: '" + resourcePath + "'");
+        List<String> sqlCommands = getCommands(resourcePath);
 
         try (Session session = sessionFactory.openSession()) {
 
@@ -282,12 +284,12 @@ public abstract class H2ContextBase implements Closeable {
         TraceOut.leave();
     }
 
-    private List<String> getCommands(String filePath) throws Exception {
+    private List<String> getCommands(String resourcePath) throws Exception {
 
         StringBuilder builder = new StringBuilder();
 
         // get all line from script file
-        Files.readAllLines(Paths.get(filePath)).stream()
+        getLinesFromResource(resourcePath).stream()
             // remove rest of line after a line comment
             .map(x -> x.contains("--") ? x.substring(0, x.indexOf("--")) : x)
             // append everything to string builder
@@ -318,6 +320,24 @@ public abstract class H2ContextBase implements Closeable {
         }
 
         return commands;
+    }
+
+    private List<String> getLinesFromResource(String resourcePath) throws Exception {
+
+        List<String> lines = null;
+
+        try (InputStream resource = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
+
+            try (InputStreamReader inReader = new InputStreamReader(resource, StandardCharsets.UTF_8)) {
+
+                try (BufferedReader bufReader = new BufferedReader(inReader)) {
+
+                    lines = bufReader.lines().collect(Collectors.toList());
+                }
+            }
+        }
+
+        return lines;
     }
 
     // +++++++++++++++++++++++++++++++

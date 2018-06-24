@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.NativeQuery;
+
 import tools.tracing.TraceOut;
 
 public class ArtDbContext extends H2ContextBase implements IArtDbContext {
@@ -89,8 +90,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         TraceOut.enter();
 
         // execute sql scripts
-        executeScript(getClass().getClassLoader().getResource("scripts/create_schema.sql").getPath());
-        executeScript(getClass().getClassLoader().getResource("scripts/create_roles.sql").getPath());
+        executeScript("scripts/create_schema.sql");
+        executeScript("scripts/create_roles.sql");
 
         TraceOut.leave();
     }
