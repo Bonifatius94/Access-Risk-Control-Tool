@@ -33,10 +33,12 @@
         </VBox>
         <Separator/>
         <VBox HBox.hgrow="ALWAYS" spacing="20">
-            <HBox alignment="BASELINE_LEFT" spacing="40">
-                <HBox alignment="BASELINE_LEFT" spacing="20">
-                    <Label text="%addPattern"/>
-                    <JFXComboBox fx:id="patternChooser" minWidth="250"/>
+            <HBox alignment="CENTER_LEFT" spacing="40">
+                <HBox alignment="CENTER_LEFT" spacing="20">
+                    <VBox HBox.hgrow="ALWAYS" spacing="5">
+                        <Label text="%addPattern"/>
+                        <JFXComboBox fx:id="patternChooser" minWidth="500" maxWidth="800"/>
+                    </VBox>
                     <JFXButton onAction="#choosePattern" styleClass="round-button" minHeight="30">
                         <tooltip>
                             <Tooltip text="%choosePattern"/>
