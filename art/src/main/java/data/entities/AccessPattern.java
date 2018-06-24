@@ -286,7 +286,9 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("usecaseId='").append(getUsecaseId()).append("', description='").append(getDescription()).append("'");
-        builder.append(", linkage='").append(linkage.toString()).append("', conditions: ");
+        if (linkage != null) {
+            builder.append(", linkage='").append(linkage.toString()).append("', conditions: ");
+        }
         conditions.forEach(x -> builder.append("\r\ncondition: ").append(x.toString()));
         return builder.toString();
     }

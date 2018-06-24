@@ -5,7 +5,7 @@
 <?import ui.custom.controls.*?>
 <?import javafx.geometry.*?>
 
-<CustomWindow xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.MainController" windowState="CanResize">
+<CustomWindow xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.MainController" windowState="CanResize" title="%art">
     <JFXTabPane CustomWindow.vgrow="ALWAYS">
         <padding>
             <Insets topRightBottomLeft="10" />
@@ -27,4 +27,5 @@
             <fx:include source="whitelists/WhitelistsView.fxml" />
         </Tab>
     </JFXTabPane>
+    <fx:include source="statusbar/StatusBarView.fxml"/>
 </CustomWindow>

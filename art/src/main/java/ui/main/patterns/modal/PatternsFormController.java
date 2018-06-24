@@ -1,4 +1,4 @@
-package ui.main.patterns;
+package ui.main.patterns.modal;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -16,6 +16,7 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -38,8 +39,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+
+import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.PTableColumn;
+import ui.main.patterns.PatternsController;
 
 
 public class PatternsFormController {
@@ -110,11 +114,12 @@ public class PatternsFormController {
     @FXML
     private Label atLeastOneCondWarning;
 
+    private PatternsController parentController;
 
     private AccessPattern accessPattern;
     private AccessPattern originalPattern;
 
-    private List<TableView<AccessPatternConditionProperty>> conditionTables;
+    private List<TableViewWithAccessCondition> conditionTables;
     private TableView<AccessPatternConditionProperty> selectedTable;
     private List<PTableColumn<AccessPatternConditionProperty, JFXButton>> deleteColumns;
     private List<JFXButton> addPropertyButtons;
@@ -144,7 +149,6 @@ public class PatternsFormController {
         this.conditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
         this.linkageBox.managedProperty().bind(Bindings.not(this.conditionBox.disableProperty()));
         this.linkageBox.visibleProperty().bind(Bindings.not(this.conditionBox.disableProperty()));
-        this.editConditionBox.managedProperty().bind(this.conditionBox.disableProperty());
         this.editConditionBox.disableProperty().bind(this.conditionBox.disableProperty());
 
         // deselect on tab change
@@ -164,7 +168,7 @@ public class PatternsFormController {
 
         // don't allow less than 1 tab
         deleteSelectedTableTabButton.disableProperty().bind(Bindings.size(conditionTabs.getTabs()).isEqualTo(1));
-        atLeastOneCondWarning.visibleProperty().bind(Bindings.size(conditionTabs.getTabs()).isEqualTo(1));
+        atLeastOneCondWarning.visibleProperty().bind(Bindings.and(Bindings.size(conditionTabs.getTabs()).isEqualTo(1), Bindings.not(editConditionBox.disableProperty())));
 
         // initialize condition type combo box component
         initializeConditionTypeComboBox();
@@ -174,7 +178,6 @@ public class PatternsFormController {
 
         // initialize linkage type combo box component
         initializeLinkageInput();
-
     }
 
     /**
@@ -183,7 +186,7 @@ public class PatternsFormController {
     public void initializeLinkageInput() {
         linkageInput.getItems().setAll(ConditionLinkage.None, ConditionLinkage.And, ConditionLinkage.Or);
 
-        linkageInput.getSelectionModel().selectedItemProperty().addListener((ChangeListener<ConditionLinkage>) (selected, oldValue, newValue) -> {
+        linkageInput.getSelectionModel().selectedItemProperty().addListener((selected, oldValue, newValue) -> {
             if (newValue == ConditionLinkage.None) {
                 conditionTabs.getTabs().clear();
                 this.conditionTables.clear();
@@ -192,12 +195,10 @@ public class PatternsFormController {
                 } else {
                     addConditionTableTab(new AccessCondition());
                 }
-                this.editConditionBox.managedProperty().unbind();
-                this.editConditionBox.visibleProperty().unbind();
-                this.editConditionBox.setVisible(false);
+                this.editConditionBox.disableProperty().unbind();
+                this.editConditionBox.setDisable(true);
             } else {
-                this.editConditionBox.managedProperty().bind(this.conditionBox.visibleProperty());
-                this.editConditionBox.visibleProperty().bind(this.conditionBox.visibleProperty());
+                this.editConditionBox.disableProperty().bind(this.conditionBox.disableProperty());
             }
         });
     }
@@ -290,6 +291,12 @@ public class PatternsFormController {
 
         if (pattern == null) {
             this.accessPattern = new AccessPattern();
+
+            // add one tab for correct display
+            addConditionTableTab(new AccessCondition());
+
+            // disable condition box
+            this.conditionBox.setDisable(true);
         } else {
 
             // prefill the inputs
@@ -302,7 +309,7 @@ public class PatternsFormController {
             if (pattern.getConditions().stream().findFirst().get().getProfileCondition() == null) {
                 this.conditionTypeInput.getSelectionModel().select("Condition");
 
-                for (AccessCondition condition : pattern.getConditions()) {
+                for (AccessCondition condition : pattern.getConditions().stream().sorted(Comparator.comparing(AccessCondition::getId)).collect(Collectors.toList())) {
                     addConditionTableTab(condition);
                 }
 
@@ -310,6 +317,12 @@ public class PatternsFormController {
                 this.linkageInput.getSelectionModel().select(pattern.getLinkage());
             } else {
                 this.conditionTypeInput.getSelectionModel().select("Profile");
+
+                // add one tab for correct display
+                addConditionTableTab(new AccessCondition());
+
+                // disable condition box
+                this.conditionBox.setDisable(true);
 
                 this.profileInput.setText(pattern.getConditions().stream().findFirst().get().getProfileCondition().getProfile());
             }
@@ -386,20 +399,8 @@ public class PatternsFormController {
         // rename tabs after deleting so no numbers are left out
         int i = 0;
         for (Tab tab : this.conditionTabs.getTabs()) {
-            tab.setText("Condition " + ++i);
+            tab.setText("COND " + ++i);
         }
-
-    }
-
-    /**
-     * Resets the form.
-     */
-    public void resetForm() {
-        this.conditionTabs.getTabs().clear();
-
-        this.giveSelectedAccessPattern(this.originalPattern);
-
-        this.validateInputs();
     }
 
     /**
@@ -414,32 +415,60 @@ public class PatternsFormController {
     /**
      * Saves the changes to the database.
      */
-    public void saveChanges() {
+    public void saveChanges(ActionEvent event) throws Exception {
 
         // replace the useCaseId and the description with the text field values
         this.accessPattern.setUsecaseId(this.useCaseIdInput.getText());
         this.accessPattern.setDescription(this.descriptionInput.getText());
         this.accessPattern.setLinkage(linkageInput.getValue());
 
-        // store the condition in here
-        List<AccessCondition> newConditions = new ArrayList<>();
-
         // execute only if the pattern is no profile
         if (this.conditionTypeInput.getSelectionModel().getSelectedItem().equals("Condition")) {
 
             // copy conditions to the list
-            for (TableView<AccessPatternConditionProperty> condTable : conditionTables) {
+            for (TableViewWithAccessCondition tableViewWithAccessCondition : conditionTables) {
 
                 // add table if it is not empty
-                if (condTable.getItems() != null && condTable.getItems().size() != 0) {
+                if (tableViewWithAccessCondition.getTableView().getItems() != null && tableViewWithAccessCondition.getTableView().getItems().size() != 0) {
 
-                    AccessPatternCondition patternCondition = new AccessPatternCondition();
-                    AccessCondition accessCondition = new AccessCondition();
+                    if (tableViewWithAccessCondition.getAccessCondition().getId() == null) {
 
-                    patternCondition.setProperties(condTable.getItems());
-                    accessCondition.setPatternCondition(patternCondition);
+                        AccessPatternCondition patternCondition = new AccessPatternCondition();
+                        AccessCondition accessCondition = new AccessCondition();
 
-                    newConditions.add(accessCondition);
+                        // set patternCondition Id
+                        if (tableViewWithAccessCondition.getAccessCondition().getPatternCondition() != null) {
+                            patternCondition.setId(tableViewWithAccessCondition.getAccessCondition().getPatternCondition().getId());
+                        }
+
+                        // set accessCondition Id
+                        accessCondition.setId(tableViewWithAccessCondition.getAccessCondition().getId());
+
+                        // add properties to patternCondition
+                        patternCondition.setProperties(tableViewWithAccessCondition.getTableView().getItems());
+
+                        // add patternConditon to accessCondition
+                        accessCondition.setPatternCondition(patternCondition);
+
+                        accessPattern.getConditions().add(accessCondition);
+
+                    } else {
+
+                        AccessCondition accessCondition = tableViewWithAccessCondition.getAccessCondition();
+                        AccessPatternCondition patternCondition = tableViewWithAccessCondition.getAccessCondition().getPatternCondition();
+
+                        List<AccessPatternConditionProperty> properties = new ArrayList<>();
+                        properties.addAll(tableViewWithAccessCondition.getTableView().getItems());
+
+                        patternCondition.setProperties(properties);
+                        accessCondition.setPatternCondition(patternCondition);
+                    }
+
+                } else {
+
+                    if (tableViewWithAccessCondition.getAccessCondition().getId() != null) {
+                        accessPattern.getConditions().remove(tableViewWithAccessCondition.getAccessCondition());
+                    }
 
                 }
             }
@@ -452,13 +481,24 @@ public class PatternsFormController {
             profileCond.setProfile(this.profileInput.getText());
             accessCondition.setProfileCondition(profileCond);
 
-            newConditions.add(accessCondition);
+            List<AccessCondition> conditions = new ArrayList<>();
+            conditions.add(accessCondition);
+
+            accessPattern.setConditions(conditions);
         }
 
-        // add the list to the AccessPattern
-        this.accessPattern.setConditions(newConditions);
+        // save the pattern to the database
 
-        System.out.println(this.accessPattern);
+        // new pattern, id is null
+        if (accessPattern.getId() == null) {
+            AppComponents.getDbContext().createPattern(accessPattern);
+        } else {
+            AppComponents.getDbContext().updatePattern(accessPattern);
+        }
+
+        // refresh the patternsTable in the parentController
+        parentController.updatePatternsTable();
+        close(event);
 
     }
 
@@ -517,6 +557,9 @@ public class PatternsFormController {
         deleteColumn.setPercentageWidth(0.07);
         deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPatternConditionProperty accessPatternConditionProperty) -> {
             conditionTable.getItems().remove(accessPatternConditionProperty);
+
+            //remove the property from the condition (call by reference)
+            condition.getPatternCondition().getProperties().remove(accessPatternConditionProperty);
             return accessPatternConditionProperty;
         }));
         deleteColumns.add(deleteColumn);
@@ -532,7 +575,7 @@ public class PatternsFormController {
         conditionTable.getColumns().addAll(authObject, authObjectProperty, value1, value2, value3, value4, deleteColumn);
 
         // table to all tables
-        this.conditionTables.add(conditionTable);
+        this.conditionTables.add(new TableViewWithAccessCondition(conditionTable, condition));
 
         // add entries to the table
         if (condition.getPatternCondition() != null) {
@@ -540,6 +583,9 @@ public class PatternsFormController {
             conditionTable.setItems(entries);
             conditionTable.refresh();
         }
+
+        // presort table
+        conditionTable.getSortOrder().addAll(authObject, authObjectProperty);
 
         // create add button
         JFXButton addPropertyButton = new JFXButton();
@@ -656,5 +702,45 @@ public class PatternsFormController {
                 column.setVisible(false);
             }
         }
+    }
+
+
+    /**
+     * Stores a TableView and an AccessCondition which is needed for updating a pattern correctly.
+     */
+    public class TableViewWithAccessCondition {
+
+        private TableView<AccessPatternConditionProperty> tableView;
+        private AccessCondition accessCondition;
+
+        public TableViewWithAccessCondition(TableView<AccessPatternConditionProperty> tableView, AccessCondition accessCondition) {
+            this.tableView = tableView;
+            this.accessCondition = accessCondition;
+        }
+
+        public TableView<AccessPatternConditionProperty> getTableView() {
+            return tableView;
+        }
+
+        public void setTableView(TableView<AccessPatternConditionProperty> tableView) {
+            this.tableView = tableView;
+        }
+
+        public AccessCondition getAccessCondition() {
+            return accessCondition;
+        }
+
+        public void setAccessCondition(AccessCondition accessCondition) {
+            this.accessCondition = accessCondition;
+        }
+    }
+
+    /**
+     * Sets the parent controller.
+     *
+     * @param parentController the parent controller
+     */
+    public void setParentController(PatternsController parentController) {
+        this.parentController = parentController;
     }
 }

@@ -22,7 +22,7 @@ import javafx.stage.Stage;
 import ui.App;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
-import ui.main.patterns.PatternsFormController;
+import ui.main.patterns.modal.PatternsFormController;
 
 
 public class AnalysisResultController {

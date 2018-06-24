@@ -29,7 +29,7 @@ import javafx.stage.Stage;
 import ui.App;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
-import ui.main.patterns.PatternsFormController;
+import ui.main.patterns.modal.PatternsFormController;
 
 
 public class ConfigDetailsController {
@@ -131,7 +131,7 @@ public class ConfigDetailsController {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../../patterns/PatternsFormView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../../patterns/modal/PatternsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
