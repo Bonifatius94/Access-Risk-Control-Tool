@@ -89,7 +89,7 @@ public class WhitelistsController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        tableRefresh();
+
 
         filterController.shouldFilterProperty.addListener((obs, oldValue, newValue) -> {
             if (newValue) {
@@ -104,7 +104,12 @@ public class WhitelistsController {
 
     }
 
-    private void updateWhitelistTable() throws Exception {
+    /**
+     * Updates Whitelist Table.
+     *
+     * @throws Exception if a Database error occurred.
+     */
+    public void updateWhitelistTable() throws Exception {
         List<Whitelist> whitelists = database.getFilteredWhitelists(filterController.showArchivedProperty.getValue(), filterController.searchStringProperty.getValue(),
             filterController.startDateProperty.getValue(), filterController.startDateProperty.getValue(), 0);
         ObservableList<Whitelist> list = FXCollections.observableList(whitelists);
@@ -120,7 +125,7 @@ public class WhitelistsController {
         deleteWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (Whitelist whitelist) -> {
             try {
                 database.deleteWhitelist(whitelist);
-                tableRefresh();
+                updateWhitelistTable();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -169,6 +174,9 @@ public class WhitelistsController {
             stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
             stage.show();
+
+            NewWhitelistDialogController newWhitelistDialogController = loader.getController();
+            newWhitelistDialogController.setParentController(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -223,10 +231,11 @@ public class WhitelistsController {
                 //deletes whitelist from DB
                 try {
                     database.deleteWhitelist(whitelist);
+                    updateWhitelistTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                tableRefresh();
+
             } else if (customAlert.showAndWait().isPresent() && customAlert.showAndWait().get() == ButtonType.CANCEL) {
                 customAlert.close();
             }
@@ -258,10 +267,10 @@ public class WhitelistsController {
             Whitelist whitelist = whitelistTable.getSelectionModel().getSelectedItem();
             try {
                 database.createWhitelist(whitelist);
+                updateWhitelistTable();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            tableRefresh();
         }
     }
 
@@ -282,13 +291,12 @@ public class WhitelistsController {
                 WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
                 Whitelist importedWhitelist = whitelistImportHelper.importWhitelist(path);
                 startImportDialog(importedWhitelist);
-                tableRefresh();
+                updateWhitelistTable();
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
-
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "No file selected", "you need to select an xlsx file to import", "Ok", "");
             customAlert.showAndWait();
         }
@@ -304,7 +312,7 @@ public class WhitelistsController {
     }
 
     //TODO: reaktivate if database is ready
-    private void tableRefresh() {
+    /*private void tableRefresh() {
 
         whitelistTable.getItems().clear();
         List<Whitelist> whitelists = null;
@@ -316,6 +324,6 @@ public class WhitelistsController {
         ObservableList<Whitelist> observableList = FXCollections.observableArrayList(whitelists);
         whitelistTable.getItems().addAll(observableList);
         whitelistTable.refresh();
-    }
+    }*/
 }
 

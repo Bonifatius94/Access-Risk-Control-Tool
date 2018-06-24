@@ -20,7 +20,7 @@
               fx:controller="ui.main.whitelists.NewWhitelistDialogController" windowState="NoResize">
     <!--TODO: what is here needet , border color ? etc-->
     <VBox HBox.hgrow="ALWAYS" style="-fx-padding: 20" spacing="10">
-        <VBox alignment="BASELINE_LEFT" spacing="30" HBox.hgrow="ALWAYS">
+        <VBox alignment="BASELINE_LEFT" spacing="35" HBox.hgrow="ALWAYS">
             <JFXTextField fx:id="whitelistName" maxWidth="300" promptText="%whitelistName">
                 <validators>
                     <RequiredFieldValidator message="%required">
@@ -59,7 +59,7 @@
                 </TableView>
                 <VBox alignment="CENTER_RIGHT">
                     <HBox alignment="BASELINE_LEFT" HBox.hgrow="ALWAYS" spacing="40">
-                        <VBox spacing="30">
+                        <VBox spacing="35">
                             <Label text="%objectDetails">
                                 <font>
                                     <Font size="18"/>

@@ -107,7 +107,6 @@ public class WhitelistEditDialogController {
 
     /**
      * loads use case and username from the selected entry to the textfield.
-     * TODO: Ersetzung des vorherigen objekts
      *
      * @param whitelistEntry is the by call given whitelist entry.
      */
@@ -197,15 +196,33 @@ public class WhitelistEditDialogController {
      */
     @FXML
     private void saveEditWhitelist() {
+        if (!checkNameAndDescription()) {
+            if (!whitelistEditTable.getItems().isEmpty()) {
+                whitelist.getEntries().addAll(whitelistEditTable.getItems());
+                try {
+                    if (whitelist.isArchived()) {
+                        whitelistDatabase.createWhitelist(whitelist);
+                        parentController.updateWhitelistTable();
 
-        try {
-            if (whitelist.isArchived()) {
-                whitelistDatabase.createWhitelist(whitelist);
+                    } else if (whitelist.getId() == null) {
+                        whitelist.setName(tfWhitelistName.getText());
+                        whitelist.setDescription(tfDescription.getText());
+                        whitelistDatabase.createWhitelist(whitelist);
+                        parentController.updateWhitelistTable();
+                    } else {
+                        whitelistDatabase.updateWhitelist(whitelist);
+                        parentController.updateWhitelistTable();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             } else {
-                whitelistDatabase.updateWhitelist(whitelist);
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelist is empty.", "A Whitelist needs to contain at least one entry");
+                customAlert.showAndWait();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelistname or description is not valid.", "A Whitelist needs a Name and a description");
+            customAlert.showAndWait();
         }
     }
 
@@ -230,7 +247,7 @@ public class WhitelistEditDialogController {
     }
 
     /**
-     * initializes all validation of textfields.
+     * initializes all validation of text fields.
      */
     private void initializeValidation() {
         tfUserName.focusedProperty().addListener((o, oldVal, newVal) -> {
@@ -269,6 +286,8 @@ public class WhitelistEditDialogController {
         userName.setEditable(false);
         whitelistEditTable.setEditable(false);
         whitelistEditTable.refresh();
+        tfWhitelistName.setText(whitelist.getName());
+        tfDescription.setText(whitelist.getDescription());
     }
 
 
@@ -279,5 +298,14 @@ public class WhitelistEditDialogController {
      */
     public void setParentController(WhitelistsController parentController) {
         this.parentController = parentController;
+    }
+
+    /**
+     * checks if Whitelist name and whitelist Description is empty.
+     *
+     * @return true if name or description is empty.
+     */
+    private Boolean checkNameAndDescription() {
+        return tfDescription.getText().equals("") || tfWhitelistName.getText().equals("");
     }
 }

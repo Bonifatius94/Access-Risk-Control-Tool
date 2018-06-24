@@ -39,6 +39,7 @@ public class NewWhitelistDialogController {
 
     private Whitelist whitelist;
     private ArtDbContext whitelistDatabase = AppComponents.getDbContext();
+    private WhitelistsController parentController;
 
     /**
      * is automatically called by FXML loader and starts initializeColumns.
@@ -136,18 +137,32 @@ public class NewWhitelistDialogController {
      * saves New Whitelist.
      */
     public void saveNewWhitelist() {
-
-        if (!newWhitelistTable.getItems().isEmpty()) {
-            whitelist.getEntries().addAll(newWhitelistTable.getItems());
-            try {
-                whitelistDatabase.createWhitelist(whitelist);
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (!checkNameAndDescription()) {
+            if (!newWhitelistTable.getItems().isEmpty()) {
+                whitelist.getEntries().addAll(newWhitelistTable.getItems());
+                try {
+                    whitelistDatabase.createWhitelist(whitelist);
+                    parentController.updateWhitelistTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelist is empty.", "A Whitelist needs to contain at least one entry");
+                customAlert.showAndWait();
             }
         } else {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelist is empty.", "A Whitelist needs to contain at least one entry");
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelistname or description is not valid.", "A Whitelist needs a Name and a description");
             customAlert.showAndWait();
         }
+    }
+
+    /**
+     * checks if Whitelist name and whitelist Description is empty.
+     *
+     * @return true if name or description is empty.
+     */
+    private Boolean checkNameAndDescription() {
+        return tfDescription.getText().equals("") || whitelistName.getText().equals("");
     }
 
     /**
@@ -194,6 +209,15 @@ public class NewWhitelistDialogController {
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "You need to fill out both fields", "An Whitelist entry needs to have an Usecase Id and an Username");
             customAlert.showAndWait();
         }
+    }
+
+    /**
+     * Sets the parent controller.
+     *
+     * @param parentController the parent controller
+     */
+    public void setParentController(WhitelistsController parentController) {
+        this.parentController = parentController;
     }
 
 
