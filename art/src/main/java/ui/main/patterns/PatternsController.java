@@ -8,10 +8,12 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
+import java.io.File;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import io.msoffice.excel.AccessPatternImportHelper;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
@@ -27,6 +29,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 import javafx.scene.control.Tooltip;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
@@ -35,6 +38,7 @@ import ui.custom.controls.ButtonCell;
 import ui.custom.controls.ConditionTypeCellFactory;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.filter.FilterController;
+import ui.main.patterns.modal.PatternImportController;
 import ui.main.patterns.modal.PatternsFormController;
 
 
@@ -283,6 +287,44 @@ public class PatternsController {
                 AppComponents.getDbContext().deletePattern(pattern);
             }
             updatePatternsTable();
+        }
+    }
+
+    /**
+     * Opens the import dialog for AccessPatterns.
+     */
+    public void importAction() throws Exception {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle(bundle.getString("choosePatternFile"));
+        //chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Pattern Files (*.xlsx)", "*.xlsx"));
+        File selectedFile = chooser.showOpenDialog(App.primaryStage);
+
+        if (selectedFile != null) {
+
+            // import patterns with the AccessPatternImportHelper
+            AccessPatternImportHelper importHelper = new AccessPatternImportHelper();
+            List<AccessPattern> importedPatterns = importHelper.importAuthorizationPattern(selectedFile.getAbsolutePath());
+
+            // create a new FXML loader with the SapSettingsEditDialogController
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/PatternImportView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
+
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow);
+            scene.getStylesheets().add("css/dark-theme.css");
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
+            customWindow.initStage(stage);
+
+            stage.show();
+
+            // give the dialog the controller and the patterns
+            PatternImportController importController = loader.getController();
+            importController.giveImportedPatterns(importedPatterns);
+            importController.setPatternsController(this);
         }
     }
 

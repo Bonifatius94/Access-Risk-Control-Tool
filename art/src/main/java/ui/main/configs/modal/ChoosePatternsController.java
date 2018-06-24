@@ -10,6 +10,7 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
@@ -17,6 +18,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
@@ -26,6 +28,7 @@ import javafx.scene.control.TableView;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.ConditionTypeCellFactory;
+import ui.custom.controls.CustomAlert;
 import ui.custom.controls.filter.FilterController;
 
 
@@ -135,8 +138,13 @@ public class ChoosePatternsController {
     private void initializeSelectedPatternsTable() {
         // Add the delete column
         selectedPatternsTableDeleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPattern accessPattern) -> {
-            allPatternsTable.getItems().add(accessPattern);
             selectedPatternsTable.getItems().remove(accessPattern);
+            selectedPatternsTable.refresh();
+            try {
+                updateAllPatternsTable();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return accessPattern;
         }));
 
@@ -147,29 +155,42 @@ public class ChoosePatternsController {
     /**
      * Removes the selected patterns from the selectedList.
      */
-    public void removeFromSelected() {
+    public void removeFromSelected() throws Exception {
         if (selectedPatternsTable.getSelectionModel().getSelectedItems() != null) {
             List<AccessPattern> selectedPatterns = selectedPatternsTable.getSelectionModel().getSelectedItems();
-            allPatternsTable.getItems().addAll(selectedPatterns);
             selectedPatternsTable.getItems().removeAll(selectedPatterns);
             selectedPatternsTable.getSelectionModel().clearSelection();
-            allPatternsTable.refresh();
             selectedPatternsTable.refresh();
+            updateAllPatternsTable();
         }
     }
 
     /**
      * Adds the selected patterns to the selectedList.
      */
-    public void addToSelected() {
+    public void addToSelected() throws  Exception {
         if (allPatternsTable.getSelectionModel().getSelectedItems() != null) {
             List<AccessPattern> selectedPatterns = allPatternsTable.getSelectionModel().getSelectedItems();
-            selectedPatternsTable.getItems().addAll(selectedPatterns);
-            allPatternsTable.getItems().removeAll(selectedPatterns);
-            allPatternsTable.getSelectionModel().clearSelection();
-            allPatternsTable.refresh();
-            selectedPatternsTable.refresh();
+            if (!hasDuplicateUseCaseIds(selectedPatterns)) {
+                selectedPatternsTable.getItems().addAll(selectedPatterns);
+                allPatternsTable.getSelectionModel().clearSelection();
+                selectedPatternsTable.refresh();
+                updateAllPatternsTable();
+            } else {
+                CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, "Patterns enthalten Duplikate",  "Die Patterns können nicht hinzugefügt werden, da sie doppelte UseCaseIds beinhalten.");
+                alert.showAndWait();
+            }
         }
+    }
+
+    /**
+     * Returns if the list has duplicate usecaseIds.
+     * @param patterns the list that is tested
+     * @return if the list has duplicates
+     */
+    private boolean hasDuplicateUseCaseIds(List<AccessPattern> patterns) {
+        List<String> usecaseIds = patterns.stream().map(x -> x.getUsecaseId()).collect(Collectors.toList());
+        return usecaseIds.size() != usecaseIds.stream().distinct().count();
     }
 
     /**
@@ -203,7 +224,8 @@ public class ChoosePatternsController {
         // remove all entries that are already in the selectedList
         patterns = patterns.stream().filter(x -> {
             for (AccessPattern pattern : this.alreadySelectedPatterns) {
-                if (x.getId().equals(pattern.getId())) {
+                // not the same id or usecaseId
+                if (x.getId().equals(pattern.getId()) || x.getUsecaseId().equals(pattern.getUsecaseId())) {
                     return false;
                 }
             }

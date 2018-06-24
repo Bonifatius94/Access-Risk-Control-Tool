@@ -11,14 +11,17 @@ import data.entities.Whitelist;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import io.msoffice.excel.AccessPatternImportHelper;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,11 +29,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -40,8 +46,12 @@ import ui.AppComponents;
 import ui.custom.controls.AutoCompleteComboBoxListener;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.ConditionTypeCellFactory;
+import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 import ui.main.configs.ConfigsController;
+import ui.main.patterns.modal.PatternImportController;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 public class ConfigsFormController {
@@ -72,12 +82,16 @@ public class ConfigsFormController {
 
     private ConfigsController parentController;
     private Configuration configuration;
+    private ResourceBundle bundle;
+
 
     /**
      * Initializes the controller.
      */
     @FXML
     public void initialize() {
+
+        bundle = ResourceBundle.getBundle("lang");
 
         initializePatternsTable();
 
@@ -107,7 +121,8 @@ public class ConfigsFormController {
                     // remove all entries that are already in the selectedList
                     result = result.stream().filter(x -> {
                         for (AccessPattern pattern : this.patternsTable.getItems()) {
-                            if (x.getId().equals(pattern.getId())) {
+                            // not the same id or usecaseId
+                            if (x.getId().equals(pattern.getId()) || x.getUsecaseId().equals(pattern.getUsecaseId())) {
                                 return false;
                             }
                         }
@@ -236,7 +251,8 @@ public class ConfigsFormController {
         return nameInput.validate()
             && descriptionInput.validate()
             && patternsTable.getItems() != null
-            && whitelistChooser.getSelectionModel().getSelectedItem() != null;
+            && patternsTable.getItems().size() != 0
+            && whitelistChooser.getValue() != null;
     }
 
     /**
@@ -265,7 +281,6 @@ public class ConfigsFormController {
     public void chooseWhitelist() {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("ChooseWhitelistView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
@@ -299,7 +314,6 @@ public class ConfigsFormController {
     public void choosePattern() {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("ChoosePatternsView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
@@ -358,8 +372,40 @@ public class ConfigsFormController {
     /**
      * Opens a dialog which lets you choose an AccessPattern file to import and imports that into the application.
      */
-    public void importPatterns() {
+    public void importPatterns() throws Exception {
 
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle(bundle.getString("choosePatternFile"));
+        //chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Pattern Files (*.xlsx)", "*.xlsx"));
+        File selectedFile = chooser.showOpenDialog(App.primaryStage);
+
+        if (selectedFile != null) {
+
+            // import patterns with the AccessPatternImportHelper
+            AccessPatternImportHelper importHelper = new AccessPatternImportHelper();
+            List<AccessPattern> importedPatterns = importHelper.importAuthorizationPattern(selectedFile.getAbsolutePath());
+
+            // create a new FXML loader with the SapSettingsEditDialogController
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../patterns/modal/PatternImportView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
+
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow);
+            scene.getStylesheets().add("css/dark-theme.css");
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
+            customWindow.initStage(stage);
+
+            stage.show();
+
+            // give the dialog the controller and the patterns
+            PatternImportController importController = loader.getController();
+            importController.giveImportedPatterns(importedPatterns);
+            importController.setConfigsFormController(this);
+        }
     }
 
     /**
@@ -371,6 +417,14 @@ public class ConfigsFormController {
 
             this.configuration.setName(this.nameInput.getText());
             this.configuration.setDescription(this.descriptionInput.getText());
+
+            // save all new (imported) patterns to the database
+            for (AccessPattern pattern : patternsTable.getItems()) {
+                if (pattern.getId() == null) {
+                    AppComponents.getDbContext().createPattern(pattern);
+                }
+            }
+
             this.configuration.setPatterns(patternsTable.getItems());
             this.configuration.setWhitelist(whitelistChooser.getValue());
 
@@ -453,5 +507,37 @@ public class ConfigsFormController {
             }
             return map.get(string);
         }
+    }
+
+    /**
+     * Adds the given patterns to the table, taking into account that usecaseId can't be duplicate.
+     * @param patterns the patterns to add
+     */
+    public void addPatterns(List<AccessPattern> patterns) {
+
+        // check that imported patterns not have the same usecaseId as the already existing ones
+        List<AccessPattern> patternsToAdd = patterns.stream().filter(x -> {
+            for (AccessPattern pattern : this.patternsTable.getItems()) {
+                if (x.getUsecaseId().equals(pattern.getUsecaseId())) {
+                    return false;
+                }
+            }
+            return true;
+        }).collect(Collectors.toList());
+
+        // difference between the loaded patterns and the ones that are actually imported
+        int diff = patterns.size() - patternsToAdd.size();
+
+        // show alerts if difference is greater than 0
+        if (diff == 1) {
+            CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, "Nicht alle Pattern importiert",  diff + " Pattern wurd nicht importiert, da seine UsecaseIDs bereits vorhanden ist.");
+            alert.showAndWait();
+        } else if (diff > 1) {
+            CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, "Nicht alle Pattern importiert",  diff + " Patterns wurden nicht importiert, da ihre UsecaseIDs bereits vorhanden waren.");
+            alert.showAndWait();
+        }
+
+        // add the items to the table
+        patternsTable.getItems().addAll(patternsToAdd);
     }
 }
