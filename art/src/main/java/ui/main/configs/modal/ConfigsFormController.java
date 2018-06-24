@@ -363,7 +363,7 @@ public class ConfigsFormController {
      * Opens a dialog which lets you choose a Whitelist file to import and imports that into the application.
      */
     public void importWhitelist() {
-
+        // TODO add import from Franz
     }
 
     /**
