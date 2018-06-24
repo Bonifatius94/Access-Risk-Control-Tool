@@ -86,9 +86,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     protected void createNewDatabase() throws Exception {
 
+        TraceOut.enter();
+
         // execute sql scripts
         executeScript(getClass().getClassLoader().getResource("scripts/create_schema.sql").getPath());
         executeScript(getClass().getClassLoader().getResource("scripts/create_roles.sql").getPath());
+
+        TraceOut.leave();
     }
 
     // ============================================
@@ -363,11 +367,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("Pattern.createdAt >= :start");
+            conditions.add("PARSEDATETIME(Pattern.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("Pattern.createdAt <= :end");
+            conditions.add("PARSEDATETIME(Pattern.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -453,11 +457,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("Whitelist.createdAt >= :start");
+            conditions.add("PARSEDATETIME(Whitelist.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("Whitelist.createdAt <= :end");
+            conditions.add("PARSEDATETIME(Whitelist.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -537,11 +541,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("SapConfig.createdAt >= :start");
+            conditions.add("PARSEDATETIME(SapConfig.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("SapConfig.createdAt <= :end");
+            conditions.add("PARSEDATETIME(SapConfig.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -629,11 +633,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("Config.createdAt >= :start");
+            conditions.add("PARSEDATETIME(Config.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("Config.createdAt <= :end");
+            conditions.add("PARSEDATETIME(Config.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -723,11 +727,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("Query.createdAt >= :start");
+            conditions.add("PARSEDATETIME(Query.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("Query.createdAt <= :end");
+            conditions.add("PARSEDATETIME(Query.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {

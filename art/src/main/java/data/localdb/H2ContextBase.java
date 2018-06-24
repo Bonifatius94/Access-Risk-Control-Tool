@@ -17,6 +17,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Environment;
+import tools.tracing.TraceOut;
 
 public abstract class H2ContextBase implements Closeable {
 
@@ -252,7 +253,11 @@ public abstract class H2ContextBase implements Closeable {
      */
     public void executeScript(String filePath) throws Exception {
 
-        List<String> sqlCommands = getCommands(new File(filePath).getAbsolutePath());
+        TraceOut.enter();
+
+        String path = new File(filePath).getAbsolutePath();
+        TraceOut.writeInfo("Script Path: '" + path + "'");
+        List<String> sqlCommands = getCommands(path);
 
         try (Session session = sessionFactory.openSession()) {
 
@@ -273,6 +278,8 @@ public abstract class H2ContextBase implements Closeable {
                 throw ex;
             }
         }
+
+        TraceOut.leave();
     }
 
     private List<String> getCommands(String filePath) throws Exception {

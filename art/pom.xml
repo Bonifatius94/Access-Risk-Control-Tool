@@ -8,6 +8,8 @@
     <artifactId>art</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+
+
     <!-- set java version used -->
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -137,6 +139,7 @@
                 </executions>
             </plugin>
 
+            <!-- unit testing -->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
@@ -152,6 +155,7 @@
                 </configuration>
             </plugin>
 
+            <!-- maven jar export on 'package' task -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -165,6 +169,8 @@
                     </archive>
                 </configuration>
             </plugin>
+
+            <!-- maven dependency manager for jar export -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
