@@ -13,25 +13,28 @@
               fx:controller="ui.main.configs.modal.ChooseWhitelistController" windowState="NoResize">
     <VBox spacing="20" HBox.hgrow="ALWAYS" style="-fx-padding: 20">
         <HBox spacing="40" HBox.hgrow="ALWAYS">
-            <TableView VBox.vgrow="ALWAYS" fx:id="whitelistTable" minWidth="500">
-                <columns>
-                    <PTableColumn text="%name" percentageWidth="0.3">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="name"/>
-                        </cellValueFactory>
-                    </PTableColumn>
-                    <PTableColumn text="%description" percentageWidth="0.55">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="description"/>
-                        </cellValueFactory>
-                    </PTableColumn>
-                    <PTableColumn fx:id="entryCountColumn" text="#" resizable="false" percentageWidth="0.15">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="Integer"/>
-                        </cellValueFactory>
-                    </PTableColumn>
-                </columns>
-            </TableView>
+            <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="10">
+                <fx:include source="../../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
+                <TableView VBox.vgrow="ALWAYS" fx:id="whitelistTable" minWidth="500">
+                    <columns>
+                        <PTableColumn text="%name" percentageWidth="0.3">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="name"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn text="%description" percentageWidth="0.55">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="description"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn fx:id="entryCountColumn" text="#" resizable="false" percentageWidth="0.15">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="Integer"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                    </columns>
+                </TableView>
+            </VBox>
             <VBox spacing="20">
                 <Label text="%whitelistDetails" style="-fx-font-size: 150%; -fx-padding: 0 0 10 0"/>
                 <VBox HBox.hgrow="ALWAYS" spacing="40">
@@ -56,17 +59,25 @@
                 </TableView>
             </VBox>
         </HBox>
-        <HBox spacing="20" HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT">
-            <JFXButton onAction="#saveChanges" prefWidth="120" text="%apply">
+        <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_LEFT">
+            <Label text="%noWhitelistChosen" fx:id="noWhitelistChosenLabel" style="-fx-font-size: 1.2em">
                 <graphic>
-                    <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
+                    <MaterialDesignIconView glyphName="ALERT"/>
                 </graphic>
-            </JFXButton>
-            <JFXButton onAction="#close" prefWidth="120" text="%cancel">
-                <graphic>
-                    <MaterialDesignIconView glyphName="CLOSE"/>
-                </graphic>
-            </JFXButton>
+            </Label>
+            <Region HBox.hgrow="ALWAYS"/>
+            <HBox spacing="20" alignment="BASELINE_RIGHT">
+                <JFXButton onAction="#saveChanges" prefWidth="120" text="%apply">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="CHECK"/>
+                    </graphic>
+                </JFXButton>
+                <JFXButton onAction="#close" prefWidth="120" text="%cancel">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="CLOSE"/>
+                    </graphic>
+                </JFXButton>
+            </HBox>
         </HBox>
     </VBox>
 </CustomWindow>

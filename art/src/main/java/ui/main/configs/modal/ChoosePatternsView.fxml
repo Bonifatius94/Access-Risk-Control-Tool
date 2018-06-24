@@ -17,28 +17,37 @@
 
     <VBox HBox.hgrow="ALWAYS" style="-fx-padding: 20" spacing="20">
         <HBox HBox.hgrow="ALWAYS" spacing="20">
-            <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" spacing="20" alignment="CENTER">
+            <VBox VBox.vgrow="ALWAYS" spacing="20" alignment="CENTER" minWidth="700" maxWidth="900">
                 <Label text="%allPatternsTable" style="-fx-font-size: 170%"/>
-                <TableView VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" fx:id="allPatternsTable">
-                    <columns>
-                        <PTableColumn text="UseCaseID" percentageWidth="0.2">
-                            <cellValueFactory>
-                                <PropertyValueFactory property="usecaseId"/>
-                            </cellValueFactory>
-                        </PTableColumn>
-                        <PTableColumn text="Description" percentageWidth="0.7" styleClass="align-left">
-                            <cellValueFactory>
-                                <PropertyValueFactory property="description"/>
-                            </cellValueFactory>
-                        </PTableColumn>
-                        <PTableColumn text="#" fx:id="allPatternsTableConditionCountColumn" percentageWidth="0.1"
-                                      resizable="false">
-                            <cellValueFactory>
-                                <PropertyValueFactory property="conditions"/>
-                            </cellValueFactory>
-                        </PTableColumn>
-                    </columns>
-                </TableView>
+                <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="10">
+                    <fx:include source="../../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
+                    <TableView VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" fx:id="allPatternsTable">
+                        <columns>
+                            <PTableColumn text="?" fx:id="allPatternsTableConditionTypeColumn" percentageWidth="0.06"
+                                          resizable="false">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="conditions"/>
+                                </cellValueFactory>
+                            </PTableColumn>
+                            <PTableColumn text="%useCaseID" percentageWidth="0.2">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="usecaseId"/>
+                                </cellValueFactory>
+                            </PTableColumn>
+                            <PTableColumn text="%description" percentageWidth="0.64" styleClass="align-left">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="description"/>
+                                </cellValueFactory>
+                            </PTableColumn>
+                            <PTableColumn text="#" fx:id="allPatternsTableConditionCountColumn" percentageWidth="0.1"
+                                          resizable="false">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="conditions"/>
+                                </cellValueFactory>
+                            </PTableColumn>
+                        </columns>
+                    </TableView>
+                </VBox>
             </VBox>
             <VBox spacing="50" alignment="CENTER">
                 <JFXButton fx:id="addToSelectedButton" onAction="#addToSelected" styleClass="round-button"
@@ -64,23 +73,18 @@
                 <Label text="%selectedPatternsTable" style="-fx-font-size: 170%"/>
                 <TableView VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" fx:id="selectedPatternsTable">
                     <columns>
-                        <PTableColumn text="UseCaseID" percentageWidth="0.15">
-                            <cellValueFactory>
-                                <PropertyValueFactory property="usecaseId"/>
-                            </cellValueFactory>
-                        </PTableColumn>
-                        <PTableColumn text="Description" percentageWidth="0.65" styleClass="align-left">
-                            <cellValueFactory>
-                                <PropertyValueFactory property="description"/>
-                            </cellValueFactory>
-                        </PTableColumn>
-                        <PTableColumn text="#" fx:id="selectedPatternsTableConditionCountColumn" percentageWidth="0.1"
+                        <PTableColumn text="?" fx:id="selectedPatternsTableConditionTypeColumn" percentageWidth="0.15"
                                       resizable="false">
                             <cellValueFactory>
                                 <PropertyValueFactory property="conditions"/>
                             </cellValueFactory>
                         </PTableColumn>
-                        <PTableColumn percentageWidth="0.1" fx:id="selectedPatternsTableDeleteColumn" resizable="false"
+                        <PTableColumn text="%useCaseID" percentageWidth="0.7">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="usecaseId"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn percentageWidth="0.15" fx:id="selectedPatternsTableDeleteColumn" resizable="false"
                                       sortable="false">
                         </PTableColumn>
                     </columns>
@@ -90,7 +94,7 @@
         <HBox spacing="20" alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS">
             <JFXButton onAction="#saveChanges" prefWidth="120" text="%apply">
                 <graphic>
-                    <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
+                    <MaterialDesignIconView glyphName="CHECK"/>
                 </graphic>
             </JFXButton>
             <JFXButton onAction="#close" prefWidth="120" text="%cancel">

@@ -31,6 +31,7 @@ import javafx.stage.Stage;
 import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.ConditionTypeCellFactory;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.filter.FilterController;
 import ui.main.patterns.modal.PatternsFormController;
@@ -100,7 +101,6 @@ public class PatternsController {
 
         patternsTable.setItems(list);
         patternsTable.refresh();
-
 
     }
 
@@ -201,46 +201,7 @@ public class PatternsController {
     private void initializeConditionTypeColumn() {
 
         // sets the icon of the condition to pattern or profile
-        conditionTypeColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
-
-            @Override
-            protected void updateItem(Set<AccessCondition> items, boolean empty) {
-
-                // display nothing if the row is empty, otherwise the item count
-                if (empty || items == null) {
-
-                    // nothing to display
-                    setText("");
-
-                } else {
-
-                    // add the icon
-                    MaterialDesignIconView iconView = new MaterialDesignIconView();
-                    iconView.setStyle("-fx-font-size: 1.6em");
-
-                    // wrapper label for showing a tooltip
-                    Label wrapper = new Label();
-                    wrapper.setGraphic(iconView);
-
-                    if (items.stream().findFirst().get().getProfileCondition() == null) {
-
-                        // pattern
-                        iconView.setIcon(MaterialDesignIcon.VIEW_GRID);
-                        wrapper.setTooltip(new Tooltip(bundle.getString("patternCondition")));
-
-                    } else {
-
-                        // profile
-                        iconView.setIcon(MaterialDesignIcon.ACCOUNT_BOX_OUTLINE);
-                        wrapper.setTooltip(new Tooltip(bundle.getString("profileCondition")));
-
-                    }
-
-                    setGraphic(wrapper);
-
-                }
-            }
-        });
+        conditionTypeColumn.setCellFactory(new ConditionTypeCellFactory());
     }
 
     /**
@@ -286,10 +247,13 @@ public class PatternsController {
      * Clones the selected entry and adds it to the table.
      */
     public void cloneAction() throws Exception {
-        if (patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
-            AccessPattern clonedPattern = new AccessPattern(patternsTable.getSelectionModel().getSelectedItem());
+        if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getSelectionModel().getSelectedItems().size() != 0) {
 
-            AppComponents.getDbContext().createPattern(clonedPattern);
+            for (AccessPattern patternToClone : patternsTable.getSelectionModel().getSelectedItems()) {
+
+                AccessPattern clonedPattern = new AccessPattern(patternToClone);
+                AppComponents.getDbContext().createPattern(clonedPattern);
+            }
 
             updatePatternsTable();
         }
@@ -299,7 +263,7 @@ public class PatternsController {
      * Opens the edit dialog with the selected item.
      */
     public void editAction() {
-        if (patternsTable.getSelectionModel().getSelectedItems().size() != 0 && patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
+        if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getSelectionModel().getSelectedItems().size() != 0) {
             openAccessPatternForm(patternsTable.getSelectionModel().getSelectedItem());
         }
     }
@@ -308,7 +272,7 @@ public class PatternsController {
      * Deletes the item from the table.
      */
     public void deleteAction() throws Exception {
-        if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
+        if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getSelectionModel().getSelectedItems().size() != 0) {
 
             for (AccessPattern pattern : patternsTable.getSelectionModel().getSelectedItems()) {
                 AppComponents.getDbContext().deletePattern(pattern);

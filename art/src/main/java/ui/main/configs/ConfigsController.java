@@ -2,14 +2,18 @@ package ui.main.configs;
 
 import com.jfoenix.controls.JFXButton;
 
+import data.entities.AccessPattern;
 import data.entities.Configuration;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -23,8 +27,10 @@ import javafx.scene.control.Tooltip;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
+import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
+import ui.custom.controls.filter.FilterController;
 import ui.main.configs.modal.ConfigsFormController;
 
 
@@ -42,6 +48,9 @@ public class ConfigsController {
     @FXML
     public TableColumn<Configuration, JFXButton> editColumn;
 
+    @FXML
+    public FilterController filterController;
+
 
     private ResourceBundle bundle;
 
@@ -49,7 +58,7 @@ public class ConfigsController {
      * Initializes the controller.
      */
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
 
         // load the ResourceBundle
         bundle = ResourceBundle.getBundle("lang");
@@ -60,6 +69,35 @@ public class ConfigsController {
 
         // initialize the configs table
         initializeConfigsTable();
+
+        // check if the filters are applied
+        filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
+            if (newValue) {
+                try {
+                    updateConfigsTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        // fill table with all entries from the database
+        updateConfigsTable();
+
+    }
+
+    /**
+     * Updates the configsTable items from the database, taking filters into account.
+     */
+    public void updateConfigsTable() throws Exception {
+
+        List<Configuration> configs = AppComponents.getDbContext().getFilteredConfigs(filterController.showArchivedProperty.getValue(),
+            filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
+            filterController.endDateProperty.getValue(), 0);
+        ObservableList<Configuration> list = FXCollections.observableList(configs);
+
+        configsTable.setItems(list);
+        configsTable.refresh();
 
     }
 
@@ -111,7 +149,12 @@ public class ConfigsController {
 
         // Add the delete column
         deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (Configuration configuration) -> {
-            configsTable.getItems().remove(configuration);
+            try {
+                AppComponents.getDbContext().deleteConfig(configuration);
+                updateConfigsTable();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return configuration;
         }));
 
@@ -127,18 +170,23 @@ public class ConfigsController {
     /**
      * Clones the selected entry and adds it to the table.
      */
-    public void cloneAction() {
-        if (configsTable.getSelectionModel().getSelectedItems().size() != 0 && configsTable.getFocusModel().getFocusedItem().equals(configsTable.getSelectionModel().getSelectedItem())) {
+    public void cloneAction() throws Exception {
+        if (configsTable.getSelectionModel().getSelectedItems() != null && configsTable.getSelectionModel().getSelectedItems().size() != 0) {
 
-            // clone the currently selected item and add it to the table
-            Configuration clonedConfiguration = configsTable.getSelectionModel().getSelectedItem();
-            configsTable.getItems().add(0, clonedConfiguration);
+            for (Configuration configToClone : configsTable.getSelectionModel().getSelectedItems()) {
 
-            // select the clone
-            configsTable.getSelectionModel().clearSelection();
-            configsTable.getSelectionModel().select(clonedConfiguration);
-            configsTable.scrollTo(clonedConfiguration);
-            configsTable.refresh();
+                // clone the currently selected item and add it to the table
+                Configuration clonedConfiguration = new Configuration(configsTable.getSelectionModel().getSelectedItem());
+
+                // reference whitelist and patterns in the new object
+                clonedConfiguration.setPatterns(configToClone.getPatterns());
+                clonedConfiguration.setWhitelist(configToClone.getWhitelist());
+
+                // save the new item to the config
+                AppComponents.getDbContext().createConfig(clonedConfiguration);
+            }
+
+            updateConfigsTable();
         }
     }
 
@@ -146,7 +194,7 @@ public class ConfigsController {
      * Opens the edit dialog with the selected item.
      */
     public void editAction() {
-        if (configsTable.getSelectionModel().getSelectedItems().size() != 0 && configsTable.getFocusModel().getFocusedItem().equals(configsTable.getSelectionModel().getSelectedItem())) {
+        if (configsTable.getSelectionModel().getSelectedItems() != null && configsTable.getSelectionModel().getSelectedItems().size() != 0) {
             openConfigurationForm(configsTable.getSelectionModel().getSelectedItem());
         }
     }
@@ -154,12 +202,15 @@ public class ConfigsController {
     /**
      * Deletes the item from the table.
      */
-    public void deleteAction() {
-        if (configsTable.getSelectionModel().getSelectedItems().size() != 0 && configsTable.getFocusModel().getFocusedItem().equals(configsTable.getSelectionModel().getSelectedItem())) {
+    public void deleteAction() throws Exception {
+        if (configsTable.getSelectionModel().getSelectedItems() != null && configsTable.getSelectionModel().getSelectedItems().size() != 0) {
 
             // remove all selected items
-            configsTable.getItems().removeAll(configsTable.getSelectionModel().getSelectedItems());
-            configsTable.refresh();
+            for (Configuration config : configsTable.getSelectionModel().getSelectedItems()) {
+                AppComponents.getDbContext().deleteConfig(config);
+            }
+
+            updateConfigsTable();
         }
     }
 
@@ -201,8 +252,9 @@ public class ConfigsController {
             stage.show();
 
             // give the dialog the sapConfiguration
-            ConfigsFormController configEdit = loader.getController();
-            configEdit.giveSelectedConfiguration(configuration);
+            ConfigsFormController configForm = loader.getController();
+            configForm.giveSelectedConfiguration(configuration);
+            configForm.setParentController(this);
         } catch (Exception e) {
             e.printStackTrace();
         }

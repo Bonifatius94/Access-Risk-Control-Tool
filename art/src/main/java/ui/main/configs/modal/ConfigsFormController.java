@@ -7,16 +7,19 @@ import com.jfoenix.controls.JFXTextField;
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 import data.entities.Configuration;
-
 import data.entities.Whitelist;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
-import io.msoffice.excel.AccessPatternImportHelper;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,11 +33,15 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 import ui.App;
+import ui.AppComponents;
 import ui.custom.controls.AutoCompleteComboBoxListener;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.ConditionTypeCellFactory;
 import ui.custom.controls.CustomWindow;
+import ui.main.configs.ConfigsController;
 
 
 public class ConfigsFormController {
@@ -49,10 +56,10 @@ public class ConfigsFormController {
     private JFXComboBox<Whitelist> whitelistChooser;
 
     @FXML
-    private JFXComboBox patternChooser;
+    private JFXComboBox<AccessPattern> patternChooser;
 
     @FXML
-    private TableView patternsTable;
+    private TableView<AccessPattern> patternsTable;
 
     @FXML
     public TableColumn<AccessPattern, JFXButton> deletePatternColumn;
@@ -61,25 +68,101 @@ public class ConfigsFormController {
     public TableColumn<AccessPattern, Set<AccessCondition>> conditionCountColumn;
 
     @FXML
-    private JFXButton resetFormButton;
+    public TableColumn<AccessPattern, Set<AccessCondition>> conditionTypeColumn;
 
-
+    private ConfigsController parentController;
     private Configuration configuration;
 
     /**
-     * Initializes the view.
+     * Initializes the controller.
      */
     @FXML
     public void initialize() {
-        new AutoCompleteComboBoxListener<>(whitelistChooser);
-        new AutoCompleteComboBoxListener<>(patternChooser);
 
         initializePatternsTable();
 
-        fillPatternsTable();
-
         initializeValidation();
 
+        initializePatternChooser();
+
+        initializeWhitelistChooser();
+
+    }
+
+    /**
+     * Initialize the patternChooser as an autocomplete.
+     */
+    private void initializePatternChooser() {
+
+        // create the autocomplete binding
+        new AutoCompleteComboBoxListener<>(patternChooser);
+
+        // change the items of the autocomplete according to the input
+        patternChooser.getEditor().textProperty().addListener((event) -> {
+            if (!patternChooser.getEditor().getText().isEmpty()) {
+                try {
+                    List<AccessPattern> result = AppComponents.getDbContext().getFilteredPatterns(false, patternChooser.getEditor().getText(), null, null, 5);
+                    result = result.stream().filter(x -> !patternsTable.getItems().contains(x)).collect(Collectors.toList());
+
+                    // remove all entries that are already in the selectedList
+                    result = result.stream().filter(x -> {
+                        for (AccessPattern pattern : this.patternsTable.getItems()) {
+                            if (x.getId().equals(pattern.getId())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }).collect(Collectors.toList());
+
+                    if (result.size() != 0) {
+                        ObservableList<AccessPattern> items = FXCollections.observableArrayList(new ArrayList<>(result));
+                        patternChooser.setItems(items);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        // listen for value changes and add the selected item to the table
+        patternChooser.valueProperty().addListener((ol, oldValue, newValue) -> {
+            if (newValue != null) {
+                patternsTable.getItems().add(newValue);
+                patternsTable.refresh();
+                Platform.runLater(() -> {
+                    patternChooser.setValue(null);
+                    patternChooser.getItems().clear();
+                });
+            }
+        });
+
+        // set a string converter for the patternChooser to the items are correctly displayed
+        patternChooser.setConverter(new PatternStringConverter());
+    }
+
+    /**
+     * Initialize the whitelistChooser as an autocomplete.
+     */
+    private void initializeWhitelistChooser() {
+
+        // create the autocomplete binding
+        new AutoCompleteComboBoxListener<>(whitelistChooser);
+
+        // change the items of the autocomplete according to the input
+        whitelistChooser.getEditor().textProperty().addListener((event) -> {
+            try {
+                List<Whitelist> result = AppComponents.getDbContext().getFilteredWhitelists(false, whitelistChooser.getEditor().getText(), null, null, 5);
+                if (result.size() != 0) {
+                    ObservableList<Whitelist> items = FXCollections.observableArrayList(new ArrayList<>(result));
+                    whitelistChooser.setItems(items);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        // set a string converter for the whitelistChooser to the items are correctly displayed
+        whitelistChooser.setConverter(new WhitelistStringConverter());
     }
 
     /**
@@ -100,6 +183,8 @@ public class ConfigsFormController {
         // Add the delete column
         deletePatternColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPattern accessPattern) -> {
             patternsTable.getItems().remove(accessPattern);
+            configuration.getPatterns().remove(accessPattern);
+            patternsTable.refresh();
             return accessPattern;
         }));
 
@@ -118,6 +203,9 @@ public class ConfigsFormController {
 
         // custom comparator for the conditionCountColumn
         conditionCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
+
+        // sets the icon of the condition to pattern or profile
+        conditionTypeColumn.setCellFactory(new ConditionTypeCellFactory());
     }
 
     /**
@@ -164,10 +252,10 @@ public class ConfigsFormController {
             nameInput.setText(configuration.getName());
             descriptionInput.setText(configuration.getDescription());
 
-            // TODO: prefill patterns, prefill whitelist input
+            patternsTable.setItems(FXCollections.observableList(new ArrayList<>(configuration.getPatterns())));
+            whitelistChooser.setValue(configuration.getWhitelist());
         } else {
             this.configuration = new Configuration();
-            resetFormButton.setVisible(false);
         }
     }
 
@@ -216,7 +304,7 @@ public class ConfigsFormController {
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 1200, 550);
+            Scene scene = new Scene(customWindow);
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
@@ -256,8 +344,7 @@ public class ConfigsFormController {
      * @param whitelist the given whitelist
      */
     public void setWhitelist(Whitelist whitelist) {
-        this.whitelistChooser.getItems().add(whitelist);
-        this.whitelistChooser.getSelectionModel().select(whitelist);
+        whitelistChooser.setValue(whitelist);
     }
 
 
@@ -276,26 +363,27 @@ public class ConfigsFormController {
     }
 
     /**
-     * Resets the form.
-     */
-    public void resetForm() {
-
-    }
-
-    /**
      * Saves the changes to the database.
      */
-    public void saveChanges() {
+    public void saveChanges(ActionEvent event) throws Exception {
 
         if (validateBeforeSave()) {
+
             this.configuration.setName(this.nameInput.getText());
             this.configuration.setDescription(this.descriptionInput.getText());
-
             this.configuration.setPatterns(patternsTable.getItems());
+            this.configuration.setWhitelist(whitelistChooser.getValue());
 
-            this.configuration.setWhitelist(whitelistChooser.getSelectionModel().getSelectedItem());
+            // new config, id is null
+            if (configuration.getId() == null) {
+                AppComponents.getDbContext().createConfig(configuration);
+            } else {
+                AppComponents.getDbContext().updateConfig(configuration);
+            }
 
-            System.out.println(this.configuration);
+            // refresh the configsTable in the parentController
+            parentController.updateConfigsTable();
+            close(event);
         }
     }
 
@@ -309,29 +397,61 @@ public class ConfigsFormController {
     }
 
     /**
-     * Provides the data for the patternTable.
+     * Sets the parent controller.
+     *
+     * @param parentController the parent controller
      */
-    private void fillPatternsTable() {
+    public void setParentController(ConfigsController parentController) {
+        this.parentController = parentController;
+    }
 
-        // test the table with data from the Example - Zugriffsmuster.xlsx file
-        try {
-            AccessPatternImportHelper helper = new AccessPatternImportHelper();
+    /**
+     * WhitelistStringConverter for the whitelistChooser ComboBox.
+     */
+    private class WhitelistStringConverter extends StringConverter<Whitelist> {
+        private Map<String, Whitelist> map = new HashMap<>();
 
-            List<AccessPattern> patterns = helper.importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
-            patterns.get(0).setId(0);
-            patterns.get(1).setId(1);
-            patterns.get(2).setId(2);
-            patterns.remove(3);
-            patterns.remove(4);
-
-            ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
-
-            patternsTable.setItems(list);
-            patternsTable.refresh();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        @Override
+        public String toString(Whitelist whitelist) {
+            if (whitelist == null) {
+                return "";
+            }
+            String str = whitelist.getName() + " - " + whitelist.getDescription();
+            map.put(str, whitelist);
+            return str;
         }
 
+        @Override
+        public Whitelist fromString(String string) {
+            if (!map.containsKey(string)) {
+                return null;
+            }
+            return map.get(string);
+        }
+    }
+
+    /**
+     * PatternStringConverter for the patternChooser ComboBox.
+     */
+    private class PatternStringConverter extends StringConverter<AccessPattern> {
+        private Map<String, AccessPattern> map = new HashMap<>();
+
+        @Override
+        public String toString(AccessPattern pattern) {
+            if (pattern == null) {
+                return "";
+            }
+            String str = pattern.getUsecaseId() + " - " + pattern.getDescription();
+            map.put(str, pattern);
+            return str;
+        }
+
+        @Override
+        public AccessPattern fromString(String string) {
+            if (!map.containsKey(string)) {
+                return null;
+            }
+            return map.get(string);
+        }
     }
 }

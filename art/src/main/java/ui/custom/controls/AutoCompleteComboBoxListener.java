@@ -10,19 +10,16 @@ import javafx.scene.input.KeyEvent;
 public class AutoCompleteComboBoxListener<T> implements EventHandler<KeyEvent> {
 
     private JFXComboBox comboBox;
-    private StringBuilder sb;
-    private ObservableList<T> data;
     private boolean moveCaretToPos = false;
     private int caretPos;
 
     /**
      * Adds a listener to the given comboBox which works like an autocomplete.
+     *
      * @param comboBox the comboBox to turn into an autocomplete
      */
     public AutoCompleteComboBoxListener(final JFXComboBox comboBox) {
         this.comboBox = comboBox;
-        sb = new StringBuilder();
-        data = comboBox.getItems();
 
         this.comboBox.setEditable(true);
         this.comboBox.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -63,24 +60,14 @@ public class AutoCompleteComboBoxListener<T> implements EventHandler<KeyEvent> {
             return;
         }
 
-        ObservableList list = FXCollections.observableArrayList();
-        for (int i = 0; i < data.size(); i++) {
-            if (data.get(i).toString().toLowerCase().startsWith(
-                AutoCompleteComboBoxListener.this.comboBox
-                    .getEditor().getText().toLowerCase())) {
-                list.add(data.get(i));
-            }
-        }
-        String t = comboBox.getEditor().getText();
-
-        comboBox.setItems(list);
-        comboBox.getEditor().setText(t);
         if (!moveCaretToPos) {
             caretPos = -1;
         }
-        moveCaret(t.length());
-        if (!list.isEmpty()) {
+
+        if (!comboBox.getItems().isEmpty()) {
             comboBox.show();
+        } else {
+            comboBox.hide();
         }
     }
 

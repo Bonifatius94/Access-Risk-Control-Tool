@@ -1,24 +1,26 @@
 package ui.main.configs.modal;
 
-import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 
-import io.msoffice.excel.WhitelistImportHelper;
-
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import ui.AppComponents;
+import ui.custom.controls.filter.FilterController;
 
 
 public class ChooseWhitelistController {
@@ -30,9 +32,6 @@ public class ChooseWhitelistController {
     public TableColumn<Whitelist, Set<WhitelistEntry>> entryCountColumn;
 
     @FXML
-    public JFXButton applyButton;
-
-    @FXML
     public JFXTextField nameField;
 
     @FXML
@@ -40,6 +39,12 @@ public class ChooseWhitelistController {
 
     @FXML
     public TableView<WhitelistEntry> whitelistEntries;
+
+    @FXML
+    public FilterController filterController;
+
+    @FXML
+    public Label noWhitelistChosenLabel;
 
 
     private ConfigsFormController parentController;
@@ -49,7 +54,7 @@ public class ChooseWhitelistController {
      * Initializes the view.
      */
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
 
         // set text fields uneditable
         this.nameField.setEditable(false);
@@ -57,7 +62,21 @@ public class ChooseWhitelistController {
 
         initializeWhitelistTable();
 
-        fillWhitelistTable();
+        // show warning if no whitelist is selected
+        noWhitelistChosenLabel.visibleProperty().bind(Bindings.isNull(whitelistTable.getSelectionModel().selectedItemProperty()));
+
+        // check if the filters are applied
+        filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
+            if (newValue) {
+                try {
+                    updateWhitelistTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        updateWhitelistTable();
     }
 
     /**
@@ -130,33 +149,14 @@ public class ChooseWhitelistController {
     /**
      * Fills the whitelist table with entries.
      */
-    private void fillWhitelistTable() {
-        try {
+    private void updateWhitelistTable() throws Exception {
+        List<Whitelist> whitelists = AppComponents.getDbContext().getFilteredWhitelists(filterController.showArchivedProperty.getValue(),
+            filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
+            filterController.endDateProperty.getValue(), 0);
 
-            // fill whitelist table with dummy data
-            Whitelist whitelist = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");
-            whitelist.setName("Whitelist");
-            whitelist.setDescription("description");
+        ObservableList<Whitelist> list = FXCollections.observableList(whitelists);
 
-            Whitelist whitelist2 = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");
-            whitelist2.setName("Whitelist2");
-            whitelist2.setDescription("description2");
-
-            Whitelist whitelist3 = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");
-            whitelist3.setName("Whitelist3");
-            whitelist3.setDescription("description3");
-
-            Whitelist whitelist4 = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");
-            whitelist4.setName("Whitelist4");
-            whitelist4.setDescription("description4");
-
-            ObservableList<Whitelist> entries = FXCollections.observableArrayList();
-            entries.addAll(whitelist, whitelist2, whitelist3, whitelist4);
-
-            this.whitelistTable.setItems(entries);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        whitelistTable.setItems(list);
+        whitelistTable.refresh();
     }
 }

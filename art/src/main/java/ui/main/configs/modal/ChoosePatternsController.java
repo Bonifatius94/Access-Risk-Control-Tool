@@ -7,9 +7,8 @@ import data.entities.AccessPattern;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
-import io.msoffice.excel.AccessPatternImportHelper;
-
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,7 +23,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
+import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.ConditionTypeCellFactory;
+import ui.custom.controls.filter.FilterController;
 
 
 public class ChoosePatternsController {
@@ -36,16 +38,16 @@ public class ChoosePatternsController {
     public TableView<AccessPattern> selectedPatternsTable;
 
     @FXML
-    public TableColumn<AccessPattern, JFXButton> allPatternsTableDeleteColumn;
-
-    @FXML
     public TableColumn<AccessPattern, JFXButton> selectedPatternsTableDeleteColumn;
 
     @FXML
     public TableColumn<AccessPattern, Set<AccessCondition>> allPatternsTableConditionCountColumn;
 
     @FXML
-    public TableColumn<AccessPattern, Set<AccessCondition>> selectedPatternsTableConditionCountColumn;
+    public TableColumn<AccessPattern, Set<AccessCondition>> allPatternsTableConditionTypeColumn;
+
+    @FXML
+    public TableColumn<AccessPattern, Set<AccessCondition>> selectedPatternsTableConditionTypeColumn;
 
     @FXML
     public JFXButton addToSelectedButton;
@@ -53,12 +55,36 @@ public class ChoosePatternsController {
     @FXML
     public JFXButton removeFromSelectedButton;
 
+    @FXML
+    public FilterController filterController;
+
+
     private ConfigsFormController parentController;
     private List<AccessPattern> alreadySelectedPatterns;
+    private ResourceBundle bundle;
 
+    /**
+     * Initializes the controller.
+     */
     @FXML
     public void initialize() {
+
+        // load the ResourceBundle
+        bundle = ResourceBundle.getBundle("lang");
+
+        // initialize the tables
         initializePatternsTables();
+
+        // check if the filters are applied
+        filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
+            if (newValue) {
+                try {
+                    updateAllPatternsTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**
@@ -98,6 +124,9 @@ public class ChoosePatternsController {
 
         // custom comparator for the conditionCountColumn
         allPatternsTableConditionCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
+
+        // sets the icon of the condition to pattern or profile
+        allPatternsTableConditionTypeColumn.setCellFactory(new ConditionTypeCellFactory());
     }
 
     /**
@@ -111,21 +140,8 @@ public class ChoosePatternsController {
             return accessPattern;
         }));
 
-        // overwrite the column in which the number of useCases is displayed
-        selectedPatternsTableConditionCountColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
-
-            @Override
-            protected void updateItem(Set<AccessCondition> items, boolean empty) {
-
-                // display nothing if the row is empty, otherwise the item count
-                setText((empty || items == null) ? "" : "" + items.size());
-
-            }
-
-        });
-
-        // custom comparator for the conditionCountColumn
-        selectedPatternsTableConditionCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
+        // sets the icon of the condition to pattern or profile
+        selectedPatternsTableConditionTypeColumn.setCellFactory(new ConditionTypeCellFactory());
     }
 
     /**
@@ -161,7 +177,7 @@ public class ChoosePatternsController {
      *
      * @param selectedPatterns the already selected patterns
      */
-    public void giveSelectedPatterns(List<AccessPattern> selectedPatterns) {
+    public void giveSelectedPatterns(List<AccessPattern> selectedPatterns) throws Exception {
 
         this.alreadySelectedPatterns = selectedPatterns;
 
@@ -172,44 +188,32 @@ public class ChoosePatternsController {
         }
 
         // fill the allPatternsTable
-        fillAllPatternsTable();
+        updateAllPatternsTable();
     }
 
     /**
      * Provides the data for the patternTable.
      */
-    private void fillAllPatternsTable() {
+    private void updateAllPatternsTable() throws Exception {
 
-        // test the table with data from the Example - Zugriffsmuster.xlsx file
-        try {
-            AccessPatternImportHelper helper = new AccessPatternImportHelper();
+        List<AccessPattern> patterns = AppComponents.getDbContext().getFilteredPatterns(filterController.showArchivedProperty.getValue(),
+            filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
+            filterController.endDateProperty.getValue(), 0);
 
-            List<AccessPattern> patterns = helper.importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
-
-            patterns.get(0).setId(0);
-            patterns.get(1).setId(1);
-            patterns.get(2).setId(2);
-            patterns.get(3).setId(3);
-            patterns.get(4).setId(4);
-
-            // remove all entries that are already in the selectedList
-            patterns = patterns.stream().filter(x -> {
-                for (AccessPattern pattern : this.alreadySelectedPatterns) {
-                    if (x.getId() == pattern.getId()) {
-                        return false;
-                    }
+        // remove all entries that are already in the selectedList
+        patterns = patterns.stream().filter(x -> {
+            for (AccessPattern pattern : this.alreadySelectedPatterns) {
+                if (x.getId().equals(pattern.getId())) {
+                    return false;
                 }
-                return true;
-            }).collect(Collectors.toList());
+            }
+            return true;
+        }).collect(Collectors.toList());
 
-            ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
+        ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
 
-            allPatternsTable.setItems(list);
-            allPatternsTable.refresh();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        allPatternsTable.setItems(list);
+        allPatternsTable.refresh();
 
     }
 
@@ -223,6 +227,7 @@ public class ChoosePatternsController {
 
     /**
      * Sets the parent controller so we can give it some data.
+     *
      * @param controller the parent controller
      */
     public void setParentController(ConfigsFormController controller) {

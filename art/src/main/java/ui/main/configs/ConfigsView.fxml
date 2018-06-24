@@ -10,6 +10,7 @@
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.configs.ConfigsController"
       spacing="10">
+    <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
     <TableView VBox.vgrow="ALWAYS" fx:id="configsTable">
         <columns>
             <PTableColumn text="Name" percentageWidth="0.35" resizable="false" >
