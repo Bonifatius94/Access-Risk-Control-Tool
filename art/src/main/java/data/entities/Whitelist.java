@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -22,20 +23,69 @@ import org.hibernate.annotations.FetchMode;
 @Table(name = "Whitelists")
 public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
 
+    // =============================
+    //         constructors
+    // =============================
+
+    public Whitelist() {
+        // nothing to do here ...
+    }
+
+    /**
+     * This constructor creates a new instance with the given parameters.
+     *
+     * @param name the name of the new instance
+     * @param description the description of the new instance
+     * @param entries the whitelist entries of the new instance
+     */
+    public Whitelist(String name, String description, List<WhitelistEntry> entries) {
+
+        setName(name);
+        setDescription(description);
+        setEntries(entries);
+    }
+
+    /**
+     * This constructor clones the given instance.
+     *
+     * @param original the instance to be cloned
+     */
+    public Whitelist(Whitelist original) {
+
+        this.setName(original.getName());
+        this.setDescription(original.getDescription());
+        this.setEntries(original.getEntries().stream().map(x -> new WhitelistEntry(x)).collect(Collectors.toSet()));
+    }
+
+    // =============================
+    //           members
+    // =============================
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(nullable = false)
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "whitelist", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Fetch(value = FetchMode.SUBSELECT)
     private Set<WhitelistEntry> entries = new HashSet<>();
 
+    @Column(nullable = false)
     private boolean isArchived;
+
+    @Column(nullable = false)
     private ZonedDateTime createdAt;
+
+    @Column(nullable = false)
     private String createdBy;
+
+    // =============================
+    //      getters / setters
+    // =============================
 
     public Integer getId() {
         return id;
@@ -43,6 +93,14 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -133,40 +191,6 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
         builder.append("\r\nCreatedAt = ").append(getCreatedAt()).append(", CreatedBy = ").append(createdBy).append(", IsArchived = ").append(isArchived());
 
         return builder.toString();
-    }
-
-    /**
-     * This is a custom implementation of equals method that checks for data equality.
-     *
-     * @param other the object to compare with
-     * @return whether they are equal
-     */
-    @Override
-    public boolean equals(Object other) {
-
-        /*boolean ret = (other == this);
-
-        if (other instanceof Whitelist) {
-
-            Whitelist cmp = (Whitelist) other;
-
-            ret = (this.description.equals(cmp.getDescription())
-                && this.id == null || (
-                    this.isArchived == cmp.isArchived()
-                    && this.createdAt.equals(cmp.getCreatedAt())
-                    && this.createdBy.equals(cmp.getCreatedBy())
-                ));
-        }
-
-        return ret;*/
-
-        return super.equals(other);
-    }
-
-    @Override
-    public int hashCode() {
-        //return (id != null) ? id : 0;
-        return super.hashCode();
     }
 
 }

@@ -18,25 +18,67 @@ import javax.persistence.Table;
 @Table(name = "AccessConditions")
 public class AccessCondition {
 
+    // =============================
+    //         constructors
+    // =============================
+
+    public AccessCondition() {
+
+    }
+
+    public AccessCondition(AccessPattern pattern, AccessPatternCondition patternCondition) {
+        setPattern(pattern);
+        setPatternCondition(patternCondition);
+    }
+
+    public AccessCondition(AccessPattern pattern, AccessProfileCondition profileCondition) {
+        setPattern(pattern);
+        setProfileCondition(profileCondition);
+    }
+
+    /**
+     * This constructor clone the given instance.
+     *
+     * @param original the instance to be cloned
+     */
+    public AccessCondition(AccessCondition original) {
+
+        this.setType(original.getType());
+
+        if (original.getType() == AccessConditionType.Profile) {
+            this.setProfileCondition(new AccessProfileCondition(original.getProfileCondition()));
+            this.getProfileCondition().setCondition(this);
+        } else {
+            this.setPatternCondition(new AccessPatternCondition(original.getPatternCondition()));
+            this.getPatternCondition().setCondition(this);
+        }
+    }
+
+    // =============================
+    //           members
+    // =============================
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 7)
+    @Column(length = 7, nullable = false)
     private AccessConditionType type;
 
     @ManyToOne
     @JoinColumn(name = "PatternId")
     private AccessPattern pattern;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "ProfileConditionId")
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
     private AccessProfileCondition profileCondition;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "PatternConditionId")
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
     private AccessPatternCondition patternCondition;
+
+    // =============================
+    //       getters / setters
+    // =============================
 
     public Integer getId() {
         return id;
@@ -53,7 +95,6 @@ public class AccessCondition {
     public void setType(AccessConditionType type) {
         this.type = type;
     }
-
 
     public AccessPattern getPattern() {
         return pattern;
@@ -76,6 +117,7 @@ public class AccessCondition {
     public void setProfileCondition(AccessProfileCondition profileCondition) {
 
         this.profileCondition = profileCondition;
+        this.profileCondition.setCondition(this);
         this.type = AccessConditionType.Profile;
         this.patternCondition = null;
     }
@@ -93,6 +135,7 @@ public class AccessCondition {
     public void setPatternCondition(AccessPatternCondition patternCondition) {
 
         this.patternCondition = patternCondition;
+        this.patternCondition.setCondition(this);
         this.type = AccessConditionType.Pattern;
         this.profileCondition = null;
     }
@@ -109,38 +152,6 @@ public class AccessCondition {
     @Override
     public String toString() {
         return (type == AccessConditionType.Profile) ? profileCondition.toString() : patternCondition.toString();
-    }
-
-    /**
-     * This is a custom implementation of equals method that checks for data equality.
-     *
-     * @param other the object to compare with
-     * @return whether they are equal
-     */
-    @Override
-    public boolean equals(Object other) {
-
-        /*boolean ret = (other == this);
-
-        if (other instanceof AccessCondition) {
-
-            AccessCondition cmp = (AccessCondition) other;
-
-            ret = (type == cmp.getType()
-                && ((this.pattern == null && cmp.getPattern() == null) || (this.pattern != null && this.pattern.equals(cmp.getPattern())))
-                && ((this.profileCondition == null && cmp.getProfileCondition() == null) || (this.profileCondition != null && this.profileCondition.equals(cmp.getProfileCondition())))
-                && ((this.patternCondition == null && cmp.getPatternCondition() == null) || (this.patternCondition != null && this.patternCondition.equals(cmp.getPatternCondition()))));
-        }
-
-        return ret;*/
-
-        return super.equals(other);
-    }
-
-    @Override
-    public int hashCode() {
-        //return (id != null) ? id : 0;
-        return super.hashCode();
     }
 
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -24,6 +25,32 @@ import org.hibernate.annotations.FetchMode;
 @Table(name = "CriticalAccessQueries")
 public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelper {
 
+    // =============================
+    //        constructors
+    // =============================
+
+    public CriticalAccessQuery() {
+        // nothing to do here ...
+    }
+
+    /**
+     * This constructor create a new instance with the given parameters.
+     *
+     * @param config the config of the new instance
+     * @param sapConfig the sap config of the new instance
+     * @param entries the critical entries of the new instance
+     */
+    public CriticalAccessQuery(Configuration config, SapConfiguration sapConfig, Set<CriticalAccessEntry> entries) {
+
+        setConfig(config);
+        setSapConfig(sapConfig);
+        setEntries(entries);
+    }
+
+    // =============================
+    //            members
+    // =============================
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -37,12 +64,20 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
     private SapConfiguration sapConfig;
 
     @OneToMany(mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Fetch(value = FetchMode.SUBSELECT)
     private Set<CriticalAccessEntry> entries = new HashSet<>();
 
+    @Column(nullable = false)
     private boolean isArchived;
+
+    @Column(nullable = false)
     private ZonedDateTime createdAt;
+
+    @Column(nullable = false)
     private String createdBy;
+
+    // =============================
+    //      getters / setters
+    // =============================
 
     public Integer getId() {
         return id;
@@ -139,41 +174,6 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
 
         // TODO: implement logic
         return super.toString();
-    }
-
-    /**
-     * This is a custom implementation of equals method that checks for data equality.
-     *
-     * @param other the object to compare with
-     * @return whether they are equal
-     */
-    @Override
-    public boolean equals(Object other) {
-
-        /*boolean ret = (other == this);
-
-        if (other instanceof CriticalAccessQuery) {
-
-            CriticalAccessQuery cmp = (CriticalAccessQuery) other;
-
-            ret = (((this.config == null && cmp.getConfig() == null) || (this.config != null && this.config.equals(cmp.getConfig())))
-                && ((this.sapConfig == null && cmp.getSapConfig() == null) || (this.sapConfig != null && this.sapConfig.equals(cmp.getSapConfig())))
-                && this.id == null || (
-                this.isArchived == cmp.isArchived()
-                    && this.createdAt.equals(cmp.getCreatedAt())
-                    && this.createdBy.equals(cmp.getCreatedBy())
-                ));
-        }
-
-        return ret;*/
-
-        return super.equals(other);
-    }
-
-    @Override
-    public int hashCode() {
-        //return (id != null) ? id : 0;
-        return super.hashCode();
     }
 
 }

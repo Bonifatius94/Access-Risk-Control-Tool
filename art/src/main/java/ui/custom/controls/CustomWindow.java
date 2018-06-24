@@ -20,6 +20,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import ui.AppComponents;
 
 /*
  * sources:
@@ -78,7 +79,9 @@ public class CustomWindow extends VBox {
      * CanMinimize: Miximize button is disabled and resize arrows at the border of the window, too. Minimize is still working as usual.
      * NoResize: Window size cannot be changed by user and only close button is available.
      */
-    public enum WindowState { CanResize, CanMinimize, NoResize, NoButtons }
+    public enum WindowState {
+        CanResize, CanMinimize, NoResize, NoButtons
+    }
 
     private final ObjectProperty<WindowState> windowStateProperty = new SimpleObjectProperty<>(this, "windowState", WindowState.CanResize);
 
@@ -301,6 +304,7 @@ public class CustomWindow extends VBox {
 
     /**
      * Sets the windowState accordingly.
+     *
      * @param newState the new window state
      */
     public void setWindowState(WindowState newState) {
@@ -309,5 +313,4 @@ public class CustomWindow extends VBox {
         WindowState oldState = this.windowStateProperty.get();
         this.windowStateProperty.set(newState);
     }
-
 }

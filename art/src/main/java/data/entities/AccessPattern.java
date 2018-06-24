@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -33,16 +34,12 @@ import org.hibernate.annotations.FetchMode;
 public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
 
     // =============================
-    //      empty constructor
+    //        constructors
     // =============================
 
     public AccessPattern() {
         // nothing to do here ...
     }
-
-    // =============================
-    //      complex auth pattern
-    // =============================
 
     /**
      * This constructor creates a new instance of an auth pattern of complex type (without usecase id and description defined).
@@ -80,10 +77,6 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
         setLinkage(linkage);
     }
 
-    // =============================
-    //      simple auth pattern
-    // =============================
-
     /**
      * This constructor creates a new instance of an auth pattern of simple type (without usecase id and description defined).
      *
@@ -110,15 +103,33 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
         setLinkage(ConditionLinkage.None);
     }
 
+    /**
+     * This constructor clones an existing.
+     *
+     * @param original the pattern to clone
+     */
+    public AccessPattern(AccessPattern original) {
+
+        this.setUsecaseId(original.getUsecaseId());
+        this.setDescription(original.getDescription());
+        this.setLinkage(original.getLinkage());
+
+        this.setConditions(original.getConditions().stream().map(x -> new AccessCondition(x)).collect(Collectors.toSet()));
+        //conditions.forEach(x -> x.setPattern(this));
+    }
+
     // =============================
-    //           properties
+    //           members
     // =============================
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
     private String usecaseId;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -126,14 +137,18 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
     private ConditionLinkage linkage = ConditionLinkage.None;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "pattern", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Fetch(value = FetchMode.SUBSELECT)
     private Set<AccessCondition> conditions = new HashSet<>();
 
     @ManyToMany(mappedBy = "patterns", fetch = FetchType.EAGER)
     private Set<Configuration> configurations = new HashSet<>();
 
+    @Column(nullable = false)
     private boolean isArchived;
+
+    @Column(nullable = false)
     private ZonedDateTime createdAt;
+
+    @Column(nullable = false)
     private String createdBy;
 
     // =============================
@@ -274,42 +289,6 @@ public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
         builder.append(", linkage='").append(linkage.toString()).append("', conditions: ");
         conditions.forEach(x -> builder.append("\r\ncondition: ").append(x.toString()));
         return builder.toString();
-    }
-
-    /**
-     * This is a custom implementation of equals method that checks for data equality.
-     *
-     * @param other the object to compare with
-     * @return whether they are equal
-     */
-    @Override
-    public boolean equals(Object other) {
-
-        /*boolean ret = (other == this);
-
-        if (other instanceof AccessPattern) {
-
-            AccessPattern cmp = (AccessPattern) other;
-
-            ret = (usecaseId.equals(cmp.getUsecaseId())
-                && ((this.description == null && cmp.getDescription() == null) || (this.description != null && this.description.equals(cmp.getDescription())))
-                && this.linkage == cmp.getLinkage()
-                && this.id == null || (
-                    this.isArchived == cmp.isArchived()
-                    && this.createdAt.equals(cmp.getCreatedAt())
-                    && this.createdBy.equals(cmp.getCreatedBy())
-                ));
-        }
-
-        return ret;*/
-
-        return super.equals(other);
-    }
-
-    @Override
-    public int hashCode() {
-        //return (id != null) ? id : 0;
-        return super.hashCode();
     }
 
 }

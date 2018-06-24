@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import ui.custom.controls.CustomWindow?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import com.jfoenix.controls.JFXPasswordField?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.validation.RequiredFieldValidator?>
+<CustomWindow xmlns="http://javafx.com/javafx"
+              xmlns:fx="http://javafx.com/fxml"
+              fx:controller="ui.login.firstuse.FirstUseWizardController" windowState="NoResize">
+    <VBox HBox.hgrow="ALWAYS" style="-fx-padding: 20" spacing="20" alignment="CENTER" styleClass="first-use-wizard">
+        <ImageView fitWidth="180" fitHeight="180">
+            <image>
+                <Image url="@/icons/art_512.png"/>
+            </image>
+        </ImageView>
+        <Separator/>
+        <VBox fx:id="welcomeBox" HBox.hgrow="ALWAYS" maxWidth="300" minHeight="260" spacing="10">
+            <Label wrapText="true" text="%welcomeText"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Separator />
+            <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" style="-fx-padding: 10 0 0 0">
+                <JFXButton fx:id="nextButton" text="%next" onAction="#goToUserCreation">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="ARROW_RIGHT"/>
+                    </graphic>
+                </JFXButton>
+            </HBox>
+        </VBox>
+        <VBox fx:id="createUserBox" HBox.hgrow="ALWAYS" visible="false" maxWidth="300" minHeight="260" spacing="10">
+            <VBox spacing="35">
+                <Label wrapText="true" text="%userCreationText"/>
+                <HBox alignment="BASELINE_LEFT" spacing="10">
+                    <MaterialDesignIconView glyphName="ACCOUNT"/>
+                    <JFXTextField fx:id="usernameInput" prefWidth="240" promptText="%username">
+                        <validators>
+                            <RequiredFieldValidator message="%required">
+                                <MaterialDesignIconView glyphName="ALERT"/>
+                            </RequiredFieldValidator>
+                        </validators>
+                    </JFXTextField>
+                </HBox>
+                <HBox alignment="BASELINE_LEFT" spacing="10">
+                    <MaterialDesignIconView glyphName="KEY"/>
+                    <JFXPasswordField fx:id="passwordInput" prefWidth="240" promptText="%password">
+                        <validators>
+                            <RequiredFieldValidator message="%required">
+                                <MaterialDesignIconView glyphName="ALERT"/>
+                            </RequiredFieldValidator>
+                        </validators>
+                    </JFXPasswordField>
+                    <JFXTextField fx:id="passwordInputPlain" prefWidth="240" promptText="%password">
+                        <validators>
+                            <RequiredFieldValidator message="%required">
+                                <MaterialDesignIconView glyphName="ALERT"/>
+                            </RequiredFieldValidator>
+                        </validators>
+                    </JFXTextField>
+                    <MaterialDesignIconView fx:id="showPasswordIconView" glyphName="EYE_OFF"
+                                            onMouseClicked="#togglePasswordDisplay" size="20"/>
+                </HBox>
+            </VBox>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Separator />
+            <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" style="-fx-padding: 10 0 0 0">
+                <JFXButton fx:id="createUserButton" text="%createUser" onAction="#createUserAndGoToFinish">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="ARROW_RIGHT"/>
+                    </graphic>
+                </JFXButton>
+            </HBox>
+        </VBox>
+        <VBox fx:id="finishBox" HBox.hgrow="ALWAYS" visible="false" maxWidth="300" minHeight="260" spacing="10">
+            <Label wrapText="true" text="%firstUserSuccessText"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Separator />
+            <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" style="-fx-padding: 10 0 0 0">
+                <JFXButton fx:id="finishButton" text="%finish" onAction="#closeAndStartApp">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="CHECK"/>
+                    </graphic>
+                </JFXButton>
+            </HBox>
+        </VBox>
+    </VBox>
+</CustomWindow>

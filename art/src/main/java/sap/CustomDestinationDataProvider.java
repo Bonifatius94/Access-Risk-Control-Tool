@@ -6,45 +6,110 @@ import com.sap.conn.jco.ext.DestinationDataProvider;
 
 import data.entities.SapConfiguration;
 
+import java.util.HashMap;
 import java.util.Properties;
 
+// source: https://archive.sap.com/discussions/thread/1887028
 
 public class CustomDestinationDataProvider implements DestinationDataProvider {
-    private DestinationDataEventListener destinationDataEventListener;
 
-    private SapConfiguration config;
-    private String username;
-    private String password;
+    // =============================
+    //           singleton
+    // =============================
 
     /**
-     * Creates a new CustomDestinationDataProvider with the given configuration, username and password.
+     * This constructor is flagged private to enforce usage as singleton.
+     * It also registers this instance as data provider for JCo connections.
+     */
+    private CustomDestinationDataProvider() {
+        com.sap.conn.jco.ext.Environment.registerDestinationDataProvider(this);
+    }
+
+    private static CustomDestinationDataProvider instance = null;
+
+    public static CustomDestinationDataProvider getInstance() {
+        return instance = (instance != null ? instance : new CustomDestinationDataProvider());
+    }
+
+    // =============================
+    //            members
+    // =============================
+
+    private DestinationDataEventListener destinationDataEventListener;
+    private HashMap<String, Properties> settingsOfSessions = new HashMap<>();
+    private int sessionCount = 0;
+
+    // =============================
+    //     register / unregister
+    // =============================
+
+    /**
+     * Creates a new connection session with the given configuration, username and password.
      *
      * @param config the configuration
      * @param username the username
      * @param password the password
+     * @return the session key of the new connection
      */
-    public CustomDestinationDataProvider(SapConfiguration config, String username, String password) {
-        // init this instance with sap config
-        this.config = config;
-        this.username = username;
-        this.password = password;
+    public synchronized String openSession(SapConfiguration config, String username, String password) {
+
+        // generate session key
+        final String sessionKey = String.valueOf(sessionCount++) + "_" + config.getServerDestination();
+
+        // create settings instance with given data
+        final Properties settings = new Properties();
+        settings.setProperty(DestinationDataProvider.JCO_ASHOST, config.getServerDestination());
+        settings.setProperty(DestinationDataProvider.JCO_SYSNR, config.getSysNr());
+        settings.setProperty(DestinationDataProvider.JCO_CLIENT, config.getClient());
+        settings.setProperty(DestinationDataProvider.JCO_LANG, config.getLanguage());
+        settings.setProperty(DestinationDataProvider.JCO_POOL_CAPACITY, config.getPoolCapacity());
+        settings.setProperty(DestinationDataProvider.JCO_USER, username);
+        settings.setProperty(DestinationDataProvider.JCO_PASSWD, password);
+
+        // add session
+        settingsOfSessions.put(sessionKey, settings);
+
+        return sessionKey;
     }
 
-    @Override
-    public Properties getDestinationProperties(String connectionName) throws DataProviderException {
-        final Properties settings = new Properties();
-        try {
-            settings.setProperty(DestinationDataProvider.JCO_ASHOST, config.getServerDestination());
-            settings.setProperty(DestinationDataProvider.JCO_SYSNR, config.getSysNr());
-            settings.setProperty(DestinationDataProvider.JCO_CLIENT, config.getClient());
-            settings.setProperty(DestinationDataProvider.JCO_USER, username);
-            settings.setProperty(DestinationDataProvider.JCO_PASSWD, password);
-            settings.setProperty(DestinationDataProvider.JCO_LANG, config.getLanguage());
-            settings.setProperty(DestinationDataProvider.JCO_POOL_CAPACITY, config.getPoolCapacity());
-            return settings;
-        } catch (Exception e) {
-            return new Properties();
+    /**
+     * This method removes a session.
+     *
+     * @param sessionKey the key of the session to remove
+     */
+    public void closeSession(String sessionKey) {
+
+        if (!settingsOfSessions.containsKey(sessionKey)) {
+            throw new IllegalArgumentException("Unknown session key: " + sessionKey);
         }
+
+        // make sure that the connection data is no longer referenced
+        settingsOfSessions.get(sessionKey).clear();
+        settingsOfSessions.remove(sessionKey);
+
+        // run garbage collector to delete connection data
+        System.gc();
+    }
+
+    // =============================
+    //          overrides
+    // =============================
+
+    /**
+     * This method gets the connection settings of the given session (only used by JCo internally when connecting to the given server destination).
+     *
+     * @param sessionKey the session key of the session
+     * @return the settings of the session
+     * @throws DataProviderException caused by operational errors by JCo
+     */
+    @Override
+    public Properties getDestinationProperties(String sessionKey) throws DataProviderException {
+
+        if (!settingsOfSessions.containsKey(sessionKey)) {
+            throw new IllegalArgumentException("Unknown session key: " + sessionKey);
+        }
+
+        return settingsOfSessions.get(sessionKey);
     }
 
     @Override

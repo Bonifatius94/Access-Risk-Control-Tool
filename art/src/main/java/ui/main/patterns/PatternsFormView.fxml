@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.validation.RequiredFieldValidator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import ui.custom.controls.CustomWindow?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import ui.custom.controls.PTableColumn?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.Tab?>
+<?import com.jfoenix.controls.JFXTabPane?>
+<?import javafx.scene.control.Tooltip?>
+<CustomWindow title="%editPatternTitle" windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
+              xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.patterns.PatternsFormController">
+    <VBox spacing="20" HBox.hgrow="ALWAYS" style="-fx-padding: 20">
+        <VBox alignment="BASELINE_LEFT" spacing="40" HBox.hgrow="ALWAYS">
+            <JFXTextField fx:id="useCaseIdInput" promptText="%useCaseID" maxWidth="250">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+            <JFXTextField fx:id="descriptionInput" promptText="%description" maxWidth="500">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+            <HBox alignment="BASELINE_LEFT" HBox.hgrow="ALWAYS" spacing="50">
+                <HBox alignment="BASELINE_LEFT" spacing="20">
+                    <Label text="%type"/>
+                    <JFXComboBox fx:id="conditionTypeInput"/>
+                </HBox>
+                <HBox fx:id="linkageBox" visible="false" alignment="BASELINE_LEFT" spacing="20">
+                    <Label text="%linkage"/>
+                    <JFXComboBox fx:id="linkageInput"/>
+                </HBox>
+                <JFXTextField fx:id="profileInput" promptText="%profileValue" maxWidth="350" visible="false">
+                    <validators>
+                        <RequiredFieldValidator message="%required">
+                            <MaterialDesignIconView glyphName="ALERT"/>
+                        </RequiredFieldValidator>
+                    </validators>
+                </JFXTextField>
+            </HBox>
+        </VBox>
+        <Separator/>
+        <HBox HBox.hgrow="ALWAYS" fx:id="conditionBox" spacing="30" alignment="CENTER">
+            <JFXTabPane fx:id="conditionTabs" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"/>
+            <VBox spacing="20" alignment="TOP_CENTER">
+                <HBox fx:id="editConditionBox" visible="false" alignment="BASELINE_LEFT" spacing="20">
+                    <JFXButton onAction="#addEmptyConditionTableTab" prefHeight="30" styleClass="round-button">
+                        <graphic>
+                            <MaterialDesignIconView glyphName="PLUS"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%addCondition"/>
+                        </tooltip>
+                    </JFXButton>
+                    <JFXButton fx:id="deleteSelectedTableTabButton" styleClass="warning-button, round-button"
+                               onAction="#deleteSelectedTableTab" prefHeight="30">
+                        <graphic>
+                            <MaterialDesignIconView glyphName="MINUS"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%deleteCondition"/>
+                        </tooltip>
+                    </JFXButton>
+                    <Label fx:id="atLeastOneCondWarning" text="%atLeastOneCondWarning" visible="false"/>
+                </HBox>
+                <Separator/>
+                <Label text="%conditionPropertiesTitle">
+                    <font>
+                        <Font size="18"/>
+                    </font>
+                </Label>
+                <VBox HBox.hgrow="ALWAYS" spacing="40" style="-fx-padding: 0 0 30 0">
+                    <JFXTextField fx:id="authObjectInput" promptText="%authObject" minWidth="150" maxWidth="350">
+                        <validators>
+                            <RequiredFieldValidator message="%required">
+                                <MaterialDesignIconView glyphName="ALERT"/>
+                            </RequiredFieldValidator>
+                        </validators>
+                    </JFXTextField>
+                    <JFXTextField fx:id="authFieldInput" promptText="%authField" minWidth="150" maxWidth="350">
+                        <validators>
+                            <RequiredFieldValidator message="%required">
+                                <MaterialDesignIconView glyphName="ALERT"/>
+                            </RequiredFieldValidator>
+                        </validators>
+                    </JFXTextField>
+                </VBox>
+                <VBox HBox.hgrow="ALWAYS" spacing="35">
+                    <HBox HBox.hgrow="ALWAYS" spacing="30">
+                        <JFXTextField fx:id="authFieldValue1Input" promptText="%authFieldValue1" minWidth="150"
+                                      maxWidth="300" HBox.hgrow="ALWAYS">
+                            <validators>
+                                <RequiredFieldValidator message="%required">
+                                    <MaterialDesignIconView glyphName="ALERT"/>
+                                </RequiredFieldValidator>
+                            </validators>
+                        </JFXTextField>
+                        <JFXTextField fx:id="authFieldValue2Input" promptText="%authFieldValue2" minWidth="150"
+                                      maxWidth="300" HBox.hgrow="ALWAYS">
+                            <validators>
+                                <RequiredFieldValidator message="%required">
+                                    <MaterialDesignIconView glyphName="ALERT"/>
+                                </RequiredFieldValidator>
+                            </validators>
+                        </JFXTextField>
+                    </HBox>
+                    <HBox HBox.hgrow="ALWAYS" spacing="30">
+                        <JFXTextField fx:id="authFieldValue3Input" promptText="%authFieldValue3" minWidth="150"
+                                      maxWidth="300" HBox.hgrow="ALWAYS">
+                        </JFXTextField>
+                        <JFXTextField fx:id="authFieldValue4Input" promptText="%authFieldValue4" minWidth="150"
+                                      maxWidth="300" HBox.hgrow="ALWAYS">
+                        </JFXTextField>
+                    </HBox>
+                </VBox>
+                <HBox alignment="CENTER_RIGHT">
+                    <JFXButton onAction="#editConditionProperty" prefHeight="30" prefWidth="30"
+                               styleClass="round-button">
+                        <graphic>
+                            <MaterialDesignIconView glyphName="CHECK"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%apply"/>
+                        </tooltip>
+                    </JFXButton>
+                </HBox>
+            </VBox>
+        </HBox>
+        <Separator/>
+        <HBox HBox.hgrow="ALWAYS">
+            <HBox alignment="BASELINE_LEFT" HBox.hgrow="ALWAYS">
+                <JFXButton text="%revert" onAction="#resetForm">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="UNDO_VARIANT"/>
+                    </graphic>
+                </JFXButton>
+            </HBox>
+            <HBox spacing="20" alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS">
+                <JFXButton onAction="#saveChanges" prefWidth="120" text="%save">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
+                    </graphic>
+                </JFXButton>
+                <JFXButton onAction="#close" prefWidth="120" text="%cancel">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="CLOSE"/>
+                    </graphic>
+                </JFXButton>
+            </HBox>
+        </HBox>
+    </VBox>
+</CustomWindow>
