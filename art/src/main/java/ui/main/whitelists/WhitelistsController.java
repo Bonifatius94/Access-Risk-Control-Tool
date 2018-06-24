@@ -37,6 +37,7 @@ import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.PTableColumn;
+import ui.custom.controls.filter.FilterController;
 
 public class WhitelistsController {
 
@@ -49,8 +50,12 @@ public class WhitelistsController {
     @FXML
     private PTableColumn<Whitelist, JFXButton> deleteWhitelistColumn;
     @FXML
-    @SuppressWarnings("all")
+
     private PTableColumn<Whitelist, Set<WhitelistEntry>> entryCountColumn;
+
+    public FilterController filter;
+
+    private ResourceBundle bundle;
 
     ArtDbContext database = AppComponents.getDbContext();
     //private Boolean includeArchivedData = true;
@@ -61,9 +66,22 @@ public class WhitelistsController {
      */
     @FXML
     public void initialize() {
+
+        bundle = ResourceBundle.getBundle("lang");
+
         initializeColumns();
 
-        try {
+        filter.shouldFilterProperty.addListener((obs, oldValue, newValue) -> {
+            if (newValue) {
+                try {
+                    updateWhitelistTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        /*try {
             //Test code
 
             WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
@@ -91,10 +109,20 @@ public class WhitelistsController {
             ObservableList<Whitelist> observableList = FXCollections.observableArrayList(whitelists);
             whitelistTable.getItems().addAll(observableList);
             whitelistTable.refresh();
-            tableRefresh();
+
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
+        tableRefresh();
+    }
+
+    private void updateWhitelistTable() throws Exception {
+        /*List<Whitelist> whitelists = database.getFilteredWhitelists(filter.showArchivedProperty.getValue(), filter.searchStringProperty.getValue(),
+            filter.startDateProperty.getValue(), filter.startDateProperty.getValue(), 0);
+        ObservableList<Whitelist> list = FXCollections.observableList(whitelists);
+        whitelistTable.setItems(list);
+        whitelistTable.refresh();
+        */
     }
 
     /**

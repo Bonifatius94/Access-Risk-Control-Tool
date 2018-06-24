@@ -10,6 +10,7 @@
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="ui.main.whitelists.WhitelistsController"
       spacing="10" fx:id="whitelistViewFxId">
+    <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
     <TableView VBox.vgrow="ALWAYS" fx:id="whitelistTable">
         <!--<columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>-->
         <columns>
