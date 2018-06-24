@@ -107,7 +107,7 @@ public class SapQueryDetailController {
     /**
      * Opens the window for running the query with preselected values.
      */
-    public void rerunQuery() {
+    public void rerunQuery(ActionEvent event) {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
@@ -125,6 +125,7 @@ public class SapQueryDetailController {
 
             customWindow.setTitle(bundle.getString("newAnalysis"));
 
+            close(event);
             stage.show();
 
             // give the dialog the sapConfiguration

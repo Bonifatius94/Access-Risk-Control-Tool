@@ -204,7 +204,7 @@ public class NewSapQueryController {
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 300, 280);
+            Scene scene = new Scene(customWindow);
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
