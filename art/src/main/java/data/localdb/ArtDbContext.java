@@ -1,7 +1,6 @@
 package data.localdb;
 
 import data.entities.AccessCondition;
-import data.entities.AccessConditionType;
 import data.entities.AccessPattern;
 import data.entities.AccessPatternCondition;
 import data.entities.AccessPatternConditionProperty;
@@ -23,7 +22,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
@@ -37,11 +35,12 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     //             CONSTRUCTOR
     // ===================================
 
-    public ArtDbContext(String username, String password) {
+    public ArtDbContext(String username, String password) throws Exception {
         super(getDefaultDatabaseFilePath(), username, password);
     }
 
-    public ArtDbContext(String filePath, String username, String password) {
+    @Deprecated
+    public ArtDbContext(String filePath, String username, String password) throws Exception {
         super(filePath, username, password);
     }
 
@@ -85,17 +84,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     }
 
     @Override
-    protected void setAdditionalProperties(org.hibernate.cfg.Configuration config) {
+    protected void createNewDatabase() throws Exception {
 
-        super.setAdditionalProperties(config);
-
-        // apply scripts that are executed after a new database file has been created by hibernate
-        config.setProperty("hibernate.hbm2ddl.import_files", "scripts/create_views.sql, scripts/create_roles.sql");
-
-        // configure hibernate logging level
-        java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.SEVERE);
-
-        // TODO: remove all 'hibernate.hbm2ddl' settings in production builds
+        // execute sql scripts
+        executeScript(getClass().getClassLoader().getResource("scripts/create_schema.sql").getPath());
+        executeScript(getClass().getClassLoader().getResource("scripts/create_roles.sql").getPath());
     }
 
     // ============================================
@@ -370,11 +363,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("Pattern.createdAt >= :start");
+            conditions.add("PARSEDATETIME(Pattern.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("Pattern.createdAt <= :end");
+            conditions.add("PARSEDATETIME(Pattern.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -460,11 +453,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("Whitelist.createdAt >= :start");
+            conditions.add("PARSEDATETIME(Whitelist.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("Whitelist.createdAt <= :end");
+            conditions.add("PARSEDATETIME(Whitelist.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -544,11 +537,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("SapConfig.createdAt >= :start");
+            conditions.add("PARSEDATETIME(SapConfig.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("SapConfig.createdAt <= :end");
+            conditions.add("PARSEDATETIME(SapConfig.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -636,11 +629,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("Config.createdAt >= :start");
+            conditions.add("PARSEDATETIME(Config.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("Config.createdAt <= :end");
+            conditions.add("PARSEDATETIME(Config.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -730,11 +723,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("Query.createdAt >= :start");
+            conditions.add("PARSEDATETIME(Query.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("Query.createdAt <= :end");
+            conditions.add("PARSEDATETIME(Query.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -767,17 +760,37 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // check if the config has already been used by a critical access query
         boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getId().equals(config.getId()));
 
-        if (archive) {
+        try (Session session = openSession()) {
 
-            archiveConfig(config);
+            Transaction transaction = null;
+
+            try {
+
+                transaction = session.beginTransaction();
+
+                if (archive) {
+                    archiveConfig(session, config);
+                }
+
+                session.update(config);
+
+                session.flush();
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
+            }
         }
-
-        updateRecord(config);
 
         TraceOut.leave();
     }
 
-    private void archiveConfig(Configuration config) throws Exception {
+    private void archiveConfig(Session session, Configuration config) throws Exception {
 
         // get the id of the original config
         Integer originalId = config.getId();
@@ -789,13 +802,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         archived.setPatterns(original.getPatterns());
         archived.setArchived(true);
         archived.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
-        insertRecord(archived);
+        session.save(archived);
 
         // reference the copy of the original in critical access queries instead of the config to update
         getSapQueries(true).stream().filter(x -> x.getConfig().getId().equals(originalId)).forEach(query -> {
 
             query.setConfig(archived);
-            updateRecord(query);
+            session.update(query);
         });
     }
 
@@ -815,17 +828,37 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // check if the pattern has already been used by a critical access query
         boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getPatterns().stream().anyMatch(y -> y.getId().equals(pattern.getId())));
 
-        if (archive) {
+        try (Session session = openSession()) {
 
-            archivePattern(pattern);
+            Transaction transaction = null;
+
+            try {
+
+                transaction = session.beginTransaction();
+
+                if (archive) {
+                    archivePattern(session, pattern);
+                }
+
+                session.update(pattern);
+
+                session.flush();
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
+            }
         }
-
-        updateRecord(pattern);
 
         TraceOut.leave();
     }
 
-    private void archivePattern(AccessPattern pattern) throws Exception {
+    private void archivePattern(Session session, AccessPattern pattern) throws Exception {
 
         // get the id of the original pattern
         Integer originalId = pattern.getId();
@@ -835,7 +868,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         AccessPattern archived = new AccessPattern(original);
         archived.setArchived(true);
         archived.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
-        insertRecord(archived);
+        session.save(archived);
 
         // get configs referencing the original pattern
         Set<Configuration> originalConfigs =
@@ -861,7 +894,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 // reference new archived pattern
                 originalConfig.setPatterns(patterns);
-                updateRecord(originalConfig);
+                session.update(originalConfig);
 
             } else {
 
@@ -872,13 +905,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                 copy.setPatterns(patterns);
                 copy.setArchived(true);
                 copy.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
-                insertRecord(copy);
+                session.save(copy);
 
                 // reference the new config on all critical access queries
                 queries.stream().filter(x -> x.getConfig().getId().equals(originalConfig.getId())).forEach(query -> {
 
                     query.setConfig(copy);
-                    updateRecord(query);
+                    session.update(query);
                 });
             }
         });
@@ -900,17 +933,37 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // check if the whitelist has already been used by a critical access query
         boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
 
-        if (archive) {
+        try (Session session = openSession()) {
 
-            archiveWhitelist(whitelist);
+            Transaction transaction = null;
+
+            try {
+
+                transaction = session.beginTransaction();
+
+                if (archive) {
+                    archiveWhitelist(session, whitelist);
+                }
+
+                session.update(whitelist);
+
+                session.flush();
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
+            }
         }
-
-        updateRecord(whitelist);
 
         TraceOut.leave();
     }
 
-    private void archiveWhitelist(Whitelist whitelist) throws Exception {
+    private void archiveWhitelist(Session session, Whitelist whitelist) throws Exception {
 
         // get the id of the original whitelist
         Integer originalId = whitelist.getId();
@@ -920,7 +973,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         Whitelist archived = new Whitelist(original);
         archived.setArchived(true);
         archived.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
-        insertRecord(archived);
+        session.save(archived);
 
         // get critical access queries referencing a config that references the original pattern
         Set<CriticalAccessQuery> queries =
@@ -935,7 +988,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 // reference archived whitelist
                 originalConfig.setWhitelist(archived);
-                updateRecord(originalConfig);
+                session.update(originalConfig);
 
             } else {
 
@@ -946,13 +999,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                 copy.setPatterns(originalConfig.getPatterns());
                 copy.setArchived(true);
                 copy.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
-                insertRecord(copy);
+                session.save(copy);
 
                 // reference the new config on all critical access queries
                 queries.stream().filter(x -> x.getConfig().getId().equals(originalConfig.getId())).forEach(query -> {
 
                     query.setConfig(copy);
-                    updateRecord(query);
+                    session.update(query);
                 });
             }
         });
@@ -972,17 +1025,37 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // check if the sap config has already been used by a critical access query
         boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getSapConfig().getId().equals(config.getId()));
 
-        if (archive) {
+        try (Session session = openSession()) {
 
-            archiveSapConfig(config);
+            Transaction transaction = null;
+
+            try {
+
+                transaction = session.beginTransaction();
+
+                if (archive) {
+                    archiveSapConfig(session, config);
+                }
+
+                session.update(config);
+
+                session.flush();
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
+            }
         }
-
-        updateRecord(config);
 
         TraceOut.leave();
     }
 
-    private void archiveSapConfig(SapConfiguration config) throws Exception {
+    private void archiveSapConfig(Session session, SapConfiguration config) throws Exception {
 
         // get the id of the original whitelist
         Integer originalId = config.getId();
@@ -992,13 +1065,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         SapConfiguration archived = new SapConfiguration(original);
         archived.setArchived(true);
         archived.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
-        insertRecord(archived);
+        session.save(archived);
 
         // reference the new sap config on all critical access queries
         getSapQueries(true).stream().filter(x -> x.getSapConfig().getId().equals(originalId)).forEach(query -> {
 
             query.setSapConfig(archived);
-            updateRecord(query);
+            session.update(query);
         });
     }
 
@@ -1023,14 +1096,35 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // check if the config has already been used by a critical access query
         boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getId().equals(config.getId()));
 
-        if (archive) {
+        try (Session session = openSession()) {
 
-            config.setArchived(true);
-            updateRecord(config);
+            Transaction transaction = null;
 
-        } else {
+            try {
 
-            deleteRecord(config);
+                transaction = session.beginTransaction();
+
+                if (archive) {
+
+                    config.setArchived(true);
+                    session.update(config);
+
+                } else {
+
+                    session.delete(config);
+                }
+
+                session.flush();
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
+            }
         }
 
         TraceOut.leave();
@@ -1053,27 +1147,48 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // check if the pattern has already been used by a critical access query
         boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getPatterns().stream().anyMatch(y -> y.getId().equals(pattern.getId())));
 
-        // remove pattern from active configs referencing it
-        pattern.getConfigurations().forEach(config -> {
+        try (Session session = openSession()) {
 
-            if (!config.isArchived()) {
+            Transaction transaction = null;
 
-                config.getPatterns().remove(pattern);
-                config.adjustReferences();
-                updateRecord(config);
+            try {
+
+                transaction = session.beginTransaction();
+
+                // remove pattern from active configs referencing it
+                pattern.getConfigurations().forEach(config -> {
+
+                    if (!config.isArchived()) {
+
+                        config.getPatterns().remove(pattern);
+                        config.adjustReferences();
+                        session.update(config);
+                    }
+                });
+
+                if (archive) {
+
+                    // archive pattern
+                    pattern.setArchived(true);
+                    session.update(pattern);
+
+                } else {
+
+                    // delete pattern
+                    session.delete(pattern);
+                }
+
+                session.flush();
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
             }
-        });
-
-        if (archive) {
-
-            // archive pattern
-            pattern.setArchived(true);
-            updateRecord(pattern);
-
-        } else {
-
-            // delete pattern
-            deleteRecord(pattern);
         }
 
         TraceOut.leave();
@@ -1096,23 +1211,44 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // check if the whitelist has already been used by a critical access query
         boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
 
-        // remove whitelist from active configs referencing it
-        getConfigs(false).forEach(config -> {
+        try (Session session = openSession()) {
 
-            config.setWhitelist(null);
-            updateRecord(config);
-        });
+            Transaction transaction = null;
 
-        if (archive) {
+            try {
 
-            // archive whitelist
-            whitelist.setArchived(true);
-            updateRecord(whitelist);
+                transaction = session.beginTransaction();
 
-        } else {
+                // remove whitelist from active configs referencing it
+                getConfigs(false).forEach(config -> {
 
-            // delete whitelist
-            deleteRecord(whitelist);
+                    config.setWhitelist(null);
+                    session.update(config);
+                });
+
+                if (archive) {
+
+                    // archive whitelist
+                    whitelist.setArchived(true);
+                    session.update(whitelist);
+
+                } else {
+
+                    // delete whitelist
+                    session.delete(whitelist);
+                }
+
+                session.flush();
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
+            }
         }
 
         TraceOut.leave();
@@ -1133,16 +1269,37 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // check if the sap config has already been used by a critical access query
         boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getSapConfig().getId().equals(config.getId()));
 
-        if (archive) {
+        try (Session session = openSession()) {
 
-            // archive sap config
-            config.setArchived(true);
-            updateRecord(config);
+            Transaction transaction = null;
 
-        } else {
+            try {
 
-            // delete sap config
-            deleteRecord(config);
+                transaction = session.beginTransaction();
+
+                if (archive) {
+
+                    // archive sap config
+                    config.setArchived(true);
+                    session.update(config);
+
+                } else {
+
+                    // delete sap config
+                    session.delete(config);
+                }
+
+                session.flush();
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
+            }
         }
 
         TraceOut.leave();
@@ -1167,18 +1324,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         List<DbUser> users;
 
         try (Session session = getSessionFactory().openSession()) {
-
-            /*String sql =
-                "SELECT DISTINCT "
-                + "    Users.Name AS User, "
-                + "    GROUP_CONCAT(Rights.GrantedRole) AS Roles "
-                + "FROM INFORMATION_SCHEMA.Users "
-                + "LEFT OUTER JOIN INFORMATION_SCHEMA.Rights "
-                + "    ON Users.Name = Rights.Grantee "
-                + "WHERE Rights.Grantee IS NULL OR GranteeType = 'USER' "
-                + "GROUP BY Users.Name";
-
-            List<Object[]> results = session.createNativeQuery(sql).getResultList();*/
 
             List<Object[]> results = session.createNativeQuery("SELECT * FROM DbUsers").getResultList();
 
