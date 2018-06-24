@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -51,8 +52,8 @@ public class ConfigsController {
     @FXML
     public FilterController filterController;
 
-
     private ResourceBundle bundle;
+    private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
 
     /**
      * Initializes the controller.
@@ -96,9 +97,11 @@ public class ConfigsController {
             filterController.endDateProperty.getValue(), 0);
         ObservableList<Configuration> list = FXCollections.observableList(configs);
 
+        // update itemCount
+        numberOfItems.setValue(list.size());
+
         configsTable.setItems(list);
         configsTable.refresh();
-
     }
 
     /**
@@ -137,6 +140,10 @@ public class ConfigsController {
 
         // set selection mode to MULTIPLE
         configsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        // show an item count (+ selected)
+        itemCount.textProperty().bind(Bindings.concat(Bindings.size(configsTable.getSelectionModel().getSelectedItems()).asString("%s / "),
+            numberOfItems.asString("%s " + bundle.getString("selected"))));
 
         initializeTableColumns();
     }

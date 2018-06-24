@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -61,6 +62,7 @@ public class PatternsController {
     public FilterController filterController;
 
     private ResourceBundle bundle;
+    private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
 
     /**
      * Initializes the controller.
@@ -98,6 +100,9 @@ public class PatternsController {
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
             filterController.endDateProperty.getValue(), 0);
         ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
+
+        // update itemCount
+        numberOfItems.setValue(list.size());
 
         patternsTable.setItems(list);
         patternsTable.refresh();
@@ -140,7 +145,7 @@ public class PatternsController {
 
         // show an item count (+ selected)
         itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "),
-            Bindings.size(patternsTable.getItems()).asString("%s " + bundle.getString("selected"))));
+            numberOfItems.asString("%s " + bundle.getString("selected"))));
 
         initializeTableColumns();
     }
