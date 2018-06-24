@@ -35,6 +35,7 @@ public class ConditionTypeCellFactory implements Callback<TableColumn<AccessPatt
 
                     // nothing to display
                     setText("");
+                    setGraphic(null);
 
                 } else {
 
