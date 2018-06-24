@@ -119,14 +119,12 @@ public class LoginController {
             // build the scene and add it to the stage
             Scene scene = new Scene(customWindow, 1050, 750);
             scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
+            App.primaryStage.setScene(scene);
+            App.primaryStage.setTitle(bundle.getString("art"));
+            customWindow.initStage(App.primaryStage);
 
             close(event);
-            stage.show();
+            App.primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }

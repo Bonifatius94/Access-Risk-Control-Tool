@@ -74,8 +74,6 @@ public class CustomWindow extends VBox {
     private double horizontalOffset = 0;
     private double verticalOffset = 0;
 
-    private boolean isMainWindow;
-
     /**
      * CanResize: Everything is working. Resizing is fully allowed.
      * CanMinimize: Miximize button is disabled and resize arrows at the border of the window, too. Minimize is still working as usual.
@@ -241,11 +239,6 @@ public class CustomWindow extends VBox {
             @Override
             public void handle(ActionEvent event) {
 
-                // close the database context if the main window is closed
-                if (isMainWindow) {
-                    AppComponents.getDbContext().close();
-                }
-
                 // close current stage
                 stage.close();
             }
@@ -320,9 +313,4 @@ public class CustomWindow extends VBox {
         WindowState oldState = this.windowStateProperty.get();
         this.windowStateProperty.set(newState);
     }
-
-    public void setMainWindow(boolean isMainWindow) {
-        this.isMainWindow = isMainWindow;
-    }
-
 }
