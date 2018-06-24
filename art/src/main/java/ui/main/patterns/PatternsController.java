@@ -1,19 +1,20 @@
 package ui.main.patterns;
 
 import com.jfoenix.controls.JFXButton;
+
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+
+import io.msoffice.excel.AccessPatternImportHelper;
 
 import java.io.File;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import io.msoffice.excel.AccessPatternImportHelper;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
@@ -301,11 +302,6 @@ public class PatternsController {
         File selectedFile = chooser.showOpenDialog(App.primaryStage);
 
         if (selectedFile != null) {
-
-            // import patterns with the AccessPatternImportHelper
-            AccessPatternImportHelper importHelper = new AccessPatternImportHelper();
-            List<AccessPattern> importedPatterns = importHelper.importAuthorizationPattern(selectedFile.getAbsolutePath());
-
             // create a new FXML loader with the SapSettingsEditDialogController
             FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/PatternImportView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
@@ -320,6 +316,10 @@ public class PatternsController {
             customWindow.initStage(stage);
 
             stage.show();
+
+            // import patterns with the AccessPatternImportHelper
+            AccessPatternImportHelper importHelper = new AccessPatternImportHelper();
+            List<AccessPattern> importedPatterns = importHelper.importAuthorizationPattern(selectedFile.getAbsolutePath());
 
             // give the dialog the controller and the patterns
             PatternImportController importController = loader.getController();

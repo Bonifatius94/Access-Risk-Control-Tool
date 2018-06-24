@@ -11,6 +11,8 @@ import data.entities.Whitelist;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import io.msoffice.excel.AccessPatternImportHelper;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,10 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import io.msoffice.excel.AccessPatternImportHelper;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -35,7 +35,6 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -50,8 +49,6 @@ import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 import ui.main.configs.ConfigsController;
 import ui.main.patterns.modal.PatternImportController;
-
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 public class ConfigsFormController {
@@ -382,10 +379,6 @@ public class ConfigsFormController {
 
         if (selectedFile != null) {
 
-            // import patterns with the AccessPatternImportHelper
-            AccessPatternImportHelper importHelper = new AccessPatternImportHelper();
-            List<AccessPattern> importedPatterns = importHelper.importAuthorizationPattern(selectedFile.getAbsolutePath());
-
             // create a new FXML loader with the SapSettingsEditDialogController
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../../patterns/modal/PatternImportView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
@@ -400,6 +393,10 @@ public class ConfigsFormController {
             customWindow.initStage(stage);
 
             stage.show();
+
+            // import patterns with the AccessPatternImportHelper
+            AccessPatternImportHelper importHelper = new AccessPatternImportHelper();
+            List<AccessPattern> importedPatterns = importHelper.importAuthorizationPattern(selectedFile.getAbsolutePath());
 
             // give the dialog the controller and the patterns
             PatternImportController importController = loader.getController();
@@ -530,10 +527,10 @@ public class ConfigsFormController {
 
         // show alerts if difference is greater than 0
         if (diff == 1) {
-            CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, "Nicht alle Pattern importiert",  diff + " Pattern wurd nicht importiert, da seine UsecaseIDs bereits vorhanden ist.");
+            CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("notAllImportedTitle"),  diff + " " + bundle.getString("idDuplicate"));
             alert.showAndWait();
         } else if (diff > 1) {
-            CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, "Nicht alle Pattern importiert",  diff + " Patterns wurden nicht importiert, da ihre UsecaseIDs bereits vorhanden waren.");
+            CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("notAllImportedTitle"), diff + " " + bundle.getString("idDuplicates"));
             alert.showAndWait();
         }
 

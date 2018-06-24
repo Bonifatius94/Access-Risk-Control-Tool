@@ -1,36 +1,28 @@
 package ui.main.patterns.modal;
 
-import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
+
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
-import io.msoffice.excel.AccessPatternImportHelper;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
-import ui.AppComponents;
-import ui.custom.controls.ButtonCell;
-import ui.custom.controls.ConditionTypeCellFactory;
-import ui.main.configs.ConfigsController;
-import ui.main.configs.modal.ConfigsFormController;
-import ui.main.patterns.PatternsController;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+
+import ui.AppComponents;
+import ui.custom.controls.ConditionTypeCellFactory;
+import ui.main.configs.modal.ConfigsFormController;
+import ui.main.patterns.PatternsController;
 
 
 public class PatternImportController {
@@ -45,7 +37,7 @@ public class PatternImportController {
     public TableColumn<AccessPattern, Set<AccessCondition>> conditionTypeColumn;
 
     @FXML
-    public TableColumn checkRowColumn;
+    public TableColumn<AccessPattern, AccessPattern> checkRowColumn;
 
     private ConfigsFormController configsFormController;
     private PatternsController patternsController;
@@ -160,6 +152,9 @@ public class PatternImportController {
         }
     }
 
+    /**
+     * Gives the parentControllers the imported patterns and closes the window.
+     */
     public void saveChanges(ActionEvent event) throws Exception {
 
         if (selectedPatterns.size() != 0) {

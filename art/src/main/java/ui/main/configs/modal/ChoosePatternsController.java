@@ -177,7 +177,7 @@ public class ChoosePatternsController {
                 selectedPatternsTable.refresh();
                 updateAllPatternsTable();
             } else {
-                CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, "Patterns enthalten Duplikate",  "Die Patterns können nicht hinzugefügt werden, da sie doppelte UseCaseIds beinhalten.");
+                CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("patternsDuplicateTitle"),  bundle.getString("patternsDuplicateMessage"));
                 alert.showAndWait();
             }
         }
