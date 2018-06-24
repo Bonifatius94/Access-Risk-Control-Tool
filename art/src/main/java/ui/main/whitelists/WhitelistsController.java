@@ -10,8 +10,6 @@ import io.msoffice.excel.WhitelistImportHelper;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -49,13 +47,12 @@ public class WhitelistsController {
     private PTableColumn<Whitelist, JFXButton> editWhitelistColumn;
     @FXML
     private PTableColumn<Whitelist, JFXButton> deleteWhitelistColumn;
+
     @FXML
-
     private PTableColumn<Whitelist, Set<WhitelistEntry>> entryCountColumn;
+    @FXML
+    private FilterController filterController;
 
-    public FilterController filter;
-
-    private ResourceBundle bundle;
 
     ArtDbContext database = AppComponents.getDbContext();
     //private Boolean includeArchivedData = true;
@@ -65,13 +62,35 @@ public class WhitelistsController {
      * TODO: change all database functions from test functions to end version functions
      */
     @FXML
-    public void initialize() {
-
-        bundle = ResourceBundle.getBundle("lang");
+    public void initialize() throws Exception {
 
         initializeColumns();
 
-        filter.shouldFilterProperty.addListener((obs, oldValue, newValue) -> {
+
+        try {
+            //Test code
+
+            WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
+            Whitelist whitelist1 = whitelistImportHelper.importWhitelist("Example - Whitelist.xlsx");
+            whitelist1.setDescription("test");
+            whitelist1.setArchived(true);
+            whitelist1.setName("bla");
+            whitelist1.setArchived(true);
+            database.createWhitelist(whitelist1);
+            //database.createWhitelist(whitelist1);
+
+            List<Whitelist> whitelistList;
+            whitelistList = database.getWhitelists(true);
+            ObservableList<Whitelist> observableList = FXCollections.observableArrayList(whitelistList);
+            whitelistTable.getItems().addAll(observableList);
+            whitelistTable.refresh();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        tableRefresh();
+
+        filterController.shouldFilterProperty.addListener((obs, oldValue, newValue) -> {
             if (newValue) {
                 try {
                     updateWhitelistTable();
@@ -80,49 +99,17 @@ public class WhitelistsController {
                 }
             }
         });
+        updateWhitelistTable();
 
-        /*try {
-            //Test code
-
-            WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
-            Whitelist whitelist1 = whitelistImportHelper.importWhitelist("Example - Whitelist.xlsx");
-            whitelist1.setDescription("test");
-            whitelist1.setArchived(true);
-            whitelist1.setName("bla");
-            database.createWhitelist(whitelist1);
-            whitelist1.setDescription("test2");
-            whitelist1.setArchived(true);
-            //database.createWhitelist(whitelist1);
-
-            whitelist1.setCreatedAt(ZonedDateTime.now());
-            whitelist1.setId(2);
-            whitelist1.setArchived(true);
-            whitelist1.setDescription("testWhitelist");
-            List<Whitelist> whitelistList;
-            whitelistList = database.getWhitelists(true);
-            List<Whitelist> whitelists = new ArrayList<>();
-            whitelists.add(whitelist1);
-            ObservableList<Whitelist> obs = FXCollections.observableArrayList(whitelistList);
-            obs.addAll(whitelists);
-            obs.addAll(whitelist1, whitelist1);
-            whitelistTable.getItems().addAll(obs);
-            ObservableList<Whitelist> observableList = FXCollections.observableArrayList(whitelists);
-            whitelistTable.getItems().addAll(observableList);
-            whitelistTable.refresh();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-        tableRefresh();
     }
 
     private void updateWhitelistTable() throws Exception {
-        /*List<Whitelist> whitelists = database.getFilteredWhitelists(filter.showArchivedProperty.getValue(), filter.searchStringProperty.getValue(),
-            filter.startDateProperty.getValue(), filter.startDateProperty.getValue(), 0);
+        List<Whitelist> whitelists = database.getFilteredWhitelists(filterController.showArchivedProperty.getValue(), filterController.searchStringProperty.getValue(),
+            filterController.startDateProperty.getValue(), filterController.startDateProperty.getValue(), 0);
         ObservableList<Whitelist> list = FXCollections.observableList(whitelists);
         whitelistTable.setItems(list);
         whitelistTable.refresh();
-        */
+
     }
 
     /**
@@ -133,10 +120,10 @@ public class WhitelistsController {
         deleteWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (Whitelist whitelist) -> {
             try {
                 database.deleteWhitelist(whitelist);
+                tableRefresh();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            tableRefresh();
             return whitelist;
         }));
         deleteWhitelistColumn.setSortable(false);
@@ -276,7 +263,7 @@ public class WhitelistsController {
 
     /**
      * starts Whitelist import.
-     * TODO: einige optimierungen
+     * TODO: Dialog
      */
 
     public void importWhitelist() {
@@ -289,9 +276,8 @@ public class WhitelistsController {
             Whitelist whitelist;
             try {
                 WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
-                whitelist = whitelistImportHelper.importWhitelist(path);
-
-                database.createWhitelist(whitelist);
+                Whitelist importedWhitelist = whitelistImportHelper.importWhitelist(path);
+                startImportDialog(importedWhitelist);
                 tableRefresh();
 
             } catch (Exception e) {
@@ -302,6 +288,15 @@ public class WhitelistsController {
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "No file selected", "you need to select an xlsx file to import", "Ok", "");
             customAlert.showAndWait();
         }
+    }
+
+    /**
+     * Starts a dialog do edit imported whitelist.TODO: adding to table
+     *
+     * @param whitelist is the imported Whitlsit
+     */
+    private void startImportDialog(Whitelist whitelist) {
+        editDialogWhitelist(whitelist);
     }
 
     //TODO: reaktivate if database is ready
