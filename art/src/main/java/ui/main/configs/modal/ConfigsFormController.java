@@ -527,7 +527,7 @@ public class ConfigsFormController {
 
         // show alerts if difference is greater than 0
         if (diff == 1) {
-            CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("notAllImportedTitle"),  diff + " " + bundle.getString("idDuplicate"));
+            CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("notAllImportedTitle"),  bundle.getString("idDuplicate"));
             alert.showAndWait();
         } else if (diff > 1) {
             CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("notAllImportedTitle"), diff + " " + bundle.getString("idDuplicates"));
