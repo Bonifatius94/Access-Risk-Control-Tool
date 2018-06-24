@@ -46,6 +46,7 @@ public class WhitelistEditDialogController {
     @FXML
     private PTableColumn<WhitelistEntry, String> userName;
 
+    private WhitelistsController parentController;
     private ArtDbContext whitelistDatabase = AppComponents.getDbContext();
     private static Whitelist whitelist;
     private static Whitelist whitelistOld;
@@ -268,5 +269,15 @@ public class WhitelistEditDialogController {
         userName.setEditable(false);
         whitelistEditTable.setEditable(false);
         whitelistEditTable.refresh();
+    }
+
+
+    /**
+     * Sets the parent controller.
+     *
+     * @param parentController the parent controller
+     */
+    public void setParentController(WhitelistsController parentController) {
+        this.parentController = parentController;
     }
 }

@@ -36,6 +36,7 @@ import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.PTableColumn;
 import ui.custom.controls.filter.FilterController;
+import ui.main.patterns.PatternsController;
 
 public class WhitelistsController {
 
@@ -50,9 +51,9 @@ public class WhitelistsController {
 
     @FXML
     private PTableColumn<Whitelist, Set<WhitelistEntry>> entryCountColumn;
-    @FXML
-    private FilterController filterController;
 
+    @FXML
+    public FilterController filterController;
 
     ArtDbContext database = AppComponents.getDbContext();
     //private Boolean includeArchivedData = true;
@@ -109,7 +110,6 @@ public class WhitelistsController {
         ObservableList<Whitelist> list = FXCollections.observableList(whitelists);
         whitelistTable.setItems(list);
         whitelistTable.refresh();
-
     }
 
     /**
@@ -127,12 +127,14 @@ public class WhitelistsController {
             return whitelist;
         }));
         deleteWhitelistColumn.setSortable(false);
+
         // Add the edit column
         editWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (Whitelist whitelist) -> {
             editDialogWhitelist(whitelist);
             return whitelist;
         }));
         editWhitelistColumn.setSortable(false);
+
         // overwrite the column in which the number of whitelistEntrys is displayed
         entryCountColumn.setCellFactory(col -> new TableCell<Whitelist, Set<WhitelistEntry>>() {
                 @Override
@@ -199,6 +201,8 @@ public class WhitelistsController {
             customWindow.initStage(stage);
             stage.show();
 
+            WhitelistEditDialogController editDialogController = loader.getController();
+            editDialogController.setParentController(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
