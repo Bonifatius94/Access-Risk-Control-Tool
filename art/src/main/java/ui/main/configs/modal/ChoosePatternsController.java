@@ -177,7 +177,7 @@ public class ChoosePatternsController {
                 selectedPatternsTable.refresh();
                 updateAllPatternsTable();
             } else {
-                CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("patternsDuplicateTitle"),  bundle.getString("patternsDuplicateMessage"));
+                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("patternsDuplicateTitle"),  bundle.getString("patternsDuplicateMessage"));
                 alert.showAndWait();
             }
         }
