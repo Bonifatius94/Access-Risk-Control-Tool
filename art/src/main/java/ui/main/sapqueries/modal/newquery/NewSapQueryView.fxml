@@ -20,7 +20,7 @@
                 <VBox HBox.hgrow="ALWAYS" spacing="35">
                     <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="30">
                         <Label text="%configuration"/>
-                        <JFXComboBox fx:id="configAutocomplete" minWidth="250"/>
+                        <JFXComboBox fx:id="configChooser" minWidth="450" maxWidth="900"/>
                         <JFXButton onAction="#chooseConfig" styleClass="round-button" minHeight="30">
                             <tooltip>
                                 <Tooltip text="%chooseConfig"/>
@@ -32,7 +32,7 @@
                     </HBox>
                     <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="30">
                         <Label text="%sapSettings"/>
-                        <JFXComboBox fx:id="sapSettingsAutocomplete" minWidth="250"/>
+                        <JFXComboBox fx:id="sapSettingsChooser" minWidth="450" maxWidth="900"/>
                         <JFXButton onAction="#chooseSapSettings" styleClass="round-button" minHeight="30">
                             <tooltip>
                                 <Tooltip text="%chooseSapSettings"/>

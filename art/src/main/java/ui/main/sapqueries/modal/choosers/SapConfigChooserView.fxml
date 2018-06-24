@@ -15,7 +15,8 @@
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.main.sapqueries.modal.choosers.SapConfigChooserController">
     <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
-        <TableView VBox.vgrow="ALWAYS" fx:id="sapConnectionTable">
+        <fx:include source="../../../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
+        <TableView VBox.vgrow="ALWAYS" fx:id="sapSettingsTable">
             <columns>
                 <PTableColumn percentageWidth="0.4" resizable="false" text="Server">
                     <cellValueFactory>

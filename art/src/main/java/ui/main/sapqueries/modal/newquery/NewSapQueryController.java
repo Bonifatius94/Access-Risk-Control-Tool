@@ -8,9 +8,15 @@ import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
 
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,9 +28,13 @@ import javafx.scene.effect.BoxBlur;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 import sap.SapConnector;
+
 import ui.App;
+import ui.AppComponents;
+import ui.custom.controls.AutoCompleteComboBoxListener;
 import ui.custom.controls.CustomWindow;
 import ui.main.sapqueries.modal.choosers.ConfigChooserController;
 import ui.main.sapqueries.modal.choosers.SapConfigChooserController;
@@ -33,10 +43,10 @@ import ui.main.sapqueries.modal.choosers.SapConfigChooserController;
 public class NewSapQueryController {
 
     @FXML
-    public JFXComboBox<Configuration> configAutocomplete;
+    public JFXComboBox<Configuration> configChooser;
 
     @FXML
-    public JFXComboBox<SapConfiguration> sapSettingsAutocomplete;
+    public JFXComboBox<SapConfiguration> sapSettingsChooser;
 
     @FXML
     public VBox inputBox;
@@ -69,11 +79,61 @@ public class NewSapQueryController {
     public void initialize() {
         bundle = ResourceBundle.getBundle("lang");
 
-        // TODO: register AutoCompletes
+        initializeConfigChooser();
 
+        initalizeSapSettingsChooser();
+    }
 
-        // init sap settings (here: test server data)
-        this.sapConfiguration = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "some description", "00", "001", "EN", "0");
+    /**
+     * Initialize the configChooser as an autocomplete.
+     */
+    private void initializeConfigChooser() {
+
+        // create the autocomplete binding
+        new AutoCompleteComboBoxListener<>(configChooser);
+
+        // change the items of the autocomplete according to the input
+        configChooser.getEditor().textProperty().addListener((event) -> {
+            try {
+                List<Configuration> result = AppComponents.getDbContext().getFilteredConfigs(false, configChooser.getEditor().getText(), null, null, 5);
+                ObservableList<Configuration> items = FXCollections.observableArrayList();
+                if (result.size() != 0) {
+                    items.addAll(result);
+                }
+                Platform.runLater(() -> configChooser.setItems(items));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        // set a string converter for the whitelistChooser to the items are correctly displayed
+        configChooser.setConverter(new ConfigurationStringConverter());
+    }
+
+    /**
+     * Initialize the configChooser as an autocomplete.
+     */
+    private void initalizeSapSettingsChooser() {
+
+        // create the autocomplete binding
+        new AutoCompleteComboBoxListener<>(sapSettingsChooser);
+
+        // change the items of the autocomplete according to the input
+        sapSettingsChooser.getEditor().textProperty().addListener((event) -> {
+            try {
+                List<SapConfiguration> result = AppComponents.getDbContext().getFilteredSapConfigs(false, configChooser.getEditor().getText(), null, null, 5);
+                ObservableList<SapConfiguration> items = FXCollections.observableArrayList();
+                if (result.size() != 0) {
+                    items.addAll(result);
+                }
+                Platform.runLater(() -> sapSettingsChooser.setItems(items));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        // set a string converter for the whitelistChooser to the items are correctly displayed
+        sapSettingsChooser.setConverter(new SapSettingsStringConverter());
     }
 
     /**
@@ -86,7 +146,7 @@ public class NewSapQueryController {
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 1000, 700);
+            Scene scene = new Scene(customWindow, 1100, 700);
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
@@ -115,7 +175,7 @@ public class NewSapQueryController {
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 800, 600);
+            Scene scene = new Scene(customWindow, 900, 600);
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
@@ -176,12 +236,10 @@ public class NewSapQueryController {
         if (sapConfiguration != null && configuration != null) {
 
             // prefill the config
-            configAutocomplete.getItems().add(configuration);
-            configAutocomplete.getSelectionModel().select(configuration);
+            configChooser.setValue(configuration);
 
             // prefill the sapConfig
-            sapSettingsAutocomplete.getItems().add(sapConfiguration);
-            sapSettingsAutocomplete.getSelectionModel().select(sapConfiguration);
+            sapSettingsChooser.setValue(sapConfiguration);
         }
     }
 
@@ -280,8 +338,8 @@ public class NewSapQueryController {
     public void setConfig(Configuration config) {
 
         if (config != null) {
-            this.configAutocomplete.getItems().add(config);
-            this.configAutocomplete.getSelectionModel().select(config);
+            this.configChooser.getItems().add(config);
+            this.configChooser.getSelectionModel().select(config);
         }
     }
 
@@ -293,8 +351,8 @@ public class NewSapQueryController {
     public void setSapConfig(SapConfiguration sapConfig) {
 
         if (sapConfig != null) {
-            this.sapSettingsAutocomplete.getItems().add(sapConfig);
-            this.sapSettingsAutocomplete.getSelectionModel().select(sapConfig);
+            this.sapSettingsChooser.getItems().add(sapConfig);
+            this.sapSettingsChooser.getSelectionModel().select(sapConfig);
         }
     }
 
@@ -305,5 +363,55 @@ public class NewSapQueryController {
      */
     public void close(ActionEvent event) {
         (((Button) event.getSource()).getScene().getWindow()).hide();
+    }
+
+    /**
+     * ConfigurationStringConverter for the patternChooser ComboBox.
+     */
+    private class ConfigurationStringConverter extends StringConverter<Configuration> {
+        private Map<String, Configuration> map = new HashMap<>();
+
+        @Override
+        public String toString(Configuration configuration) {
+            if (configuration == null) {
+                return "";
+            }
+            String str = configuration.getName() + " - " + configuration.getDescription();
+            map.put(str, configuration);
+            return str;
+        }
+
+        @Override
+        public Configuration fromString(String string) {
+            if (!map.containsKey(string)) {
+                return null;
+            }
+            return map.get(string);
+        }
+    }
+
+    /**
+     * SapSettingsStringConverter for the patternChooser ComboBox.
+     */
+    private class SapSettingsStringConverter extends StringConverter<SapConfiguration> {
+        private Map<String, SapConfiguration> map = new HashMap<>();
+
+        @Override
+        public String toString(SapConfiguration configuration) {
+            if (configuration == null) {
+                return "";
+            }
+            String str = configuration.getServerDestination() + " - " + configuration.getDescription();
+            map.put(str, configuration);
+            return str;
+        }
+
+        @Override
+        public SapConfiguration fromString(String string) {
+            if (!map.containsKey(string)) {
+                return null;
+            }
+            return map.get(string);
+        }
     }
 }

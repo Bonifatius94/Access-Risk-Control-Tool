@@ -8,10 +8,12 @@ import data.entities.Configuration;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,8 +26,11 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import ui.App;
+import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.ConditionTypeCellFactory;
 import ui.custom.controls.CustomWindow;
+import ui.custom.controls.filter.FilterController;
 import ui.main.sapqueries.modal.details.ConfigDetailsController;
 import ui.main.sapqueries.modal.newquery.NewSapQueryController;
 
@@ -48,14 +53,36 @@ public class ConfigChooserController {
     public JFXTextField whitelistDescription;
 
     @FXML
+    public TableColumn<AccessPattern, Set<AccessCondition>> conditionTypeColumn;
+
+    @FXML
     public TableColumn<Configuration, JFXButton> viewDetailsColumn;
+
+    @FXML
+    public FilterController filterController;
 
     private NewSapQueryController parentController;
 
 
+    /**
+     * Initializes the controller.
+     */
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
         initializeTables();
+
+        // check if the filters are applied
+        filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
+            if (newValue) {
+                try {
+                    updateConfigsTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        updateConfigsTable();
     }
 
     /**
@@ -91,6 +118,24 @@ public class ConfigChooserController {
 
         // custom comparator for the useCaseCountColumn
         useCaseCountColumn.setComparator((list1, list2) -> list1.size() <= list2.size() ? 0 : 1);
+
+        // sets the icon of the condition to pattern or profile
+        conditionTypeColumn.setCellFactory(new ConditionTypeCellFactory());
+    }
+
+    /**
+     * Updates the configsTable items from the database, taking filters into account.
+     */
+    public void updateConfigsTable() throws Exception {
+
+        List<Configuration> configs = AppComponents.getDbContext().getFilteredConfigs(filterController.showArchivedProperty.getValue(),
+            filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
+            filterController.endDateProperty.getValue(), 0);
+        ObservableList<Configuration> list = FXCollections.observableList(configs);
+
+        configsTable.setItems(list);
+        configsTable.refresh();
+
     }
 
     /**
