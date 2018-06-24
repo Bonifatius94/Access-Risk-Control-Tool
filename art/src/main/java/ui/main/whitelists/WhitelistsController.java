@@ -74,7 +74,7 @@ public class WhitelistsController {
             database.createWhitelist(whitelist1);
             whitelist1.setDescription("test2");
             whitelist1.setArchived(true);
-            database.createWhitelist(whitelist1);
+            //database.createWhitelist(whitelist1);
 
             whitelist1.setCreatedAt(ZonedDateTime.now());
             whitelist1.setId(2);

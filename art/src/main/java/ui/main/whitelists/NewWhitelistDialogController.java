@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
+import data.localdb.ArtDbContext;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
+import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
 import ui.custom.controls.PTableColumn;
@@ -36,7 +38,7 @@ public class NewWhitelistDialogController {
     public JFXTextField whitelistName;
 
     private Whitelist whitelist;
-    //private WhitelistDatabase whitelistDatabase;
+    private ArtDbContext whitelistDatabase = AppComponents.getDbContext();
 
     /**
      * is automatically called by FXML loader and starts initializeColumns.
@@ -56,7 +58,7 @@ public class NewWhitelistDialogController {
         }
         newWhitelistTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                editWhitelistEntry((WhitelistEntry) newValue);
+                editWhitelistEntry(newValue);
             }
         });
     }
@@ -99,23 +101,17 @@ public class NewWhitelistDialogController {
     }
 
     /**
-     * loads already Existig WhitelistEntry in Textfields. TODO: further editImplementations.
+     * loads already Existig WhitelistEntry in Textfields.
      *
      * @param whitelistEntry the WhitelistEntry that should be changed.
      */
     private void editWhitelistEntry(WhitelistEntry whitelistEntry) {
 
-        if (whitelistEntry != null) {
+        tfUscaseId.setText(whitelistEntry.getUsecaseId());
+        tfUserName.setText(whitelistEntry.getUsername());
 
-            tfUscaseId.setText(whitelistEntry.getUsecaseId());
-            tfUserName.setText(whitelistEntry.getUsername());
-
-            tfUserName.validate();
-            tfUscaseId.validate();
-        } else {
-            tfUscaseId.setText("");
-            tfUserName.setText("");
-        }
+        tfUserName.validate();
+        tfUscaseId.validate();
 
     }
 
@@ -140,10 +136,14 @@ public class NewWhitelistDialogController {
      * saves New Whitelist.
      */
     public void saveNewWhitelist() {
-        List<WhitelistEntry> entriesList = new ArrayList<>(newWhitelistTable.getItems());
-        if (!entriesList.isEmpty()) {
-            whitelist.getEntries().addAll(entriesList);
-            //whitelistDatabase.save(whitelist);
+
+        if (!newWhitelistTable.getItems().isEmpty()) {
+            whitelist.getEntries().addAll(newWhitelistTable.getItems());
+            try {
+                whitelistDatabase.createWhitelist(whitelist);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelist is empty.", "A Whitelist needs to contain at least one entry");
             customAlert.showAndWait();
@@ -155,22 +155,20 @@ public class NewWhitelistDialogController {
      */
     public void addNewWhitelistEntry() {
 
-        tfUserName.clear();
-        tfUserName.clear();
-        this.newWhitelistTable.getItems().add(new WhitelistEntry());
-        this.newWhitelistTable.requestFocus();
-        this.newWhitelistTable.getSelectionModel().selectLast();
-        this.newWhitelistTable.getFocusModel().focus(newWhitelistTable.getItems().size() - 1);
-        this.newWhitelistTable.scrollTo(newWhitelistTable.getItems().size() - 1);
+        if (!tfUserName.getText().equals("") && !tfUscaseId.getText().equals("")) {
+            WhitelistEntry whitelistEntry = new WhitelistEntry(tfUscaseId.getText(), tfUserName.getText());
+            newWhitelistTable.getItems().add(whitelistEntry);
+        } else {
+            tfUserName.clear();
+            tfUserName.clear();
+            this.newWhitelistTable.getItems().add(new WhitelistEntry());
+            this.newWhitelistTable.requestFocus();
+            this.newWhitelistTable.getSelectionModel().selectLast();
+            this.newWhitelistTable.getFocusModel().focus(newWhitelistTable.getItems().size() - 1);
+            this.newWhitelistTable.scrollTo(newWhitelistTable.getItems().size() - 1);
+        }
 
 
-        /* if (!tfUserName.getText().equals("") && !tfUsecaseId.getText().equals("")) {
-            WhitelistEntry whitelistEntry = new WhitelistEntry(tfUsecaseId.getText(), tfUserName.getText());
-            //TODO: was muss hier rein ???)
-            if (true) {
-                whitelistEditTable.getItems().add(whitelistEntry);
-            }
-        }*/
     }
 
     /**
@@ -180,10 +178,9 @@ public class NewWhitelistDialogController {
     public void saveEntry() {
         if (!tfUscaseId.getText().equals("") && !tfUserName.getText().equals("")) {
             if (newWhitelistTable.getSelectionModel().getSelectedItem() != null) {
-                WhitelistEntry whitelistEntry =  newWhitelistTable.getSelectionModel().getSelectedItem();
+                WhitelistEntry whitelistEntry = newWhitelistTable.getSelectionModel().getSelectedItem();
                 whitelistEntry.setUsecaseId(tfUscaseId.getText());
                 whitelistEntry.setUsername(tfUserName.getText());
-                whitelist.getEntries().add(whitelistEntry);
 
                 this.newWhitelistTable.refresh();
 

@@ -65,14 +65,14 @@
                                     <Font size="18"/>
                                 </font>
                             </Label>
-                            <JFXTextField fx:id="tfUserName" prefWidth="300" promptText="%username">
+                            <JFXTextField fx:id="tfUscaseId" prefWidth="300" promptText="%useCaseId">
                                 <validators>
                                     <RequiredFieldValidator message="%required">
                                         <MaterialDesignIconView glyphName="ALERT"/>
                                     </RequiredFieldValidator>
                                 </validators>
                             </JFXTextField>
-                            <JFXTextField fx:id="tfUscaseId" prefWidth="300" promptText="%useCaseId">
+                            <JFXTextField fx:id="tfUserName" prefWidth="300" promptText="%username">
                                 <validators>
                                     <RequiredFieldValidator message="%required">
                                         <MaterialDesignIconView glyphName="ALERT"/>
