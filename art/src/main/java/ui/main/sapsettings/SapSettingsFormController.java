@@ -4,15 +4,17 @@ import com.jfoenix.controls.JFXTextField;
 import data.entities.SapConfiguration;
 import data.localdb.ArtDbContext;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 
+import javafx.scene.control.Button;
 import sap.ISapConnector;
 import sap.SapConnector;
 import ui.AppComponents;
 import ui.custom.controls.CustomAlert;
 
-public class SapSettingsEditDialogController {
+public class SapSettingsFormController {
 
     public JFXTextField hostServerField;
 
@@ -38,7 +40,6 @@ public class SapSettingsEditDialogController {
     /**
      * Initializes the view.
      */
-    @FXML
     public void initialize() {
         startValidation();
     }
@@ -46,32 +47,25 @@ public class SapSettingsEditDialogController {
     /**
      * Saves the currently edited connection.
      */
-    @FXML
-    public void saveConnection() {
+    public void saveConnection(ActionEvent event) throws Exception {
 
-        if (!checkTextFields()) {
-            CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "WARNING Some Input missing",
-                "If you want to save SAP Configuration/n you need Valid input in each of those Textfields", "Ok", "Cancel");
-            alert.showAndWait();
-        } else {
+        if (checkTextFields()) {
             this.sapConfig.setDescription(descriptionField.getText());
             this.sapConfig.setSysNr(sysNrField.getText());
             this.sapConfig.setServerDestination(hostServerField.getText());
             this.sapConfig.setClient(jcoClientField.getText());
             this.sapConfig.setPoolCapacity(tfPoolCapacity.getText());
             this.sapConfig.setLanguage(tfLanguage.getText());
-            try {
-                if (this.sapConfig.isArchived()) {
-                    database.createSapConfig(this.sapConfig);
-                    parentController.updateSapSettingsTable();
 
-                } else {
-                    database.updateSapConfig(this.sapConfig);
-                    parentController.updateSapSettingsTable();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            // create new config if id is null
+            if (this.sapConfig.getId() == null) {
+                database.createSapConfig(this.sapConfig);
+            } else {
+                database.updateSapConfig(this.sapConfig);
             }
+
+            close(event);
+            parentController.updateSapSettingsTable();
         }
     }
 
@@ -91,28 +85,25 @@ public class SapSettingsEditDialogController {
      * Establishes a test connection to SAP.
      */
     public void connect() {
-        if (!checkTextFields()) {
+        if (checkTextFields()) {
 
-            CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, "WARNING Missing some Input", "If you want to save SAP Configuration/n you need to set a valid Input", "Ok", "Cancel");
-            alert.showAndWait();
-
-        } else {
             this.sapConfig.setClient(jcoClientField.getText());
             this.sapConfig.setServerDestination(hostServerField.getText());
             this.sapConfig.setSysNr(sysNrField.getText());
             this.sapConfig.setLanguage(tfLanguage.getText());
             this.sapConfig.setPoolCapacity(tfPoolCapacity.getText());
             this.sapConfig.setDescription(descriptionField.getText());
+
             try {
 
+                // get exception from server
                 ISapConnector sapConnector = new SapConnector(this.sapConfig, "abs", "abs");
                 sapConnector.canPingServer();
 
             } catch (Exception e) {
 
+                // if exception contains error code 103, connection was successful
                 if (e.getCause().toString().contains("103")) {
-                    System.out.println(e.getCause().toString());
-                    System.out.println(sapConfig.getServerDestination());
                     CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, "SAP Connection Status", "Connection Status: Success", "OK", "Cancel");
                     customAlert.showAndWait();
                 } else {
@@ -129,28 +120,21 @@ public class SapSettingsEditDialogController {
      *
      * @param sapConfig the given SapConfig
      */
-    void giveSelectedSapConfig(SapConfiguration sapConfig) {
-        this.sapConfig = sapConfig;
-        this.oldSapConfig = new SapConfiguration();
-        this.oldSapConfig.setId(sapConfig.getId());
-        this.oldSapConfig.setCreatedBy(sapConfig.getCreatedBy());
-        this.oldSapConfig.setPoolCapacity(sapConfig.getPoolCapacity());
-        this.oldSapConfig.setLanguage(sapConfig.getLanguage());
-        this.oldSapConfig.setClient(sapConfig.getClient());
-        this.oldSapConfig.setServerDestination(sapConfig.getServerDestination());
-        this.oldSapConfig.setSysNr(sapConfig.getSysNr());
-        this.oldSapConfig.setArchived(sapConfig.isArchived());
-        this.oldSapConfig.setCreatedAt(sapConfig.getCreatedAt());
-        this.oldSapConfig.setDescription(sapConfig.getDescription());
+    public void giveSelectedSapConfig(SapConfiguration sapConfig) {
 
-        hostServerField.setText(sapConfig.getServerDestination());
-        sysNrField.setText(sapConfig.getSysNr());
-        jcoClientField.setText(sapConfig.getClient());
-        tfLanguage.setText(sapConfig.getLanguage());
-        tfPoolCapacity.setText(sapConfig.getPoolCapacity());
-        descriptionField.setText(sapConfig.getDescription());
+        if (sapConfig != null) {
+            this.sapConfig = sapConfig;
+            this.oldSapConfig = new SapConfiguration(sapConfig);
 
-
+            hostServerField.setText(sapConfig.getServerDestination());
+            sysNrField.setText(sapConfig.getSysNr());
+            jcoClientField.setText(sapConfig.getClient());
+            tfLanguage.setText(sapConfig.getLanguage());
+            tfPoolCapacity.setText(sapConfig.getPoolCapacity());
+            descriptionField.setText(sapConfig.getDescription());
+        } else {
+            this.sapConfig = new SapConfiguration();
+        }
     }
 
     /**
@@ -164,8 +148,6 @@ public class SapSettingsEditDialogController {
         descriptionField.setText(sapConfig.getDescription());
         tfPoolCapacity.setText(sapConfig.getPoolCapacity());
         tfLanguage.setText(sapConfig.getLanguage());
-
-
     }
 
     /**
@@ -213,5 +195,14 @@ public class SapSettingsEditDialogController {
      */
     void setParentController(SapSettingsController sapSettingsController) {
         this.parentController = sapSettingsController;
+    }
+
+    /**
+     * Hides the stage.
+     *
+     * @param event the given ActionEvent
+     */
+    public void close(ActionEvent event) {
+        (((Button) event.getSource()).getScene().getWindow()).hide();
     }
 }
