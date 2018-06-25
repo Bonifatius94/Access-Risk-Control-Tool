@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -49,9 +50,6 @@ public class WhitelistFormController {
     public JFXTextField tfWhitelistName;
 
     @FXML
-    public JFXButton addButton;
-
-    @FXML
     private PTableColumn<WhitelistEntry, String> usecaseId;
 
     @FXML
@@ -63,6 +61,13 @@ public class WhitelistFormController {
     @FXML
     private JFXButton applyButton;
 
+    @FXML
+    private JFXButton addButton;
+
+    @FXML
+    private JFXButton copyButton;
+
+
 
     private WhitelistsController parentController;
     private ArtDbContext whitelistDatabase = AppComponents.getDbContext();
@@ -71,12 +76,22 @@ public class WhitelistFormController {
     private ResourceBundle bundle = ResourceBundle.getBundle("lang");
 
     /**
-     * automatically called by FXML loader, starts initialize Columns.
+     * Automatically called by FXML loader, starts initialize Columns.
      */
     public void initialize() {
 
         initializeTableColumns();
         initializeValidation();
+
+        // addButton disable binding
+        this.addButton.disableProperty().bind(Bindings.and(
+            Bindings.isEmpty(tfUserName.textProperty()),
+            Bindings.isEmpty(tfUsecaseId.textProperty())));
+
+        // copyButton disable binding
+        this.copyButton.disableProperty().bind(Bindings.and(
+            Bindings.isEmpty(tfUserName.textProperty()),
+            Bindings.isEmpty(tfUsecaseId.textProperty())));
 
 
         whitelistEditTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -102,7 +117,7 @@ public class WhitelistFormController {
     }
 
     /**
-     * loads use case and username from the selected entry to the textfield.
+     * Loads use case and username from the selected entry to the textfield.
      *
      * @param whitelistEntry is the by call given whitelist entry.
      */
@@ -143,27 +158,50 @@ public class WhitelistFormController {
     }
 
     /**
-     * creates a new Whitelist entry.
+     * Creates a new Whitelist Entry.
      */
     public void addWhitelistEntry() {
-        // whitelistEditTable
         WhitelistEntry entry = new WhitelistEntry();
-        if (tfUsecaseId.validate() && tfUserName.validate()) {
-            entry = new WhitelistEntry(tfUsecaseId.getText(), tfUserName.getText());
-        }
-        whitelistEditTable.getItems().add(entry);
+        entry = new WhitelistEntry(tfUsecaseId.getText(), tfUserName.getText());
 
+        whitelistEditTable.getItems().add(entry);
         this.whitelistEditTable.requestFocus();
         this.whitelistEditTable.getSelectionModel().selectLast();
         this.whitelistEditTable.getFocusModel().focus(whitelistEditTable.getItems().size() - 1);
         this.whitelistEditTable.scrollTo(whitelistEditTable.getItems().size() - 1);
+
+        resetDetails();
+    }
+
+
+    private void resetDetails() {
+        tfUserName.setText("");
+        tfUsecaseId.setText("");
     }
 
     /**
-     * saves New WhitelistEntry and warns if id or username is missing.
+     * Creates a new Whitelist Entry.
+     */
+    public void copyWhitelistEntry() {
+        WhitelistEntry entry = new WhitelistEntry();
+        if (tfUsecaseId.validate() && tfUserName.validate()) {
+            entry = new WhitelistEntry(tfUsecaseId.getText(), tfUserName.getText());
+        }
+
+        whitelistEditTable.getItems().add(entry);
+        this.whitelistEditTable.requestFocus();
+        this.whitelistEditTable.getSelectionModel().selectLast();
+        this.whitelistEditTable.getFocusModel().focus(whitelistEditTable.getItems().size() - 1);
+        this.whitelistEditTable.scrollTo(whitelistEditTable.getItems().size() - 1);
+
+        resetDetails();
+    }
+
+    /**
+     * Applies the changes from the detail view to the table.
      */
     @FXML
-    public void saveEntry() {
+    public void applyChanges() {
         if (tfUsecaseId.validate() && tfUserName.validate()) {
             if (whitelistEditTable.getSelectionModel().getSelectedItem() != null) {
                 WhitelistEntry whitelistEntry = whitelistEditTable.getSelectionModel().getSelectedItem();
@@ -172,15 +210,11 @@ public class WhitelistFormController {
 
                 this.whitelistEditTable.refresh();
             }
-
-        } else {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "You need to fill out both fields", "An Whitelist entry needs to have an Usecase Id and an Username", "Ok", "Ok");
-            customAlert.showAndWait();
         }
     }
 
     /**
-     * save edited Whitelist.
+     * Save edited Whitelist.
      */
     @FXML
     private void saveEditWhitelist() throws Exception {
@@ -210,7 +244,7 @@ public class WhitelistFormController {
     }
 
     /**
-     * cancels the edit process of a whitelist.
+     * Cancels the edit process of a whitelist.
      */
     @FXML
     private void cancelEditWhitelist() {
@@ -223,7 +257,7 @@ public class WhitelistFormController {
     }
 
     /**
-     * initializes all validation of text fields.
+     * Initializes all validation of text fields.
      */
     private void initializeValidation() {
         tfUserName.focusedProperty().addListener((o, oldVal, newVal) -> {
@@ -258,7 +292,7 @@ public class WhitelistFormController {
     }
 
     /**
-     * checks if Whitelist name and whitelist Description is empty.
+     * Checks if Whitelist name and whitelist Description is empty.
      *
      * @return true if name or description is empty.
      */

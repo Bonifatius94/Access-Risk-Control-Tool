@@ -17,6 +17,7 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import ui.custom.controls.PTableColumn?>
 <?import ui.custom.controls.CustomWindow?>
+<?import com.jfoenix.controls.JFXCheckBox?>
 <CustomWindow xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" title="%editWhitelist"
               fx:controller="ui.main.whitelists.modal.WhitelistFormController" windowState="NoResize">
     <VBox HBox.hgrow="ALWAYS" style="-fx-padding: 20" spacing="20">
@@ -86,7 +87,17 @@
                                     <Tooltip text="%newEntry"/>
                                 </tooltip>
                             </JFXButton>
-                            <JFXButton fx:id="applyButton" styleClass="round-button" onAction="#saveEntry" prefWidth="30"
+                            <JFXButton fx:id="copyButton"
+                                       onAction="#copyWhitelistEntry" styleClass="round-button" prefWidth="30"
+                                       prefHeight="30">
+                                <graphic>
+                                    <MaterialDesignIconView glyphName="CONTENT_COPY"/>
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="%copyEntry"/>
+                                </tooltip>
+                            </JFXButton>
+                            <JFXButton fx:id="applyButton" styleClass="round-button" onAction="#applyChanges" prefWidth="30"
                                        prefHeight="30">
                                 <graphic>
                                     <MaterialDesignIconView glyphName="CHECK"/>
