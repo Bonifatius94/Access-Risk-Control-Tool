@@ -20,7 +20,7 @@ GRANT ALL ON AccessPatternConditions TO DataAnalyst;
 GRANT ALL ON AccessProfileConditions TO DataAnalyst;
 GRANT ALL ON AccessPatternConditionProperties TO DataAnalyst;
 GRANT ALL ON SapConfigurations TO DataAnalyst;
-GRANT SELECT ON DbUsers TO Admin;
+GRANT SELECT ON DbUsers TO DataAnalyst;
 
 -- grant privileges to viewer role
 GRANT ALL ON CriticalAccessQueries TO Viewer;
@@ -35,7 +35,7 @@ GRANT SELECT ON AccessPatternConditions TO Viewer;
 GRANT SELECT ON AccessProfileConditions TO Viewer;
 GRANT SELECT ON AccessPatternConditionProperties TO Viewer;
 GRANT SELECT ON SapConfigurations TO Viewer;
-GRANT SELECT ON DbUsers TO Admin;
+GRANT SELECT ON DbUsers TO Viewer;
 
 -- remove privileges for public role (only registered users can access data)
 REVOKE ALL ON CriticalAccessQueries FROM PUBLIC;

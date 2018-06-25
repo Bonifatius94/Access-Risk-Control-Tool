@@ -28,7 +28,7 @@ public class PrivilegesTest {
 
         assert(false);
 
-        // TODO: add calls for missing database operations here ...
+        // TODO: add calls for missing database operations here ......
     }
 
     private boolean testPrivilegesGetDatabaseUsers(String username, String password, boolean expectedResult) {

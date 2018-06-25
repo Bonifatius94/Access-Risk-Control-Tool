@@ -1,78 +1,141 @@
 package ui.login;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXTextField;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+
+import java.util.ResourceBundle;
+
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import ui.App;
+import ui.AppComponents;
+import ui.custom.controls.CustomWindow;
 
-import tools.tracing.TraceOut;
 
 public class LoginController {
 
     @FXML
-    private TextField tfLoginUsername;
+    private JFXTextField usernameInput;
 
     @FXML
-    private PasswordField tfLoginPassword;
+    private JFXPasswordField passwordInput;
 
-    private StringProperty loginUsername = new SimpleStringProperty("");
-    private StringProperty loginPassword = new SimpleStringProperty("");
+    @FXML
+    private JFXTextField passwordInputPlain;
+
+    @FXML
+    private MaterialDesignIconView showPasswordIconView;
+
+    @FXML
+    private Label errorLabel;
 
     /**
-     * This method initializes the data bindings and event handlers.
+     * Initializes the view with all needed bindings.
      */
+    @FXML
     public void initialize() {
 
-        TraceOut.enter();
+        // bind password inputs
+        passwordInput.managedProperty().bind(passwordInput.visibleProperty());
+        passwordInputPlain.managedProperty().bind(passwordInputPlain.visibleProperty());
+        passwordInputPlain.visibleProperty().bind(Bindings.not(passwordInput.visibleProperty()));
+        passwordInput.textProperty().bindBidirectional(passwordInputPlain.textProperty());
 
-        tfLoginUsername.textProperty().bindBidirectional(loginUsername);
-        tfLoginPassword.textProperty().bindBidirectional(loginPassword);
-
-        TraceOut.leave();
+        initializeValidation();
     }
 
-    @FXML
-    protected void btnOkClicked(ActionEvent e) {
-
-        TraceOut.enter();
-
-        // send login request
-        sendLoginRequest(loginUsername.getValue(), loginPassword.getValue());
-
-        // close window
-        Button button = (Button)e.getSource();
-        Stage stage = (Stage) button.getScene().getWindow();
-        stage.close();
-
-        TraceOut.leave();
+    /**
+     * Handles the database login.
+     */
+    public void login(ActionEvent event) {
+        if (validateBeforeSubmit()) {
+            if (AppComponents.tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
+                startApplication(event);
+            } else {
+                errorLabel.setVisible(true);
+            }
+        }
     }
 
-    @FXML
-    protected void btnCancelClicked(ActionEvent e) {
-
-        TraceOut.enter();
-
-        // close window
-        Button button = (Button)e.getSource();
-        Stage stage = (Stage) button.getScene().getWindow();
-        stage.close();
-
-        TraceOut.leave();
+    /**
+     * Toggles the password visibility.
+     */
+    public void togglePasswordDisplay() {
+        if (passwordInput.isVisible()) {
+            showPasswordIconView.setIcon(MaterialDesignIcon.EYE);
+            passwordInput.visibleProperty().set(false);
+        } else {
+            showPasswordIconView.setIcon(MaterialDesignIcon.EYE_OFF);
+            passwordInput.visibleProperty().set(true);
+        }
     }
 
-    // TODO: remove this suppress annotation
-    @SuppressWarnings("unused")
-    private void sendLoginRequest(String username, String password) {
+    /**
+     * Initializes the validation for certain text inputs in order to display an error message (e.g. required).
+     */
+    private void initializeValidation() {
 
-        TraceOut.enter();
+        usernameInput.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                usernameInput.validate();
+            }
+        });
 
-        // TODO: implement logic
-
-        TraceOut.leave();
+        passwordInput.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                passwordInput.validate();
+            }
+        });
     }
 
+    /**
+     * Validates the login inputs.
+     *
+     * @return if the inputs are valid
+     */
+    private boolean validateBeforeSubmit() {
+        return usernameInput.validate() && passwordInput.validate() && passwordInputPlain.validate();
+    }
+
+    /**
+     * Starts the application by opening the MainView.
+     */
+    private void startApplication(ActionEvent event) {
+        try {
+            // create a new FXML loader with the SapSettingsEditDialogController
+            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../main/MainView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
+
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow, 1050, 750);
+            scene.getStylesheets().add("css/dark-theme.css");
+            App.primaryStage.setScene(scene);
+            App.primaryStage.setTitle(bundle.getString("art"));
+            customWindow.initStage(App.primaryStage);
+
+            close(event);
+            App.primaryStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Hides the stage.
+     *
+     * @param event the given ActionEvent
+     */
+    public void close(ActionEvent event) {
+        (((Button) event.getSource()).getScene().getWindow()).hide();
+    }
 }

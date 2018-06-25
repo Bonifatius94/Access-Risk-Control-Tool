@@ -33,7 +33,7 @@ public class AccessPatternTest {
             // query patterns
             List<AccessPattern> patterns = context.getPatterns(false);
 
-            AccessPattern profileAccessPattern = patterns.stream().filter(x -> x.getConditions().size() == 1).findFirst().get();
+            AccessPattern profileAccessPattern = patterns.stream().filter(x -> x.getId().equals(1)).findFirst().get();
             AccessProfileCondition profileCondition = profileAccessPattern.getConditions().stream().findFirst().get().getProfileCondition();
 
             // check if test data was queried successfully
@@ -145,14 +145,11 @@ public class AccessPatternTest {
     }
 
     @Test
-    @Disabled
     public void testUpdatePatternWithProfileCondition() {
 
         boolean ret = false;
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
-
-            // TODO: create another whitelist in data seed that is not used by a critical access query
 
             // query patterns
             List<AccessPattern> patterns = context.getPatterns(false);
@@ -328,8 +325,6 @@ public class AccessPatternTest {
 
     @Test
     public void deletePattern() {
-
-        // TODO: create missing three tests (patter / profile condition X normal update / archiving logic)
 
         boolean ret = false;
 
