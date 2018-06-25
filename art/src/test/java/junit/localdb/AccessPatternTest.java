@@ -215,7 +215,8 @@ public class AccessPatternTest {
             profilePattern = patterns.stream().filter(x -> x.getId().equals(profilePatternId)).findFirst().get();
             profileCondition = profilePattern.getConditions().stream().findFirst().get().getProfileCondition();
 
-            // TODO: change success condition (this case goes into archiving logic)
+            // test if updated correct
+
 
             // check if test data was queried successfully
             ret = patterns.size() == 3
