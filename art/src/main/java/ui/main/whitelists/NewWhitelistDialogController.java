@@ -7,6 +7,7 @@ import data.entities.WhitelistEntry;
 import data.localdb.ArtDbContext;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class NewWhitelistDialogController {
 
     public JFXTextField tfUscaseId;
     public JFXTextField tfUserName;
-    //public JFXButton cancelButton;
+
     public JFXButton addButton;
     public JFXTextField tfDescription;
     public JFXTextField whitelistName;
@@ -45,7 +46,6 @@ public class NewWhitelistDialogController {
      * is automatically called by FXML loader and starts initializeColumns.
      */
     @FXML
-    @SuppressWarnings("all")
     public void initialize() {
         initializeColumns();
         initializeValidation();
@@ -120,16 +120,18 @@ public class NewWhitelistDialogController {
      * cancel New Whitelist deletes all information.
      */
     public void cancelNewWhitelist() {
-
-        CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Still unsaved changes. Do you want to save them?", "By pressing cancel Whitelist will be deleted", "Save", "Cancel");
-        ButtonType buttonType = customAlert.showAndWait().get();
-        if (buttonType == ButtonType.OK) {
-            saveNewWhitelist();
-            Stage stage = (Stage) newWhitelistTable.getScene().getWindow();
-            stage.close();
-        } else if (buttonType == ButtonType.CANCEL) {
-            Stage stage = (Stage) newWhitelistTable.getScene().getWindow();
-            stage.close();
+        if (!newWhitelistTable.getItems().isEmpty()) {
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Still unsaved changes. Do you want to save them?", "By pressing cancel Whitelist will be deleted",
+                "Save", "Cancel");
+            String buttonType = customAlert.showAndWait().get().getText();
+            if (buttonType.equals("Save")) {
+                saveNewWhitelist();
+                ((Stage) newWhitelistTable.getScene().getWindow()).close();
+            } else if (buttonType.equals("Cancel")) {
+                ((Stage) newWhitelistTable.getScene().getWindow()).close();
+            }
+        } else {
+            ((Stage) newWhitelistTable.getScene().getWindow()).close();
         }
     }
 
@@ -139,7 +141,16 @@ public class NewWhitelistDialogController {
     public void saveNewWhitelist() {
         if (!checkNameAndDescription()) {
             if (!newWhitelistTable.getItems().isEmpty()) {
-                whitelist.getEntries().addAll(newWhitelistTable.getItems());
+                whitelist = new Whitelist();
+                whitelist.setArchived(false);
+                whitelist.setDescription(tfDescription.getText());
+                whitelist.setName(whitelistName.getText());
+
+                for (WhitelistEntry wle : newWhitelistTable.getItems()) {
+                    wle.setWhitelist(whitelist);
+                    whitelist.getEntries().add(wle);
+                }
+                //whitelist.getEntries().addAll(newWhitelistTable.getItems());
                 try {
                     whitelistDatabase.createWhitelist(whitelist);
                     parentController.updateWhitelistTable();
@@ -147,11 +158,11 @@ public class NewWhitelistDialogController {
                     e.printStackTrace();
                 }
             } else {
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelist is empty.", "A Whitelist needs to contain at least one entry");
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelist is empty.", "A Whitelist needs to contain at least one entry", "Ok", "Ok");
                 customAlert.showAndWait();
             }
         } else {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelistname or description is not valid.", "A Whitelist needs a Name and a description");
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelistname or description is not valid.", "A Whitelist needs a Name and a description", "Ok", "Ok");
             customAlert.showAndWait();
         }
     }
@@ -183,7 +194,6 @@ public class NewWhitelistDialogController {
             this.newWhitelistTable.scrollTo(newWhitelistTable.getItems().size() - 1);
         }
 
-
     }
 
     /**
@@ -203,10 +213,9 @@ public class NewWhitelistDialogController {
                 newWhitelistTable.getItems().add(new WhitelistEntry(tfUscaseId.getText(), tfUserName.getText()));
                 this.newWhitelistTable.refresh();
             }
-            //whitelistEditTable.getItems().add();
 
         } else {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "You need to fill out both fields", "An Whitelist entry needs to have an Usecase Id and an Username");
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "You need to fill out both fields", "An Whitelist entry needs to have an Usecase Id and an Username", "Ok", "Ok");
             customAlert.showAndWait();
         }
     }
@@ -219,6 +228,5 @@ public class NewWhitelistDialogController {
     public void setParentController(WhitelistsController parentController) {
         this.parentController = parentController;
     }
-
 
 }

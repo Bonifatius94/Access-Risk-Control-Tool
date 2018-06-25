@@ -20,6 +20,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableView;
@@ -56,7 +57,6 @@ public class WhitelistsController {
     public FilterController filterController;
 
     ArtDbContext database = AppComponents.getDbContext();
-    //private Boolean includeArchivedData = true;
 
     /**
      * this function is automatically called by FXML loader , its starts initialize.
@@ -68,7 +68,7 @@ public class WhitelistsController {
         initializeColumns();
 
 
-        try {
+        /*try {
             //Test code
 
             WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
@@ -88,7 +88,7 @@ public class WhitelistsController {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
 
 
         filterController.shouldFilterProperty.addListener((obs, oldValue, newValue) -> {
@@ -123,6 +123,7 @@ public class WhitelistsController {
     private void initializeColumns() {
 
         deleteWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (Whitelist whitelist) -> {
+
             try {
                 database.deleteWhitelist(whitelist);
                 updateWhitelistTable();
@@ -156,12 +157,11 @@ public class WhitelistsController {
      */
     @FXML
     public void newWhitelist() {
-        //TODO: save new whitelist in Database bzw Description dialog hinzufügen
 
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("NewWhitelistDialogView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/whitelists/NewWhitelistDialogView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
             // build the scene and add it to the stage
             Scene scene = new Scene(customWindow, 900, 650);
@@ -193,11 +193,10 @@ public class WhitelistsController {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("WhitelistEditDialogView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/whitelists/WhitelistEditDialogView.fxml"), bundle);
             // give the dialog the
             WhitelistEditDialogController.giveSelectedWhitelist(whitelist);
             CustomWindow customWindow = loader.load();
-            System.out.println(whitelist == null);
 
             // build the scene and add it to the stage
             Scene scene = new Scene(customWindow, 900, 650);
@@ -221,23 +220,26 @@ public class WhitelistsController {
      */
     @FXML
     void deleteWhitelist() {
-        if (whitelistTable.getSelectionModel().getSelectedItem().equals(whitelistTable.getFocusModel().getFocusedItem()) && !whitelistTable.getSelectionModel().getSelectedItem().isArchived()) {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Do you really want to delete Whitelist with Id"
-                + whitelistTable.getSelectionModel().getSelectedItem().getId().toString(), "By clicking OK the Whitelist will be deleted, click cancel to stop the deletion", "OK", "Cancel");
+        if (whitelistTable.getSelectionModel().getSelectedItem() != null) {
+            if (!whitelistTable.getSelectionModel().getSelectedItem().isArchived()) {
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Do you really want to delete Whitelist with Id: "
+                    + whitelistTable.getSelectionModel().getSelectedItem().getId().toString(), "By clicking OK the Whitelist will be deleted, click cancel to stop the deletion", "OK", "Cancel");
 
-            Whitelist whitelist = whitelistTable.getSelectionModel().getSelectedItem();
-            if (customAlert.showAndWait().isPresent() && customAlert.showAndWait().get() == ButtonType.OK) {
-                whitelistTable.getItems().remove(whitelist);
-                //deletes whitelist from DB
-                try {
-                    database.deleteWhitelist(whitelist);
-                    updateWhitelistTable();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                Whitelist whitelist = whitelistTable.getSelectionModel().getSelectedItem();
+                String buttenText = customAlert.showAndWait().get().getText();
+
+                if (buttenText.equals("Cancel")) {
+
+                    customAlert.close();
+                } else {
+                    //deletes whitelist from DB
+                    try {
+                        database.deleteWhitelist(whitelist);
+                        updateWhitelistTable();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-
-            } else if (customAlert.showAndWait().isPresent() && customAlert.showAndWait().get() == ButtonType.CANCEL) {
-                customAlert.close();
             }
         }
     }
@@ -248,7 +250,7 @@ public class WhitelistsController {
      */
     @FXML
     void editWhitelist() {
-        if (whitelistTable.getSelectionModel().getSelectedItem().equals(whitelistTable.getFocusModel().getFocusedItem())) {
+        if (whitelistTable.getSelectionModel().getSelectedItem() != null) {
             editDialogWhitelist(whitelistTable.getSelectionModel().getSelectedItem());
         }
         whitelistTable.setOnMouseClicked(event -> {
@@ -259,24 +261,27 @@ public class WhitelistsController {
     }
 
     /**
-     * clones a selected Whitelist. TODO: needs some additional checking( on ID and stuff) eventually??.
+     * clones a selected Whitelist.
      */
     @FXML
     void cloneWhitelist() {
-        if (whitelistTable.getSelectionModel().getSelectedItem().equals(whitelistTable.getFocusModel().getFocusedItem())) {
-            Whitelist whitelist = whitelistTable.getSelectionModel().getSelectedItem();
-            try {
-                database.createWhitelist(whitelist);
-                updateWhitelistTable();
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (whitelistTable.getSelectionModel().getSelectedItem() != null) {
+            if (whitelistTable.getSelectionModel().getSelectedItem().equals(whitelistTable.getFocusModel().getFocusedItem())) {
+                Whitelist whitelist = new Whitelist(whitelistTable.getSelectionModel().getSelectedItem());
+                whitelist.setArchived(false);
+                whitelist.setDescription("Clone -" + whitelist.getDescription());
+                try {
+                    database.createWhitelist(whitelist);
+                    updateWhitelistTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
     /**
      * starts Whitelist import.
-     * TODO: Dialog
      */
 
     public void importWhitelist() {
@@ -303,7 +308,7 @@ public class WhitelistsController {
     }
 
     /**
-     * Starts a dialog do edit imported whitelist.TODO: adding to table
+     * Starts a dialog do edit imported whitelist.
      *
      * @param whitelist is the imported Whitlsit
      */
@@ -311,19 +316,5 @@ public class WhitelistsController {
         editDialogWhitelist(whitelist);
     }
 
-    //TODO: reaktivate if database is ready
-    /*private void tableRefresh() {
-
-        whitelistTable.getItems().clear();
-        List<Whitelist> whitelists = null;
-        try {
-            whitelists = database.getWhitelists(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        ObservableList<Whitelist> observableList = FXCollections.observableArrayList(whitelists);
-        whitelistTable.getItems().addAll(observableList);
-        whitelistTable.refresh();
-    }*/
 }
 

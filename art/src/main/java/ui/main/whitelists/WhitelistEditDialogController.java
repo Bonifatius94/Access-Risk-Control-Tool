@@ -186,7 +186,7 @@ public class WhitelistEditDialogController {
             //whitelistEditTable.getItems().add();
 
         } else {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "You need to fill out both fields", "An Whitelist entry needs to have an Usecase Id and an Username");
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "You need to fill out both fields", "An Whitelist entry needs to have an Usecase Id and an Username", "Ok", "Ok");
             customAlert.showAndWait();
         }
     }
@@ -199,14 +199,14 @@ public class WhitelistEditDialogController {
         if (!checkNameAndDescription()) {
             if (!whitelistEditTable.getItems().isEmpty()) {
                 whitelist.getEntries().addAll(whitelistEditTable.getItems());
+                whitelist.setName(tfWhitelistName.getText());
+                whitelist.setDescription(tfDescription.getText());
                 try {
                     if (whitelist.isArchived()) {
                         whitelistDatabase.createWhitelist(whitelist);
                         parentController.updateWhitelistTable();
 
                     } else if (whitelist.getId() == null) {
-                        whitelist.setName(tfWhitelistName.getText());
-                        whitelist.setDescription(tfDescription.getText());
                         whitelistDatabase.createWhitelist(whitelist);
                         parentController.updateWhitelistTable();
                     } else {
@@ -217,11 +217,11 @@ public class WhitelistEditDialogController {
                     e.printStackTrace();
                 }
             } else {
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelist is empty.", "A Whitelist needs to contain at least one entry");
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelist is empty.", "A Whitelist needs to contain at least one entry", "Ok", "Ok");
                 customAlert.showAndWait();
             }
         } else {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelistname or description is not valid.", "A Whitelist needs a Name and a description");
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelistname or description is not valid.", "A Whitelist needs a Name and a description", "Ok", "Ok");
             customAlert.showAndWait();
         }
     }
@@ -232,12 +232,14 @@ public class WhitelistEditDialogController {
     @FXML
     private void cancelEditWhitelist() {
         //not sure if this is needed ? (DEEP_COPY???)
-        if (whitelist.getEntries().size() != whitelistOld.getEntries().size()) {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Still unsaved changes in Whitelist", "Do you want to save changes", "Save", "Chancel");
-            ButtonType buttonType = customAlert.showAndWait().get();
-            if (buttonType == ButtonType.OK) {
+        if (!whitelist.equals(whitelistOld)) {
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Still unsaved changes in Whitelist", "Do you want to save changes", "Save", "Cancel");
+            String buttonType = customAlert.showAndWait().get().getText();
+            if (buttonType.equals("Save")) {
                 saveEditWhitelist();
-            } else if (buttonType == ButtonType.CANCEL) {
+                ((Stage) whitelistEditTable.getScene().getWindow()).close();
+
+            } else if (buttonType.equals("Cancel")) {
                 whitelistEditTable.getScene().getWindow().hide();
             }
         }
@@ -280,7 +282,7 @@ public class WhitelistEditDialogController {
         List<WhitelistEntry> whitelistEntryList = new ArrayList<>(whitelist.getEntries());
 
         ObservableList<WhitelistEntry> list = FXCollections.observableArrayList(whitelistEntryList);
-
+        whitelistEditTable.getItems().clear();
         whitelistEditTable.setItems(list);
         usecaseId.setEditable(false);
         userName.setEditable(false);
