@@ -59,6 +59,7 @@ public class WhitelistsController {
     public FilterController filterController;
 
     ArtDbContext database = AppComponents.getDbContext();
+    private ResourceBundle bundle = ResourceBundle.getBundle("lang");
 
     /**
      * this function is automatically called by FXML loader , its starts initialize.
@@ -191,7 +192,7 @@ public class WhitelistsController {
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 900, 650);
+            Scene scene = new Scene(customWindow);
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
             stage.setScene(scene);
@@ -214,17 +215,15 @@ public class WhitelistsController {
      */
     public void deleteWhitelist() throws Exception {
         if (whitelistTable.getSelectionModel().getSelectedItems() != null && whitelistTable.getSelectionModel().getSelectedItems().size() != 0) {
-            if (!whitelistTable.getSelectionModel().getSelectedItem().isArchived()) {
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Delete selected Whitelists?",
-                    "By clicking OK the whitelists will be deleted, click cancel to stop the deletion", "Ok", "Cancel");
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                bundle.getString("deleteConfirmMessage") + " (" + whitelistTable.getSelectionModel().getSelectedItems().size() + ")", "Ok", "Cancel");
 
-                if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
-                    // deletes whitelists from DB
-                    for (Whitelist whitelist : whitelistTable.getSelectionModel().getSelectedItems()) {
-                        database.deleteWhitelist(whitelist);
-                    }
-                    updateWhitelistTable();
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                // deletes whitelists from DB
+                for (Whitelist whitelist : whitelistTable.getSelectionModel().getSelectedItems()) {
+                    database.deleteWhitelist(whitelist);
                 }
+                updateWhitelistTable();
             }
         }
     }
@@ -271,9 +270,6 @@ public class WhitelistsController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "No file selected", "you need to select an xlsx file to import", "Ok", "");
-            customAlert.showAndWait();
         }
     }
 

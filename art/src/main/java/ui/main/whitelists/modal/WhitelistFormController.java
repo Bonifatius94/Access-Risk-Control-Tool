@@ -9,6 +9,7 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
@@ -53,6 +54,7 @@ public class WhitelistFormController {
     private ArtDbContext whitelistDatabase = AppComponents.getDbContext();
     private Whitelist whitelist;
     private Whitelist whitelistOld;
+    private ResourceBundle bundle = ResourceBundle.getBundle("lang");
 
     /**
      * automatically called by FXML loader, starts initialize Columns.
@@ -187,7 +189,7 @@ public class WhitelistFormController {
 
                 ((Stage) whitelistEditTable.getScene().getWindow()).close();
             } else {
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Whitelist is empty.", "A Whitelist needs to contain at least one entry", "Ok", "Ok");
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("whitelistEmptyAlertTitle"), bundle.getString("whitelistEmptyAlertMessage"), "Ok", "Ok");
                 customAlert.showAndWait();
             }
         }
@@ -199,7 +201,7 @@ public class WhitelistFormController {
     @FXML
     private void cancelEditWhitelist() {
         if (!whitelist.equals(whitelistOld)) {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Still unsaved changes in Whitelist", "Changes are lost", "Ok", "Cancel");
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"), bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 ((Stage) whitelistEditTable.getScene().getWindow()).close();
             }
@@ -233,25 +235,6 @@ public class WhitelistFormController {
     }
 
     /**
-     * reverts all fields and table to old stand.
-     */
-    public void revertEdit() {
-        whitelist = whitelistOld;
-        List<WhitelistEntry> whitelistEntryList = new ArrayList<>(whitelist.getEntries());
-
-        ObservableList<WhitelistEntry> list = FXCollections.observableArrayList(whitelistEntryList);
-        whitelistEditTable.getItems().clear();
-        whitelistEditTable.setItems(list);
-        usecaseId.setEditable(false);
-        userName.setEditable(false);
-        whitelistEditTable.setEditable(false);
-        whitelistEditTable.refresh();
-        tfWhitelistName.setText(whitelist.getName());
-        tfDescription.setText(whitelist.getDescription());
-    }
-
-
-    /**
      * Sets the parent controller.
      *
      * @param parentController the parent controller
@@ -265,7 +248,24 @@ public class WhitelistFormController {
      *
      * @return true if name or description is empty.
      */
-    private Boolean checkNameAndDescription() {
+    private boolean checkNameAndDescription() {
         return tfDescription.getText().equals("") || tfWhitelistName.getText().equals("");
+    }
+
+    /**
+     * Makes all entries editable according to boolean.
+     */
+    public void setEditable(boolean editable) {
+        if (!editable) {
+            tfWhitelistName.setEditable(false);
+            tfDescription.setEditable(false);
+            tfUsecaseId.setEditable(false);
+            tfUserName.setEditable(false);
+        } else {
+            tfWhitelistName.setEditable(true);
+            tfDescription.setEditable(true);
+            tfUsecaseId.setEditable(true);
+            tfUserName.setEditable(true);
+        }
     }
 }
