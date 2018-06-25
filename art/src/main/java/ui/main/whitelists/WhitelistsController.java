@@ -10,10 +10,14 @@ import io.msoffice.excel.WhitelistImportHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -21,6 +25,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
+import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableRow;
@@ -49,6 +54,7 @@ public class WhitelistsController {
 
     @FXML
     private PTableColumn<Whitelist, JFXButton> editWhitelistColumn;
+
     @FXML
     private PTableColumn<Whitelist, JFXButton> deleteWhitelistColumn;
 
@@ -56,9 +62,16 @@ public class WhitelistsController {
     private PTableColumn<Whitelist, Set<WhitelistEntry>> entryCountColumn;
 
     @FXML
+    private PTableColumn<Whitelist, ZonedDateTime> creationColumn;
+
+    @FXML
+    private Label itemCount;
+
+    @FXML
     public FilterController filterController;
 
     ArtDbContext database = AppComponents.getDbContext();
+    private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
     private ResourceBundle bundle = ResourceBundle.getBundle("lang");
 
     /**
@@ -81,6 +94,11 @@ public class WhitelistsController {
             return row;
         });
 
+        // show an item count (+ selected)
+        itemCount.textProperty().bind(Bindings.concat(Bindings.size(whitelistTable.getSelectionModel().getSelectedItems()).asString("%s / "),
+            numberOfItems.asString("%s " + bundle.getString("selected"))));
+
+
         // set selection mode to MULTIPLE
         whitelistTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -96,7 +114,6 @@ public class WhitelistsController {
         });
 
         updateWhitelistTable();
-
     }
 
     /**
@@ -109,6 +126,10 @@ public class WhitelistsController {
             filterController.startDateProperty.getValue(), filterController.startDateProperty.getValue(), 0);
         ObservableList<Whitelist> list = FXCollections.observableList(whitelists);
         whitelistTable.setItems(list);
+
+        // update itemCount
+        numberOfItems.setValue(list.size());
+
         whitelistTable.refresh();
     }
 
@@ -145,6 +166,14 @@ public class WhitelistsController {
             }
         );
         entryCountColumn.setComparator((list1, list2) -> (list1.size() <= list2.size()) ? 0 : 1);
+
+        // format create timestamp
+        creationColumn.setCellFactory(col -> new TableCell<Whitelist, ZonedDateTime>() {
+            @Override
+            protected void updateItem(ZonedDateTime item, boolean empty) {
+                setText((empty || item == null) ? "" : item.format(DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")));
+            }
+        });
     }
 
     /**

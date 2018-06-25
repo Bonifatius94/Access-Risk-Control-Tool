@@ -7,6 +7,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import ui.custom.controls.PTableColumn?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.Label?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="ui.main.whitelists.WhitelistsController"
       spacing="10" fx:id="whitelistViewFxId">
@@ -30,7 +32,7 @@
                 </cellValueFactory>
             </PTableColumn>
 
-            <PTableColumn text="%creationDate" resizable="false" percentageWidth="0.2">
+            <PTableColumn text="%creationDate" fx:id="creationColumn" resizable="false" percentageWidth="0.2">
                 <cellValueFactory>
                     <PropertyValueFactory property="createdAt"/>
                 </cellValueFactory>
@@ -44,18 +46,17 @@
             </PTableColumn>
             <PTableColumn percentageWidth="0.05" resizable="false" fx:id="deleteWhitelistColumn">
             </PTableColumn>
-
         </columns>
-
     </TableView>
 
     <HBox alignment="BOTTOM_RIGHT" spacing="10">
+        <Label fx:id="itemCount"/>
+        <Region HBox.hgrow="ALWAYS"/>
         <JFXButton text="%import" prefWidth="100" onAction="#importWhitelist">
             <graphic>
                 <MaterialDesignIconView glyphName="IMPORT"/>
             </graphic>
         </JFXButton>
-
         <JFXButton text="%clone" prefWidth="100" onAction="#cloneWhitelist">
             <graphic>
                 <MaterialDesignIconView glyphName="CONTENT_COPY"/>
