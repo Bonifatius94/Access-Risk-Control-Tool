@@ -16,6 +16,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -56,6 +58,9 @@ public class FirstUseWizardController {
     @FXML
     private JFXButton finishButton;
 
+    @FXML
+    private HBox usernameValidationBox;
+
     /**
      * Initializes the view with all needed bindings.
      */
@@ -78,6 +83,12 @@ public class FirstUseWizardController {
         createUserButton.defaultButtonProperty().bind(Bindings.isNotEmpty(usernameInput.textProperty()));
         finishButton.defaultButtonProperty().bind(finishButton.focusedProperty());
 
+        // transform typed text to uppercase
+        usernameInput.setTextFormatter(new TextFormatter<>((change) -> {
+            change.setText(change.getText().toUpperCase());
+            return change;
+        }));
+
         initializeValidation();
     }
 
@@ -98,6 +109,22 @@ public class FirstUseWizardController {
      * Initializes the validation for userCreation inputs.
      */
     private void initializeValidation() {
+
+        // validate the input with regex and display error message
+        usernameInput.textProperty().addListener((ol, oldValue, newValue) -> {
+            if (newValue.isEmpty()) {
+                usernameValidationBox.setVisible(false);
+            } else {
+                if (!newValue.equals(oldValue)) {
+                    if (!newValue.matches("([A-Z]{3,}+(_|\\w)*)")) {
+                        usernameValidationBox.setVisible(true);
+                    } else {
+                        usernameValidationBox.setVisible(false);
+                    }
+                    usernameInput.validate();
+                }
+            }
+        });
 
         usernameInput.focusedProperty().addListener((o, oldVal, newVal) -> {
             if (!newVal) {
@@ -125,7 +152,7 @@ public class FirstUseWizardController {
      * @return if the inputs are valid
      */
     private boolean validateBeforeCreate() {
-        return usernameInput.validate() && passwordInput.validate() && passwordInputPlain.validate();
+        return usernameInput.validate() && passwordInput.validate() && passwordInputPlain.validate() && !usernameValidationBox.isVisible();
     }
 
     /**

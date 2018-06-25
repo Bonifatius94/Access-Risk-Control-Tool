@@ -1,5 +1,7 @@
 package ui.custom.controls;
 
+import java.util.ResourceBundle;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -7,9 +9,11 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+
 public class CustomAlert extends Alert {
 
     private CustomWindow window;
+    private ResourceBundle bundle = ResourceBundle.getBundle("lang");
 
     private String title;
     private String contentText;
@@ -33,6 +37,8 @@ public class CustomAlert extends Alert {
         super(alertType);
         this.title = title;
         this.contentText = contentText;
+        this.okButtonText = bundle.getString("defaultOkButtonText");
+        this.cancelButtonText = bundle.getString("defaultCancelButtonText");
 
         init();
     }

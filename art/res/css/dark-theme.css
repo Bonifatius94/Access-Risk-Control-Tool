@@ -162,7 +162,7 @@
     -fx-text-fill: -fx-text !important;
 }
 
-.jfx-combo-box .cell {
+.jfx-combo-box .cell, .jfx-combo-box .text-field {
     -fx-text-fill: -fx-text !important;
 }
 
@@ -492,4 +492,8 @@ alternative design with separators left and right of complete header bar
 
 .status-bar .database-icon {
     -fx-fill: -fx-success;
+}
+
+.warning-text {
+    -fx-text-fill: red;
 }

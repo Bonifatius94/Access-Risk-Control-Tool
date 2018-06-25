@@ -380,7 +380,6 @@ public class PatternsFormController {
         for (Tab tab : this.conditionTabs.getTabs()) {
             tab.setText("COND " + ++i);
         }
-
     }
 
     /**
