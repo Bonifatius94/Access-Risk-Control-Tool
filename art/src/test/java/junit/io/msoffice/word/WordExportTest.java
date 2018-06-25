@@ -26,6 +26,8 @@ public class WordExportTest {
     @Test
     public void testWordExport() {
 
+        boolean ret = false;
+
         try {
 
             // get access patterns from excel file
@@ -54,6 +56,9 @@ public class WordExportTest {
 
             // export data as pdf format
             new ReportExportHelper().exportReport(query, "out.pdf", ReportExportType.Pdf);
+
+            // if no exception occurred, the test was successful
+            ret = true;
 
         } catch (Exception ex) {
             ex.printStackTrace();
