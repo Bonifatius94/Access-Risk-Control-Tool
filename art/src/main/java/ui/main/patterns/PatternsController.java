@@ -1,18 +1,22 @@
 package ui.main.patterns;
 
 import com.jfoenix.controls.JFXButton;
+
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
+import io.msoffice.excel.AccessPatternImportHelper;
+
+import java.io.File;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -26,16 +30,16 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.paint.Paint;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.ConditionTypeCellFactory;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.filter.FilterController;
+import ui.main.patterns.modal.PatternImportController;
 import ui.main.patterns.modal.PatternsFormController;
 
 
@@ -63,6 +67,7 @@ public class PatternsController {
     public FilterController filterController;
 
     private ResourceBundle bundle;
+    private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
 
     /**
      * Initializes the controller.
@@ -101,9 +106,11 @@ public class PatternsController {
             filterController.endDateProperty.getValue(), 0);
         ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
 
+        // update itemCount
+        numberOfItems.setValue(list.size());
+
         patternsTable.setItems(list);
         patternsTable.refresh();
-
 
     }
 
@@ -132,7 +139,7 @@ public class PatternsController {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     AccessPattern pattern = row.getItem();
-                    editAccessPattern(pattern);
+                    openAccessPatternForm(pattern);
                 }
             });
             return row;
@@ -143,7 +150,7 @@ public class PatternsController {
 
         // show an item count (+ selected)
         itemCount.textProperty().bind(Bindings.concat(Bindings.size(patternsTable.getSelectionModel().getSelectedItems()).asString("%s / "),
-            Bindings.size(patternsTable.getItems()).asString("%s " + bundle.getString("selected"))));
+            numberOfItems.asString("%s " + bundle.getString("selected"))));
 
         initializeTableColumns();
     }
@@ -166,7 +173,7 @@ public class PatternsController {
 
         // Add the edit column
         editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (AccessPattern accessPattern) -> {
-            editAccessPattern(accessPattern);
+            openAccessPatternForm(accessPattern);
             return accessPattern;
         }));
 
@@ -204,54 +211,15 @@ public class PatternsController {
     private void initializeConditionTypeColumn() {
 
         // sets the icon of the condition to pattern or profile
-        conditionTypeColumn.setCellFactory(col -> new TableCell<AccessPattern, Set<AccessCondition>>() {
-
-            @Override
-            protected void updateItem(Set<AccessCondition> items, boolean empty) {
-
-                // display nothing if the row is empty, otherwise the item count
-                if (empty || items == null) {
-
-                    // nothing to display
-                    setText("");
-
-                } else {
-
-                    // add the icon
-                    MaterialDesignIconView iconView = new MaterialDesignIconView();
-                    iconView.setStyle("-fx-font-size: 1.6em");
-
-                    // wrapper label for showing a tooltip
-                    Label wrapper = new Label();
-                    wrapper.setGraphic(iconView);
-
-                    if (items.stream().findFirst().get().getProfileCondition() == null) {
-
-                        // pattern
-                        iconView.setIcon(MaterialDesignIcon.VIEW_GRID);
-                        wrapper.setTooltip(new Tooltip(bundle.getString("patternCondition")));
-
-                    } else {
-
-                        // profile
-                        iconView.setIcon(MaterialDesignIcon.ACCOUNT_BOX_OUTLINE);
-                        wrapper.setTooltip(new Tooltip(bundle.getString("profileCondition")));
-
-                    }
-
-                    setGraphic(wrapper);
-
-                }
-            }
-        });
+        conditionTypeColumn.setCellFactory(new ConditionTypeCellFactory());
     }
 
     /**
      * Opens a modal edit dialog for the selected AccessPattern.
      *
-     * @param accessPattern the selected AccessPattern
+     * @param accessPattern the selected AccessPattern to edit, or null if a new one is created
      */
-    public void editAccessPattern(AccessPattern accessPattern) {
+    public void openAccessPatternForm(AccessPattern accessPattern) {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
@@ -289,10 +257,13 @@ public class PatternsController {
      * Clones the selected entry and adds it to the table.
      */
     public void cloneAction() throws Exception {
-        if (patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
-            AccessPattern clonedPattern = new AccessPattern(patternsTable.getSelectionModel().getSelectedItem());
+        if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getSelectionModel().getSelectedItems().size() != 0) {
 
-            AppComponents.getDbContext().createPattern(clonedPattern);
+            for (AccessPattern patternToClone : patternsTable.getSelectionModel().getSelectedItems()) {
+
+                AccessPattern clonedPattern = new AccessPattern(patternToClone);
+                AppComponents.getDbContext().createPattern(clonedPattern);
+            }
 
             updatePatternsTable();
         }
@@ -302,8 +273,8 @@ public class PatternsController {
      * Opens the edit dialog with the selected item.
      */
     public void editAction() {
-        if (patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
-            editAccessPattern(patternsTable.getSelectionModel().getSelectedItem());
+        if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getSelectionModel().getSelectedItems().size() != 0) {
+            openAccessPatternForm(patternsTable.getSelectionModel().getSelectedItem());
         }
     }
 
@@ -311,7 +282,7 @@ public class PatternsController {
      * Deletes the item from the table.
      */
     public void deleteAction() throws Exception {
-        if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getFocusModel().getFocusedItem().equals(patternsTable.getSelectionModel().getSelectedItem())) {
+        if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getSelectionModel().getSelectedItems().size() != 0) {
 
             for (AccessPattern pattern : patternsTable.getSelectionModel().getSelectedItems()) {
                 AppComponents.getDbContext().deletePattern(pattern);
@@ -321,9 +292,46 @@ public class PatternsController {
     }
 
     /**
+     * Opens the import dialog for AccessPatterns.
+     */
+    public void importAction() throws Exception {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle(bundle.getString("choosePatternFile"));
+        //chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Pattern Files (*.xlsx)", "*.xlsx"));
+        File selectedFile = chooser.showOpenDialog(App.primaryStage);
+
+        if (selectedFile != null) {
+            // create a new FXML loader with the SapSettingsEditDialogController
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/PatternImportView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
+
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow);
+            scene.getStylesheets().add("css/dark-theme.css");
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
+            customWindow.initStage(stage);
+
+            stage.show();
+
+            // import patterns with the AccessPatternImportHelper
+            AccessPatternImportHelper importHelper = new AccessPatternImportHelper();
+            List<AccessPattern> importedPatterns = importHelper.importAuthorizationPattern(selectedFile.getAbsolutePath());
+
+            // give the dialog the controller and the patterns
+            PatternImportController importController = loader.getController();
+            importController.giveImportedPatterns(importedPatterns);
+            importController.setPatternsController(this);
+        }
+    }
+
+    /**
      * Opens the modal dialog to create a new item.
      */
     public void addAction() {
-        editAccessPattern(null);
+        openAccessPatternForm(null);
     }
 }
