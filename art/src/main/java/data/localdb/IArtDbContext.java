@@ -302,4 +302,12 @@ public interface IArtDbContext {
      */
     DbUser getCurrentUser() throws Exception;
 
+    /**
+     * This method checks if the current user has already logged in before.
+     *
+     * @return a boolean value that indicates whether the current user has already logged in before
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    public boolean isFirstLogin() throws Exception;
+
 }

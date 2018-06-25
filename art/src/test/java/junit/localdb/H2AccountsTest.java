@@ -35,7 +35,7 @@ public class H2AccountsTest {
 
             // query accounts
             List<DbUser> users = context.getDatabaseUsers();
-            ret = users.size() == 7;
+            ret = users.size() == 6;
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -81,7 +81,6 @@ public class H2AccountsTest {
     }
 
     @Test
-    @Disabled
     public void testChangePassword() {
 
         boolean ret = false;
@@ -153,6 +152,43 @@ public class H2AccountsTest {
             user = context.getDatabaseUsers().stream().filter(x -> x.getUsername().equals(username)).findFirst().orElse(null);
 
             ret = (user == null);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        assert (ret);
+    }
+
+    @Test
+    public void testFirstLogin() {
+
+        boolean ret = false;
+
+        final String username = "testuser";
+        final String password = "vabsojgbojrwiotioewhr";
+
+        try (ArtDbContext context = new ArtDbContext("test", "test")) {
+
+            // create new user as viewer
+            DbUser user = new DbUser(username, new HashSet(Arrays.asList(DbUserRole.Viewer)));
+            context.createDatabaseUser(user, password);
+
+            // check if first login role was assigned
+            ret = context.getDatabaseUsers().stream().anyMatch(x -> x.getUsername().equals(username.toUpperCase()) && x.isFirstLogin());
+            assert(ret);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        try (ArtDbContext context = new ArtDbContext(username, password)) {
+
+            // check if it is the first login (which should be true)
+            ret = context.isFirstLogin();
+
+            // check if first login role was removed by isFirstLogin()
+            ret = ret && context.getDatabaseUsers().stream().anyMatch(x -> x.getUsername().equals(username.toUpperCase()) && !x.isFirstLogin());
 
         } catch (Exception ex) {
             ex.printStackTrace();
