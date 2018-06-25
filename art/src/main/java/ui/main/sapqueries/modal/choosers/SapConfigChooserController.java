@@ -72,11 +72,9 @@ public class SapConfigChooserController {
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
             filterController.endDateProperty.getValue(), 0);
         ObservableList<SapConfiguration> list = FXCollections.observableList(sapConfigs);
-        ;
 
         sapSettingsTable.setItems(list);
         sapSettingsTable.refresh();
-
     }
 
     /**

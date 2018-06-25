@@ -12,19 +12,31 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import com.jfoenix.controls.JFXCheckBox?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.main.sapqueries.modal.newquery.AnalysisResultController">
     <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
-        <Label fx:id="resultLabel" />
-        <TableView fx:id="resultTable" minWidth="500" VBox.vgrow="ALWAYS">
+        <Label fx:id="resultLabel"/>
+        <TableView fx:id="resultTable" minWidth="700" VBox.vgrow="ALWAYS">
             <columns>
-                <PTableColumn text="%violatedUseCaseID" percentageWidth="0.45">
+                <PTableColumn text="?" fx:id="conditionTypeColumn" percentageWidth="0.06" resizable="false">
                     <cellValueFactory>
                         <PropertyValueFactory property="accessPattern"/>
                     </cellValueFactory>
                 </PTableColumn>
-                <PTableColumn text="%username" percentageWidth="0.45">
+                <PTableColumn text="%violatedUseCaseID" fx:id="usecaseIdColumn" percentageWidth="0.2">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="accessPattern"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn text="%description" fx:id="descriptionColumn" percentageWidth="0.4"
+                              styleClass="align-left">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="accessPattern"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn text="%username" percentageWidth="0.24">
                     <cellValueFactory>
                         <PropertyValueFactory property="username"/>
                     </cellValueFactory>
@@ -32,16 +44,25 @@
                 <PTableColumn percentageWidth="0.1" fx:id="viewPatternDetailsColumn"/>
             </columns>
         </TableView>
-        <HBox alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS" spacing="40">
-            <HBox alignment="BASELINE_LEFT" spacing="20">
-                <Label text="%format"/>
-                <JFXComboBox fx:id="exportFormatChooser"/>
+        <Separator/>
+        <VBox HBox.hgrow="ALWAYS" spacing="20">
+            <Label text="%exportTitle" style="-fx-font-size: 1.3em"/>
+            <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" spacing="20">
+                <VBox alignment="CENTER_LEFT" spacing="5" minWidth="100">
+                    <Label text="%format"/>
+                    <JFXComboBox fx:id="exportFormatChooser"/>
+                </VBox>
+                <HBox alignment="CENTER_LEFT" spacing="40">
+                    <JFXCheckBox fx:id="includePatternsCheckbox" text="%includePatterns"/>
+                    <JFXCheckBox fx:id="includeWhitelistCheckbox" text="%includeWhitelist"/>
+                </HBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <JFXButton onAction="#exportResults" text="%export">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="EXPORT"/>
+                    </graphic>
+                </JFXButton>
             </HBox>
-            <JFXButton onAction="#exportResults" text="%export">
-                <graphic>
-                    <MaterialDesignIconView glyphName="EXPORT"/>
-                </graphic>
-            </JFXButton>
-        </HBox>
+        </VBox>
     </VBox>
 </CustomWindow>
