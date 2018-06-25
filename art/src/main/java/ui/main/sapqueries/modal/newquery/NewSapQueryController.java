@@ -96,11 +96,10 @@ public class NewSapQueryController {
         configChooser.getEditor().textProperty().addListener((event) -> {
             try {
                 List<Configuration> result = AppComponents.getDbContext().getFilteredConfigs(false, configChooser.getEditor().getText(), null, null, 5);
-                ObservableList<Configuration> items = FXCollections.observableArrayList();
                 if (result.size() != 0) {
-                    items.addAll(result);
+                    ObservableList<Configuration> items = FXCollections.observableArrayList(result);
+                    configChooser.setItems(items);
                 }
-                Platform.runLater(() -> configChooser.setItems(items));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -122,11 +121,10 @@ public class NewSapQueryController {
         sapSettingsChooser.getEditor().textProperty().addListener((event) -> {
             try {
                 List<SapConfiguration> result = AppComponents.getDbContext().getFilteredSapConfigs(false, configChooser.getEditor().getText(), null, null, 5);
-                ObservableList<SapConfiguration> items = FXCollections.observableArrayList();
                 if (result.size() != 0) {
-                    items.addAll(result);
+                    ObservableList<SapConfiguration> items = FXCollections.observableArrayList(result);
+                    sapSettingsChooser.setItems(items);
                 }
-                Platform.runLater(() -> sapSettingsChooser.setItems(items));
             } catch (Exception e) {
                 e.printStackTrace();
             }
