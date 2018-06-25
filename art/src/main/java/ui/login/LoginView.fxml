@@ -11,6 +11,7 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
+<?import javafx.scene.control.Tooltip?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.login.LoginController" title="%login">
@@ -49,16 +50,21 @@
                             </RequiredFieldValidator>
                         </validators>
                     </JFXTextField>
-                    <MaterialDesignIconView fx:id="showPasswordIconView" glyphName="EYE_OFF"
-                                            onMouseClicked="#togglePasswordDisplay" size="20"/>
+                    <Label style="-fx-cursor: hand">
+                        <graphic>
+                            <MaterialDesignIconView fx:id="showPasswordIconView" glyphName="EYE_OFF"
+                                                    onMouseClicked="#togglePasswordDisplay" size="20"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%toggleVisibility"/>
+                        </tooltip>
+                    </Label>
                 </HBox>
             </VBox>
-            <Label visible="false" fx:id="errorLabel" text="%databaseLoginError" wrapText="true"
-                   style="-fx-padding: 10 0 0 0">
-                <graphic>
-                    <MaterialDesignIconView glyphName="ALERT"/>
-                </graphic>
-            </Label>
+            <HBox fx:id="errorBox" visible="false" spacing="20" minHeight="100" style="-fx-padding: 30 0 10 0">
+                <MaterialDesignIconView glyphName="ALERT" size="20"/>
+                <Label fx:id="errorLabel" wrapText="true"/>
+            </HBox>
             <Separator/>
             <HBox alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS" style="-fx-padding: 10 0 0 0">
                 <JFXButton onAction="#close" text="%cancel">
