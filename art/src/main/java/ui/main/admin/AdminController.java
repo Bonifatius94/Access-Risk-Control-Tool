@@ -6,19 +6,20 @@ import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import data.entities.DbUser;
 import data.entities.DbUserRole;
+import data.localdb.ArtDbContext;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableView;
 
+import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.CustomAlert;
 import ui.custom.controls.PTableColumn;
 
 
@@ -39,10 +40,75 @@ public class AdminController {
     public PTableColumn<DbUser, JFXButton> deleteColumn;
     @FXML
     public PTableColumn<DbUser, String> passwordColumn;
-    @FXML
-    private Set<DbUserRole> dbUserRolesSet = new HashSet<>();
-    @FXML
-    private Set<DbUserRole> dbUserRolesSet2 = new HashSet<>();
+
+    ArtDbContext database = AppComponents.getDbContext();
+
+    private DbUser editDbUser;
+
+    private DbUser oldDbUser;
+
+    private Set<DbUserRole> dbUserRoleSet = new HashSet<>();
+
+    /**
+     * is called by the FXMl and initializes all parts of the window.
+     */
+    public void initialize() {
+
+        initializeColumns();
+        initializeCheckboxes();
+        editDbUser = new DbUser("", dbUserRoleSet);
+
+        userTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                editUser(newValue);
+            }
+        }));
+        tableRefresh();
+
+    }
+
+    /**
+     * Initializes the checkboxes, by setting selected on false.
+     */
+    private void initializeCheckboxes() {
+        viewerCheckbox.setSelected(false);
+        adminCheckbox.setSelected(false);
+        dataAnalystCheckbox.setSelected(false);
+    }
+
+    /**
+     * Initializes the Columns with delete Buttons.
+     */
+    private void initializeColumns() {
+        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (DbUser user) -> {
+            try {
+                //check if the currently active user, is going to be deleted
+                if (user.getUsername().equals(database.getCurrentUser().getUsername().toUpperCase())) {
+                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "You can not delete yourself", "It is not possible to delete the currently active USer", "Ok", "Ok");
+                    customAlert.showAndWait();
+                } else {
+                    //Confirmation dialog if the admin really wants to delete the selected user
+                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Do you really want to delete user: " + user.getUsername() + " ?",
+                        "By clicking Ok the user will be deleted, if you changed your mind or missclicked press cancel", "Ok", "Cancel");
+                    String buttonText = customAlert.showAndWait().get().getText();
+                    if (buttonText.equals("Ok")) {
+                        if (database.getDatabaseUsers().contains(user)) {
+                            database.deleteDatabaseUser(user.getUsername());
+                            tableRefresh();
+                        } else {
+                            //if the user was not saved (in database) due to an eventual error
+                            userTable.getItems().remove(user);
+                        }
+                    }
+                }
+                initializeCheckboxes();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return user;
+        }));
+
+    }
 
     /**
      * Function is called by a Checkbox event from the admin checkbox,
@@ -50,12 +116,11 @@ public class AdminController {
      */
     @FXML
     public void adminSelected() {
-        DbUser user = userTable.getSelectionModel().getSelectedItem();
         if (adminCheckbox.isSelected()) {
-            user.addRole(DbUserRole.Admin);
+            this.editDbUser.addRole(DbUserRole.Admin);
 
         } else if (!adminCheckbox.isSelected()) {
-            user.removeRole(DbUserRole.Admin);
+            this.editDbUser.removeRole(DbUserRole.Admin);
         }
     }
 
@@ -65,39 +130,40 @@ public class AdminController {
      */
     @FXML
     public void viewerSelected() {
-        DbUser user = userTable.getSelectionModel().getSelectedItem();
         if (viewerCheckbox.isSelected()) {
-            user.addRole(DbUserRole.Viewer);
-
+            this.editDbUser.addRole(DbUserRole.Viewer);
         } else if (!viewerCheckbox.isSelected()) {
-            user.removeRole(DbUserRole.Viewer);
+            this.editDbUser.removeRole(DbUserRole.Viewer);
         }
+
     }
 
     /**
      * Function is called by a Checkbox event from the dataAnalyst checkbox,
-     * and adds or deletes the dataAnalyst role from the DbUserRole set.
+     * and adds or deletes the dataAnalyst role from the DbUserRole set(from the currently edited user).
      */
     @FXML
     public void dataAnalystSelected() {
-        DbUser user = userTable.getSelectionModel().getSelectedItem();
+
         if (dataAnalystCheckbox.isSelected()) {
-            user.addRole(DbUserRole.DataAnalyst);
+            this.editDbUser.addRole(DbUserRole.DataAnalyst);
 
         } else if (!dataAnalystCheckbox.isSelected()) {
-            user.removeRole(DbUserRole.DataAnalyst);
+            this.editDbUser.removeRole(DbUserRole.DataAnalyst);
         }
+
     }
 
     /**
      * adds new User with a initial password , that password should be changed by this user.
-     * TODO: further Implementations
      */
     public void addNewUser() {
         initializeCheckboxes();
-        //Set<DbUserRole> userRoles
-        //DbUser newDbUser = new DbUser(tfDbUserName.getText(), )
-        userTable.getItems().add(new DbUser("", new HashSet<>()));
+        DbUser newDbUser = new DbUser("", new HashSet<>());
+        tfDbUserPassword.clear();
+        userTable.getItems().add(newDbUser);
+        userTable.refresh();
+        userTable.getSelectionModel().select(newDbUser);
 
     }
 
@@ -105,76 +171,64 @@ public class AdminController {
      * Save user Changes to the table and the db.
      */
     public void saveUserChanges() {
+        if (!tfDbUserName.getText().equals("") || !tfDbUserPassword.getText().equals("")) {
+            try {
+                //check if the user already exists
+                Boolean userExists = false;
+                this.editDbUser.setUsername(tfDbUserName.getText());
+                List<DbUser> dbUserList = database.getDatabaseUsers();
+                for (DbUser db : dbUserList) {
+                    if (db.getUsername().equals(this.editDbUser.getUsername().toUpperCase())) {
+                        userExists = true;
+                    }
+                }
+                //if the user exists update roles
+                if (userExists) {
+                    database.updateUserRoles(editDbUser);
+                } else {
+                    //else create new user with password
+                    database.createDatabaseUser(this.editDbUser, tfDbUserPassword.getText());
+                }
+                tableRefresh();
+            } catch (Exception e) {
+                e.printStackTrace();
 
-        userTable.getSelectionModel().getSelectedItem().setUsername(tfDbUserName.getText());
-        userTable.refresh();
+            }
+        } else {
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Missing input", "User always need an Username and a password", "Ok", "Ok");
+            customAlert.showAndWait();
+        }
 
     }
 
     /**
-     * is called by the FXMl and intializes all parts of the window.
-     * TODO: futher implementations
+     * initializes all fields with the user data.
+     *
+     * @param newValue is the user , who is going to be edited
      */
-    public void initialize() {
-        //TODO: laden der nutzer aus der Datenbank
-
-        dbUserRolesSet.add(DbUserRole.Admin);
-        dbUserRolesSet.add(DbUserRole.Viewer);
-        dbUserRolesSet2.add(DbUserRole.DataAnalyst);
-
-        //Testcode
-        DbUser dbUser1 = new DbUser("Peter", dbUserRolesSet);
-        DbUser dbUser2 = new DbUser("Hans", dbUserRolesSet2);
-        List<DbUser> dbUsersSet = new ArrayList<DbUser>();
-        dbUsersSet.add(dbUser1);
-        dbUsersSet.add(dbUser2);
-
-        ObservableList<DbUser> list = FXCollections.observableList(dbUsersSet);
-        userTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                editUser(newValue);
-            }
-        }));
-        userTable.setItems(list);
-        dbUserRolesSet.clear();
-        userTable.refresh();
-        //userTable.
-        initializeColumns();
-        initializeCheckboxes();
-    }
-
     private void editUser(DbUser newValue) {
-        tfDbUserName.setText(newValue.getUsername());
+        this.oldDbUser = new DbUser(newValue.getUsername(), newValue.getRoles());
+        this.editDbUser = newValue;
         tfDbUserPassword.setDisable(true);
-        adminCheckbox.setSelected(newValue.getRoles().contains(DbUserRole.Admin));
-        viewerCheckbox.setSelected(newValue.getRoles().contains(DbUserRole.Viewer));
-        dataAnalystCheckbox.setSelected(newValue.getRoles().contains(DbUserRole.DataAnalyst));
+        tfDbUserName.setText(editDbUser.getUsername());
+        adminCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.Admin));
+        viewerCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.Viewer));
+        dataAnalystCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.DataAnalyst));
+        if (editDbUser.getUsername().equals("")) {
+            tfDbUserPassword.setDisable(false);
+        }
     }
 
     /**
-     * Intializes the checkboxes.
+     * reloads all users from database and fills Tableview.
      */
-    private void initializeCheckboxes() {
-        viewerCheckbox.setSelected(false);
-        adminCheckbox.setSelected(false);
-        dataAnalystCheckbox.setSelected(false);
-    }
-
-    /**
-     * Intiliazes the Columns.
-     */
-    private void initializeColumns() {
-        //TODO: initialPassword column initialization
-        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (DbUser user) -> {
-            if (userTable.getSelectionModel().getSelectedItem() == user) {
-                userTable.getItems().remove(user);
-                initializeCheckboxes();
-            } else {
-                userTable.getItems().remove(user);
-            }
-
-            return user;
-        }));
-
+    private void tableRefresh() {
+        try {
+            userTable.getItems().clear();
+            userTable.getItems().addAll(database.getDatabaseUsers());
+            userTable.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
