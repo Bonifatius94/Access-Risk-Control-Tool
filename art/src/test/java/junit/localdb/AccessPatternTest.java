@@ -187,7 +187,6 @@ public class AccessPatternTest {
     }
 
     @Test
-    @Disabled
     public void testUpdatePatternWithProfileConditionWithArchiving() {
 
         boolean ret = false;
@@ -195,8 +194,8 @@ public class AccessPatternTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query patterns
-            List<AccessPattern> patterns = context.getPatterns(false);
-            AccessPattern profilePattern = patterns.stream().filter(x -> x.getConditions().size() == 1).findFirst().get();
+            List<AccessPattern> patterns = context.getPatterns(true);
+            AccessPattern profilePattern = patterns.stream().filter(x -> x.getId().equals(new Integer(4))).findFirst().get();
             AccessProfileCondition profileCondition = profilePattern.getConditions().stream().findFirst().get().getProfileCondition();
             Integer profilePatternId = profilePattern.getId();
 
@@ -211,7 +210,7 @@ public class AccessPatternTest {
             context.updatePattern(profilePattern);
 
             // query data again
-            patterns = context.getPatterns(false);
+            patterns = context.getPatterns(true);
             profilePattern = patterns.stream().filter(x -> x.getId().equals(profilePatternId)).findFirst().get();
             profileCondition = profilePattern.getConditions().stream().findFirst().get().getProfileCondition();
 
@@ -219,7 +218,7 @@ public class AccessPatternTest {
 
 
             // check if test data was queried successfully
-            ret = patterns.size() == 3
+            ret = patterns.size() == 7
                 && profilePattern.getDescription().equals(newDescription) && profilePattern.getLinkage() == ConditionLinkage.Or
                 && profileCondition.getProfile().equals(newProfile);
 
