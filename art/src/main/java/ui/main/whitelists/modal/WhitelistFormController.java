@@ -209,6 +209,7 @@ public class WhitelistFormController {
                 resetDetails();
 
                 this.whitelistEditTable.getSelectionModel().clearSelection();
+                this.whitelistEditTable.refresh();
             }
         }
     }
