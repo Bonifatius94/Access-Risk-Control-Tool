@@ -1,33 +1,44 @@
 package ui.main.sapsettings;
 
 import com.jfoenix.controls.JFXTextField;
+
 import data.entities.SapConfiguration;
 import data.localdb.ArtDbContext;
+
+import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-
 import javafx.scene.control.Button;
+
 import sap.ISapConnector;
 import sap.SapConnector;
+
 import ui.AppComponents;
 import ui.custom.controls.CustomAlert;
 
+
 public class SapSettingsFormController {
 
+    @FXML
     public JFXTextField hostServerField;
 
+    @FXML
     public JFXTextField sysNrField;
 
+    @FXML
     public JFXTextField jcoClientField;
 
-
+    @FXML
     public JFXTextField descriptionField;
 
+    @FXML
     public JFXTextField tfPoolCapacity;
 
+    @FXML
     public JFXTextField tfLanguage;
+
 
     private SapConfiguration sapConfig;
     private SapConfiguration oldSapConfig;
@@ -35,6 +46,8 @@ public class SapSettingsFormController {
     private ArtDbContext database = AppComponents.getDbContext();
 
     private SapSettingsController parentController;
+    ResourceBundle bundle = ResourceBundle.getBundle("lang");
+
 
 
     /**
@@ -76,8 +89,8 @@ public class SapSettingsFormController {
      * @return false if any(except password and username) textfield is empty, everytime else it returns true.
      */
     private Boolean checkTextFields() {
-        return !(hostServerField.getText().equals("") || sysNrField.getText().equals("") || jcoClientField.getText().equals("") || tfLanguage.getText().equals("")
-            || tfPoolCapacity.getText().equals("") || descriptionField.getText().equals(""));
+        return (hostServerField.validate() && sysNrField.validate() && jcoClientField.validate() && tfLanguage.validate()
+            && tfPoolCapacity.validate() && descriptionField.validate());
     }
 
 
@@ -104,10 +117,10 @@ public class SapSettingsFormController {
 
                 // if exception contains error code 103, connection was successful
                 if (e.getCause().toString().contains("103")) {
-                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, "SAP Connection Status", "Connection Status: Success", "OK", "Cancel");
+                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("sapConnectTitle"), bundle.getString("sapConnectSuccessMessage"), "OK", "Cancel");
                     customAlert.showAndWait();
                 } else {
-                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Server Test Connection", "Connection Status: Error " + e.getCause().toString(), "Ok", "Cancel");
+                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("sapConnectTitle"), bundle.getString("sapConnectFailedMessage"), "Ok", "Cancel");
                     customAlert.showAndWait();
                 }
             }

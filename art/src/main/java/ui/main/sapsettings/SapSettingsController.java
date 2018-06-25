@@ -47,6 +47,7 @@ public class SapSettingsController {
     public FilterController filterController;
 
     private ArtDbContext database = AppComponents.getDbContext();
+    ResourceBundle bundle = ResourceBundle.getBundle("lang");
 
 
     /**
@@ -171,10 +172,10 @@ public class SapSettingsController {
 
                 // if exception contains error code 103, connection was successful
                 if (e.getCause().toString().contains("103")) {
-                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, "SAP Connection Status", "Connection Status: Success", "OK", "Cancel");
+                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("sapConnectTitle"), bundle.getString("sapConnectSuccessMessage"), "OK", "Cancel");
                     customAlert.showAndWait();
                 } else {
-                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Server Test Connection", "Connection Status: Error " + e.getCause().toString(), "Ok", "Cancel");
+                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("sapConnectTitle"), bundle.getString("sapConnectFailedMessage"), "Ok", "Cancel");
                     customAlert.showAndWait();
                 }
             }
