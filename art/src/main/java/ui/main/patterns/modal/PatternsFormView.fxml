@@ -141,7 +141,7 @@
                             <Tooltip text="%copyProperty"/>
                         </tooltip>
                     </JFXButton>
-                    <JFXButton onAction="#editConditionProperty" prefHeight="30" prefWidth="30"
+                    <JFXButton onAction="#applyChanges" prefHeight="30" prefWidth="30"
                                styleClass="round-button" fx:id="applyPopertyChangesButton">
                         <graphic>
                             <MaterialDesignIconView glyphName="CHECK"/>

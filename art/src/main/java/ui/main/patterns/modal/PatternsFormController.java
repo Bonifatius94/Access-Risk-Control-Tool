@@ -638,10 +638,19 @@ public class PatternsFormController {
 
             // bind copyPropertyButton
             this.copyPropertyButton.disableProperty().bind(
+                Bindings.or(Bindings.isNull(selectedTable.getSelectionModel().selectedItemProperty()),
                 Bindings.or(Bindings.size(selectedTable.getItems()).isEqualTo(maxEntries),
                     Bindings.or(Bindings.isEmpty(authObjectInput.textProperty()),
                         Bindings.or(Bindings.isEmpty(authFieldInput.textProperty()),
-                            Bindings.isEmpty(authFieldValue1Input.textProperty())))));
+                            Bindings.isEmpty(authFieldValue1Input.textProperty()))))));
+
+            // bind applyPropertyButton
+            this.applyPopertyChangesButton.disableProperty().bind(
+                Bindings.or(Bindings.isNull(selectedTable.getSelectionModel().selectedItemProperty()),
+                    Bindings.or(Bindings.size(selectedTable.getItems()).isEqualTo(maxEntries),
+                        Bindings.or(Bindings.isEmpty(authObjectInput.textProperty()),
+                            Bindings.or(Bindings.isEmpty(authFieldInput.textProperty()),
+                                Bindings.isEmpty(authFieldValue1Input.textProperty()))))));
         });
 
         this.conditionTabs.getTabs().add(tab);
@@ -650,8 +659,7 @@ public class PatternsFormController {
     /**
      * Edits the selected condition property.
      */
-    public void editConditionProperty() {
-
+    public void applyChanges() {
         if (selectedProperty != null && authObjectInput.validate() && authFieldInput.validate() && authFieldValue1Input.validate()) {
 
             // store all the new values from the textFields
@@ -662,6 +670,7 @@ public class PatternsFormController {
             selectedProperty.setValue3(authFieldValue3Input.getText());
             selectedProperty.setValue4(authFieldValue4Input.getText());
 
+            selectedTable.getSelectionModel().clearSelection();
             resetDetails();
         }
     }
@@ -682,7 +691,8 @@ public class PatternsFormController {
         selectedTable.getItems().add(propertyToAdd);
         selectedTable.requestFocus();
         selectedTable.scrollTo(selectedTable.getItems().size() - 1);
-
+        selectedTable.getSelectionModel().clearSelection();
+        
         resetDetails();
     }
 
