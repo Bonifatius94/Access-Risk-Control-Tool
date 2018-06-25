@@ -16,6 +16,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.HBox;
+
 import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.CustomWindow;
@@ -41,12 +42,25 @@ public class LoginController {
     @FXML
     private HBox usernameValidationBox;
 
+    @FXML
+    private HBox errorBox;
+
+
+    private ResourceBundle bundle;
+    private int loginAttempts;
+    private long startTime = 0;
+    private final int maxAttempts = 3; // 3 attempts
+    private final int penaltyTime = 60000; // one minute penalty time
+
 
     /**
      * Initializes the view with all needed bindings.
      */
     @FXML
     public void initialize() {
+        bundle = ResourceBundle.getBundle("lang");
+
+        loginAttempts = 0;
 
         // bind password inputs
         passwordInput.managedProperty().bind(passwordInput.visibleProperty());
@@ -67,11 +81,24 @@ public class LoginController {
      * Handles the database login.
      */
     public void login(ActionEvent event) {
-        if (validateBeforeSubmit()) {
-            if (AppComponents.tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
-                startApplication(event);
-            } else {
-                errorLabel.setVisible(true);
+
+        if (System.currentTimeMillis() - startTime > penaltyTime) {
+
+            errorBox.setVisible(false);
+            errorLabel.setText(bundle.getString("databaseLoginError") + " " + (maxAttempts - loginAttempts) + ")");
+
+            if (validateBeforeSubmit()) {
+                if (AppComponents.tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
+                    startApplication(event);
+                } else {
+                    // reset the attempts and show penalty error
+                    if (loginAttempts++ == maxAttempts) {
+                        startTime = System.currentTimeMillis();
+                        errorLabel.setText(bundle.getString("penaltyError"));
+                        loginAttempts = 0;
+                    }
+                    errorBox.setVisible(true);
+                }
             }
         }
     }
@@ -109,7 +136,7 @@ public class LoginController {
                 }
             }
         });
-        
+
         usernameInput.focusedProperty().addListener((o, oldVal, newVal) -> {
             if (!newVal) {
                 usernameInput.validate();
@@ -152,7 +179,6 @@ public class LoginController {
             close(event);
             App.primaryStage.show();
         } catch (Exception e) {
-            errorLabel.setText(e.getMessage());
             e.printStackTrace();
         }
     }
