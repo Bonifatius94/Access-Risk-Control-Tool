@@ -16,12 +16,12 @@
     <TableView VBox.vgrow="ALWAYS" fx:id="whitelistTable">
 
         <columns>
-            <PTableColumn text="%whitelistName" resizable="false" percentageWidth="0.15">
+            <PTableColumn text="%whitelistName" resizable="false" percentageWidth="0.15" styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="name"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="%description" resizable="false" percentageWidth="0.3">
+            <PTableColumn text="%description" resizable="false" percentageWidth="0.3" styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="description"/>
                 </cellValueFactory>
@@ -31,7 +31,6 @@
                     <PropertyValueFactory property="entries"/>
                 </cellValueFactory>
             </PTableColumn>
-
             <PTableColumn text="%creationDate" fx:id="creationColumn" resizable="false" percentageWidth="0.2">
                 <cellValueFactory>
                     <PropertyValueFactory property="createdAt"/>
@@ -52,27 +51,27 @@
     <HBox alignment="BOTTOM_RIGHT" spacing="10">
         <Label fx:id="itemCount"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <JFXButton text="%import" prefWidth="100" onAction="#importWhitelist">
+        <JFXButton text="%import" prefWidth="130" onAction="#importWhitelist">
             <graphic>
                 <MaterialDesignIconView glyphName="IMPORT"/>
             </graphic>
         </JFXButton>
-        <JFXButton text="%clone" prefWidth="100" onAction="#cloneWhitelist">
+        <JFXButton text="%clone" prefWidth="130" onAction="#cloneWhitelist">
             <graphic>
                 <MaterialDesignIconView glyphName="CONTENT_COPY"/>
             </graphic>
         </JFXButton>
-        <JFXButton text="%newWhitelist" prefWidth="100" onAction="#newWhitelist">
+        <JFXButton text="%newWhitelist" prefWidth="130" onAction="#newWhitelist">
             <graphic>
                 <MaterialDesignIconView glyphName="PLUS"/>
             </graphic>
         </JFXButton>
-        <JFXButton text="%edit" prefWidth="100" onAction="#editWhitelist">
+        <JFXButton text="%edit" prefWidth="130" onAction="#editWhitelist">
           <graphic>
               <MaterialDesignIconView glyphName="PENCIL"/>
           </graphic>
         </JFXButton>
-        <JFXButton text="%delete" prefWidth="100" onAction="#deleteWhitelist" styleClass="warning-button">
+        <JFXButton text="%delete" prefWidth="130" onAction="#deleteWhitelist" styleClass="warning-button">
             <graphic>
                 <MaterialDesignIconView glyphName="DELETE"/>
             </graphic>
