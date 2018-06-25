@@ -40,9 +40,6 @@ public class LoginController {
     private Label errorLabel;
 
     @FXML
-    private HBox usernameValidationBox;
-
-    @FXML
     private HBox errorBox;
 
 
@@ -121,22 +118,6 @@ public class LoginController {
      */
     private void initializeValidation() {
 
-        // validate the input with regex and display error message
-        usernameInput.textProperty().addListener((ol, oldValue, newValue) -> {
-            if (newValue.isEmpty()) {
-                usernameValidationBox.setVisible(false);
-            } else {
-                if (!newValue.equals(oldValue)) {
-                    if (!newValue.matches("([A-Z]{3,}+(_|\\w)*)")) {
-                        usernameValidationBox.setVisible(true);
-                    } else {
-                        usernameValidationBox.setVisible(false);
-                    }
-                    usernameInput.validate();
-                }
-            }
-        });
-
         usernameInput.focusedProperty().addListener((o, oldVal, newVal) -> {
             if (!newVal) {
                 usernameInput.validate();
@@ -156,7 +137,7 @@ public class LoginController {
      * @return if the inputs are valid
      */
     private boolean validateBeforeSubmit() {
-        return usernameInput.validate() && passwordInput.validate() && passwordInputPlain.validate() && !usernameValidationBox.isVisible();
+        return usernameInput.validate() && passwordInput.validate() && passwordInputPlain.validate();
     }
 
     /**
