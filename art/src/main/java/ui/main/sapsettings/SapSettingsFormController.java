@@ -1,5 +1,6 @@
 package ui.main.sapsettings;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 
 import data.entities.SapConfiguration;
@@ -39,6 +40,12 @@ public class SapSettingsFormController {
     @FXML
     public JFXTextField tfLanguage;
 
+    @FXML
+    public JFXButton connectButton;
+
+    @FXML
+    public JFXButton saveButton;
+
 
     private SapConfiguration sapConfig;
     private SapConfiguration oldSapConfig;
@@ -47,7 +54,6 @@ public class SapSettingsFormController {
 
     private SapSettingsController parentController;
     ResourceBundle bundle = ResourceBundle.getBundle("lang");
-
 
 
     /**
@@ -197,8 +203,29 @@ public class SapSettingsFormController {
                 descriptionField.validate();
             }
         });
+    }
 
-
+    /**
+     * Sets the editable property of the textfields and removes save and connect button.
+     */
+    public void setEditable(boolean editable) {
+        if (!editable) {
+            jcoClientField.setEditable(false);
+            sysNrField.setEditable(false);
+            tfPoolCapacity.setEditable(false);
+            hostServerField.setEditable(false);
+            descriptionField.setEditable(false);
+            connectButton.setVisible(false);
+            saveButton.setVisible(false);
+        } else {
+            jcoClientField.setEditable(true);
+            sysNrField.setEditable(true);
+            tfPoolCapacity.setEditable(true);
+            hostServerField.setEditable(true);
+            descriptionField.setEditable(true);
+            connectButton.setVisible(true);
+            saveButton.setVisible(true);
+        }
     }
 
     /**
@@ -206,7 +233,7 @@ public class SapSettingsFormController {
      *
      * @param sapSettingsController the parent Controller.
      */
-    void setParentController(SapSettingsController sapSettingsController) {
+    public void setParentController(SapSettingsController sapSettingsController) {
         this.parentController = sapSettingsController;
     }
 
