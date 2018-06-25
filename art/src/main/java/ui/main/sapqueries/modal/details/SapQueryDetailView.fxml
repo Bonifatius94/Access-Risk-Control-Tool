@@ -27,7 +27,10 @@
                             </graphic>
                         </JFXButton>
                     </HBox>
-                    <Label text="Anzahl an kritischen Zugriffsmustern: 24" style="-fx-font-size: 2em"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <MaterialDesignIconView fx:id="statusIcon" size="30"/>
+                        <Label fx:id="criticalAccessCount" style="-fx-font-size: 1.6em"/>
+                    </HBox>
                 </VBox>
                 <HBox HBox.hgrow="ALWAYS" spacing="40">
                     <JFXTextField fx:id="dateField" promptText="%createdAt" editable="false" focusTraversable="false"
@@ -40,7 +43,7 @@
             <Separator/>
             <VBox HBox.hgrow="ALWAYS" spacing="30">
                 <HBox HBox.hgrow="ALWAYS">
-                    <Label text="%configuration" style="-fx-font-size: 1.6em"/>
+                    <Label text="%configuration" style="-fx-font-size: 1.8em"/>
                     <Region HBox.hgrow="ALWAYS"/>
                     <JFXButton text="%details" onAction="#openConfigDetails" focusTraversable="false">
                         <graphic>
@@ -59,7 +62,7 @@
             <Separator/>
             <VBox HBox.hgrow="ALWAYS" spacing="30">
                 <HBox HBox.hgrow="ALWAYS">
-                    <Label text="%sapSettings" style="-fx-font-size: 1.6em"/>
+                    <Label text="%sapSettings" style="-fx-font-size: 1.8em"/>
                     <Region HBox.hgrow="ALWAYS"/>
                     <JFXButton text="%details" onAction="#openSapConfigDetails" focusTraversable="false">
                         <graphic>

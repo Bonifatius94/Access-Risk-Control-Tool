@@ -4,6 +4,9 @@ import com.jfoenix.controls.JFXTextField;
 
 import data.entities.CriticalAccessQuery;
 
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
@@ -12,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
@@ -39,7 +43,14 @@ public class SapQueryDetailController {
     @FXML
     public JFXTextField createdByField;
 
+    @FXML
+    public Label criticalAccessCount;
 
+    @FXML
+    public MaterialDesignIconView statusIcon;
+
+
+    ResourceBundle bundle = ResourceBundle.getBundle("lang");
     private CriticalAccessQuery query;
 
     @FXML
@@ -66,6 +77,16 @@ public class SapQueryDetailController {
             sapConfigurationNameField.setText(query.getSapConfig().getServerDestination());
             sapConfigurationDescriptionField.setText(query.getSapConfig().getDescription());
 
+            // set the label
+            if (query.getEntries() != null && query.getEntries().size() != 0) {
+                criticalAccessCount.setText(bundle.getString("criticalAccessCount") + " " + query.getEntries().size());
+                statusIcon.setIcon(MaterialDesignIcon.CLOSE);
+                statusIcon.setStyle("-fx-fill: -fx-error");
+            } else {
+                criticalAccessCount.setText(bundle.getString("noCriticalAccess"));
+                statusIcon.setIcon(MaterialDesignIcon.CHECK);
+                statusIcon.setStyle("-fx-fill: -fx-success");
+            }
         }
     }
 
@@ -75,7 +96,6 @@ public class SapQueryDetailController {
     public void openConfigDetails() {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../details/ConfigDetailsView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
