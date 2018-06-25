@@ -1425,10 +1425,15 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                     createDbUserEntry(session, user);
                 }
 
+                session.flush();
+                transaction.commit();
+
                 // get the existing database account
                 DbUser original = getDatabaseUsers().stream().filter(x -> x.getUsername().equals(user.getUsername().toUpperCase())).findFirst().orElse(null);
 
                 if (original != null) {
+
+                    transaction = session.beginTransaction();
 
                     // grant privileges that were added by admin
                     user.getRoles().stream().filter(x -> !original.getRoles().contains(x)).forEach(role -> addDbRole(session, user.getUsername(), role));
@@ -1625,46 +1630,41 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     }
 
     /**
-     * This method checks if the current user has already logged in before.
+     * This method sets the first login flag of the current user.
      *
-     * @return a boolean value that indicates whether the current user has already logged in before
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
     @Override
-    public boolean isFirstLogin() throws Exception {
+    public void setFirstLoginOfCurrentUser(DbUser user, boolean flag) throws Exception {
 
-        DbUser user = getCurrentUser();
-        boolean ret = user.isFirstLogin();
+        try (Session session = getSessionFactory().openSession()) {
 
-        // remove first login flag if it is set
-        if (ret) {
+            Transaction transaction = null;
 
-            try (Session session = getSessionFactory().openSession()) {
+            try {
 
-                Transaction transaction = null;
+                transaction = session.beginTransaction();
 
-                try {
+                final String sql = "UPDATE DbUsers SET IsFirstLogin = :isFirstLogin WHERE Username = :username";
+                session.createNativeQuery(sql)
+                    .setParameter("username", getCurrentUser().getUsername())
+                    .setParameter("isFirstLogin", flag)
+                    .executeUpdate();
 
-                    transaction = session.beginTransaction();
+                session.flush();
+                transaction.commit();
 
-                    final String sql = "UPDATE DbUsers SET IsFirstLogin = 0 WHERE Username = :username";
-                    session.createNativeQuery(sql).setParameter("username", user.getUsername()).executeUpdate();
+                user.setFirstLogin(flag);
 
-                    session.flush();
-                    transaction.commit();
+            } catch (Exception ex) {
 
-                } catch (Exception ex) {
-
-                    if (transaction != null) {
-                        transaction.rollback();
-                    }
-
-                    throw ex;
+                if (transaction != null) {
+                    transaction.rollback();
                 }
+
+                throw ex;
             }
         }
-
-        return ret;
     }
 
 }

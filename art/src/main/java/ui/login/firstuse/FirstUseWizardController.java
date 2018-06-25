@@ -176,8 +176,7 @@ public class FirstUseWizardController {
                 try {
 
                     // give the first user the Admin user role
-                    DbUser currentUser = AppComponents.getDbContext().getCurrentUser();
-                    currentUser.addRole(DbUserRole.Admin);
+                    DbUser currentUser = new DbUser(usernameInput.getText(), true, false, false, false);
                     AppComponents.getDbContext().updateUserRoles(currentUser);
 
                 } catch (Exception e) {
