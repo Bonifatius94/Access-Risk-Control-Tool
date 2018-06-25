@@ -12,28 +12,23 @@
     <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
     <TableView VBox.vgrow="ALWAYS" fx:id="sapConnectionTable">
         <columns>
-            <PTableColumn percentageWidth="0.35" resizable="false" text="%hostServer">
+            <PTableColumn percentageWidth="0.25" resizable="false" text="%description">
+                <cellValueFactory>
+                    <PropertyValueFactory property="description"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.3" resizable="false" text="%hostServer">
                 <cellValueFactory>
                     <PropertyValueFactory property="serverDestination"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" resizable="false" text="%sysNR">
-                <cellValueFactory>
-                    <PropertyValueFactory property="sysNr"/>
-                </cellValueFactory>
-            </PTableColumn>
-            <PTableColumn percentageWidth="0.1" resizable="false" text="%jcoClient">
-                <cellValueFactory>
-                    <PropertyValueFactory property="client"/>
-                </cellValueFactory>
-            </PTableColumn>
-            <PTableColumn percentageWidth="0.2" resizable="false" text="%creationDate">
+
+            <PTableColumn percentageWidth="0.25" resizable="false" text="%creationDate">
                 <cellValueFactory>
                     <PropertyValueFactory property="createdAt"/>
                 </cellValueFactory>
             </PTableColumn>
 
-            <!-- TODO: additional Columns for Author,  ???? -->
             <PTableColumn percentageWidth="0.1" resizable="false" fx:id="editConfigColumn">
             </PTableColumn>
             <PTableColumn percentageWidth="0.1" resizable="false" fx:id="deleteConfigColumn">

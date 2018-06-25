@@ -11,19 +11,18 @@
 <?import ui.custom.controls.CustomWindow?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <CustomWindow spacing="30" style="-fx-padding: 10"
-              title="            Edit Sap Configuration" windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
+              title="Edit Sap Configuration" windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
               xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.sapsettings.SapSettingsEditDialogController">
     <HBox alignment="TOP_CENTER" spacing="20" VBox.vgrow="ALWAYS">
         <VBox alignment="BASELINE_CENTER" spacing="35">
             <JFXTextField fx:id="descriptionField" prefWidth="300" promptText="%description">
-                <font>
-                    <Font size="14.0"/>
-                </font>
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
             </JFXTextField>
             <JFXTextField fx:id="hostServerField" prefWidth="300" promptText="%hostServer">
-                <font>
-                    <Font size="14.0"/>
-                </font>
                 <validators>
                     <RequiredFieldValidator message="%required">
                         <MaterialDesignIconView glyphName="ALERT"/>
@@ -32,47 +31,37 @@
             </JFXTextField>
 
             <JFXTextField fx:id="sysNrField" prefWidth="100" promptText="%sysNR">
-                <font>
-                    <Font size="14.0"/>
-                </font>
                 <validators>
                     <RequiredFieldValidator message="%required">
-                        <MaterialDesignIconView glyphName="ALERT" />
-                    </RequiredFieldValidator>
-                </validators>
-            </JFXTextField>
-            <JFXTextField fx:id="jcoClientField" prefWidth="75" promptText="%jcoClient">
-                <font>
-                    <Font size="14.0"/>
-                </font>
-                <validators>
-                    <RequiredFieldValidator message="%required">
-                        <MaterialDesignIconView glyphName="ALERT" />
-                    </RequiredFieldValidator>
-                </validators>
-            </JFXTextField>
-            <JFXTextField fx:id="userNameField" prefWidth="200" promptText="%username">
-                <font>
-                    <Font size="14.0"/>
-                </font>
-                <validators>
-                    <RequiredFieldValidator message="%required">
-                        <MaterialDesignIconView glyphName="ALERT" />
-                    </RequiredFieldValidator>
-                </validators>
-            </JFXTextField>
-            <JFXPasswordField fx:id="passwordField" prefWidth="200" promptText="%password">
-                <font>
-                    <Font size="14.0"/>
-                </font>
-                <validators>
-                    <RequiredFieldValidator message="Eingabe erforderlich(nur für Testverbindung)">
                         <MaterialDesignIconView glyphName="ALERT"/>
                     </RequiredFieldValidator>
                 </validators>
-            </JFXPasswordField>
+            </JFXTextField>
+
+            <JFXTextField fx:id="jcoClientField" prefWidth="75" promptText="%jcoClient">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+            <JFXTextField fx:id="tfLanguage" prefWidth="200" promptText="%language">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+            <JFXTextField fx:id="tfPoolCapacity" prefWidth="200" promptText="%poolCapacity">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+
             <HBox spacing="20" alignment="BASELINE_CENTER">
-                <HBox alignment="BASELINE_LEFT" >
+                <HBox alignment="BASELINE_LEFT">
                     <JFXButton onAction="#revertChanges" prefWidth="100" text="%revertChange">
                         <graphic>
                             <MaterialDesignIconView glyphName="UNDO_VARIANT"/>

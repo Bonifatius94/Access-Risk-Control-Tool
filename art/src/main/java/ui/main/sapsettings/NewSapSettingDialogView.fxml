@@ -15,14 +15,13 @@
     <HBox alignment="TOP_CENTER" spacing="20" VBox.vgrow="ALWAYS">
         <VBox alignment="BASELINE_CENTER" spacing="35">
             <JFXTextField fx:id="descriptionField" prefWidth="300" promptText="%description">
-                <font>
-                    <Font size="14.0"/>
-                </font>
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
             </JFXTextField>
-            <JFXTextField fx:id="hostServerField" prefWidth="300" promptText="%hostServer">
-                <font>
-                    <Font size="14.0"/>
-                </font>
+            <JFXTextField fx:id="tfHostServerField" prefWidth="300" promptText="%hostServer">
                 <validators>
                     <RequiredFieldValidator message="%required">
                         <MaterialDesignIconView glyphName="ALERT"/>
@@ -30,45 +29,35 @@
                 </validators>
             </JFXTextField>
             <JFXTextField fx:id="sysNrField" prefWidth="300" promptText="%sysNR">
-                <font>
-                    <Font size="14.0"/>
-                </font>
                 <validators>
                     <RequiredFieldValidator message="%required">
                         <MaterialDesignIconView glyphName="ALERT"/>
                     </RequiredFieldValidator>
                 </validators>
             </JFXTextField>
-            <JFXTextField fx:id="jcoClientField" prefWidth="75" promptText="%jcoClient">
-                <font>
-                    <Font size="14.0"/>
-                </font>
+            <JFXTextField fx:id="tfJcoClientField" prefWidth="75" promptText="%jcoClient">
                 <validators>
                     <RequiredFieldValidator message="%required">
                         <MaterialDesignIconView glyphName="ALERT"/>
                     </RequiredFieldValidator>
                 </validators>
             </JFXTextField>
-            <JFXTextField fx:id="userNameField" prefWidth="200" promptText="%username">
-                <font>
-                    <Font size="14.0"/>
-                </font>
+
+            <JFXTextField fx:id="tfLanguage" prefWidth="200" promptText="%language">
                 <validators>
                     <RequiredFieldValidator message="%required">
                         <MaterialDesignIconView glyphName="ALERT"/>
                     </RequiredFieldValidator>
                 </validators>
             </JFXTextField>
-            <JFXPasswordField fx:id="passwordField" prefWidth="200" promptText="%password">
-                <font>
-                    <Font size="14.0"/>
-                </font>
+            <JFXTextField fx:id="tfPoolCapacity" prefWidth="200" promptText="%poolCapacity">
                 <validators>
-                    <RequiredFieldValidator message="Eingabe erforderlich(nur für Testverbindung)">
+                    <RequiredFieldValidator message="%required">
                         <MaterialDesignIconView glyphName="ALERT"/>
                     </RequiredFieldValidator>
                 </validators>
-            </JFXPasswordField>
+            </JFXTextField>
+
             <HBox spacing="20" alignment="BASELINE_CENTER">
                 <JFXButton onAction="#testConnect" prefHeight="35" prefWidth="100" text="%testConnect">
                     <graphic>

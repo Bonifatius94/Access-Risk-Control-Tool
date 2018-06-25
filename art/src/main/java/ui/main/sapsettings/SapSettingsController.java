@@ -44,11 +44,10 @@ public class SapSettingsController {
     @FXML
     private TableColumn<SapConfiguration, JFXButton> deleteConfigColumn;
 
-    public static SapConfiguration sapConfiguration;
 
     public FilterController filterController;
 
-    ArtDbContext database = AppComponents.getDbContext();
+    private ArtDbContext database = AppComponents.getDbContext();
 
 
     /**
@@ -57,15 +56,6 @@ public class SapSettingsController {
     @FXML
     public void initialize() {
         initializeTableColumn();
-        try {
-            List<SapConfiguration> sapConfigList = database.getSapConfigs(true);
-            ObservableList<SapConfiguration> list = FXCollections.observableList(sapConfigList);
-            sapConnectionTable.setItems(list);
-            sapConnectionTable.refresh();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         filterController.shouldFilterProperty.addListener((obs, oldValue, newValue) -> {
             if (newValue) {
@@ -77,15 +67,24 @@ public class SapSettingsController {
             }
         });
 
+        try {
+            updateSapSettingsTable();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
     }
 
     /**
-     * updates Sap Setting Table
+     * updates Sap Setting Table.
      */
-    public void updateSapSettingsTable() {
-        //List<SapConfiguration> sapConfigurationList = database.getFilteredSapConfigs(filterController.showArchivedProperty.getValue(),
-        //filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(), filterController.endDateProperty.getValue(), 0);
+    void updateSapSettingsTable() throws Exception {
+        List<SapConfiguration> sapConfigurationList = database.getFilteredSapConfigs(filterController.showArchivedProperty.getValue(),
+            filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(), filterController.endDateProperty.getValue(), 0);
+        ObservableList<SapConfiguration> list = FXCollections.observableList(sapConfigurationList);
+        sapConnectionTable.setItems(list);
+        sapConnectionTable.refresh();
     }
 
 
@@ -97,10 +96,10 @@ public class SapSettingsController {
         deleteConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (SapConfiguration sapConfiguration) -> {
             try {
                 database.deleteSapConfig(sapConfiguration);
+                updateSapSettingsTable();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            refresh();
             return sapConfiguration;
         }));
 
@@ -122,7 +121,7 @@ public class SapSettingsController {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("SapSettingsEditDialogView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/SapSettingsEditDialogView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
@@ -138,13 +137,11 @@ public class SapSettingsController {
             stage.show();
             SapSettingsEditDialogController sapEdit = loader.getController();
             sapEdit.giveSelectedSapConfig(sapConfiguration);
-            //while (stage.isShowing()) {
-            refresh();
-            //}
+            sapEdit.setParentController(this);
+            updateSapSettingsTable();
 
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            System.out.println(e.getClass().toString());
+        } catch (Exception e) {
+
             e.printStackTrace();
         }
     }
@@ -157,24 +154,25 @@ public class SapSettingsController {
         //test Code
         if (sapConnectionTable.getFocusModel().getFocusedItem().equals(sapConnectionTable.getSelectionModel().getSelectedItem())) {
 
+            SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
             sapConfiguration.setLanguage("EN");
             sapConfiguration.setPoolCapacity("0");
 
             try {
-                String username = "GROUP_11";
-                String password = "Wir sind das beste Team!";
-                ISapConnector sapConnector = new SapConnector(sapConfiguration, username, password);
-                Boolean pingServer = sapConnector.canPingServer();
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, "Server Test Connection", "Connection Status: " + pingServer);
-                customAlert.showAndWait();
-            } catch (Exception e) {
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "SAP Connection Error", "Connection Status: Failed");
-                customAlert.showAndWait();
-                e.printStackTrace();
-            }
 
-            //SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
-            //TODO: Saplogin Dialog
+                ISapConnector sapConnector = new SapConnector(sapConfiguration, "abs", "abs");
+                sapConnector.canPingServer();
+
+            } catch (Exception e) {
+
+                if (e.getCause().toString().contains("103")) {
+                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, "SAP Connection Status", "Connection Status: Success", "OK", "Cancel");
+                    customAlert.showAndWait();
+                } else {
+                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Server Test Connection", "Connection Status: Error " + e.getCause().toString(), "Ok", "Cancel");
+                    customAlert.showAndWait();
+                }
+            }
         }
     }
 
@@ -185,7 +183,7 @@ public class SapSettingsController {
         try {
             // create a new FXML loader with the NewSapSettingDialogView
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("NewSapSettingDialogView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/NewSapSettingDialogView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
@@ -197,13 +195,12 @@ public class SapSettingsController {
             stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
             stage.show();
-            //while (stage.isShowing()) {
-            refresh();
-            //}
+            NewSapSettingDialogController controller = loader.getController();
+            controller.setParentController(this);
+            updateSapSettingsTable();
 
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            System.out.println(e.getClass().toString());
+
+        } catch (Exception e) {
             e.printStackTrace();
 
         }
@@ -218,7 +215,7 @@ public class SapSettingsController {
                 SapConfiguration sapConfiguration = new SapConfiguration(sapConnectionTable.getSelectionModel().getSelectedItem());
                 sapConfiguration.setDescription("Clone - " + sapConnectionTable.getSelectionModel().getSelectedItem().getDescription());
                 database.createSapConfig(sapConfiguration);
-                refresh();
+                updateSapSettingsTable();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -248,24 +245,12 @@ public class SapSettingsController {
             SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
             try {
                 database.deleteSapConfig(sapConfiguration);
+                updateSapSettingsTable();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            refresh();
         }
     }
 
-    /**
-     * should give new Sap setting to table. TODO: further implementations(add filters)
-     */
-    public void refresh() {
-
-        try {
-            sapConnectionTable.getItems().clear();
-            sapConnectionTable.getItems().addAll(database.getSapConfigs(true));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 }
