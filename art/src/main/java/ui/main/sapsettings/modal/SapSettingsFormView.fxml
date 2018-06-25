@@ -9,7 +9,7 @@
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import javafx.scene.control.Separator?>
 <CustomWindow windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
-              xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.sapsettings.SapSettingsFormController">
+              xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.sapsettings.modal.SapSettingsFormController">
     <VBox spacing="20" style="-fx-padding: 20">
         <VBox alignment="BASELINE_CENTER" spacing="40" style="-fx-padding: 0 0 20 0">
             <JFXTextField fx:id="descriptionField" prefWidth="300" promptText="%description">

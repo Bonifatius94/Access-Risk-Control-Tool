@@ -1,4 +1,4 @@
-package ui.main.sapsettings;
+package ui.main.sapsettings.modal;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
@@ -18,6 +18,7 @@ import sap.SapConnector;
 
 import ui.AppComponents;
 import ui.custom.controls.CustomAlert;
+import ui.main.sapsettings.SapSettingsController;
 
 
 public class SapSettingsFormController {

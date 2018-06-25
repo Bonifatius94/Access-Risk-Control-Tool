@@ -25,7 +25,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.input.MouseButton;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -38,6 +37,7 @@ import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.filter.FilterController;
+import ui.main.sapsettings.modal.SapSettingsFormController;
 
 
 public class SapSettingsController {
@@ -107,7 +107,7 @@ public class SapSettingsController {
     /**
      * updates Sap Setting Table.
      */
-    void updateSapSettingsTable() throws Exception {
+    public void updateSapSettingsTable() throws Exception {
         List<SapConfiguration> sapConfigurationList = database.getFilteredSapConfigs(filterController.showArchivedProperty.getValue(),
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(), filterController.endDateProperty.getValue(), 0);
         ObservableList<SapConfiguration> list = FXCollections.observableList(sapConfigurationList);
@@ -160,7 +160,7 @@ public class SapSettingsController {
         try {
             // create a new FXML loader with the SapSettingsFormController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/SapSettingsFormView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/modal/SapSettingsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
@@ -219,7 +219,7 @@ public class SapSettingsController {
         try {
             // create a new FXML loader with the NewSapSettingDialogView
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/SapSettingsFormView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/modal/SapSettingsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
