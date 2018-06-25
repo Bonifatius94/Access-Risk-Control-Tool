@@ -14,10 +14,10 @@
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.main.sapqueries.modal.newquery.NewSapQueryController" windowState="NoResize">
-    <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-padding: 20" spacing="10">
+    <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-padding: 20">
         <StackPane>
             <VBox HBox.hgrow="ALWAYS" fx:id="inputBox" spacing="20">
-                <VBox HBox.hgrow="ALWAYS" spacing="35">
+                <VBox HBox.hgrow="ALWAYS" spacing="40">
                     <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="30">
                         <Label text="%configuration"/>
                         <JFXComboBox fx:id="configChooser" minWidth="450" maxWidth="900"/>

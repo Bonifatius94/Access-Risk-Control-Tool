@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 
 import data.entities.AccessPattern;
 import data.entities.Configuration;
+import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
 
@@ -16,8 +17,10 @@ import io.msoffice.excel.WhitelistImportHelper;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -37,7 +40,9 @@ import javafx.stage.Stage;
 
 import ui.App;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.ConditionTypeCellFactory;
 import ui.custom.controls.CustomWindow;
+import ui.custom.controls.SapQueryStatusCellFactory;
 import ui.main.sapqueries.modal.details.SapQueryDetailController;
 
 public class SapQueriesController {
@@ -59,6 +64,9 @@ public class SapQueriesController {
 
     @FXML
     public TableColumn<CriticalAccessQuery, JFXButton> editColumn;
+
+    @FXML
+    public TableColumn<CriticalAccessQuery, Set<CriticalAccessEntry>> queryStatusColumn;
 
     @FXML
     public Label itemCount;
@@ -170,6 +178,9 @@ public class SapQueriesController {
                 setText((empty || time == null) ? "" : "" + time.format(DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")));
             }
         });
+
+        // sets the icon of the condition to pattern or profile
+        queryStatusColumn.setCellFactory(new SapQueryStatusCellFactory());
     }
 
     /**
@@ -251,6 +262,11 @@ public class SapQueriesController {
             SapConfiguration sapConfig = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "some description", "00", "001", "EN", "0");
             sapConfig.setDescription("Eine SAP Beschreibung");
             query.setSapConfig(sapConfig);
+
+            CriticalAccessEntry entry = new CriticalAccessEntry();
+            List<CriticalAccessEntry> centry = new ArrayList<>();
+            centry.add(entry);
+            query.setEntries(centry);
 
             // created at flag
             query.setCreatedAt(ZonedDateTime.now());

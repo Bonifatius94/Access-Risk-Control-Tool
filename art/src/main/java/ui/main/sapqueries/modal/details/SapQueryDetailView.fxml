@@ -15,7 +15,7 @@
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.main.sapqueries.modal.details.SapQueryDetailController" windowState="NoResize">
     <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
-        <VBox spacing="40">
+        <VBox spacing="30">
             <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" alignment="BASELINE_LEFT" spacing="50">
                 <VBox spacing="10">
                     <HBox>
@@ -60,7 +60,7 @@
                 </HBox>
             </VBox>
             <Separator/>
-            <VBox HBox.hgrow="ALWAYS" spacing="30">
+            <VBox HBox.hgrow="ALWAYS" spacing="30" style="-fx-padding: 0 0 10 0">
                 <HBox HBox.hgrow="ALWAYS">
                     <Label text="%sapSettings" style="-fx-font-size: 1.8em"/>
                     <Region HBox.hgrow="ALWAYS"/>

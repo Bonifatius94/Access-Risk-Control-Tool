@@ -493,3 +493,14 @@ alternative design with separators left and right of complete header bar
 .status-bar .database-icon {
     -fx-fill: -fx-success;
 }
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Tooltip Styling                                                             *
+ *                                                                             *
+ ******************************************************************************/
+
+.tooltip {
+    -fx-font-size: 1.1em;
+}
