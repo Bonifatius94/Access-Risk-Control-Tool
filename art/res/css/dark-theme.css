@@ -504,3 +504,7 @@ alternative design with separators left and right of complete header bar
 .tooltip {
     -fx-font-size: 1.1em;
 }
+
+.warning-text {
+    -fx-text-fill: red;
+}
