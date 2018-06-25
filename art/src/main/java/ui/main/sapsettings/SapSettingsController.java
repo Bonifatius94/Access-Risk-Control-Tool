@@ -5,9 +5,13 @@ import data.entities.SapConfiguration;
 import data.localdb.ArtDbContext;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -15,7 +19,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -38,15 +44,24 @@ public class SapSettingsController {
 
     @FXML
     private TableView<SapConfiguration> sapConnectionTable;
+
     @FXML
     private TableColumn<SapConfiguration, JFXButton> editConfigColumn;
+
     @FXML
     private TableColumn<SapConfiguration, JFXButton> deleteConfigColumn;
+
+    @FXML
+    private TableColumn<SapConfiguration, ZonedDateTime> creationColumn;
+
+    @FXML
+    private Label itemCount;
 
 
     public FilterController filterController;
 
     private ArtDbContext database = AppComponents.getDbContext();
+    private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
     ResourceBundle bundle = ResourceBundle.getBundle("lang");
 
 
@@ -82,6 +97,10 @@ public class SapSettingsController {
             return row;
         });
 
+        // show an item count (+ selected)
+        itemCount.textProperty().bind(Bindings.concat(Bindings.size(sapConnectionTable.getSelectionModel().getSelectedItems()).asString("%s / "),
+            numberOfItems.asString("%s " + bundle.getString("selected"))));
+
         updateSapSettingsTable();
     }
 
@@ -93,6 +112,10 @@ public class SapSettingsController {
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(), filterController.endDateProperty.getValue(), 0);
         ObservableList<SapConfiguration> list = FXCollections.observableList(sapConfigurationList);
         sapConnectionTable.setItems(list);
+
+        // update itemCount
+        numberOfItems.setValue(list.size());
+
         sapConnectionTable.refresh();
     }
 
@@ -118,6 +141,13 @@ public class SapSettingsController {
             return sapConfiguration;
         }));
 
+        // format created at date column
+        creationColumn.setCellFactory(col -> new TableCell<SapConfiguration, ZonedDateTime>() {
+            @Override
+            protected void updateItem(ZonedDateTime item, boolean empty) {
+                setText((empty || item == null) ? "" : item.format(DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")));
+            }
+        });
     }
 
     /**
@@ -141,9 +171,9 @@ public class SapSettingsController {
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
-
-            // give the dialog the sapConfiguration
             stage.show();
+
+            customWindow.setTitle(bundle.getString("editSapSettingsTitle"));
 
             SapSettingsFormController sapEdit = loader.getController();
             sapEdit.giveSelectedSapConfig(sapConfiguration);
@@ -201,6 +231,8 @@ public class SapSettingsController {
             stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
             stage.show();
+
+            customWindow.setTitle(bundle.getString("newSapSettingsTitle"));
 
             SapSettingsFormController sapEdit = loader.getController();
             sapEdit.giveSelectedSapConfig(null);

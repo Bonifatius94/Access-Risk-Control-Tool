@@ -7,28 +7,28 @@
 <?import javafx.scene.layout.VBox?>
 <?import ui.custom.controls.PTableColumn?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Region?>
 <VBox spacing="10" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="ui.main.sapsettings.SapSettingsController">
     <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
     <TableView VBox.vgrow="ALWAYS" fx:id="sapConnectionTable">
         <columns>
-            <PTableColumn percentageWidth="0.25" resizable="false" text="%description">
+            <PTableColumn percentageWidth="0.25" resizable="false" text="%description" styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="description"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.3" resizable="false" text="%hostServer">
+            <PTableColumn percentageWidth="0.3" resizable="false" text="%hostServer" styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="serverDestination"/>
                 </cellValueFactory>
             </PTableColumn>
-
-            <PTableColumn percentageWidth="0.25" resizable="false" text="%creationDate">
+            <PTableColumn percentageWidth="0.25" fx:id="creationColumn" resizable="false" text="%creationDate">
                 <cellValueFactory>
                     <PropertyValueFactory property="createdAt"/>
                 </cellValueFactory>
             </PTableColumn>
-
             <PTableColumn percentageWidth="0.1" resizable="false" fx:id="editConfigColumn">
             </PTableColumn>
             <PTableColumn percentageWidth="0.1" resizable="false" fx:id="deleteConfigColumn">
@@ -37,29 +37,29 @@
     </TableView>
 
     <HBox alignment="BOTTOM_RIGHT" spacing="15">
-        <HBox alignment="BOTTOM_LEFT" spacing="10">
-            <JFXButton prefWidth="120" text="%newConnection" onAction="#newSapConnectionAction">
-                <graphic>
-                    <MaterialDesignIconView glyphName="PLUS"/>
-                </graphic>
-            </JFXButton>
-            <JFXButton prefWidth="100" text="%testConnect" onAction="#connectAction">
-                <graphic>
-                    <MaterialDesignIconView glyphName="ACCESS_POINT"/>
-                </graphic>
-            </JFXButton>
-        </HBox>
-        <JFXButton prefWidth="100" text="%clone" onAction="#cloneAction">
+        <Label fx:id="itemCount"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <JFXButton prefWidth="130" text="%testConnect" onAction="#connectAction">
+            <graphic>
+                <MaterialDesignIconView glyphName="ACCESS_POINT"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton prefWidth="130" text="%newConnection" onAction="#newSapConnectionAction">
+            <graphic>
+                <MaterialDesignIconView glyphName="PLUS"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton prefWidth="130" text="%clone" onAction="#cloneAction">
             <graphic>
                 <MaterialDesignIconView glyphName="CONTENT_COPY"/>
             </graphic>
         </JFXButton>
-        <JFXButton prefWidth="100" text="%edit" onAction="#editAction">
+        <JFXButton prefWidth="130" text="%edit" onAction="#editAction">
             <graphic>
                 <MaterialDesignIconView glyphName="PENCIL"/>
             </graphic>
         </JFXButton>
-        <JFXButton prefWidth="100" text="Delete" onAction="#deleteAction" styleClass="warning-button">
+        <JFXButton prefWidth="130" text="Delete" onAction="#deleteAction" styleClass="warning-button">
             <graphic>
                 <MaterialDesignIconView glyphName="DELETE"/>
             </graphic>
