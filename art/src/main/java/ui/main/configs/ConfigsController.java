@@ -109,22 +109,11 @@ public class ConfigsController {
      */
     private void initializeConfigsTable() {
 
+        // replace Placeholder of PatternsTable with other message
+        configsTable.setPlaceholder(new Label(bundle.getString("noEntries")));
+
         // initialize table columns
         initializeTableColumns();
-
-        // replace Placeholder of PatternsTable with addButton
-        JFXButton addButton = new JFXButton();
-        addButton.setOnAction(event -> {
-            addAction();
-        });
-        MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.PLUS);
-        addButton.setGraphic(view);
-        addButton.setTooltip(new Tooltip(bundle.getString("firstPattern")));
-        addButton.getStyleClass().add("round-button");
-        addButton.setMinHeight(30);
-        addButton.setPrefHeight(30);
-
-        configsTable.setPlaceholder(addButton);
 
         // catch row double click
         configsTable.setRowFactory(tv -> {

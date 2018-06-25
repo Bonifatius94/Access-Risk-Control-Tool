@@ -70,7 +70,11 @@ public class SapSettingsController {
      */
     @FXML
     public void initialize() throws Exception {
+
         initializeTableColumn();
+
+        // replace Placeholder of PatternsTable with other message
+        sapConnectionTable.setPlaceholder(new Label(bundle.getString("noEntries")));
 
         filterController.shouldFilterProperty.addListener((obs, oldValue, newValue) -> {
             if (newValue) {

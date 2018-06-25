@@ -128,19 +128,8 @@ public class SapQueriesController {
      */
     private void initializeQueriesTable() {
 
-        // replace Placeholder of PatternsTable with addButton
-        JFXButton addButton = new JFXButton();
-        addButton.setOnAction(event -> {
-            addAction();
-        });
-        MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.PLUS);
-        addButton.setGraphic(view);
-        addButton.setTooltip(new Tooltip(bundle.getString("firstPattern")));
-        addButton.getStyleClass().add("round-button");
-        addButton.setMinHeight(30);
-        addButton.setPrefHeight(30);
-
-        queriesTable.setPlaceholder(addButton);
+        // replace Placeholder of PatternsTable with other message
+        queriesTable.setPlaceholder(new Label(bundle.getString("noEntries")));
 
         // catch row double click
         queriesTable.setRowFactory(tv -> {

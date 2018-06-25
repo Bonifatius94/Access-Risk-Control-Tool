@@ -82,6 +82,9 @@ public class WhitelistsController {
 
         initializeColumns();
 
+        // replace Placeholder of PatternsTable with other message
+        whitelistTable.setPlaceholder(new Label(bundle.getString("noEntries")));
+
         // catch row double click
         whitelistTable.setRowFactory(tv -> {
             TableRow<Whitelist> row = new TableRow<>();

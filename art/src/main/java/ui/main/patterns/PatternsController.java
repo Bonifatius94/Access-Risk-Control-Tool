@@ -119,19 +119,8 @@ public class PatternsController {
      */
     private void initializePatternsTable() {
 
-        // replace Placeholder of PatternsTable with addButton
-        JFXButton addButton = new JFXButton();
-        addButton.setOnAction(event -> {
-            addAction();
-        });
-        MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.PLUS);
-        addButton.setGraphic(view);
-        addButton.setTooltip(new Tooltip(bundle.getString("firstPattern")));
-        addButton.getStyleClass().add("round-button");
-        addButton.setMinHeight(30);
-        addButton.setPrefHeight(30);
-
-        patternsTable.setPlaceholder(addButton);
+        // replace Placeholder of PatternsTable with other message
+        patternsTable.setPlaceholder(new Label(bundle.getString("noEntries")));
 
         // catch row double click
         patternsTable.setRowFactory(tv -> {
