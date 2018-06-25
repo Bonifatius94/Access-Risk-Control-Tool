@@ -215,7 +215,8 @@ public class WhitelistsController {
     public void deleteWhitelist() throws Exception {
         if (whitelistTable.getSelectionModel().getSelectedItems() != null && whitelistTable.getSelectionModel().getSelectedItems().size() != 0) {
             if (!whitelistTable.getSelectionModel().getSelectedItem().isArchived()) {
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Delete selected Whitelists?", "By clicking OK the whitelists will be deleted, click cancel to stop the deletion", "Ok", "Cancel");
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Delete selected Whitelists?",
+                    "By clicking OK the whitelists will be deleted, click cancel to stop the deletion", "Ok", "Cancel");
 
                 if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                     // deletes whitelists from DB
