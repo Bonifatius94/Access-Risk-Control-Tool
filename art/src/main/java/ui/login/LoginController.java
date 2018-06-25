@@ -14,8 +14,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.layout.HBox;
 import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.CustomWindow;
@@ -38,6 +38,10 @@ public class LoginController {
     @FXML
     private Label errorLabel;
 
+    @FXML
+    private HBox usernameValidationBox;
+
+
     /**
      * Initializes the view with all needed bindings.
      */
@@ -49,6 +53,12 @@ public class LoginController {
         passwordInputPlain.managedProperty().bind(passwordInputPlain.visibleProperty());
         passwordInputPlain.visibleProperty().bind(Bindings.not(passwordInput.visibleProperty()));
         passwordInput.textProperty().bindBidirectional(passwordInputPlain.textProperty());
+
+        // transform typed text to uppercase
+        usernameInput.setTextFormatter(new TextFormatter<>((change) -> {
+            change.setText(change.getText().toUpperCase());
+            return change;
+        }));
 
         initializeValidation();
     }
@@ -84,6 +94,22 @@ public class LoginController {
      */
     private void initializeValidation() {
 
+        // validate the input with regex and display error message
+        usernameInput.textProperty().addListener((ol, oldValue, newValue) -> {
+            if (newValue.isEmpty()) {
+                usernameValidationBox.setVisible(false);
+            } else {
+                if (!newValue.equals(oldValue)) {
+                    if (!newValue.matches("([A-Z]{3,}+(_|\\w)*)")) {
+                        usernameValidationBox.setVisible(true);
+                    } else {
+                        usernameValidationBox.setVisible(false);
+                    }
+                    usernameInput.validate();
+                }
+            }
+        });
+        
         usernameInput.focusedProperty().addListener((o, oldVal, newVal) -> {
             if (!newVal) {
                 usernameInput.validate();
@@ -103,7 +129,7 @@ public class LoginController {
      * @return if the inputs are valid
      */
     private boolean validateBeforeSubmit() {
-        return usernameInput.validate() && passwordInput.validate() && passwordInputPlain.validate();
+        return usernameInput.validate() && passwordInput.validate() && passwordInputPlain.validate() && !usernameValidationBox.isVisible();
     }
 
     /**
@@ -126,6 +152,7 @@ public class LoginController {
             close(event);
             App.primaryStage.show();
         } catch (Exception e) {
+            errorLabel.setText(e.getMessage());
             e.printStackTrace();
         }
     }

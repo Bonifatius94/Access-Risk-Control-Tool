@@ -11,6 +11,7 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
+<?import javafx.scene.control.Tooltip?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.login.LoginController" title="%login">
@@ -25,13 +26,28 @@
             <VBox spacing="35">
                 <HBox alignment="BASELINE_LEFT" spacing="10">
                     <MaterialDesignIconView style="-fx-font-size: 1.6em" glyphName="ACCOUNT"/>
-                    <JFXTextField fx:id="usernameInput" prefWidth="240" promptText="%username">
-                        <validators>
-                            <RequiredFieldValidator message="%required">
-                                <MaterialDesignIconView glyphName="ALERT"/>
-                            </RequiredFieldValidator>
-                        </validators>
-                    </JFXTextField>
+                    <VBox spacing="8">
+                        <JFXTextField fx:id="usernameInput" prefWidth="240" promptText="%username">
+                            <validators>
+                                <RequiredFieldValidator message="%required">
+                                    <MaterialDesignIconView glyphName="ALERT"/>
+                                </RequiredFieldValidator>
+                            </validators>
+                        </JFXTextField>
+                        <HBox fx:id="usernameValidationBox" visible="false">
+                            <Label text="%usernameInvalid" styleClass="warning-text"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <MaterialDesignIconView glyphName="ALERT"/>
+                        </HBox>
+                    </VBox>
+                    <Label style="-fx-cursor: hand">
+                        <graphic>
+                            <MaterialDesignIconView glyphName="INFORMATION" size="20"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%usernameTooltip"/>
+                        </tooltip>
+                    </Label>
                 </HBox>
                 <HBox alignment="BASELINE_LEFT" spacing="10">
                     <MaterialDesignIconView style="-fx-font-size: 1.6em" glyphName="KEY"/>
@@ -49,8 +65,15 @@
                             </RequiredFieldValidator>
                         </validators>
                     </JFXTextField>
-                    <MaterialDesignIconView fx:id="showPasswordIconView" glyphName="EYE_OFF"
-                                            onMouseClicked="#togglePasswordDisplay" size="20"/>
+                    <Label style="-fx-cursor: hand">
+                        <graphic>
+                            <MaterialDesignIconView fx:id="showPasswordIconView" glyphName="EYE_OFF"
+                                                    onMouseClicked="#togglePasswordDisplay" size="20"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%toggleVisibility"/>
+                        </tooltip>
+                    </Label>
                 </HBox>
             </VBox>
             <Label visible="false" fx:id="errorLabel" text="%databaseLoginError" wrapText="true"
