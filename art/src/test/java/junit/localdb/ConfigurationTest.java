@@ -142,6 +142,9 @@ public class ConfigurationTest {
             context.updateConfig(activeConfig);
             context.updateConfig(archivedConfig);
 
+            // test to see if the configurations were updateted corret
+
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }

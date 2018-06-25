@@ -112,7 +112,9 @@ public class CriticalAccessQueryTest {
 
             // query updated data
             List<CriticalAccessQuery> queries = context.getFilteredCriticalAccessQueries(false, null, null, null, null);
-
+            if(queries == null) {
+                System.out.println("queries null");
+            }
             // check if new query was inserted
             ret = queries.stream().anyMatch(x -> x.getConfig().equals(config) && x.getSapConfig().equals(sapconfig) && x.getCreatedBy().equals(author));
 
