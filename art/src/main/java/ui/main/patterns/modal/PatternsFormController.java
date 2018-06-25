@@ -109,18 +109,24 @@ public class PatternsFormController {
     private JFXButton saveButton;
 
     @FXML
+    private JFXButton addPropertyButton;
+
+    @FXML
+    private JFXButton copyPropertyButton;
+
+    @FXML
     private Label atLeastOneCondWarning;
 
     private PatternsController parentController;
 
     private AccessPattern accessPattern;
-    private AccessPattern originalPattern;
 
     private List<TableViewWithAccessCondition> conditionTables;
     private TableView<AccessPatternConditionProperty> selectedTable;
     private List<PTableColumn<AccessPatternConditionProperty, JFXButton>> deleteColumns;
-    private List<JFXButton> addPropertyButtons;
     private AccessPatternConditionProperty selectedProperty;
+    private ResourceBundle bundle = ResourceBundle.getBundle("lang");
+    private int maxEntries = 10; // the maximum entries per table
 
 
     /**
@@ -134,9 +140,6 @@ public class PatternsFormController {
 
         // initialize delete columns
         this.deleteColumns = new ArrayList<>();
-
-        // initialize addProperty buttons
-        this.addPropertyButtons = new ArrayList<>();
 
         // set condition input items
         this.conditionTypeInput.getItems().setAll("Condition", "Profile");
@@ -310,6 +313,9 @@ public class PatternsFormController {
                     addConditionTableTab(condition);
                 }
 
+                this.selectedTable = conditionTables.get(0).getTableView();
+
+
                 // preselect correct linkage
                 this.linkageInput.getSelectionModel().select(pattern.getLinkage());
             } else {
@@ -324,9 +330,6 @@ public class PatternsFormController {
                 this.profileInput.setText(pattern.getConditions().stream().findFirst().get().getProfileCondition().getProfile());
             }
         }
-
-        // save the original pattern as deep copy
-        this.originalPattern = new AccessPattern(this.accessPattern);
     }
 
     /**
@@ -364,15 +367,7 @@ public class PatternsFormController {
             authFieldValue1Input.validate();
 
         } else {
-
-            // reset form
-            authObjectInput.setText("");
-            authFieldInput.setText("");
-            authFieldValue1Input.setText("");
-            authFieldValue2Input.setText("");
-            authFieldValue3Input.setText("");
-            authFieldValue4Input.setText("");
-
+            resetDetails();
         }
 
     }
@@ -531,9 +526,6 @@ public class PatternsFormController {
     @SuppressWarnings("unchecked") // TODO: remove this annotation if possible
     public void addConditionTableTab(AccessCondition condition) {
 
-        // get the resource bundle for internationalization
-        ResourceBundle bundle = ResourceBundle.getBundle("lang");
-
         // AuthObject Column
         PTableColumn<AccessPatternConditionProperty, String> authObject = new PTableColumn<>();
         authObject.setCellValueFactory(new PropertyValueFactory<>("authObject"));
@@ -610,35 +602,14 @@ public class PatternsFormController {
         // presort table
         conditionTable.getSortOrder().addAll(authObject, authObjectProperty);
 
-        // create add button
-        JFXButton addPropertyButton = new JFXButton();
-        addPropertyButton.setOnAction(event -> {
-            conditionTable.getItems().add(new AccessPatternConditionProperty());
-            conditionTable.requestFocus();
-            conditionTable.getSelectionModel().selectLast();
-            conditionTable.getFocusModel().focus(conditionTable.getItems().size() - 1);
-            conditionTable.scrollTo(conditionTable.getItems().size() - 1);
-        });
-        MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.PLUS);
-        addPropertyButton.setGraphic(view);
-        addPropertyButton.setTooltip(new Tooltip(bundle.getString("addProperty")));
-        addPropertyButton.getStyleClass().add("round-button");
-        addPropertyButton.setMinHeight(30);
-        addPropertyButton.setPrefHeight(30);
-
-        // disable button on 10 entries
-        addPropertyButton.disableProperty().bind(Bindings.size(conditionTable.getItems()).isEqualTo(10));
-
-        addPropertyButtons.add(addPropertyButton);
-
         // add warning label on 10 entries
         Label warningTextItemLimit = new Label(bundle.getString("warningTextItemLimit"));
-        warningTextItemLimit.visibleProperty().bind(Bindings.size(conditionTable.getItems()).isEqualTo(10));
+        warningTextItemLimit.visibleProperty().bind(Bindings.size(conditionTable.getItems()).isEqualTo(maxEntries));
 
         // box for the button
         HBox buttonBox = new HBox();
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
-        buttonBox.getChildren().addAll(warningTextItemLimit, addPropertyButton);
+        buttonBox.getChildren().addAll(warningTextItemLimit);
         buttonBox.setSpacing(20);
         buttonBox.setPadding(new Insets(0, 20, 0, 0));
         HBox.setHgrow(buttonBox, Priority.ALWAYS);
@@ -657,6 +628,20 @@ public class PatternsFormController {
         // "bind" the table to the tab
         tab.setOnSelectionChanged((event) -> {
             this.selectedTable = conditionTable;
+
+            // bind addPropertyButton
+            this.addPropertyButton.disableProperty().bind(
+                Bindings.or(Bindings.size(selectedTable.getItems()).isEqualTo(maxEntries),
+                    Bindings.and(Bindings.isEmpty(authObjectInput.textProperty()),
+                        Bindings.and(Bindings.isEmpty(authFieldInput.textProperty()),
+                            Bindings.isEmpty(authFieldValue1Input.textProperty())))));
+
+            // bind copyPropertyButton
+            this.copyPropertyButton.disableProperty().bind(
+                Bindings.or(Bindings.size(selectedTable.getItems()).isEqualTo(maxEntries),
+                    Bindings.and(Bindings.isEmpty(authObjectInput.textProperty()),
+                        Bindings.and(Bindings.isEmpty(authFieldInput.textProperty()),
+                            Bindings.isEmpty(authFieldValue1Input.textProperty())))));
         });
 
         this.conditionTabs.getTabs().add(tab);
@@ -677,11 +662,67 @@ public class PatternsFormController {
             selectedProperty.setValue3(authFieldValue3Input.getText());
             selectedProperty.setValue4(authFieldValue4Input.getText());
 
-            this.selectedTable.refresh();
-
+            resetDetails();
         }
     }
 
+    /**
+     * Adds a property to the selected table.
+     */
+    public void addConditionProperty() {
+        // create the property to add and give it the parameters
+        AccessPatternConditionProperty propertyToAdd = new AccessPatternConditionProperty();
+        propertyToAdd.setAuthObject(authObjectInput.getText());
+        propertyToAdd.setAuthObjectProperty(authFieldInput.getText());
+        propertyToAdd.setValue1(authFieldValue1Input.getText());
+        propertyToAdd.setValue2(authFieldValue2Input.getText());
+        propertyToAdd.setValue3(authFieldValue3Input.getText());
+        propertyToAdd.setValue4(authFieldValue4Input.getText());
+
+        selectedTable.getItems().add(propertyToAdd);
+        selectedTable.requestFocus();
+        selectedTable.getSelectionModel().selectLast();
+        selectedTable.getFocusModel().focus(selectedTable.getItems().size() - 1);
+        selectedTable.scrollTo(selectedTable.getItems().size() - 1);
+
+        resetDetails();
+    }
+
+
+    /**
+     * Copies the currently selected property.
+     */
+    public void copyConditionProperty() {
+        if (selectedProperty != null) {
+            // create the property to add and give it the parameters
+            AccessPatternConditionProperty propertyToAdd = new AccessPatternConditionProperty();
+            propertyToAdd.setAuthObject(authObjectInput.getText());
+            propertyToAdd.setAuthObjectProperty(authFieldInput.getText());
+            propertyToAdd.setValue1(authFieldValue1Input.getText());
+            propertyToAdd.setValue2(authFieldValue2Input.getText());
+            propertyToAdd.setValue3(authFieldValue3Input.getText());
+            propertyToAdd.setValue4(authFieldValue4Input.getText());
+
+            selectedTable.getItems().add(propertyToAdd);
+            selectedTable.requestFocus();
+            selectedTable.getSelectionModel().selectLast();
+            selectedTable.getFocusModel().focus(selectedTable.getItems().size() - 1);
+            selectedTable.scrollTo(selectedTable.getItems().size() - 1);
+        }
+    }
+
+
+    /**
+     * Resets the details.
+     */
+    private void resetDetails() {
+        authObjectInput.setText("");
+        authFieldInput.setText("");
+        authFieldValue1Input.setText("");
+        authFieldValue2Input.setText("");
+        authFieldValue3Input.setText("");
+        authFieldValue4Input.setText("");
+    }
 
     /**
      * Makes all inputs not editable and hides the buttons.
@@ -714,10 +755,7 @@ public class PatternsFormController {
             deleteSelectedTableTabButton.setVisible(false);
             saveButton.setVisible(false);
             applyPopertyChangesButton.setVisible(false);
-
-            for (JFXButton addPropertyButton : addPropertyButtons) {
-                addPropertyButton.setVisible(false);
-            }
+            addPropertyButton.setVisible(false);
 
             // remove delete column
             for (PTableColumn column : deleteColumns) {
@@ -725,7 +763,6 @@ public class PatternsFormController {
             }
         }
     }
-
 
     /**
      * Stores a TableView and an AccessCondition which is needed for updating a pattern correctly.

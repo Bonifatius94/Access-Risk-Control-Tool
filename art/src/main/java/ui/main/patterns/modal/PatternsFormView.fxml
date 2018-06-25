@@ -124,7 +124,23 @@
                         </JFXTextField>
                     </HBox>
                 </VBox>
-                <HBox alignment="CENTER_RIGHT">
+                <HBox alignment="CENTER_RIGHT" spacing="10">
+                    <JFXButton fx:id="addPropertyButton" onAction="#addConditionProperty" prefHeight="30" prefWidth="30" styleClass="round-button">
+                        <graphic>
+                            <MaterialDesignIconView glyphName="PLUS"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%addProperty"/>
+                        </tooltip>
+                    </JFXButton>
+                    <JFXButton fx:id="copyPropertyButton" onAction="#copyConditionProperty" prefHeight="30" prefWidth="30" styleClass="round-button">
+                        <graphic>
+                            <MaterialDesignIconView glyphName="CONTENT_COPY"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%copyProperty"/>
+                        </tooltip>
+                    </JFXButton>
                     <JFXButton onAction="#editConditionProperty" prefHeight="30" prefWidth="30"
                                styleClass="round-button" fx:id="applyPopertyChangesButton">
                         <graphic>
