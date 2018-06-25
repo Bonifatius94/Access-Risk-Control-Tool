@@ -85,16 +85,13 @@ public class SapQueriesController {
      * Initializes the controller.
      */
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
 
         // load the ResourceBundle
         bundle = ResourceBundle.getBundle("lang");
 
         // initialize the table
         initializeQueriesTable();
-
-        // TODO: call updateQueriesTable
-        fillQueriesTable();
 
         // check if the filters are applied
         filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
@@ -106,6 +103,8 @@ public class SapQueriesController {
                 }
             }
         });
+
+        updateQueriesTable();
     }
 
     /**
@@ -269,54 +268,6 @@ public class SapQueriesController {
             // remove all selected items
             queriesTable.getItems().removeAll(queriesTable.getSelectionModel().getSelectedItems());
             queriesTable.refresh();
-        }
-    }
-
-    /**
-     * Fills the queries table with items.
-     */
-    private void fillQueriesTable() {
-        try {
-            // parsing test whitelist from excel file
-            Whitelist whitelist = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");
-            whitelist.setName("Whitelist-Name");
-            whitelist.setDescription("Whitelist-Description");
-
-            // parsing test patterns from excel file
-            List<AccessPattern> patterns = new AccessPatternImportHelper().importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
-
-            Configuration configuration = new Configuration();
-            configuration.setWhitelist(whitelist);
-            configuration.setPatterns(patterns);
-            configuration.setName("Ein Name");
-            configuration.setDescription("Eine Beschreibung");
-
-            CriticalAccessQuery query = new CriticalAccessQuery();
-            query.setConfig(configuration);
-
-            // init sap settings (here: test server data)
-            SapConfiguration sapConfig = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "some description", "00", "001", "EN", "0");
-            sapConfig.setDescription("Eine SAP Beschreibung");
-            query.setSapConfig(sapConfig);
-
-            CriticalAccessEntry entry = new CriticalAccessEntry();
-            List<CriticalAccessEntry> centry = new ArrayList<>();
-            centry.add(entry);
-            query.setEntries(centry);
-
-            // created at flag
-            query.setCreatedAt(ZonedDateTime.now());
-
-            // created by flag
-            query.setCreatedBy("HEINZ_KARL");
-
-            ObservableList<CriticalAccessQuery> items = FXCollections.observableArrayList();
-            items.addAll(query);
-
-            queriesTable.setItems(items);
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
