@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.NativeQuery;
+import tools.tracing.TraceLevel;
 import tools.tracing.TraceOut;
 
 public class ArtDbContext extends H2ContextBase implements IArtDbContext {
@@ -47,7 +48,10 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     private static String getDefaultDatabaseFilePath() {
 
         String currentExeFolder = System.getProperty("user.dir");
-        return Paths.get(currentExeFolder, "art.h2").toAbsolutePath().toString();
+        String databasePath = Paths.get(currentExeFolder, "art.h2").toAbsolutePath().toString();
+
+        TraceOut.writeInfo(databasePath, TraceLevel.Verbose);
+        return databasePath;
     }
 
     // ===================================
