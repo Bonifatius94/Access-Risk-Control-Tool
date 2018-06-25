@@ -1,15 +1,17 @@
 package sap;
 
+import com.sap.conn.jco.JCoException;
 import data.entities.Configuration;
 import data.entities.CriticalAccessQuery;
 
 public interface ISapConnector {
 
-    /** This method pings the sap server specified in the sap server config.
-     *
+    /**
+     * This method pings the sap server specified in the sap server config.
      * @return a boolean value that indicates whether the ping was successful
+     * @throws JCoException if server ping fails, error is used by Test ping
      */
-    boolean canPingServer();
+    boolean canPingServer() throws JCoException;
 
     /**
      * This method runs a SAP analysis for the given config.
