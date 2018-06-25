@@ -1,19 +1,19 @@
 package ui.custom.controls;
 
-import data.entities.AccessCondition;
-import data.entities.AccessPattern;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+
+import java.util.ResourceBundle;
+import java.util.Set;
+
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.util.Callback;
-
-import java.util.ResourceBundle;
-import java.util.Set;
 
 public class SapQueryStatusCellFactory implements Callback<TableColumn<CriticalAccessQuery, Set<CriticalAccessEntry>>, TableCell<CriticalAccessQuery, Set<CriticalAccessEntry>>> {
     private ResourceBundle bundle = ResourceBundle.getBundle("lang");
