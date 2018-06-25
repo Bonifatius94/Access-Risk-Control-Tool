@@ -86,7 +86,7 @@
                                     <Tooltip text="%newEntry"/>
                                 </tooltip>
                             </JFXButton>
-                            <JFXButton styleClass="round-button" onAction="#saveEntry" prefWidth="30"
+                            <JFXButton fx:id="applyButton" styleClass="round-button" onAction="#saveEntry" prefWidth="30"
                                        prefHeight="30">
                                 <graphic>
                                     <MaterialDesignIconView glyphName="CHECK"/>
@@ -102,7 +102,7 @@
         </HBox>
         <Separator/>
         <HBox spacing="10" alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS">
-            <JFXButton onAction="#saveEditWhitelist" prefWidth="120" text="%save">
+            <JFXButton fx:id="saveButton" onAction="#saveEditWhitelist" prefWidth="120" text="%save">
                 <graphic>
                     <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
                 </graphic>

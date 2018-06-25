@@ -32,23 +32,37 @@ public class WhitelistFormController {
 
     @FXML
     public TableView<WhitelistEntry> whitelistEditTable;
-    //    public JFXButton cancelButton;
+
     @FXML
     public PTableColumn<WhitelistEntry, JFXButton> deleteWhitelistEntryColumn;
+
     @FXML
     public JFXTextField tfUsecaseId;
+
     @FXML
     public JFXTextField tfUserName;
+
     @FXML
     public JFXTextField tfDescription;
+
     @FXML
     public JFXTextField tfWhitelistName;
+
     @FXML
     public JFXButton addButton;
+
     @FXML
     private PTableColumn<WhitelistEntry, String> usecaseId;
+
     @FXML
     private PTableColumn<WhitelistEntry, String> userName;
+
+    @FXML
+    private JFXButton saveButton;
+
+    @FXML
+    private JFXButton applyButton;
+
 
     private WhitelistsController parentController;
     private ArtDbContext whitelistDatabase = AppComponents.getDbContext();
@@ -253,7 +267,7 @@ public class WhitelistFormController {
     }
 
     /**
-     * Makes all entries editable according to boolean.
+     * Sets the editable attribute of all textfields and visibility of saveButton.
      */
     public void setEditable(boolean editable) {
         if (!editable) {
@@ -261,11 +275,17 @@ public class WhitelistFormController {
             tfDescription.setEditable(false);
             tfUsecaseId.setEditable(false);
             tfUserName.setEditable(false);
+            saveButton.setVisible(false);
+            addButton.setVisible(false);
+            applyButton.setVisible(false);
         } else {
             tfWhitelistName.setEditable(true);
             tfDescription.setEditable(true);
             tfUsecaseId.setEditable(true);
             tfUserName.setEditable(true);
+            saveButton.setVisible(true);
+            addButton.setVisible(true);
+            applyButton.setVisible(true);
         }
     }
 }
