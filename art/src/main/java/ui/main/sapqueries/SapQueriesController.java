@@ -23,6 +23,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -39,10 +40,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import ui.App;
+import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.ConditionTypeCellFactory;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.SapQueryStatusCellFactory;
+import ui.custom.controls.filter.FilterController;
 import ui.main.sapqueries.modal.details.SapQueryDetailController;
 
 public class SapQueriesController {
@@ -71,7 +74,12 @@ public class SapQueriesController {
     @FXML
     public Label itemCount;
 
+    @FXML
+    public FilterController filterController;
+
+
     private ResourceBundle bundle;
+    private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
 
     /**
      * Initializes the controller.
@@ -85,12 +93,35 @@ public class SapQueriesController {
         // initialize the table
         initializeQueriesTable();
 
-        // fills the table
+        // TODO: call updateQueriesTable
         fillQueriesTable();
 
-        // show an item count (+ selected)
-        itemCount.textProperty().bind(Bindings.concat(Bindings.size(queriesTable.getSelectionModel().getSelectedItems()).asString("%s / "),
-            Bindings.size(queriesTable.getItems()).asString("%s " + bundle.getString("selected"))));
+        // check if the filters are applied
+        filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
+            if (newValue) {
+                try {
+                    updateQueriesTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * Updates the queriesTable items from the database, taking filters into account.
+     */
+    public void updateQueriesTable() throws Exception {
+        List<CriticalAccessQuery> patterns = AppComponents.getDbContext().getFilteredCriticalAccessQueries(filterController.showArchivedProperty.getValue(),
+            filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
+            filterController.endDateProperty.getValue(), 0);
+        ObservableList<CriticalAccessQuery> list = FXCollections.observableList(patterns);
+
+        // update itemCount
+        numberOfItems.setValue(list.size());
+
+        queriesTable.setItems(list);
+        queriesTable.refresh();
     }
 
     /**
@@ -126,6 +157,10 @@ public class SapQueriesController {
 
         // set selection mode to MULTIPLE
         queriesTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        // show an item count (+ selected)
+        itemCount.textProperty().bind(Bindings.concat(Bindings.size(queriesTable.getSelectionModel().getSelectedItems()).asString("%s / "),
+            numberOfItems.asString("%s " + bundle.getString("selected"))));
 
         initializeTableColumns();
     }
@@ -185,6 +220,7 @@ public class SapQueriesController {
 
     /**
      * Opens the selected query.
+     *
      * @param query the selected query
      */
     private void openQuery(CriticalAccessQuery query) {

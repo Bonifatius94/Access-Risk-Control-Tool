@@ -10,6 +10,7 @@
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="ui.main.sapqueries.SapQueriesController"
       spacing="10">
+    <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
     <TableView VBox.vgrow="ALWAYS" fx:id="queriesTable">
         <columns>
             <PTableColumn text="?" fx:id="queryStatusColumn" percentageWidth="0.08">
