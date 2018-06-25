@@ -21,6 +21,8 @@ import javafx.stage.Stage;
 import ui.App;
 import ui.custom.controls.CustomWindow;
 import ui.main.sapqueries.modal.newquery.NewSapQueryController;
+import ui.main.sapsettings.modal.SapSettingsFormController;
+import ui.main.whitelists.modal.WhitelistFormController;
 
 
 public class SapQueryDetailController {
@@ -120,8 +122,29 @@ public class SapQueryDetailController {
         }
     }
 
-    public void openSapConfigDetails() {
-        // TODO: open a modal window with SAPConfig Details
+    /**
+     * Opens the SapConfig details in a modal, uneditable window.
+     */
+    public void openSapConfigDetails() throws Exception {
+        // create a new FXML loader with the SapSettingsFormController
+        ResourceBundle bundle = ResourceBundle.getBundle("lang");
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/modal/SapSettingsFormView.fxml"), bundle);
+        CustomWindow customWindow = loader.load();
+
+        // build the scene and add it to the stage
+        Scene scene = new Scene(customWindow);
+        scene.getStylesheets().add("css/dark-theme.css");
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(App.primaryStage);
+        customWindow.initStage(stage);
+        stage.show();
+
+        customWindow.setTitle(bundle.getString("detailSapSettingsTitle"));
+
+        SapSettingsFormController sapView = loader.getController();
+        sapView.setEditable(false);
     }
 
     /**

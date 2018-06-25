@@ -22,6 +22,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.BoxBlur;
@@ -30,11 +31,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
+import sap.ISapConnector;
 import sap.SapConnector;
 
 import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.AutoCompleteComboBoxListener;
+import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 import ui.main.sapqueries.modal.choosers.ConfigChooserController;
 import ui.main.sapqueries.modal.choosers.SapConfigChooserController;
@@ -196,29 +199,56 @@ public class NewSapQueryController {
      * Opens the SAP login dialog.
      */
     public void openLoginDialog() {
+        if (tryToConnect()) {
+            try {
+                // create a new FXML loader with the SapSettingsEditDialogController
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("SapLoginView.fxml"), bundle);
+                CustomWindow customWindow = loader.load();
+
+                // build the scene and add it to the stage
+                Scene scene = new Scene(customWindow);
+                scene.getStylesheets().add("css/dark-theme.css");
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.initModality(Modality.WINDOW_MODAL);
+                stage.initOwner(App.primaryStage);
+                customWindow.initStage(stage);
+
+                customWindow.setTitle(bundle.getString("sapLogin"));
+
+                stage.show();
+
+                SapLoginController loginController = loader.getController();
+                loginController.setParentController(this);
+                loginController.giveSapConfig(sapConfiguration);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Tests the connection to the SAP system.
+     */
+    public boolean tryToConnect() {
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("SapLoginView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
+            // get exception from server
+            ISapConnector sapConnector = new SapConnector(sapConfiguration, "abs", "abs");
+            sapConnector.canPingServer();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            customWindow.setTitle(bundle.getString("sapLogin"));
-
-            stage.show();
-
-            SapLoginController loginController = loader.getController();
-            loginController.setParentController(this);
-            loginController.giveSapConfig(sapConfiguration);
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
+            // if exception contains error code 103, connection was successful
+            if (e.getCause() != null && e.getCause().toString().contains("103")) {
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("sapConnectTitle"), bundle.getString("sapConnectSuccessMessage"), "OK", "Cancel");
+                customAlert.showAndWait();
+            } else {
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("sapConnectTitle"), bundle.getString("sapConnectFailedMessage"), "Ok", "Cancel");
+                customAlert.showAndWait();
+            }
+
+            return false;
         }
     }
 
@@ -259,7 +289,8 @@ public class NewSapQueryController {
 
     /**
      * Starts a new SapTask with the given parameters.
-     * @param query the given query parameters
+     *
+     * @param query    the given query parameters
      * @param username the username
      * @param password the password
      */
