@@ -318,6 +318,7 @@ public class WhitelistFormController {
             saveButton.setVisible(false);
             addButton.setVisible(false);
             applyButton.setVisible(false);
+            copyButton.setVisible(false);
         } else {
             tfWhitelistName.setEditable(true);
             tfDescription.setEditable(true);
@@ -326,6 +327,7 @@ public class WhitelistFormController {
             saveButton.setVisible(true);
             addButton.setVisible(true);
             applyButton.setVisible(true);
+            copyButton.setVisible(true);
         }
     }
 }

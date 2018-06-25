@@ -764,6 +764,7 @@ public class PatternsFormController {
             saveButton.setVisible(false);
             applyPopertyChangesButton.setVisible(false);
             addPropertyButton.setVisible(false);
+            copyPropertyButton.setVisible(false);
 
             // remove delete column
             for (PTableColumn column : deleteColumns) {
