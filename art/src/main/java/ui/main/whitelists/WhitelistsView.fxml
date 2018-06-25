@@ -61,7 +61,7 @@
                 <MaterialDesignIconView glyphName="CONTENT_COPY"/>
             </graphic>
         </JFXButton>
-        <JFXButton text="%newWhitelist" prefWidth="130" onAction="#newWhitelist">
+        <JFXButton text="%newEntry" prefWidth="130" onAction="#newWhitelist">
             <graphic>
                 <MaterialDesignIconView glyphName="PLUS"/>
             </graphic>

@@ -36,7 +36,7 @@
         </columns>
     </TableView>
 
-    <HBox alignment="BOTTOM_RIGHT" spacing="15">
+    <HBox alignment="BOTTOM_RIGHT" spacing="10">
         <Label fx:id="itemCount"/>
         <Region HBox.hgrow="ALWAYS"/>
         <JFXButton prefWidth="130" text="%testConnect" onAction="#connectAction">
@@ -44,14 +44,14 @@
                 <MaterialDesignIconView glyphName="ACCESS_POINT"/>
             </graphic>
         </JFXButton>
-        <JFXButton prefWidth="130" text="%newConnection" onAction="#newSapConnectionAction">
-            <graphic>
-                <MaterialDesignIconView glyphName="PLUS"/>
-            </graphic>
-        </JFXButton>
         <JFXButton prefWidth="130" text="%clone" onAction="#cloneAction">
             <graphic>
                 <MaterialDesignIconView glyphName="CONTENT_COPY"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton prefWidth="130" text="%newEntry" onAction="#newSapConnectionAction">
+            <graphic>
+                <MaterialDesignIconView glyphName="PLUS"/>
             </graphic>
         </JFXButton>
         <JFXButton prefWidth="130" text="%edit" onAction="#editAction">

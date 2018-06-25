@@ -178,7 +178,7 @@ public class ConfigChooserController {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ui/main/sapqueries/modal/details/ConfigDetailsView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapqueries/modal/details/ConfigDetailsView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
