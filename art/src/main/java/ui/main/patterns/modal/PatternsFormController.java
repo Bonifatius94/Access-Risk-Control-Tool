@@ -632,15 +632,15 @@ public class PatternsFormController {
             // bind addPropertyButton
             this.addPropertyButton.disableProperty().bind(
                 Bindings.or(Bindings.size(selectedTable.getItems()).isEqualTo(maxEntries),
-                    Bindings.and(Bindings.isEmpty(authObjectInput.textProperty()),
-                        Bindings.and(Bindings.isEmpty(authFieldInput.textProperty()),
+                    Bindings.or(Bindings.isEmpty(authObjectInput.textProperty()),
+                        Bindings.or(Bindings.isEmpty(authFieldInput.textProperty()),
                             Bindings.isEmpty(authFieldValue1Input.textProperty())))));
 
             // bind copyPropertyButton
             this.copyPropertyButton.disableProperty().bind(
                 Bindings.or(Bindings.size(selectedTable.getItems()).isEqualTo(maxEntries),
-                    Bindings.and(Bindings.isEmpty(authObjectInput.textProperty()),
-                        Bindings.and(Bindings.isEmpty(authFieldInput.textProperty()),
+                    Bindings.or(Bindings.isEmpty(authObjectInput.textProperty()),
+                        Bindings.or(Bindings.isEmpty(authFieldInput.textProperty()),
                             Bindings.isEmpty(authFieldValue1Input.textProperty())))));
         });
 
@@ -681,8 +681,6 @@ public class PatternsFormController {
 
         selectedTable.getItems().add(propertyToAdd);
         selectedTable.requestFocus();
-        selectedTable.getSelectionModel().selectLast();
-        selectedTable.getFocusModel().focus(selectedTable.getItems().size() - 1);
         selectedTable.scrollTo(selectedTable.getItems().size() - 1);
 
         resetDetails();
