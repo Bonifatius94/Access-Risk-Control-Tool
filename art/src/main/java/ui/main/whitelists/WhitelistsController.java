@@ -20,11 +20,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -37,12 +37,14 @@ import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.PTableColumn;
 import ui.custom.controls.filter.FilterController;
-import ui.main.patterns.PatternsController;
+import ui.main.whitelists.modal.WhitelistFormController;
 
 public class WhitelistsController {
 
     @FXML
     public TableView<Whitelist> whitelistTable;
+
+    @FXML
     public VBox whitelistViewFxId;
 
     @FXML
@@ -60,37 +62,28 @@ public class WhitelistsController {
 
     /**
      * this function is automatically called by FXML loader , its starts initialize.
-     * TODO: change all database functions from test functions to end version functions
      */
     @FXML
     public void initialize() throws Exception {
 
         initializeColumns();
 
+        // catch row double click
+        whitelistTable.setRowFactory(tv -> {
+            TableRow<Whitelist> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    Whitelist whitelist = row.getItem();
+                    editDialogWhitelist(whitelist);
+                }
+            });
+            return row;
+        });
 
-        /*try {
-            //Test code
+        // set selection mode to MULTIPLE
+        whitelistTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-            WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
-            Whitelist whitelist1 = whitelistImportHelper.importWhitelist("Example - Whitelist.xlsx");
-            whitelist1.setDescription("test");
-            whitelist1.setArchived(true);
-            whitelist1.setName("bla");
-            whitelist1.setArchived(true);
-            database.createWhitelist(whitelist1);
-            //database.createWhitelist(whitelist1);
-
-            List<Whitelist> whitelistList;
-            whitelistList = database.getWhitelists(true);
-            ObservableList<Whitelist> observableList = FXCollections.observableArrayList(whitelistList);
-            whitelistTable.getItems().addAll(observableList);
-            whitelistTable.refresh();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-
-
+        // listen for filter changes
         filterController.shouldFilterProperty.addListener((obs, oldValue, newValue) -> {
             if (newValue) {
                 try {
@@ -100,6 +93,7 @@ public class WhitelistsController {
                 }
             }
         });
+
         updateWhitelistTable();
 
     }
@@ -161,22 +155,22 @@ public class WhitelistsController {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/whitelists/NewWhitelistDialogView.fxml"), bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/whitelists/modal/WhitelistFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
+
             // build the scene and add it to the stage
             Scene scene = new Scene(customWindow, 900, 650);
-
             scene.getStylesheets().add("css/dark-theme.css");
             Stage stage = new Stage();
-
             stage.setScene(scene);
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(App.primaryStage);
             customWindow.initStage(stage);
             stage.show();
 
-            NewWhitelistDialogController newWhitelistDialogController = loader.getController();
-            newWhitelistDialogController.setParentController(this);
+            WhitelistFormController whitelistFormController = loader.getController();
+            whitelistFormController.setParentController(this);
+            whitelistFormController.giveSelectedWhitelist(null);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -193,9 +187,7 @@ public class WhitelistsController {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/whitelists/WhitelistEditDialogView.fxml"), bundle);
-            // give the dialog the
-            WhitelistEditDialogController.giveSelectedWhitelist(whitelist);
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/whitelists/modal/WhitelistFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
             // build the scene and add it to the stage
@@ -208,7 +200,9 @@ public class WhitelistsController {
             customWindow.initStage(stage);
             stage.show();
 
-            WhitelistEditDialogController editDialogController = loader.getController();
+            // give parameters to the dialog
+            WhitelistFormController editDialogController = loader.getController();
+            editDialogController.giveSelectedWhitelist(whitelist);
             editDialogController.setParentController(this);
         } catch (IOException e) {
             e.printStackTrace();
@@ -218,27 +212,17 @@ public class WhitelistsController {
     /**
      * This function deletes a selected Whitelist is called By delete Button.
      */
-    @FXML
-    void deleteWhitelist() {
-        if (whitelistTable.getSelectionModel().getSelectedItem() != null) {
+    public void deleteWhitelist() throws Exception {
+        if (whitelistTable.getSelectionModel().getSelectedItems() != null && whitelistTable.getSelectionModel().getSelectedItems().size() != 0) {
             if (!whitelistTable.getSelectionModel().getSelectedItem().isArchived()) {
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Do you really want to delete Whitelist with Id: "
-                    + whitelistTable.getSelectionModel().getSelectedItem().getId().toString(), "By clicking OK the Whitelist will be deleted, click cancel to stop the deletion", "OK", "Cancel");
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Delete selected Whitelists?", "By clicking OK the whitelists will be deleted, click cancel to stop the deletion", "Ok", "Cancel");
 
-                Whitelist whitelist = whitelistTable.getSelectionModel().getSelectedItem();
-                String buttenText = customAlert.showAndWait().get().getText();
-
-                if (buttenText.equals("Cancel")) {
-
-                    customAlert.close();
-                } else {
-                    //deletes whitelist from DB
-                    try {
+                if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                    // deletes whitelists from DB
+                    for (Whitelist whitelist : whitelistTable.getSelectionModel().getSelectedItems()) {
                         database.deleteWhitelist(whitelist);
-                        updateWhitelistTable();
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
+                    updateWhitelistTable();
                 }
             }
         }
@@ -246,44 +230,30 @@ public class WhitelistsController {
 
     /**
      * This function is called from a button press and starts edit.
-     * TODO: save changes in database
      */
-    @FXML
-    void editWhitelist() {
+    public void editWhitelist() {
         if (whitelistTable.getSelectionModel().getSelectedItem() != null) {
             editDialogWhitelist(whitelistTable.getSelectionModel().getSelectedItem());
         }
-        whitelistTable.setOnMouseClicked(event -> {
-            if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
-                editDialogWhitelist(whitelistTable.getSelectionModel().getSelectedItem());
-            }
-        });
     }
 
     /**
      * clones a selected Whitelist.
      */
-    @FXML
-    void cloneWhitelist() {
-        if (whitelistTable.getSelectionModel().getSelectedItem() != null) {
-            if (whitelistTable.getSelectionModel().getSelectedItem().equals(whitelistTable.getFocusModel().getFocusedItem())) {
-                Whitelist whitelist = new Whitelist(whitelistTable.getSelectionModel().getSelectedItem());
-                whitelist.setArchived(false);
-                whitelist.setDescription("Clone -" + whitelist.getDescription());
-                try {
-                    database.createWhitelist(whitelist);
-                    updateWhitelistTable();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+    public void cloneWhitelist() throws Exception {
+        if (whitelistTable.getSelectionModel().getSelectedItems() != null && whitelistTable.getSelectionModel().getSelectedItems().size() != 0) {
+            for (Whitelist whitelist : whitelistTable.getSelectionModel().getSelectedItems()) {
+                Whitelist whitelistToAdd = new Whitelist(whitelist);
+                whitelistToAdd.setDescription("Clone - " + whitelist.getDescription());
+                database.createWhitelist(whitelistToAdd);
             }
+            updateWhitelistTable();
         }
     }
 
     /**
      * starts Whitelist import.
      */
-
     public void importWhitelist() {
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Excel files (*.xlsx)", "*.xlsx");
@@ -291,7 +261,6 @@ public class WhitelistsController {
         File file = fileChooser.showOpenDialog(App.primaryStage);
         if (file != null) {
             String path = file.getPath();
-            Whitelist whitelist;
             try {
                 WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
                 Whitelist importedWhitelist = whitelistImportHelper.importWhitelist(path);
