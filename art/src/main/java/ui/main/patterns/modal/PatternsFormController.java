@@ -106,9 +106,6 @@ public class PatternsFormController {
     private JFXButton applyPopertyChangesButton;
 
     @FXML
-    private JFXButton revertButton;
-
-    @FXML
     private JFXButton saveButton;
 
     @FXML
@@ -691,7 +688,6 @@ public class PatternsFormController {
             deleteSelectedTableTabButton.setVisible(false);
             saveButton.setVisible(false);
             applyPopertyChangesButton.setVisible(false);
-            revertButton.setVisible(false);
 
             for (JFXButton addPropertyButton : addPropertyButtons) {
                 addPropertyButton.setVisible(false);

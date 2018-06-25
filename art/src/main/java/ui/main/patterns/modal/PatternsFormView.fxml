@@ -59,7 +59,7 @@
             <JFXTabPane fx:id="conditionTabs" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"/>
             <VBox spacing="20">
                 <HBox fx:id="editConditionBox" alignment="BASELINE_LEFT" spacing="20">
-                    <JFXButton onAction="#addEmptyConditionTableTab" prefHeight="30" styleClass="round-button">
+                    <JFXButton fx:id="addConditionButton" onAction="#addEmptyConditionTableTab" prefHeight="30" styleClass="round-button">
                         <graphic>
                             <MaterialDesignIconView glyphName="PLUS"/>
                         </graphic>
@@ -139,7 +139,7 @@
         </HBox>
         <Separator/>
         <HBox spacing="20" alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS">
-            <JFXButton onAction="#saveChanges" prefWidth="120" text="%save">
+            <JFXButton fx:id="saveButton" onAction="#saveChanges" prefWidth="120" text="%save">
                 <graphic>
                     <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
                 </graphic>
