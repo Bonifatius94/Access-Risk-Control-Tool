@@ -68,7 +68,6 @@ public class WhitelistFormController {
     private JFXButton copyButton;
 
 
-
     private WhitelistsController parentController;
     private ArtDbContext whitelistDatabase = AppComponents.getDbContext();
     private Whitelist whitelist;
@@ -89,14 +88,18 @@ public class WhitelistFormController {
             Bindings.isEmpty(tfUsecaseId.textProperty())));
 
         // copyButton disable binding
-        this.copyButton.disableProperty().bind(Bindings.or(
-            Bindings.isEmpty(tfUserName.textProperty()),
-            Bindings.isEmpty(tfUsecaseId.textProperty())));
+        this.copyButton.disableProperty().bind(
+            Bindings.or(Bindings.isNull(whitelistEditTable.getSelectionModel().selectedItemProperty()),
+                Bindings.or(
+                    Bindings.isEmpty(tfUserName.textProperty()),
+                    Bindings.isEmpty(tfUsecaseId.textProperty()))));
 
         // applyButton disable binding
-        this.applyButton.disableProperty().bind(Bindings.or(
-            Bindings.isEmpty(tfUserName.textProperty()),
-            Bindings.isEmpty(tfUsecaseId.textProperty())));
+        this.applyButton.disableProperty().bind(
+            Bindings.or(Bindings.isNull(whitelistEditTable.getSelectionModel().selectedItemProperty()),
+                Bindings.or(
+                    Bindings.isEmpty(tfUserName.textProperty()),
+                    Bindings.isEmpty(tfUsecaseId.textProperty()))));
 
         whitelistEditTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -118,24 +121,6 @@ public class WhitelistFormController {
 
         deleteWhitelistEntryColumn.setSortable(false);
 
-    }
-
-    /**
-     * Loads use case and username from the selected entry to the textfield.
-     *
-     * @param whitelistEntry is the by call given whitelist entry.
-     */
-    private void editWhitelistEntry(WhitelistEntry whitelistEntry) {
-        if (whitelistEntry != null) {
-            tfUsecaseId.setText(whitelistEntry.getUsecaseId());
-            tfUserName.setText(whitelistEntry.getUsername());
-
-            tfUserName.validate();
-            tfUsecaseId.validate();
-        } else {
-            tfUsecaseId.setText("");
-            tfUserName.setText("");
-        }
     }
 
     /**
@@ -161,6 +146,25 @@ public class WhitelistFormController {
         }
     }
 
+
+    /**
+     * Loads use case and username from the selected entry to the textfield.
+     *
+     * @param whitelistEntry is the by call given whitelist entry.
+     */
+    private void editWhitelistEntry(WhitelistEntry whitelistEntry) {
+        if (whitelistEntry != null) {
+            tfUsecaseId.setText(whitelistEntry.getUsecaseId());
+            tfUserName.setText(whitelistEntry.getUsername());
+
+            tfUserName.validate();
+            tfUsecaseId.validate();
+        } else {
+            tfUsecaseId.setText("");
+            tfUserName.setText("");
+        }
+    }
+
     /**
      * Creates a new Whitelist Entry.
      */
@@ -170,28 +174,26 @@ public class WhitelistFormController {
         whitelistEditTable.getItems().add(entry);
         this.whitelistEditTable.requestFocus();
         this.whitelistEditTable.scrollTo(whitelistEditTable.getItems().size() - 1);
+        this.whitelistEditTable.getSelectionModel().clearSelection();
 
         resetDetails();
-    }
-
-
-    private void resetDetails() {
-        tfUserName.setText("");
-        tfUsecaseId.setText("");
     }
 
     /**
      * Creates a new Whitelist Entry.
      */
     public void copyWhitelistEntry() {
-        WhitelistEntry entry = new WhitelistEntry(tfUsecaseId.getText(), tfUserName.getText());
+        if (whitelistEditTable.getSelectionModel().getSelectedItem() != null) {
+            WhitelistEntry entry = new WhitelistEntry(tfUsecaseId.getText(), tfUserName.getText());
 
-        whitelistEditTable.getItems().add(entry);
-        this.whitelistEditTable.requestFocus();
-        this.whitelistEditTable.getSelectionModel().selectLast();
-        this.whitelistEditTable.getFocusModel().focus(whitelistEditTable.getItems().size() - 1);
-        this.whitelistEditTable.scrollTo(whitelistEditTable.getItems().size() - 1);
+            whitelistEditTable.getItems().add(entry);
+            this.whitelistEditTable.requestFocus();
+            this.whitelistEditTable.getSelectionModel().selectLast();
+            this.whitelistEditTable.getFocusModel().focus(whitelistEditTable.getItems().size() - 1);
+            this.whitelistEditTable.scrollTo(whitelistEditTable.getItems().size() - 1);
+        }
     }
+
 
     /**
      * Applies the changes from the detail view to the table.
@@ -206,9 +208,14 @@ public class WhitelistFormController {
 
                 resetDetails();
 
-                this.whitelistEditTable.refresh();
+                this.whitelistEditTable.getSelectionModel().clearSelection();
             }
         }
+    }
+
+    private void resetDetails() {
+        tfUserName.setText("");
+        tfUsecaseId.setText("");
     }
 
     /**
