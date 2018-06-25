@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("all")
@@ -185,10 +184,14 @@ public class H2AccountsTest {
         try (ArtDbContext context = new ArtDbContext(username, password)) {
 
             // check if it is the first login (which should be true)
-            ret = context.isFirstLogin();
+            DbUser user = context.getCurrentUser();
+            ret = ret && user.isFirstLogin();
+
+            // set first login
+            context.setFirstLoginOfCurrentUser(user, false);
 
             // check if first login role was removed by isFirstLogin()
-            ret = ret && context.getDatabaseUsers().stream().anyMatch(x -> x.getUsername().equals(username.toUpperCase()) && !x.isFirstLogin());
+            ret = ret && !user.isFirstLogin() && !context.getCurrentUser().isFirstLogin();
 
         } catch (Exception ex) {
             ex.printStackTrace();
