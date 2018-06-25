@@ -204,7 +204,6 @@ public class WhitelistsController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     /**

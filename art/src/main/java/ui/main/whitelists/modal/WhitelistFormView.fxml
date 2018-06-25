@@ -40,7 +40,7 @@
         <HBox alignment="CENTER" spacing="30">
             <VBox spacing="10">
                 <Label text="%whitelistEntries" style="-fx-font-size: 1.5em"/>
-                <TableView fx:id="whitelistEditTable" minWidth="400">
+                <TableView fx:id="whitelistEditTable" minWidth="550">
                     <columns>
                         <PTableColumn percentageWidth="0.42" text="%useCaseId" fx:id="usecaseId">
                             <cellValueFactory>
