@@ -39,6 +39,7 @@ import ui.AppComponents;
 import ui.custom.controls.AutoCompleteComboBoxListener;
 import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
+import ui.main.sapqueries.SapQueriesController;
 import ui.main.sapqueries.modal.choosers.ConfigChooserController;
 import ui.main.sapqueries.modal.choosers.SapConfigChooserController;
 
@@ -70,7 +71,7 @@ public class NewSapQueryController {
     private Label connectionLabel;
 
     private ResourceBundle bundle;
-
+    private SapQueriesController parentController;
 
     /**
      * Initializes the view.
@@ -310,6 +311,11 @@ public class NewSapQueryController {
 
         runQueryTask.setOnSucceeded(e -> {
                 try {
+                    // save the query to the database
+                    AppComponents.getDbContext().createSapQuery(runQueryTask.getValue());
+
+                    parentController.updateQueriesTable();
+
                     // open the analysisResultView and give it the results
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("AnalysisResultView.fxml"), bundle);
                     CustomWindow customWindow = loader.load();
@@ -432,5 +438,9 @@ public class NewSapQueryController {
             }
             return map.get(string);
         }
+    }
+
+    public void setParentController(SapQueriesController controller) {
+        this.parentController = controller;
     }
 }

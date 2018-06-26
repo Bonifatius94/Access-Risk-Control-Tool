@@ -20,6 +20,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.App;
 import ui.custom.controls.CustomWindow;
+import ui.main.sapqueries.SapQueriesController;
+import ui.main.sapqueries.modal.newquery.AnalysisResultController;
 import ui.main.sapqueries.modal.newquery.NewSapQueryController;
 import ui.main.sapsettings.modal.SapSettingsFormController;
 import ui.main.whitelists.modal.WhitelistFormController;
@@ -54,6 +56,7 @@ public class SapQueryDetailController {
 
     ResourceBundle bundle = ResourceBundle.getBundle("lang");
     private CriticalAccessQuery query;
+    private SapQueriesController parentController;
 
     @FXML
     public void initialize() {
@@ -123,6 +126,31 @@ public class SapQueryDetailController {
     }
 
     /**
+     * Opens the AnalysisResultView with the current query.
+     */
+    public void openResultDetails() throws Exception {
+        // open the analysisResultView and give it the results
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapqueries/modal/newquery/AnalysisResultView.fxml"), bundle);
+        CustomWindow customWindow = loader.load();
+
+        // build the scene and add it to the stage
+        Scene scene = new Scene(customWindow);
+        scene.getStylesheets().add("css/dark-theme.css");
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(App.primaryStage);
+        customWindow.initStage(stage);
+
+        customWindow.setTitle(bundle.getString("analysisResultTitle"));
+
+        stage.show();
+
+        AnalysisResultController resultController = loader.getController();
+        resultController.giveResultQuery(query);
+    }
+
+    /**
      * Opens the SapConfig details in a modal, uneditable window.
      */
     public void openSapConfigDetails() throws Exception {
@@ -174,6 +202,7 @@ public class SapQueryDetailController {
             // give the dialog the sapConfiguration
             NewSapQueryController newQuery = loader.getController();
             newQuery.giveQuery(query);
+            newQuery.setParentController(parentController);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -188,4 +217,7 @@ public class SapQueryDetailController {
         (((Button) event.getSource()).getScene().getWindow()).hide();
     }
 
+    public void setParentController(SapQueriesController controller) {
+        this.parentController = controller;
+    }
 }

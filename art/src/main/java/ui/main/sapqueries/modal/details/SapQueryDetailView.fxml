@@ -21,7 +21,7 @@
                     <HBox>
                         <Label text="%sapQuery" style="-fx-font-size: 3em"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <JFXButton text="%results" onAction="#openConfigDetails" focusTraversable="false">
+                        <JFXButton text="%results" onAction="#openResultDetails" focusTraversable="false">
                             <graphic>
                                 <MaterialDesignIconView glyphName="OPEN_IN_NEW"/>
                             </graphic>

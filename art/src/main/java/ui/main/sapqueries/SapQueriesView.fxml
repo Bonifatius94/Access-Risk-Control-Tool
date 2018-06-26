@@ -45,7 +45,7 @@
     <HBox alignment="BOTTOM_RIGHT" spacing="10">
         <Label fx:id="itemCount"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <JFXButton text="%newEntry" onAction="#addAction" prefWidth="130">
+        <JFXButton text="%newAnalysis" onAction="#addAction" prefWidth="130">
             <graphic>
                 <MaterialDesignIconView glyphName="PLUS"/>
             </graphic>

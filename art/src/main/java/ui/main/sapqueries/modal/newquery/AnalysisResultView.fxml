@@ -68,7 +68,7 @@
             </HBox>
         </VBox>
         <Separator />
-        <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" spacing="20">
+        <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" spacing="20">
             <JFXButton text="%close" onAction="#close">
                 <graphic>
                     <MaterialDesignIconView glyphName="CLOSE"/>

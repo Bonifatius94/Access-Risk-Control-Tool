@@ -47,6 +47,7 @@ import ui.custom.controls.CustomWindow;
 import ui.custom.controls.SapQueryStatusCellFactory;
 import ui.custom.controls.filter.FilterController;
 import ui.main.sapqueries.modal.details.SapQueryDetailController;
+import ui.main.sapqueries.modal.newquery.NewSapQueryController;
 
 public class SapQueriesController {
 
@@ -234,6 +235,7 @@ public class SapQueriesController {
             // give the dialog the query
             SapQueryDetailController queryDetail = loader.getController();
             queryDetail.giveSelectedQuery(query);
+            queryDetail.setParentController(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -282,6 +284,9 @@ public class SapQueriesController {
             customWindow.setTitle(bundle.getString("newAnalysis"));
 
             stage.show();
+            // give the dialog the query
+            NewSapQueryController newQuery = loader.getController();
+            newQuery.setParentController(this);
         } catch (Exception e) {
             e.printStackTrace();
         }

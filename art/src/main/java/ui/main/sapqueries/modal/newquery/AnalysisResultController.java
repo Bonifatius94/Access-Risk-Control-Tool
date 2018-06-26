@@ -151,9 +151,6 @@ public class AnalysisResultController {
             statusIcon.setStyle("-fx-fill: -fx-success");
         }
 
-        // save the query to the database
-        AppComponents.getDbContext().createSapQuery(query);
-
         this.resultTable.setItems(FXCollections.observableList(new ArrayList<>(query.getEntries())));
         this.resultTable.getSortOrder().add(usecaseIdColumn);
     }
