@@ -249,7 +249,7 @@ public class SapQueriesController {
      * Opens the edit dialog with the selected item.
      */
     public void editAction() {
-        if (queriesTable.getSelectionModel().getSelectedItems() != null) {
+        if (queriesTable.getSelectionModel().getSelectedItem() != null) {
             openQuery(queriesTable.getSelectionModel().getSelectedItem());
         }
     }
