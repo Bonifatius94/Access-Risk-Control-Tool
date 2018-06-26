@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import ui.custom.controls.CustomWindow?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXColorPicker?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<CustomWindow xmlns="http://javafx.com/javafx"
+              xmlns:fx="http://javafx.com/fxml"
+              fx:controller="ui.main.settings.SettingsController">
+    <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
+        <VBox spacing="30" HBox.hgrow="ALWAYS">
+            <HBox spacing="20" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                <Label text="%languageSettings"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <JFXComboBox fx:id="languageChooser"/>
+            </HBox>
+            <HBox spacing="20" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                <Label text="Primary"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <JFXColorPicker fx:id="primaryColorChooser"/>
+            </HBox>
+        </VBox>
+        <Separator/>
+        <HBox spacing="20" alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS">
+            <JFXButton onAction="#saveChanges" prefWidth="120" text="%save">
+                <graphic>
+                    <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
+                </graphic>
+            </JFXButton>
+            <JFXButton onAction="#close" prefWidth="120" text="%cancel">
+                <graphic>
+                    <MaterialDesignIconView glyphName="CLOSE"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
+    </VBox>
+</CustomWindow>

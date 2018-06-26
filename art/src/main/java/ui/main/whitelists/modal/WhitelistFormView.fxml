@@ -18,7 +18,7 @@
 <?import ui.custom.controls.PTableColumn?>
 <?import ui.custom.controls.CustomWindow?>
 <?import com.jfoenix.controls.JFXCheckBox?>
-<CustomWindow xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" title="%editWhitelist"
+<CustomWindow xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.main.whitelists.modal.WhitelistFormController" windowState="NoResize">
     <VBox HBox.hgrow="ALWAYS" style="-fx-padding: 20" spacing="20">
         <VBox alignment="BASELINE_LEFT" spacing="40" HBox.hgrow="ALWAYS" style="-fx-padding: 0 0 20 0">

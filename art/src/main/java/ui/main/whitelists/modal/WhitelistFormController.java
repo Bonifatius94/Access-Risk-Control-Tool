@@ -73,7 +73,7 @@ public class WhitelistFormController {
 
 
     private WhitelistsController parentController;
-    private ArtDbContext whitelistDatabase = AppComponents.getDbContext();
+    private ArtDbContext whitelistDatabase = AppComponents.getInstance().getDbContext();
     private Whitelist whitelist;
     private Whitelist whitelistOld;
     private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();

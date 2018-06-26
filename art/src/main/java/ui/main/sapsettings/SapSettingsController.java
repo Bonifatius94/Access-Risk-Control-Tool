@@ -65,7 +65,7 @@ public class SapSettingsController {
 
     public FilterController filterController;
 
-    private ArtDbContext database = AppComponents.getDbContext();
+    private ArtDbContext database = AppComponents.getInstance().getDbContext();
     private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
     private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
@@ -173,26 +173,13 @@ public class SapSettingsController {
     private void editConfig(SapConfiguration sapConfiguration) {
 
         try {
-            // create a new FXML loader with the SapSettingsFormController
-            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/modal/SapSettingsFormView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-            stage.show();
-
-            customWindow.setTitle(bundle.getString("editSapSettingsTitle"));
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapsettings/modal/SapSettingsFormView.fxml", "editSapSettingsTitle");
 
             SapSettingsFormController sapEdit = loader.getController();
             sapEdit.giveSelectedSapConfig(sapConfiguration);
             sapEdit.setParentController(this);
+
         } catch (Exception e) {
 
             e.printStackTrace();
@@ -232,22 +219,8 @@ public class SapSettingsController {
      */
     public void newSapConnectionAction() {
         try {
-            // create a new FXML loader with the NewSapSettingDialogView
-            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/modal/SapSettingsFormView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-            stage.show();
-
-            customWindow.setTitle(bundle.getString("newSapSettingsTitle"));
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapsettings/modal/SapSettingsFormView.fxml", "newSapSettingsTitle");
 
             SapSettingsFormController sapEdit = loader.getController();
             sapEdit.giveSelectedSapConfig(null);

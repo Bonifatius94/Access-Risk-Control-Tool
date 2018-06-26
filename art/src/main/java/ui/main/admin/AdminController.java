@@ -80,7 +80,7 @@ public class AdminController {
     private JFXButton addToClipboardButton;
 
 
-    private ArtDbContext database = AppComponents.getDbContext();
+    private ArtDbContext database = AppComponents.getInstance().getDbContext();
     private ResourceBundle bundle = ResourceBundle.getBundle("lang");
     private DbUser editDbUser;
     private Set<DbUserRole> dbUserRoleSet = new HashSet<>();
@@ -422,7 +422,6 @@ public class AdminController {
         char[] pw = new char[length];
         for (int i = 0; i < length; i++) {
             pw[i] = characters[random.nextInt(characters.length)];
-            System.out.println(pw[i]);
         }
 
         return new String(pw);

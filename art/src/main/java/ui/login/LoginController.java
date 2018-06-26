@@ -13,8 +13,6 @@ import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextFormatter;
@@ -22,7 +20,6 @@ import javafx.scene.layout.HBox;
 
 import ui.App;
 import ui.AppComponents;
-import ui.custom.controls.CustomWindow;
 
 
 public class LoginController {
@@ -88,7 +85,7 @@ public class LoginController {
             errorLabel.setText(bundle.getString("databaseLoginError") + " " + (maxAttempts - loginAttempts) + ")");
 
             if (validateBeforeSubmit()) {
-                if (AppComponents.tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
+                if (AppComponents.getInstance().tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
                     startApplication(event);
                 } else {
                     // reset the attempts and show penalty error
@@ -148,20 +145,11 @@ public class LoginController {
      */
     private void startApplication(ActionEvent event) {
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../main/MainView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 1050, 750);
-            scene.getStylesheets().add("css/dark-theme.css");
-            App.primaryStage.setScene(scene);
-            App.primaryStage.setTitle(bundle.getString("art"));
-            customWindow.initStage(App.primaryStage);
+            AppComponents.getInstance()
+                .showScene("ui/main/MainView.fxml","art", App.primaryStage, null, null, 1050, 750);
 
             close(event);
-            App.primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }

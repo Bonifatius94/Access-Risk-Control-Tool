@@ -170,7 +170,7 @@ public class PatternImportController {
 
                 // save the patterns to the database
                 for (AccessPattern pattern : selectedPatterns) {
-                    AppComponents.getDbContext().createPattern(pattern);
+                    AppComponents.getInstance().getDbContext().createPattern(pattern);
                 }
 
                 patternsController.updatePatternsTable();

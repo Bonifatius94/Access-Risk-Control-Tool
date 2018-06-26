@@ -6,7 +6,6 @@ import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
 import extensions.ResourceBundleHelper;
 import io.msoffice.excel.AccessPatternImportHelper;
@@ -32,7 +31,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
-import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -105,7 +103,7 @@ public class PatternsController {
      */
     public void updatePatternsTable() throws Exception {
 
-        List<AccessPattern> patterns = AppComponents.getDbContext().getFilteredPatterns(filterController.showArchivedProperty.getValue(),
+        List<AccessPattern> patterns = AppComponents.getInstance().getDbContext().getFilteredPatterns(filterController.showArchivedProperty.getValue(),
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
             filterController.endDateProperty.getValue(), 0);
         ObservableList<AccessPattern> list = FXCollections.observableList(patterns);
@@ -161,7 +159,7 @@ public class PatternsController {
 
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 try {
-                    AppComponents.getDbContext().deletePattern(accessPattern);
+                    AppComponents.getInstance().getDbContext().deletePattern(accessPattern);
                     updatePatternsTable();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -220,28 +218,9 @@ public class PatternsController {
      */
     public void openAccessPatternForm(AccessPattern accessPattern) {
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/PatternsFormView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 1200, 750);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            // set stage name
-            if (accessPattern == null) {
-                customWindow.setTitle(bundle.getString("newPatternTitle"));
-            } else {
-                customWindow.setTitle(bundle.getString("editPatternTitle"));
-            }
-
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternsFormView.fxml",
+                accessPattern == null ? "newPatternTitle" : "editPatternTitle", 1200, 750);
 
             // give the dialog the sapConfiguration
             PatternsFormController patternEdit = loader.getController();
@@ -261,7 +240,7 @@ public class PatternsController {
             for (AccessPattern patternToClone : patternsTable.getSelectionModel().getSelectedItems()) {
 
                 AccessPattern clonedPattern = new AccessPattern(patternToClone);
-                AppComponents.getDbContext().createPattern(clonedPattern);
+                AppComponents.getInstance().getDbContext().createPattern(clonedPattern);
             }
 
             updatePatternsTable();
@@ -293,7 +272,7 @@ public class PatternsController {
 
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 for (AccessPattern pattern : patternsTable.getSelectionModel().getSelectedItems()) {
-                    AppComponents.getDbContext().deletePattern(pattern);
+                    AppComponents.getInstance().getDbContext().deletePattern(pattern);
                 }
                 updatePatternsTable();
             }
@@ -311,20 +290,8 @@ public class PatternsController {
         File selectedFile = chooser.showOpenDialog(App.primaryStage);
 
         if (selectedFile != null) {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/PatternImportView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternImportView.fxml","importPatterns");
 
             // import patterns with the AccessPatternImportHelper
             AccessPatternImportHelper importHelper = new AccessPatternImportHelper();

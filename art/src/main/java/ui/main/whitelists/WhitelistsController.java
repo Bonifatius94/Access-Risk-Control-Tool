@@ -71,7 +71,7 @@ public class WhitelistsController {
     @FXML
     public FilterController filterController;
 
-    ArtDbContext database = AppComponents.getDbContext();
+    ArtDbContext database = AppComponents.getInstance().getDbContext();
     private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
     private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
@@ -192,25 +192,12 @@ public class WhitelistsController {
     public void newWhitelist() {
 
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/whitelists/modal/WhitelistFormView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
-
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 900, 650);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "newWhitelist", 900, 650);
 
             WhitelistFormController whitelistFormController = loader.getController();
             whitelistFormController.setParentController(this);
             whitelistFormController.giveSelectedWhitelist(null);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -223,26 +210,13 @@ public class WhitelistsController {
     private void editDialogWhitelist(Whitelist whitelist) {
 
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/whitelists/modal/WhitelistFormView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "editWhitelist", 900, 650);
 
-            // give parameters to the dialog
             WhitelistFormController editDialogController = loader.getController();
             editDialogController.giveSelectedWhitelist(whitelist);
             editDialogController.setParentController(this);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

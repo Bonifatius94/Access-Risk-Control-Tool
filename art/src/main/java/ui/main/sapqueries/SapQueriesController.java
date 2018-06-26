@@ -108,7 +108,7 @@ public class SapQueriesController {
      * Updates the queriesTable items from the database, taking filters into account.
      */
     public void updateQueriesTable() throws Exception {
-        List<CriticalAccessQuery> patterns = AppComponents.getDbContext().getFilteredCriticalAccessQueries(filterController.showArchivedProperty.getValue(),
+        List<CriticalAccessQuery> patterns = AppComponents.getInstance().getDbContext().getFilteredCriticalAccessQueries(filterController.showArchivedProperty.getValue(),
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
             filterController.endDateProperty.getValue(), 0);
         ObservableList<CriticalAccessQuery> list = FXCollections.observableList(patterns);
@@ -220,23 +220,8 @@ public class SapQueriesController {
      */
     private void openQuery(CriticalAccessQuery query) {
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/details/SapQueryDetailView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            customWindow.setTitle(bundle.getString("queryDetails"));
-
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/details/SapQueryDetailView.fxml","queryDetails");
 
             // give the dialog the query
             SapQueryDetailController queryDetail = loader.getController();
@@ -285,23 +270,9 @@ public class SapQueriesController {
      */
     public void addAction() {
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/newquery/NewSapQueryView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/NewSapQueryView.fxml","newAnalysis");
 
-            customWindow.setTitle(bundle.getString("newAnalysis"));
-
-            stage.show();
             // give the dialog the query
             NewSapQueryController newQuery = loader.getController();
             newQuery.setParentController(this);
@@ -314,7 +285,7 @@ public class SapQueriesController {
         if (query != null) {
 
             query.setArchived(true);
-            AppComponents.getDbContext().updateRecord(query);
+            AppComponents.getInstance().getDbContext().updateRecord(query);
 
             updateQueriesTable();
         }

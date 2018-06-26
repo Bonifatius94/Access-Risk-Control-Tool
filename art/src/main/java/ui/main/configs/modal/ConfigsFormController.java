@@ -29,7 +29,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
@@ -37,8 +36,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import ui.App;
@@ -47,7 +44,6 @@ import ui.custom.controls.AutoCompleteComboBoxListener;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.ConditionTypeCellFactory;
 import ui.custom.controls.CustomAlert;
-import ui.custom.controls.CustomWindow;
 import ui.main.configs.ConfigsController;
 import ui.main.patterns.modal.PatternImportController;
 
@@ -113,7 +109,7 @@ public class ConfigsFormController {
         patternChooser.getEditor().textProperty().addListener((event) -> {
             if (!patternChooser.getEditor().getText().isEmpty()) {
                 try {
-                    List<AccessPattern> result = AppComponents.getDbContext().getFilteredPatterns(false, patternChooser.getEditor().getText(), null, null, 5);
+                    List<AccessPattern> result = AppComponents.getInstance().getDbContext().getFilteredPatterns(false, patternChooser.getEditor().getText(), null, null, 5);
                     result = result.stream().filter(x -> !patternsTable.getItems().contains(x)).collect(Collectors.toList());
 
                     // remove all entries that are already in the selectedList
@@ -164,7 +160,7 @@ public class ConfigsFormController {
         // change the items of the autocomplete according to the input
         whitelistChooser.getEditor().textProperty().addListener((event) -> {
             try {
-                List<Whitelist> result = AppComponents.getDbContext().getFilteredWhitelists(false, whitelistChooser.getEditor().getText(), null, null, 5);
+                List<Whitelist> result = AppComponents.getInstance().getDbContext().getFilteredWhitelists(false, whitelistChooser.getEditor().getText(), null, null, 5);
                 if (result.size() != 0) {
                     ObservableList<Whitelist> items = FXCollections.observableArrayList(new ArrayList<>(result));
                     whitelistChooser.setItems(items);
@@ -278,28 +274,12 @@ public class ConfigsFormController {
      */
     public void chooseWhitelist() {
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ChooseWhitelistView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            // set stage name
-            customWindow.setTitle(bundle.getString("selectWhitelistTitle"));
-
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/configs/modal/ChooseWhitelistView.fxml", "selectWhitelistTitle");
 
             // give the dialog the controller
             ChooseWhitelistController chooseWhitelist = loader.getController();
             chooseWhitelist.setParentController(this);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -311,23 +291,8 @@ public class ConfigsFormController {
      */
     public void choosePattern() {
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ChoosePatternsView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            // set stage name
-            customWindow.setTitle(bundle.getString("selectPatternsTitle"));
-
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/configs/modal/ChoosePatternsView.fxml", "selectPatternsTitle");
 
             // give the dialog the currently selected items
             ChoosePatternsController choosePatterns = loader.getController();
@@ -381,19 +346,7 @@ public class ConfigsFormController {
         if (selectedFile != null) {
 
             // create a new FXML loader with the SapSettingsEditDialogController
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../patterns/modal/PatternImportView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
-
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternImportView.fxml", "importPatterns");
 
             // import patterns with the AccessPatternImportHelper
             AccessPatternImportHelper importHelper = new AccessPatternImportHelper();
@@ -419,7 +372,7 @@ public class ConfigsFormController {
             // save all new (imported) patterns to the database
             for (AccessPattern pattern : patternsTable.getItems()) {
                 if (pattern.getId() == null) {
-                    AppComponents.getDbContext().createPattern(pattern);
+                    AppComponents.getInstance().getDbContext().createPattern(pattern);
                 }
             }
 
@@ -428,9 +381,9 @@ public class ConfigsFormController {
 
             // new config, id is null
             if (configuration.getId() == null) {
-                AppComponents.getDbContext().createConfig(configuration);
+                AppComponents.getInstance().getDbContext().createConfig(configuration);
             } else {
-                AppComponents.getDbContext().updateConfig(configuration);
+                AppComponents.getInstance().getDbContext().updateConfig(configuration);
             }
 
             // refresh the configsTable in the parentController

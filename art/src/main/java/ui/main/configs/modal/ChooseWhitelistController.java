@@ -150,7 +150,7 @@ public class ChooseWhitelistController {
      * Fills the whitelist table with entries.
      */
     private void updateWhitelistTable() throws Exception {
-        List<Whitelist> whitelists = AppComponents.getDbContext().getFilteredWhitelists(filterController.showArchivedProperty.getValue(),
+        List<Whitelist> whitelists = AppComponents.getInstance().getDbContext().getFilteredWhitelists(filterController.showArchivedProperty.getValue(),
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
             filterController.endDateProperty.getValue(), 0);
 

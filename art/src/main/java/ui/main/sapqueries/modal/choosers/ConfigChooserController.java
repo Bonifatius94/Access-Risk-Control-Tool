@@ -132,7 +132,7 @@ public class ConfigChooserController {
      */
     public void updateConfigsTable() throws Exception {
 
-        List<Configuration> configs = AppComponents.getDbContext().getFilteredConfigs(filterController.showArchivedProperty.getValue(),
+        List<Configuration> configs = AppComponents.getInstance().getDbContext().getFilteredConfigs(filterController.showArchivedProperty.getValue(),
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
             filterController.endDateProperty.getValue(), 0);
         ObservableList<Configuration> list = FXCollections.observableList(configs);
@@ -180,23 +180,8 @@ public class ConfigChooserController {
      */
     private void viewConfigDetails(Configuration configuration) {
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapqueries/modal/details/ConfigDetailsView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 1050, 650);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            customWindow.setTitle(bundle.getString("configDetails"));
-
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/details/ConfigDetailsView.fxml","configDetails", 1050, 650);
 
             // give the dialog the sapConfiguration
             ConfigDetailsController configDetails = loader.getController();

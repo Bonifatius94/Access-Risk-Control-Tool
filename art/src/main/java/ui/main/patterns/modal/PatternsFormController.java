@@ -486,9 +486,9 @@ public class PatternsFormController {
 
             // new pattern, id is null
             if (accessPattern.getId() == null) {
-                AppComponents.getDbContext().createPattern(accessPattern);
+                AppComponents.getInstance().getDbContext().createPattern(accessPattern);
             } else {
-                AppComponents.getDbContext().updatePattern(accessPattern);
+                AppComponents.getInstance().getDbContext().updatePattern(accessPattern);
             }
 
             // refresh the patternsTable in the parentController
