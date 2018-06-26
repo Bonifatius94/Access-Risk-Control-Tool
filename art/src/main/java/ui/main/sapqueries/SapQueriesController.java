@@ -154,10 +154,16 @@ public class SapQueriesController {
     private void initializeTableColumns() {
         // Add the delete column
         archiveColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.ARCHIVE, bundle.getString("archive"), (CriticalAccessQuery query) -> {
-            try {
-                archiveQuery(query);
-            } catch (Exception e) {
-                e.printStackTrace();
+
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("archiveConfirmTitle"),
+                bundle.getString("archiveConfirmMessage"), "Ok", "Cancel");
+
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                try {
+                    archiveQuery(query);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             return query;
         }));

@@ -130,18 +130,24 @@ public class SapSettingsController {
      */
     private void initializeTableColumn() {
         // Add the delete column
-        deleteConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (SapConfiguration sapConfiguration) -> {
-            try {
-                database.deleteSapConfig(sapConfiguration);
-                updateSapSettingsTable();
-            } catch (Exception e) {
-                e.printStackTrace();
+        deleteConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (SapConfiguration sapConfiguration) -> {
+
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                try {
+                    database.deleteSapConfig(sapConfiguration);
+                    updateSapSettingsTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             return sapConfiguration;
         }));
 
         // Add the edit column
-        editConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (SapConfiguration sapConfiguration) -> {
+        editConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (SapConfiguration sapConfiguration) -> {
             editConfig(sapConfiguration);
             return sapConfiguration;
         }));

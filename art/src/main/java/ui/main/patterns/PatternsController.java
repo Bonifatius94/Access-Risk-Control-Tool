@@ -153,18 +153,24 @@ public class PatternsController {
     private void initializeTableColumns() {
 
         // Add the delete column
-        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPattern accessPattern) -> {
-            try {
-                AppComponents.getDbContext().deletePattern(accessPattern);
-                updatePatternsTable();
-            } catch (Exception e) {
-                e.printStackTrace();
+        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (AccessPattern accessPattern) -> {
+
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                try {
+                    AppComponents.getDbContext().deletePattern(accessPattern);
+                    updatePatternsTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             return accessPattern;
         }));
 
         // Add the edit column
-        editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (AccessPattern accessPattern) -> {
+        editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (AccessPattern accessPattern) -> {
             openAccessPatternForm(accessPattern);
             return accessPattern;
         }));

@@ -147,18 +147,24 @@ public class ConfigsController {
     private void initializeTableColumns() {
 
         // Add the delete column
-        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (Configuration configuration) -> {
-            try {
-                AppComponents.getDbContext().deleteConfig(configuration);
-                updateConfigsTable();
-            } catch (Exception e) {
-                e.printStackTrace();
+        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (Configuration configuration) -> {
+
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                try {
+                    AppComponents.getDbContext().deleteConfig(configuration);
+                    updateConfigsTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             return configuration;
         }));
 
         // Add the edit column
-        editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (Configuration configuration) -> {
+        editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (Configuration configuration) -> {
             openConfigurationForm(configuration);
             return configuration;
         }));

@@ -141,20 +141,25 @@ public class WhitelistsController {
      */
     private void initializeColumns() {
 
-        deleteWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (Whitelist whitelist) -> {
+        deleteWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (Whitelist whitelist) -> {
 
-            try {
-                database.deleteWhitelist(whitelist);
-                updateWhitelistTable();
-            } catch (Exception e) {
-                e.printStackTrace();
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                try {
+                    database.deleteWhitelist(whitelist);
+                    updateWhitelistTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             return whitelist;
         }));
         deleteWhitelistColumn.setSortable(false);
 
         // Add the edit column
-        editWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (Whitelist whitelist) -> {
+        editWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (Whitelist whitelist) -> {
             editDialogWhitelist(whitelist);
             return whitelist;
         }));
