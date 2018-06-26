@@ -1,10 +1,11 @@
 package ui;
+
 //for testing
+import data.entities.CriticalAccessQuery;
+import io.csvexport.CsvExport;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import data.entities.CriticalAccessQuery;
-import io.csvexport.CsvExport;
 
 import java.util.ResourceBundle;
 
