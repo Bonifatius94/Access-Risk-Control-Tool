@@ -74,6 +74,9 @@ public class AdminController {
     private Label usernameValidationLabel;
 
     @FXML
+    private JFXButton cancelButton;
+
+    @FXML
     private JFXButton addToClipboardButton;
 
 
@@ -146,6 +149,9 @@ public class AdminController {
 
         // bind addToClipboardButton disable to newUserMode
         addToClipboardButton.disableProperty().bind(Bindings.not(newUserMode));
+
+        // bind cancelButton disable to newUserMode
+        cancelButton.disableProperty().bind(Bindings.not(newUserMode));
     }
 
     /**
@@ -334,6 +340,8 @@ public class AdminController {
         // enable user table
         newUserMode.setValue(false);
         tfDbUserPassword.setText("");
+        tfDbUserName.setText("");
+        initializeCheckboxes();
 
         this.copiedToClipboard = false;
         tableRefresh();
@@ -418,5 +426,19 @@ public class AdminController {
         }
 
         return new String(pw);
+    }
+
+    /**
+     * Cancels the user creation.
+     */
+    public void cancelUserCreation() {
+        newUserMode.setValue(false);
+
+        // reset all inputs
+        tfDbUserName.setText("");
+        tfDbUserPassword.setText("");
+        initializeCheckboxes();
+
+        tableRefresh();
     }
 }

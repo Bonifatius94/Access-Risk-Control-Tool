@@ -60,7 +60,7 @@
                         </Label>
                     </HBox>
                     <HBox spacing="10">
-                        <JFXTextField promptText="%dbUserPassword" fx:id="tfDbUserPassword" prefWidth="250">
+                        <JFXTextField promptText="%dbUserPassword" fx:id="tfDbUserPassword" prefWidth="250" editable="false">
                             <validators>
                                 <RequiredFieldValidator message="%required">
                                     <MaterialDesignIconView glyphName="ALERT"/>
@@ -96,6 +96,15 @@
                     </graphic>
                     <tooltip>
                         <Tooltip text="%addUser"/>
+                    </tooltip>
+                </JFXButton>
+                <JFXButton styleClass="round-button" fx:id="cancelButton"
+                           onAction="#cancelUserCreation" prefHeight="30">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="CLOSE"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%cancel"/>
                     </tooltip>
                 </JFXButton>
                 <JFXButton styleClass="round-button" fx:id="applyButton"
