@@ -78,7 +78,6 @@ public class WhitelistTest {
     }
 
     @Test
-    @Disabled
     public void testUpdateWhitelist() {
 
         boolean ret = false;
@@ -116,7 +115,6 @@ public class WhitelistTest {
                 && whitelist.getEntries().size() == 6
                 && entry1.getUsecaseId().equals(newUsecaseId) && entry1.getUsername().equals(newUsername);
 
-            // TODO: add a test for archiving logic (old whitelist was used by a sap query)
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -193,8 +191,6 @@ public class WhitelistTest {
 
             // check if test data was queried successfully
             ret = whitelist == null;
-
-            // TODO: write a test for archiving logic (old whitelist was used by a sap query)
 
         } catch (Exception ex) {
             ex.printStackTrace();

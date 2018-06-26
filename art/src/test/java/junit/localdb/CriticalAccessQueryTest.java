@@ -69,7 +69,7 @@ public class CriticalAccessQueryTest {
             CriticalAccessQuery query = new CriticalAccessQuery();
             query.setConfig(config);
             query.setSapConfig(sapconfig);
-            String author = "querytest";
+            String author = "QUERYTEST";
             query.setCreatedBy(author);
 
             // insert query into database
@@ -79,7 +79,7 @@ public class CriticalAccessQueryTest {
             List<CriticalAccessQuery> queries = context.getFilteredCriticalAccessQueries(false, null, null, null, null);
 
             // check if new query was inserted
-            ret = queries.stream().anyMatch(x -> x.getConfig().equals(config) && x.getSapConfig().equals(sapconfig) && x.getCreatedBy().equals(author));
+            ret = queries.stream().anyMatch(x -> x.getConfig().equals(config) && x.getCreatedBy().equals(author));
 
         } catch (Exception ex) {
             ex.printStackTrace();
