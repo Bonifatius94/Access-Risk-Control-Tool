@@ -47,15 +47,20 @@ public class WordExportTest {
             CriticalAccessQuery query = new CriticalAccessQuery(config, sapConfig,
                 new HashSet<>(Arrays.asList(
                     new CriticalAccessEntry(patterns.get(0), "Test User"),
-                    new CriticalAccessEntry(patterns.get(1), "Test User 2")
+                    new CriticalAccessEntry(patterns.get(1), "Test User 2"),
+                    new CriticalAccessEntry(patterns.get(2), "Test User 3"),
+                    new CriticalAccessEntry(patterns.get(2), "Test User 3"),
+                    new CriticalAccessEntry(patterns.get(2), "Test User 3")
                 ))
             );
+
+          //  System.out.println(query.getEntries().iterator().next().getAccessPattern());
 
             // export data as docx format
             new ReportExportHelper().exportReport(query, "out.docx", ReportExportType.Word);
 
             // export data as pdf format
-            new ReportExportHelper().exportReport(query, "out.pdf", ReportExportType.Pdf);
+         //   new ReportExportHelper().exportReport(query, "out.pdf", ReportExportType.Pdf);
 
             // if no exception occurred, the test was successful
             ret = true;

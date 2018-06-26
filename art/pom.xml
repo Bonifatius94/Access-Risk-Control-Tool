@@ -106,6 +106,14 @@
             <version>8.0.3</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.knowm.xchart/xchart -->
+        <dependency>
+            <groupId>org.knowm.xchart</groupId>
+            <artifactId>xchart</artifactId>
+            <version>3.5.2</version>
+        </dependency>
+
+
         <!-- Dependency for Icon Collections -->
         <dependency>
             <groupId>de.jensd</groupId>
