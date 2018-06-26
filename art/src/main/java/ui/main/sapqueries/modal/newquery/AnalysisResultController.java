@@ -15,9 +15,11 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -28,6 +30,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import ui.App;
+import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
 import ui.main.patterns.modal.PatternsFormController;
@@ -36,7 +39,10 @@ import ui.main.patterns.modal.PatternsFormController;
 public class AnalysisResultController {
 
     @FXML
-    private Label resultLabel;
+    private MaterialDesignIconView statusIcon;
+
+    @FXML
+    private Label criticalAccessCount;
 
     @FXML
     private TableView<CriticalAccessEntry> resultTable;
@@ -131,10 +137,22 @@ public class AnalysisResultController {
      *
      * @param query the result query
      */
-    public void giveResultQuery(CriticalAccessQuery query) {
+    public void giveResultQuery(CriticalAccessQuery query) throws Exception {
         resultQuery = query;
 
-        this.resultLabel.setText(query.getEntries().size() + " CriticalAccessEntries were found.");
+        // set the label
+        if (query.getEntries() != null && query.getEntries().size() != 0) {
+            criticalAccessCount.setText(bundle.getString("criticalAccessCount") + " " + query.getEntries().size());
+            statusIcon.setIcon(MaterialDesignIcon.CLOSE);
+            statusIcon.setStyle("-fx-fill: -fx-error");
+        } else {
+            criticalAccessCount.setText(bundle.getString("noCriticalAccess"));
+            statusIcon.setIcon(MaterialDesignIcon.CHECK);
+            statusIcon.setStyle("-fx-fill: -fx-success");
+        }
+
+        // save the query to the database
+        AppComponents.getDbContext().createSapQuery(query);
 
         this.resultTable.setItems(FXCollections.observableList(new ArrayList<>(query.getEntries())));
         this.resultTable.getSortOrder().add(usecaseIdColumn);
@@ -148,7 +166,6 @@ public class AnalysisResultController {
     public void viewAccessPatternDetails(AccessPattern accessPattern) {
         try {
             // create a new FXML loader
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../../../patterns/modal/PatternsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
@@ -221,5 +238,14 @@ public class AnalysisResultController {
                 return cell;
             }
         });
+    }
+
+    /**
+     * Hides the stage.
+     *
+     * @param event the given ActionEvent
+     */
+    public void close(ActionEvent event) {
+        (((Button) event.getSource()).getScene().getWindow()).hide();
     }
 }

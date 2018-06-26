@@ -69,9 +69,6 @@ public class NewSapQueryController {
     @FXML
     private Label connectionLabel;
 
-
-    private Configuration configuration;
-    private SapConfiguration sapConfiguration;
     private ResourceBundle bundle;
 
 
@@ -199,7 +196,7 @@ public class NewSapQueryController {
      * Opens the SAP login dialog.
      */
     public void openLoginDialog() {
-        if (tryToConnect()) {
+        if (sapSettingsChooser.getValue() != null && configChooser.getValue() != null && tryToConnect()) {
             try {
                 // create a new FXML loader with the SapSettingsEditDialogController
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("SapLoginView.fxml"), bundle);
@@ -220,7 +217,7 @@ public class NewSapQueryController {
 
                 SapLoginController loginController = loader.getController();
                 loginController.setParentController(this);
-                loginController.giveSapConfig(sapConfiguration);
+                loginController.giveSapConfig(sapSettingsChooser.getValue());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -233,22 +230,20 @@ public class NewSapQueryController {
     public boolean tryToConnect() {
         try {
             // get exception from server
-            ISapConnector sapConnector = new SapConnector(sapConfiguration, "abs", "abs");
+            ISapConnector sapConnector = new SapConnector(sapSettingsChooser.getValue(), "abs", "abs");
             sapConnector.canPingServer();
 
             return true;
         } catch (Exception e) {
 
             // if exception contains error code 103, connection was successful
-            if (e.getCause() != null && e.getCause().toString().contains("103")) {
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("sapConnectTitle"), bundle.getString("sapConnectSuccessMessage"), "OK", "Cancel");
-                customAlert.showAndWait();
+            if (e.getCause().toString().contains("103")) {
+                return true;
             } else {
                 CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("sapConnectTitle"), bundle.getString("sapConnectFailedMessage"), "Ok", "Cancel");
                 customAlert.showAndWait();
+                return false;
             }
-
-            return false;
         }
     }
 
@@ -258,16 +253,13 @@ public class NewSapQueryController {
      * @param query the given query
      */
     public void giveQuery(CriticalAccessQuery query) {
-        sapConfiguration = query.getSapConfig();
-        configuration = query.getConfig();
-
-        if (sapConfiguration != null && configuration != null) {
+        if (query != null) {
 
             // prefill the config
-            configChooser.setValue(configuration);
+            configChooser.setValue(query.getConfig());
 
             // prefill the sapConfig
-            sapSettingsChooser.setValue(sapConfiguration);
+            sapSettingsChooser.setValue(query.getSapConfig());
         }
     }
 
@@ -280,8 +272,8 @@ public class NewSapQueryController {
         connectionLabel.setText(bundle.getString("connectingToSap"));
 
         CriticalAccessQuery query = new CriticalAccessQuery();
-        query.setConfig(this.configuration);
-        query.setSapConfig(this.sapConfiguration);
+        query.setConfig(this.configChooser.getValue());
+        query.setSapConfig(this.sapSettingsChooser.getValue());
         query.setCreatedAt(ZonedDateTime.now());
 
         startSapTask(query, username, password);
@@ -306,7 +298,7 @@ public class NewSapQueryController {
                         this.updateProgress(percentage, 1);
                     });
 
-                    return connector.runAnalysis(configuration);
+                    return connector.runAnalysis(query.getConfig());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -367,8 +359,7 @@ public class NewSapQueryController {
     public void setConfig(Configuration config) {
 
         if (config != null) {
-            this.configChooser.getItems().add(config);
-            this.configChooser.getSelectionModel().select(config);
+            this.configChooser.setValue(config);
         }
     }
 
@@ -381,7 +372,6 @@ public class NewSapQueryController {
 
         if (sapConfig != null) {
             this.sapSettingsChooser.getItems().add(sapConfig);
-            this.sapSettingsChooser.getSelectionModel().select(sapConfig);
         }
     }
 

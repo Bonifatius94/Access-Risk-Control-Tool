@@ -17,7 +17,10 @@
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.main.sapqueries.modal.newquery.AnalysisResultController">
     <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
-        <Label fx:id="resultLabel"/>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <MaterialDesignIconView fx:id="statusIcon" size="30"/>
+            <Label fx:id="criticalAccessCount" style="-fx-font-size: 1.6em"/>
+        </HBox>
         <TableView fx:id="resultTable" minWidth="700" VBox.vgrow="ALWAYS">
             <columns>
                 <PTableColumn text="?" fx:id="conditionTypeColumn" percentageWidth="0.06" resizable="false">
@@ -64,5 +67,13 @@
                 </JFXButton>
             </HBox>
         </VBox>
+        <Separator />
+        <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" spacing="20">
+            <JFXButton text="%close" onAction="#close">
+                <graphic>
+                    <MaterialDesignIconView glyphName="CLOSE"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
     </VBox>
 </CustomWindow>
