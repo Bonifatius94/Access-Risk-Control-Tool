@@ -1,10 +1,10 @@
 package ui;
 
 import extensions.ResourceBundleHelper;
-import extensions.Utf8Control;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javafx.application.Application;
@@ -13,6 +13,10 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+
+import settings.UserSettings;
+import settings.UserSettingsHelper;
 
 import tools.tracing.TraceLevel;
 import tools.tracing.TraceMode;
@@ -40,6 +44,9 @@ public class App extends Application {
         // init global exception handling
         Thread.currentThread().setUncaughtExceptionHandler(this::unhandledExceptionOccurred);
 
+        // apply user settings
+        applyUserSettings();
+
         // add the icons to the primary stage
         addIconsToStage(primaryStage);
 
@@ -55,7 +62,7 @@ public class App extends Application {
 
         // close the database connection if the primaryStage (MainView) is closed
         primaryStage.setOnHidden(event -> {
-            AppComponents.getDbContext().close();
+            onAppClosing(event);
         });
 
         TraceOut.leave();
@@ -81,6 +88,18 @@ public class App extends Application {
 
         // write exception to log file
         TraceOut.writeException(e);
+    }
+
+    private void applyUserSettings() throws Exception {
+
+        // get user settings
+        UserSettings settings = new UserSettingsHelper().loadUserSettings();
+
+        // write properties to trace
+        settings.entrySet().forEach(x -> TraceOut.writeInfo("user setting '" + x.getKey() + "' = '" + x.getValue() + "'", TraceLevel.Verbose));
+
+        // apply settings
+        Locale.setDefault(settings.getLanguage());
     }
 
     /**
@@ -124,7 +143,7 @@ public class App extends Application {
 
         // load the LoginView
         ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("login/LoginView.fxml"), bundle);
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/login/LoginView.fxml"), bundle);
         CustomWindow window = loader.load();
 
         // build the scene and add it to the stage
@@ -156,5 +175,11 @@ public class App extends Application {
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_128.png")));
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_256.png")));
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_512.png")));
+    }
+
+    private void onAppClosing(WindowEvent e) {
+
+        // close database
+        AppComponents.getDbContext().close();
     }
 }
