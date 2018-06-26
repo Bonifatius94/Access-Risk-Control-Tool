@@ -2,22 +2,15 @@ package ui.main.sapqueries;
 
 import com.jfoenix.controls.JFXButton;
 
-import data.entities.AccessPattern;
 import data.entities.Configuration;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
 
-import data.entities.Whitelist;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
-
-import io.msoffice.excel.AccessPatternImportHelper;
-import io.msoffice.excel.WhitelistImportHelper;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -29,20 +22,21 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
-import ui.custom.controls.ConditionTypeCellFactory;
+import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.SapQueryStatusCellFactory;
 import ui.custom.controls.filter.FilterController;
@@ -64,7 +58,7 @@ public class SapQueriesController {
     public TableColumn<CriticalAccessQuery, ZonedDateTime> createdAtColumn;
 
     @FXML
-    public TableColumn<CriticalAccessQuery, JFXButton> deleteColumn;
+    public TableColumn<CriticalAccessQuery, JFXButton> archiveColumn;
 
     @FXML
     public TableColumn<CriticalAccessQuery, JFXButton> editColumn;
@@ -159,8 +153,12 @@ public class SapQueriesController {
      */
     private void initializeTableColumns() {
         // Add the delete column
-        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (CriticalAccessQuery query) -> {
-            queriesTable.getItems().remove(query);
+        archiveColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.ARCHIVE, bundle.getString("archive"), (CriticalAccessQuery query) -> {
+            try {
+                archiveQuery(query);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return query;
         }));
 
@@ -251,14 +249,26 @@ public class SapQueriesController {
     }
 
     /**
-     * Deletes the item from the table.
+     * Archives all selected items.
      */
-    public void deleteAction() {
-        if (queriesTable.getSelectionModel().getSelectedItems() != null) {
+    public void archiveAction() throws Exception {
+        if (queriesTable.getSelectionModel().getSelectedItems() != null && queriesTable.getSelectionModel().getSelectedItems().size() != 0) {
+            CustomAlert customAlert;
+            if (queriesTable.getSelectionModel().getSelectedItems().size() == 1) {
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("archiveConfirmTitle"),
+                    bundle.getString("archiveConfirmMessage"), "Ok", "Cancel");
+            } else {
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("archiveMultipleConfirmTitle"),
+                    bundle.getString("archiveMultipleConfirmMessage"), "Ok", "Cancel");
+            }
 
-            // remove all selected items
-            queriesTable.getItems().removeAll(queriesTable.getSelectionModel().getSelectedItems());
-            queriesTable.refresh();
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                // archive all selected items
+                for (CriticalAccessQuery query : queriesTable.getSelectionModel().getSelectedItems()) {
+                    query.setArchived(true);
+                }
+            }
+            updateQueriesTable();
         }
     }
 
@@ -289,6 +299,15 @@ public class SapQueriesController {
             newQuery.setParentController(this);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void archiveQuery(CriticalAccessQuery query) throws Exception {
+        if (query != null) {
+            query.setArchived(true);
+            // TODO: update item
+
+            updateQueriesTable();
         }
     }
 }

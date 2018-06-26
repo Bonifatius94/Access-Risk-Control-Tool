@@ -18,6 +18,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -30,6 +32,7 @@ import javafx.stage.Stage;
 import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.filter.FilterController;
 import ui.main.configs.modal.ConfigsFormController;
@@ -200,13 +203,23 @@ public class ConfigsController {
      */
     public void deleteAction() throws Exception {
         if (configsTable.getSelectionModel().getSelectedItems() != null && configsTable.getSelectionModel().getSelectedItems().size() != 0) {
-
-            // remove all selected items
-            for (Configuration config : configsTable.getSelectionModel().getSelectedItems()) {
-                AppComponents.getDbContext().deleteConfig(config);
+            CustomAlert customAlert;
+            if (configsTable.getSelectionModel().getSelectedItems().size() == 1) {
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                    bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+            } else {
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteMultipleConfirmTitle"),
+                    bundle.getString("deleteMultipleConfirmMessage"), "Ok", "Cancel");
             }
 
-            updateConfigsTable();
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                // remove all selected items
+                for (Configuration config : configsTable.getSelectionModel().getSelectedItems()) {
+                    AppComponents.getDbContext().deleteConfig(config);
+                }
+
+                updateConfigsTable();
+            }
         }
     }
 

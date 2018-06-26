@@ -37,7 +37,7 @@
             </PTableColumn>
             <PTableColumn percentageWidth="0.07" fx:id="editColumn" resizable="false" sortable="false">
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" fx:id="deleteColumn" resizable="false" sortable="false">
+            <PTableColumn percentageWidth="0.1" fx:id="archiveColumn" resizable="false" sortable="false">
             </PTableColumn>
         </columns>
     </TableView>
@@ -55,9 +55,9 @@
                 <MaterialDesignIconView glyphName="OPEN_IN_NEW"/>
             </graphic>
         </JFXButton>
-        <JFXButton text="%delete" onAction="#deleteAction" prefWidth="130" styleClass="warning-button">
+        <JFXButton text="%archive" onAction="#archiveAction" prefWidth="130">
             <graphic>
-                <MaterialDesignIconView glyphName="DELETE"/>
+                <MaterialDesignIconView glyphName="ARCHIVE"/>
             </graphic>
         </JFXButton>
     </HBox>
