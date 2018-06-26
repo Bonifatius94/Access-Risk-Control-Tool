@@ -38,7 +38,7 @@ public class WhitelistTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class WhitelistTest {
 
         //TODO: Fix bug caused a merge
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -120,7 +120,7 @@ public class WhitelistTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -132,7 +132,7 @@ public class WhitelistTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query first whitelist from database
-            Whitelist whitelist = context.getWhitelists(false).get(0);
+            Whitelist whitelist = context.getWhitelists(true).stream().filter(x -> x.isArchived() == true).findFirst().get();
             int whitelistId = whitelist.getId();
 
             // make changes
@@ -155,7 +155,7 @@ public class WhitelistTest {
             context.updateWhitelist(whitelist);
 
             // query whitelist
-            whitelist = context.getWhitelists(false).stream().filter(x -> x.getId().equals(whitelistId)).findFirst().orElse(null);
+            whitelist = context.getWhitelists(true).stream().filter(x -> x.getId().equals(whitelistId)).findFirst().orElse(null);
             entry1 = whitelist.getEntries().stream().filter(x -> x.getId().equals(entry1Id)).findFirst().get();
 
             ret = newDescription.equals(whitelist.getDescription())
@@ -168,7 +168,7 @@ public class WhitelistTest {
             ex.printStackTrace();
         }
 
-        assert(false);
+        assert (false);
     }
 
     @Test
@@ -196,7 +196,7 @@ public class WhitelistTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -208,26 +208,23 @@ public class WhitelistTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query whitelists
-            List<Whitelist> whitelists = context.getWhitelists(false);
-            Whitelist whitelist = whitelists.get(0);
+            Whitelist whitelist = context.getWhitelists(true).stream().filter(x -> x.isArchived() == true).findFirst().get();
             int id = whitelist.getId();
 
             // delete whitelist
             context.deleteWhitelist(whitelist);
 
             // query whitelist again. check if everything was deleted
-            whitelist = context.getWhitelists(false).stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
+            whitelist = context.getWhitelists(true).stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
 
             // check if test data was querried successfully
-            ret = whitelist == null;
-
-            // TODO: write a test for archiving logic (old whitelist was used by a sap query)
+            ret = whitelist.isArchived() == true;
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        assert(false);
+        assert (false);
     }
 
 }

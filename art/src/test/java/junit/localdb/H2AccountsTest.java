@@ -111,7 +111,7 @@ public class H2AccountsTest {
         try (ArtDbContext context = new ArtDbContext(username, oldPassword)) {
 
             // login with old password must not be successful
-            assert(false);
+            assert (false);
 
         } catch (Exception ex) {
             // nothing to do here ...

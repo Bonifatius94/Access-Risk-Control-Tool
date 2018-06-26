@@ -45,7 +45,7 @@ public class AccessPatternTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -93,17 +93,17 @@ public class AccessPatternTest {
             // check if new pattern was inserted
             ret = patterns.size() == 4
                 && patterns.stream().anyMatch(
-                       x -> x.getConditions().size() == 2
+                x -> x.getConditions().size() == 2
                     && x.getUsecaseId().equals(usecaseId)
                     && x.getDescription().equals(description)
                     && x.getLinkage() == ConditionLinkage.And
-                );
+            );
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class AccessPatternTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -183,7 +183,7 @@ public class AccessPatternTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -226,7 +226,7 @@ public class AccessPatternTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -263,9 +263,9 @@ public class AccessPatternTest {
             ret = patterns.size() == 3
                 && pattern.getConditions().size() == 1
                 && pattern.getConditions().stream().anyMatch(x ->
-                    x.getId().equals(conditionId)
+                x.getId().equals(conditionId)
                     && x.getPatternCondition().getProperties().stream().anyMatch(y -> y.getId().equals(propertyId) && newValue4.equals(y.getValue4()))
-                );
+            );
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -273,7 +273,7 @@ public class AccessPatternTest {
 
         // TODO: add another test for evaluating archiving logic on update
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -320,7 +320,7 @@ public class AccessPatternTest {
 
         // TODO: add another test for evaluating archiving logic on update
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -349,7 +349,7 @@ public class AccessPatternTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
 }

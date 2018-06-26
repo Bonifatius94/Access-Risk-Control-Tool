@@ -33,7 +33,7 @@ public class SapSettingsTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class SapSettingsTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class SapSettingsTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -123,7 +123,7 @@ public class SapSettingsTest {
             ex.printStackTrace();
         }
 
-        assert(false);
+        assert (false);
     }
 
     @Test
@@ -150,7 +150,7 @@ public class SapSettingsTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -178,7 +178,7 @@ public class SapSettingsTest {
             ex.printStackTrace();
         }
 
-        assert(false);
+        assert (false);
     }
 
 }

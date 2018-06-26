@@ -50,7 +50,7 @@ public class CriticalAccessQueryTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class CriticalAccessQueryTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -120,7 +120,7 @@ public class CriticalAccessQueryTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -161,7 +161,7 @@ public class CriticalAccessQueryTest {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        assert(false);
+        assert (false);
     }
 
 }

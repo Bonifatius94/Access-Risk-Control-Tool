@@ -22,11 +22,11 @@ public class PrivilegesTest {
     public void testPrivileges() {
 
         // IArtDbContext.getDatabaseUsers()
-        assert(testPrivilegesGetDatabaseUsers("TestAdmin", "foobar", true));
-        assert(testPrivilegesGetDatabaseUsers("TestDataAnalyst", "foobar", false));
-        assert(testPrivilegesGetDatabaseUsers("TestViewer", "foobar", false));
+        assert (testPrivilegesGetDatabaseUsers("TestAdmin", "foobar", true));
+        assert (testPrivilegesGetDatabaseUsers("TestDataAnalyst", "foobar", false));
+        assert (testPrivilegesGetDatabaseUsers("TestViewer", "foobar", false));
 
-        assert(false);
+        assert (false);
 
         // TODO: add calls for missing database operations here ......
     }

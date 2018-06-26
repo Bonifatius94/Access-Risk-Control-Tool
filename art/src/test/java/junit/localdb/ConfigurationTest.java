@@ -62,8 +62,8 @@ public class ConfigurationTest {
             config.setWhitelist(whitelist);
 
             config.setPatterns(Arrays.asList(
-                    patterns.stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get(),
-                    patterns.stream().filter(x -> x.getId().equals(new Integer(2))).findFirst().get()
+                patterns.stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get(),
+                patterns.stream().filter(x -> x.getId().equals(new Integer(2))).findFirst().get()
             ));
 
             // insert config into database
@@ -209,7 +209,7 @@ public class ConfigurationTest {
             Configuration testactiveconfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
             Configuration testarchivedconfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
             ret = !testactiveconfig.getPatterns().stream().anyMatch(x -> x.equals(activeConfig));
-            ret =  ret == !testactiveconfig.getPatterns().stream().anyMatch(x -> x.equals(archivedConfig));
+            ret = ret == !testactiveconfig.getPatterns().stream().anyMatch(x -> x.equals(archivedConfig));
 
         } catch (Exception ex) {
             ex.printStackTrace();

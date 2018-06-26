@@ -52,7 +52,7 @@ public class FiltersTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -84,7 +84,7 @@ public class FiltersTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class FiltersTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -140,7 +140,7 @@ public class FiltersTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -180,7 +180,7 @@ public class FiltersTest {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
 }
