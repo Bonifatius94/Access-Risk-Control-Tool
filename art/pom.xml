@@ -8,6 +8,8 @@
     <artifactId>art</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+
+
     <!-- set java version used -->
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -32,16 +34,25 @@
             <version>3.17</version>
         </dependency>
 
+        <!-- general JUnit testing framework -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Provides a testing framework for JavaFX Applications -->
         <dependency>
             <groupId>org.testfx</groupId>
             <artifactId>testfx-core</artifactId>
-            <version>4.0.13-alpha</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testfx</groupId>
-            <artifactId>testfx-junit</artifactId>
             <version>4.0.13-alpha</version>
             <scope>test</scope>
         </dependency>
@@ -91,7 +102,7 @@
         <dependency>
             <groupId>com.jfoenix</groupId>
             <artifactId>jfoenix</artifactId>
-            <version>8.0.4</version>
+            <version>8.0.3</version>
         </dependency>
 
         <!-- Dependency for Icon Collections -->
@@ -134,16 +145,70 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>1.1.0</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <workingDirectory>target/test-classes</workingDirectory>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>ui.App</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
         </plugins>
 
         <!-- add *.fxml files to the build process (otherwise *.fxml files are not copied to the target folder and the program crashes) -->
         <resources>
+            <!-- copy the fxml files to the build output directory -->
             <resource>
                 <directory>src/main/java</directory>
                 <includes>
                     <include>**/*.fxml</include>
                 </includes>
             </resource>
+
+            <!-- define resources directory -->
+            <resource>
+                <directory>res</directory>
+            </resource>
         </resources>
+
+        <testResources>
+            <!-- copy the fxml files to the build output directory -->
+            <testResource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.fxml</include>
+                </includes>
+            </testResource>
+
+            <!-- define test resources directory -->
+            <testResource>
+                <directory>res-test</directory>
+            </testResource>
+
+            <!-- include resources also as test resources -->
+            <testResource>
+                <directory>res</directory>
+            </testResource>
+        </testResources>
     </build>
 </project>

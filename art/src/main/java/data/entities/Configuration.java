@@ -1,43 +1,107 @@
 package data.entities;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
+import java.time.ZonedDateTime;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "Configurations")
-public class Configuration {
+public class Configuration implements IReferenceAware, ICreationFlagsHelper {
 
-    private Integer id;
-    private String name;
-    private String description;
+    // =============================
+    //         constructors
+    // =============================
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ConfigurationXAccessPatternMap> patterns;
-    private Whitelist whitelist;
+    public Configuration() {
+        // nothing to do here ...
+    }
 
-    private boolean isArchived;
-    private OffsetDateTime createdAt;
-    private String createdBy;
+    /**
+     * This constructor initializes an instance with the given parameters.
+     *
+     * @param name the name of the new instance
+     * @param description the description of the new instance
+     * @param patterns the patterns referenced by the new instance
+     * @param whitelist the whitelist referenced by the new instance
+     */
+    public Configuration(String name, String description, List<AccessPattern> patterns, Whitelist whitelist) {
+
+        setName(name);
+        setDescription(description);
+        setPatterns(patterns);
+        setWhitelist(whitelist);
+    }
+
+    /**
+     * This constructor clones the given config (patterns and whitelist are not cloned).
+     *
+     * @param original the config to clone
+     */
+    public Configuration(Configuration original) {
+
+        this.setName(original.getName());
+        this.setDescription(original.getDescription());
+    }
+
+    // =============================
+    //           members
+    // =============================
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    // CAUTION: cascade types ALL or REMOVE lead to cascading deletions on both sides!!!
+    // this @ManyToMany setup should only write entries into the mapping table and not into the referenced table
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "nm_Configuration_AccessPattern",
+        joinColumns = { @JoinColumn(name = "ConfigId") },
+        inverseJoinColumns = { @JoinColumn(name = "AccessPatternId") }
+    )
+    private Set<AccessPattern> patterns = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "WhitelistId")
+    private Whitelist whitelist;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(nullable = false)
+    private boolean isArchived;
+
+    @Column(nullable = false)
+    private ZonedDateTime createdAt;
+
+    @Column(nullable = false)
+    private String createdBy;
+
+    // =============================
+    //      getters / setters
+    // =============================
+
     public Integer getId() {
         return id;
     }
@@ -62,28 +126,27 @@ public class Configuration {
         this.description = description;
     }
 
-    @Transient
-    public List<AccessPattern> getPatterns() {
-        // TODO: test if this code works fine with sap test
-        return patterns.stream().map(x -> x.getPattern()).collect(Collectors.toList());
+    public Set<AccessPattern> getPatterns() {
+        return patterns;
     }
 
-    /*public void setPatterns(List<ConfigurationXAccessPatternMap> patterns) {
-        this.patterns = patterns;
-    }*/
+    public void setPatterns(List<AccessPattern> patterns) {
+        setPatterns(new HashSet<>(patterns));
+    }
 
     /**
-     * This setter allows to overload access patterns instead of map entries.
+     * This setter applies the new patterns while managing to handle foreign key references.
      *
-     * @param patterns the patters to be set to this instance
+     * @param patterns the conditions to be set
      */
-    public void setPatterns(List<AccessPattern> patterns) {
+    public void setPatterns(Set<AccessPattern> patterns) {
 
-        this.patterns = patterns.stream().map(x -> new ConfigurationXAccessPatternMap(this, x)).collect(Collectors.toList());
+        this.patterns.forEach(x -> x.getConfigurations().remove(this));
+        this.patterns.clear();
+        this.patterns.addAll(patterns);
+        adjustReferences();
     }
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "WhitelistId")
     public Whitelist getWhitelist() {
         return whitelist;
     }
@@ -100,11 +163,11 @@ public class Configuration {
         isArchived = archived;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -116,24 +179,45 @@ public class Configuration {
         this.createdBy = createdBy;
     }
 
-    // =============================
-    //      hibernate triggers
+    /*// =============================
+    //   helpers for foreign keys
     // =============================
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = OffsetDateTime.now(ZoneOffset.UTC);
+    public void addPattern(AccessPattern pattern) {
+        patterns.add(pattern);
+        pattern.getConfigurations().add(this);
     }
+
+    public void removePattern(AccessPattern pattern) {
+        patterns.remove(pattern);
+        pattern.getConfigurations().remove(this);
+    }*/
 
     // =============================
     //          overrides
     // =============================
 
     /**
+     * This method adjusts the foreign key references.
+     */
+    @Override
+    public void adjustReferences() {
+
+        // adjust patterns
+        getPatterns().forEach(x -> x.getConfigurations().add(this));
+    }
+
+    @Override
+    public void initCreationFlags(ZonedDateTime createdAt, String createdBy) {
+
+        setCreatedAt(createdAt);
+        setCreatedBy(createdBy);
+    }
+
+    /**
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *
      * @return JSON-like data representation of this instance as a string
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     @Override
     public String toString() {

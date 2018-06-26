@@ -1,78 +1,175 @@
 package ui.login;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXTextField;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+
+import java.util.ResourceBundle;
+
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.stage.Stage;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.layout.HBox;
 
-import tools.tracing.TraceOut;
+import ui.App;
+import ui.AppComponents;
+import ui.custom.controls.CustomWindow;
+
 
 public class LoginController {
 
     @FXML
-    private TextField tfLoginUsername;
+    private JFXTextField usernameInput;
 
     @FXML
-    private PasswordField tfLoginPassword;
+    private JFXPasswordField passwordInput;
 
-    private StringProperty loginUsername = new SimpleStringProperty("");
-    private StringProperty loginPassword = new SimpleStringProperty("");
+    @FXML
+    private JFXTextField passwordInputPlain;
+
+    @FXML
+    private MaterialDesignIconView showPasswordIconView;
+
+    @FXML
+    private Label errorLabel;
+
+    @FXML
+    private HBox errorBox;
+
+
+    private ResourceBundle bundle;
+    private int loginAttempts;
+    private long startTime = 0;
+    private final int maxAttempts = 3; // 3 attempts
+    private final int penaltyTime = 60000; // one minute penalty time
+
 
     /**
-     * This method initializes the data bindings and event handlers.
+     * Initializes the view with all needed bindings.
      */
+    @FXML
     public void initialize() {
+        bundle = ResourceBundle.getBundle("lang");
 
-        TraceOut.enter();
+        loginAttempts = 0;
 
-        tfLoginUsername.textProperty().bindBidirectional(loginUsername);
-        tfLoginPassword.textProperty().bindBidirectional(loginPassword);
+        // bind password inputs
+        passwordInput.managedProperty().bind(passwordInput.visibleProperty());
+        passwordInputPlain.managedProperty().bind(passwordInputPlain.visibleProperty());
+        passwordInputPlain.visibleProperty().bind(Bindings.not(passwordInput.visibleProperty()));
+        passwordInput.textProperty().bindBidirectional(passwordInputPlain.textProperty());
 
-        TraceOut.leave();
+        // transform typed text to uppercase
+        usernameInput.setTextFormatter(new TextFormatter<>((change) -> {
+            change.setText(change.getText().toUpperCase());
+            return change;
+        }));
+
+        initializeValidation();
     }
 
-    @FXML
-    protected void btnOkClicked(ActionEvent e) {
+    /**
+     * Handles the database login.
+     */
+    public void login(ActionEvent event) {
 
-        TraceOut.enter();
+        if (System.currentTimeMillis() - startTime > penaltyTime) {
 
-        // send login request
-        sendLoginRequest(loginUsername.getValue(), loginPassword.getValue());
+            errorBox.setVisible(false);
+            errorLabel.setText(bundle.getString("databaseLoginError") + " " + (maxAttempts - loginAttempts) + ")");
 
-        // close window
-        Button button = (Button)e.getSource();
-        Stage stage = (Stage) button.getScene().getWindow();
-        stage.close();
-
-        TraceOut.leave();
+            if (validateBeforeSubmit()) {
+                if (AppComponents.tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
+                    startApplication(event);
+                } else {
+                    // reset the attempts and show penalty error
+                    if (loginAttempts++ == maxAttempts) {
+                        startTime = System.currentTimeMillis();
+                        errorLabel.setText(bundle.getString("penaltyError"));
+                        loginAttempts = 0;
+                    }
+                    errorBox.setVisible(true);
+                }
+            }
+        }
     }
 
-    @FXML
-    protected void btnCancelClicked(ActionEvent e) {
-
-        TraceOut.enter();
-
-        // close window
-        Button button = (Button)e.getSource();
-        Stage stage = (Stage) button.getScene().getWindow();
-        stage.close();
-
-        TraceOut.leave();
+    /**
+     * Toggles the password visibility.
+     */
+    public void togglePasswordDisplay() {
+        if (passwordInput.isVisible()) {
+            showPasswordIconView.setIcon(MaterialDesignIcon.EYE);
+            passwordInput.visibleProperty().set(false);
+        } else {
+            showPasswordIconView.setIcon(MaterialDesignIcon.EYE_OFF);
+            passwordInput.visibleProperty().set(true);
+        }
     }
 
-    // TODO: remove this suppress annotation
-    @SuppressWarnings("unused")
-    private void sendLoginRequest(String username, String password) {
+    /**
+     * Initializes the validation for certain text inputs in order to display an error message (e.g. required).
+     */
+    private void initializeValidation() {
 
-        TraceOut.enter();
+        usernameInput.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                usernameInput.validate();
+            }
+        });
 
-        // TODO: implement logic
-
-        TraceOut.leave();
+        passwordInput.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                passwordInput.validate();
+            }
+        });
     }
 
+    /**
+     * Validates the login inputs.
+     *
+     * @return if the inputs are valid
+     */
+    private boolean validateBeforeSubmit() {
+        return usernameInput.validate() && passwordInput.validate() && passwordInputPlain.validate();
+    }
+
+    /**
+     * Starts the application by opening the MainView.
+     */
+    private void startApplication(ActionEvent event) {
+        try {
+            // create a new FXML loader with the SapSettingsEditDialogController
+            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../main/MainView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
+
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow, 1050, 750);
+            scene.getStylesheets().add("css/dark-theme.css");
+            App.primaryStage.setScene(scene);
+            App.primaryStage.setTitle(bundle.getString("art"));
+            customWindow.initStage(App.primaryStage);
+
+            close(event);
+            App.primaryStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Hides the stage.
+     *
+     * @param event the given ActionEvent
+     */
+    public void close(ActionEvent event) {
+        (((Button) event.getSource()).getScene().getWindow()).hide();
+    }
 }

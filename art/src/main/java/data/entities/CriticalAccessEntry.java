@@ -1,6 +1,6 @@
 package data.entities;
 
-import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,12 +13,49 @@ import javax.persistence.Table;
 @Table(name = "CriticalAccessEntries")
 public class CriticalAccessEntry {
 
-    private Integer id;
-    private AccessPattern accessPattern;
-    private String username;
+    // =============================
+    //         constructors
+    // =============================
+
+    public CriticalAccessEntry() {
+        // nothing to do here ...
+    }
+
+    /**
+     * This constructor creates a new instance with the given data.
+     *
+     * @param pattern the pattern of the new instance
+     * @param username the username of the new instance
+     */
+    public CriticalAccessEntry(AccessPattern pattern, String username) {
+
+        setAccessPattern(pattern);
+        setUsername(username);
+    }
+
+    // =============================
+    //            members
+    // =============================
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name = "QueryId")
+    private CriticalAccessQuery query;
+
+    @ManyToOne
+    @JoinColumn(name = "ViolatedPatternId")
+    private AccessPattern accessPattern;
+
+    @Column(nullable = false)
+    private String username;
+
+    // =============================
+    //      getters / setters
+    // =============================
+
     public Integer getId() {
         return id;
     }
@@ -27,8 +64,14 @@ public class CriticalAccessEntry {
         this.id = id;
     }
 
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    @JoinColumn(name = "ViolatedPatternId")
+    public CriticalAccessQuery getQuery() {
+        return query;
+    }
+
+    public void setQuery(CriticalAccessQuery query) {
+        this.query = query;
+    }
+
     public AccessPattern getAccessPattern() {
         return accessPattern;
     }
@@ -54,27 +97,4 @@ public class CriticalAccessEntry {
         return "ViolatedUseCaseID: " + accessPattern.getUsecaseId() + ", Username: " + username;
     }
 
-    /**
-     * Compares an entry to another entry using userName and useCaseID.
-     *
-     * @param other the object to compare with
-     * @return whether they are equal
-     */
-    @Override
-    public boolean equals(Object other) {
-
-        if (other == null) {
-            return false;
-        }
-
-        if (other == this) {
-            return true;
-        }
-
-        if (!(other instanceof CriticalAccessEntry)) {
-            return false;
-        }
-
-        return (username.equals(((CriticalAccessEntry) other).username) && accessPattern.getUsecaseId().equals(((CriticalAccessEntry) other).getAccessPattern().getUsecaseId()));
-    }
 }

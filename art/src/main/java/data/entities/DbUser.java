@@ -1,20 +1,65 @@
 package data.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.util.HashSet;
+import java.util.Set;
 
-@Entity
-@Table(name = "ArtUsers")
 public class DbUser {
 
-    private String username;
-    private DbUserRole role;
+    // =============================
+    //         constructors
+    // =============================
 
-    @Id
+    /**
+     * This constructor creates a new DbUser with the given username and roles.
+     *
+     * @param username the username of the new instance
+     * @param roles the roles of the new instance
+     */
+    public DbUser(String username, Set<DbUserRole> roles) {
+
+        setUsername(username);
+        this.roles = roles;
+    }
+
+    /**
+     * This constructor creates a new DbUser with the given username and roles (as boolean flags).
+     *
+     * @param username the username of the new instance
+     * @param isAdmin a flag that indicates whether the new user is admin or not
+     * @param isDataAnalyst a flag that indicates whether the new user is data analyst or not
+     * @param isViewer a flag that indicates whether the new user is viewer or not
+     * @param isFirstLogin a flag that indicates whether the new user is logging in for the first time
+     */
+    public DbUser(String username, boolean isAdmin, boolean isDataAnalyst, boolean isViewer, boolean isFirstLogin) {
+
+        setUsername(username);
+        setFirstLogin(isFirstLogin);
+
+        if (isAdmin) {
+            roles.add(DbUserRole.Admin);
+        }
+
+        if (isDataAnalyst) {
+            roles.add(DbUserRole.DataAnalyst);
+        }
+
+        if (isViewer) {
+            roles.add(DbUserRole.Viewer);
+        }
+    }
+
+    // =============================
+    //           members
+    // =============================
+
+    private String username;
+    private Set<DbUserRole> roles = new HashSet<>();
+    private boolean isFirstLogin = false;
+
+    // =============================
+    //      getters / setters
+    // =============================
+
     public String getUsername() {
         return username;
     }
@@ -23,14 +68,24 @@ public class DbUser {
         this.username = username;
     }
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 11)
-    public DbUserRole getRole() {
-        return role;
+    public Set<DbUserRole> getRoles() {
+        return roles;
     }
 
-    public void setRole(DbUserRole role) {
-        this.role = role;
+    public void addRole(DbUserRole role) {
+        roles.add(role);
+    }
+
+    public void removeRole(DbUserRole role) {
+        roles.remove(role);
+    }
+
+    public boolean isFirstLogin() {
+        return isFirstLogin;
+    }
+
+    public void setFirstLogin(boolean firstLogin) {
+        isFirstLogin = firstLogin;
     }
 
     // =============================
@@ -39,7 +94,7 @@ public class DbUser {
 
     @Override
     public String toString() {
-        return "Username = " + getUsername() + ", Role = " + getRole().toString();
+        return "Username = " + getUsername() + ", Roles = " + getRoles().stream().map(x -> x.toString()).reduce((x, y) -> x + ", " + y).get();
     }
 
 }

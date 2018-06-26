@@ -1,7 +1,7 @@
 
 package data.entities;
 
-import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,19 +13,24 @@ import javax.persistence.Table;
 /**
  * This is a data object class for an entry specified in a whitelist.
  * It contains properties like usecase id or username.
- *
- * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
  */
 @Entity
 @Table(name = "WhitelistEntries")
 public class WhitelistEntry {
+
+    // =============================
+    //         constructors
+    // =============================
+
+    public WhitelistEntry() {
+
+    }
 
     /**
      * This constructor creates a new instance of a whitelist entry.
      *
      * @param usecaseId the usecase id of the whitelist entry
      * @param username the username of the whitelist entry
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     public WhitelistEntry(String usecaseId, String username) {
 
@@ -33,13 +38,39 @@ public class WhitelistEntry {
         setUsername(username);
     }
 
-    private Integer id;
-    private String usecaseId;
-    private String username;
-    private Whitelist whitelist;
+    /**
+     * This constructor clones the given instance.
+     *
+     * @param original the instance to be cloned
+     */
+    public WhitelistEntry(WhitelistEntry original) {
+
+        this.setUsecaseId(original.getUsecaseId());
+        this.setUsername(original.getUsername());
+    }
+
+    // =============================
+    //           members
+    // =============================
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name = "WhitelistId")
+    private Whitelist whitelist;
+
+    @Column(nullable = false)
+    private String usecaseId;
+
+    @Column(nullable = false)
+    private String username;
+
+    // =============================
+    //      getters / setters
+    // =============================
+
     public Integer getId() {
         return id;
     }
@@ -64,8 +95,6 @@ public class WhitelistEntry {
         this.usecaseId = usecaseId;
     }
 
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    @JoinColumn(name = "WhitelistId")
     public Whitelist getWhitelist() {
         return whitelist;
     }
@@ -74,14 +103,18 @@ public class WhitelistEntry {
         this.whitelist = whitelist;
     }
 
+    // =============================
+    //          overrides
+    // =============================
+
     /**
      * This is a new implementation of toString method for writing this instance to console in JSON-like style.
      *
      * @return JSON-like data representation of this instance as a string
-     * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
     @Override
     public String toString() {
         return "usecaseId='" + getUsecaseId() + "', username='" + getUsername() + "'";
     }
+
 }

@@ -3,10 +3,12 @@ package data.localdb;
 import data.entities.AccessPattern;
 import data.entities.Configuration;
 import data.entities.CriticalAccessQuery;
+import data.entities.DbUser;
 import data.entities.DbUserRole;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -61,45 +63,49 @@ public interface IArtDbContext {
     // ============================================
 
     /**
-     * This method selects all already executed ART queries from the local database.
-     * TODO: add filter option (e.g. by time: today, last week, last month, last year, all)
+     * This method selects all already executed sap queries from the local database.
      *
-     * @return a list of already executed ART queries
+     * @param includeArchived determines whether archived records are also loaded
+     * @return a list of already executed sap queries
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<CriticalAccessQuery> getArtQueries() throws Exception;
+    List<CriticalAccessQuery> getSapQueries(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all configurations from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all configurations
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<Configuration> getConfigs() throws Exception;
+    List<Configuration> getConfigs(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all access patterns from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all access patterns
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<AccessPattern> getPatterns() throws Exception;
+    List<AccessPattern> getPatterns(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all whitelists from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all whitelists
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<Whitelist> getWhitelists() throws Exception;
+    List<Whitelist> getWhitelists(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all sap configurations from the local database that are not archived with history flag.
      *
+     * @param includeArchived determines whether archived records are also loaded
      * @return a list of all sap configurations
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<SapConfiguration> getSapConfigs() throws Exception;
+    List<SapConfiguration> getSapConfigs(boolean includeArchived) throws Exception;
 
     /**
      * This method selects all user names of existing local database accounts and their privileges.
@@ -107,9 +113,71 @@ public interface IArtDbContext {
      * @return a list of local database users
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    List<String> getDatabaseUsers() throws Exception;
+    List<DbUser> getDatabaseUsers() throws Exception;
 
-    // TODO: add some userful views for more complicated queries
+    // ============================================
+    //               F I L T E R S
+    // ============================================
+
+    /**
+     * This method applies the given filter options to an access pattern query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard the wildcard string that is searched in several text attributes of whitelists
+     * @param start the lower limit of the whitelist creation timestamp to be filtered
+     * @param end the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    List<AccessPattern> getFilteredPatterns(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception;
+
+    /**
+     * This method applies the given filter options to a whitelist query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard the wildcard string that is searched in several text attributes of whitelists
+     * @param start the lower limit of the whitelist creation timestamp to be filtered
+     * @param end the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    List<Whitelist> getFilteredWhitelists(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception;
+
+    /**
+     * This method applies the given filter options to a sap configs query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard the wildcard string that is searched in several text attributes of whitelists
+     * @param start the lower limit of the whitelist creation timestamp to be filtered
+     * @param end the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    List<SapConfiguration> getFilteredSapConfigs(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception;
+
+    /**
+     * This method applies the given filter options to a configs query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard the wildcard string that is searched in several text attributes of whitelists
+     * @param start the lower limit of the whitelist creation timestamp to be filtered
+     * @param end the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    List<Configuration> getFilteredConfigs(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception;
+
+    /**
+     * This method applies the given filter options to a sap query. Include archived / wildcard / datetime range / limit are applied if not null (with AND linkage).
+     *
+     * @param includeArchived a flag that indicates whether the archived whitelists are also included
+     * @param wildcard the wildcard string that is searched in several text attributes of whitelists
+     * @param start the lower limit of the whitelist creation timestamp to be filtered
+     * @param end the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit the limit of records returned
+     * @return a list of whitelist matching the given filter options
+     */
+    List<CriticalAccessQuery> getFilteredCriticalAccessQueries(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception;
 
     // ============================================
     //                 U P D A T E
@@ -188,8 +256,6 @@ public interface IArtDbContext {
      */
     void deleteSapConfig(SapConfiguration config) throws Exception;
 
-    // TODO: add methods for archiving old sap queries
-
     // ============================================
     //          U S E R   A C C O U N T S
     // ============================================
@@ -197,21 +263,28 @@ public interface IArtDbContext {
     /**
      * This method adds a new database user with rights according to the given role.
      *
-     * @param username the name of the new database user
+     * @param user the account data of the new database user
      * @param password the password of the new database user
-     * @param role the role of the new database user
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    void createDatabaseUser(String username, String password, DbUserRole role) throws Exception;
+    void createDatabaseUser(DbUser user, String password) throws Exception;
 
     /**
-     * This method changes the role of an existing user.
+     * This method changes the roles of an existing user.
      *
-     * @param username the name of an existing database user
-     * @param role the new role of the user
+     * @param user the database user to be updated
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    void changeUserRole(String username, DbUserRole role) throws Exception;
+    void updateUserRoles(DbUser user) throws Exception;
+
+    /**
+     * This method changes the password of an existing user.
+     *
+     * @param username the name of an existing database user
+     * @param password the new password of the user
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    void changePassword(String username, String password) throws Exception;
 
     /**
      * This method deletes an existing database user.
@@ -221,17 +294,21 @@ public interface IArtDbContext {
      */
     void deleteDatabaseUser(String username) throws Exception;
 
-    // ============================================
-    //                  L O G I N
-    // ============================================
-
     /**
-     * This method switches the logged in user. (it also works for first login)
+     * This method gets the current logged-in database user.
      *
-     * @param username the name of the new user
-     * @param password the password of the new user
+     * @return the current logged-in user
      * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
      */
-    boolean switchUser(String username, String password) throws Exception;
+    DbUser getCurrentUser() throws Exception;
+
+    /**
+     * This method sets the first login flag of the current user.
+     *
+     * @param user the current logged-in user
+     * @param flag the first login flag to be set
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    public void setFirstLoginOfCurrentUser(DbUser user, boolean flag) throws Exception;
 
 }

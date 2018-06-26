@@ -1,16 +1,22 @@
 package data.localdb;
 
-import data.entities.IRecord;
-
 import java.io.Closeable;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Environment;
 
 public abstract class H2ContextBase implements Closeable {
 
@@ -18,16 +24,42 @@ public abstract class H2ContextBase implements Closeable {
     // ++        Constructors       ++
     // +++++++++++++++++++++++++++++++
 
-    public H2ContextBase(String username, String password) {
+    /**
+     * This constructor initializes a new H2 database context to the given database file using to given login credentials.
+     *
+     * @param filePath the H2 database file path (file system automatically appends '.mv.db')
+     * @param username the username for login
+     * @param password the password for login
+     */
+    public H2ContextBase(String filePath, String username, String password) throws Exception {
 
-        sessionFactory = initSessionFactory(username, password);
+        this.filePath = filePath;
+        this.username = username;
+        this.password = password;
+
+        boolean isNewDatabase = !new File(getFilePath()).exists();
+        sessionFactory = initSessionFactory(filePath, username, password);
+
+        if (isNewDatabase) {
+            createNewDatabase();
+        }
     }
+
+    // +++++++++++++++++++++++++++++++
+    // ++          Members          ++
+    // +++++++++++++++++++++++++++++++
+
+    private String filePath;
+    private SessionFactory sessionFactory;
+
+    private String username;
+    private String password;
+
+    private final String filePassword = "<4KHhSVpG{cb~E]:d;%Su,!re^k39#668ncR=mh^9AssGP<{gR\")m)&&ZNeX!fus=tt,Z~$Ed#tS-P9!*k/[vvnPt?*DJ)W*G%~3";
 
     // +++++++++++++++++++++++++++++++
     // ++     Session Initiation    ++
     // +++++++++++++++++++++++++++++++
-
-    private SessionFactory sessionFactory;
 
     /**
      * This method initializes a new session factory with settings from hibernate.properties file and the overloaded login credentials.
@@ -37,27 +69,48 @@ public abstract class H2ContextBase implements Closeable {
      * @return a new instance of session factory
      * @throws HibernateException caused by database error
      */
-    private SessionFactory initSessionFactory(String username, String password) throws HibernateException {
+    private SessionFactory initSessionFactory(String filePath, String username, String password) throws HibernateException {
+
+        // configure hibernate logging level
+        java.util.logging.Logger.getLogger("org.hibernate").setLevel(java.util.logging.Level.SEVERE);
 
         // init config with settings from hibernate.properties file
-        Configuration config = new Configuration();
+        final StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
 
-        // set username and password
-        config.setProperty("hibernate.connection.username", username);
-        config.setProperty("hibernate.connection.password", password);
+        builder.applySetting(Environment.DRIVER, "org.h2.Driver");
+        builder.applySetting(Environment.DIALECT, "org.hibernate.dialect.H2Dialect");
+        builder.applySetting(Environment.URL, "jdbc:h2:file:" + filePath + ";CIPHER=AES");
+        builder.applySetting(Environment.USER, username);
+        builder.applySetting(Environment.PASS, filePassword + " " + password);
+        //builder.applySetting(Environment.SHOW_SQL, "true");
 
-        // init hibernate DAO classes
-        getAnnotatedClasses().forEach(config::addAnnotatedClass);
+        // apply annotated data entity classes
+        final StandardServiceRegistry registry = builder.build();
+        final MetadataSources metadataSources = new MetadataSources(registry);
+        getAnnotatedClasses().forEach(metadataSources::addAnnotatedClass);
 
-        return config.buildSessionFactory();
+        Metadata metadata = metadataSources.getMetadataBuilder().build();
+        SessionFactory sessionFactory = metadata.getSessionFactoryBuilder().build();
+
+        // build the session factory and return it
+        return sessionFactory;
     }
 
     /**
-     * This method gets the DAO classes of the context that are applied to the session factory.
+     * This method create a new database file with the desired database schema.
+     */
+    protected abstract void createNewDatabase() throws Exception;
+
+    /**
+     * This method gets the data entity classes of the context that are applied to the session factory.
      *
      * @return a list of classes that match a database table (marked by @Entity annotation)
      */
     protected abstract List<Class> getAnnotatedClasses();
+
+    protected Session openSession() {
+        return sessionFactory.openSession();
+    }
 
     /**
      * Apply new user credentials to the session factory to create connections for the new user.
@@ -65,13 +118,14 @@ public abstract class H2ContextBase implements Closeable {
      * @param username new username of the sessions created by the session factory
      * @param password new password of the sessions created by the session factory
      */
-    public void changeUser(String username, String password) {
+    @Deprecated
+    protected void changeUser(String username, String password) {
 
         // close old session factory
         sessionFactory.close();
 
         // create new session factory with given login credentials
-        sessionFactory = initSessionFactory(username, password);
+        sessionFactory = initSessionFactory(filePath, username, password);
     }
 
     // +++++++++++++++++++++++++++++++
@@ -86,7 +140,7 @@ public abstract class H2ContextBase implements Closeable {
      * @return a list of DAO entity objects from the result set of the query (on error the list = null)
      */
     @SuppressWarnings({"unchecked"})
-    public <T extends IRecord>  List<T> queryDataset(String sql) {
+    public <T> List<T> queryDataset(String sql) {
 
         List<T> records;
 
@@ -104,24 +158,27 @@ public abstract class H2ContextBase implements Closeable {
      * @param record the DAO to be inserted into database
      * @param <T> the type of the DAO (implicitly set)
      */
-    public <T extends IRecord> void insertRecord(T record) {
+    public <T> void insertRecord(T record) {
 
         Transaction transaction = null;
 
         try (Session session = sessionFactory.openSession()) {
 
-            transaction = session.beginTransaction();
-            session.save(record);
-            session.flush();
-            transaction.commit();
+            try {
 
-        } catch (Exception ex) {
+                transaction = session.beginTransaction();
+                session.save(record);
+                session.flush();
+                transaction.commit();
 
-            if (transaction != null) {
-                transaction.rollback();
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
             }
-
-            throw ex;
         }
     }
 
@@ -131,24 +188,27 @@ public abstract class H2ContextBase implements Closeable {
      * @param record the DAO to be updated
      * @param <T> the type of the DAO (implicitly set)
      */
-    public <T extends IRecord> void updateRecord(T record) {
+    public <T> void updateRecord(T record) {
 
         Transaction transaction = null;
 
         try (Session session = sessionFactory.openSession()) {
 
-            transaction = session.beginTransaction();
-            session.update(record);
-            session.flush();
-            transaction.commit();
+            try {
 
-        } catch (Exception ex) {
+                transaction = session.beginTransaction();
+                session.update(record);
+                session.flush();
+                transaction.commit();
 
-            if (transaction != null) {
-                transaction.rollback();
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
             }
-
-            throw ex;
         }
     }
 
@@ -158,25 +218,101 @@ public abstract class H2ContextBase implements Closeable {
      * @param record the DAO to be deleted
      * @param <T> the type of the DAO (implicitly set)
      */
-    public <T extends IRecord> void deleteRecord(T record) {
+    public <T> void deleteRecord(T record)  {
 
         Transaction transaction = null;
 
         try (Session session = sessionFactory.openSession()) {
 
-            transaction = session.beginTransaction();
-            session.delete(record);
-            session.flush();
-            transaction.commit();
+            try {
 
-        } catch (Exception ex) {
+                transaction = session.beginTransaction();
+                session.delete(record);
+                session.flush();
+                transaction.commit();
 
-            if (transaction != null) {
-                transaction.rollback();
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
             }
-
-            throw ex;
         }
+    }
+
+    // +++++++++++++++++++++++++++++++
+    // ++      execute script       ++
+    // +++++++++++++++++++++++++++++++
+
+    /**
+     * This method executes a sql script. Therefore it gets all statement from the script and executes them in one transaction.
+     *
+     * @param filePath the file path of the script to be executed
+     * @throws Exception caused by file errors while reading the script or while executing the sql commands
+     */
+    public void executeScript(String filePath) throws Exception {
+
+        List<String> sqlCommands = getCommands(new File(filePath).getAbsolutePath());
+
+        try (Session session = sessionFactory.openSession()) {
+
+            Transaction transaction = null;
+
+            try {
+
+                transaction = session.beginTransaction();
+                sqlCommands.forEach(sql -> session.createNativeQuery(sql).executeUpdate());
+                transaction.commit();
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
+            }
+        }
+    }
+
+    private List<String> getCommands(String filePath) throws Exception {
+
+        StringBuilder builder = new StringBuilder();
+
+        // get all line from script file
+        Files.readAllLines(Paths.get(filePath)).stream()
+            // remove rest of line after a line comment
+            .map(x -> x.contains("--") ? x.substring(0, x.indexOf("--")) : x)
+            // append everything to string builder
+            .forEach(x -> builder.append(x).append("\n"));
+
+        List<String> commands = new ArrayList<>();
+        int quotesCount = 0;
+        int start = 0;
+
+        for (int i = 0; i < builder.length(); i++) {
+
+            char c = builder.charAt(i);
+
+            // increase quotes count when a single quote occurs
+            if (c == '\'') {
+
+                quotesCount++;
+
+            // check if the end of a command is reached (when quotes count is not even, the semicolon is part of a quote text)
+            } else if (c == ';' && quotesCount % 2 == 0) {
+
+                // get the command, apply it to the commands list and reset all temporary variables
+                String command = builder.substring(start, i + 1);
+                commands.add(command);
+                quotesCount = 0;
+                start = i + 1;
+            }
+        }
+
+        return commands;
     }
 
     // +++++++++++++++++++++++++++++++
@@ -190,5 +326,25 @@ public abstract class H2ContextBase implements Closeable {
     public void close() {
         sessionFactory.close();
     }
-    
+
+    // +++++++++++++++++++++++++++++++
+    // ++     Getters / Setters     ++
+    // +++++++++++++++++++++++++++++++
+
+    public String getFilePath() {
+        return filePath + ".mv.db";
+    }
+
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
 }

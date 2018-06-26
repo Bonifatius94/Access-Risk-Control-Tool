@@ -1,18 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
-<?import com.jfoenix.controls.*?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import ui.custom.controls.PTableColumn?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Region?>
+<VBox spacing="10" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ui.main.sapsettings.SapSettingsController">
+    <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
+    <TableView VBox.vgrow="ALWAYS" fx:id="sapConnectionTable">
+        <columns>
+            <PTableColumn percentageWidth="0.25" resizable="false" text="%description" styleClass="align-left">
+                <cellValueFactory>
+                    <PropertyValueFactory property="description"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.3" resizable="false" text="%hostServer" styleClass="align-left">
+                <cellValueFactory>
+                    <PropertyValueFactory property="serverDestination"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.25" fx:id="creationColumn" resizable="false" text="%creationDate">
+                <cellValueFactory>
+                    <PropertyValueFactory property="createdAt"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.1" resizable="false" fx:id="editConfigColumn">
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.1" resizable="false" fx:id="deleteConfigColumn">
+            </PTableColumn>
+        </columns>
+    </TableView>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.sapsettings.SapSettingsController"
-      spacing="10">
-    <JFXTreeTableView VBox.vgrow="ALWAYS">
-        <!-- TODO: implement columns here ... -->
-    </JFXTreeTableView>
-
-    <HBox alignment="BOTTOM_RIGHT" spacing="10">
-        <JFXButton text="Clone ..." prefWidth="100" />
-        <JFXButton text="New ..." prefWidth="100" />
-        <JFXButton text="Edit ..." prefWidth="100" />
-        <JFXButton text="Delete" prefWidth="100" />
+    <HBox alignment="BOTTOM_RIGHT" spacing="15">
+        <Label fx:id="itemCount"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <JFXButton prefWidth="130" text="%testConnect" onAction="#connectAction">
+            <graphic>
+                <MaterialDesignIconView glyphName="ACCESS_POINT"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton prefWidth="130" text="%newConnection" onAction="#newSapConnectionAction">
+            <graphic>
+                <MaterialDesignIconView glyphName="PLUS"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton prefWidth="130" text="%clone" onAction="#cloneAction">
+            <graphic>
+                <MaterialDesignIconView glyphName="CONTENT_COPY"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton prefWidth="130" text="%edit" onAction="#editAction">
+            <graphic>
+                <MaterialDesignIconView glyphName="PENCIL"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton prefWidth="130" text="Delete" onAction="#deleteAction" styleClass="warning-button">
+            <graphic>
+                <MaterialDesignIconView glyphName="DELETE"/>
+            </graphic>
+        </JFXButton>
     </HBox>
 </VBox>
+
