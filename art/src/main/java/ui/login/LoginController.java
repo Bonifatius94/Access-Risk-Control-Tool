@@ -2,8 +2,11 @@ package ui.login;
 
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+
+import extensions.ResourceBundleHelper;
 
 import java.util.ResourceBundle;
 
@@ -55,7 +58,7 @@ public class LoginController {
      */
     @FXML
     public void initialize() {
-        bundle = ResourceBundle.getBundle("lang");
+        bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
         loginAttempts = 0;
 
@@ -146,7 +149,7 @@ public class LoginController {
     private void startApplication(ActionEvent event) {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../main/MainView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 

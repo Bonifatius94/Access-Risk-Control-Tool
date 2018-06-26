@@ -13,7 +13,8 @@ import data.entities.AccessProfileCondition;
 import data.entities.ConditionLinkage;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+
+import extensions.ResourceBundleHelper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -32,9 +33,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -125,7 +124,7 @@ public class PatternsFormController {
     private TableView<AccessPatternConditionProperty> selectedTable;
     private List<PTableColumn<AccessPatternConditionProperty, JFXButton>> deleteColumns;
     private AccessPatternConditionProperty selectedProperty;
-    private ResourceBundle bundle = ResourceBundle.getBundle("lang");
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
     private int maxEntries = 10; // the maximum entries per table
 
 

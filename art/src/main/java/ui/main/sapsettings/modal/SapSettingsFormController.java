@@ -6,6 +6,8 @@ import com.jfoenix.controls.JFXTextField;
 import data.entities.SapConfiguration;
 import data.localdb.ArtDbContext;
 
+import extensions.ResourceBundleHelper;
+
 import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
@@ -54,7 +56,7 @@ public class SapSettingsFormController {
     private ArtDbContext database = AppComponents.getDbContext();
 
     private SapSettingsController parentController;
-    ResourceBundle bundle = ResourceBundle.getBundle("lang");
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
 
     /**

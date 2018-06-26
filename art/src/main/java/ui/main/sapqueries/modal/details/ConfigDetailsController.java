@@ -9,6 +9,8 @@ import data.entities.WhitelistEntry;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import extensions.ResourceBundleHelper;
+
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -130,7 +132,7 @@ public class ConfigDetailsController {
     public void viewAccessPatternDetails(AccessPattern accessPattern) {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../../../patterns/modal/PatternsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 

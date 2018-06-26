@@ -1,9 +1,13 @@
 package ui.main.sapsettings;
 
 import com.jfoenix.controls.JFXButton;
+
 import data.entities.SapConfiguration;
 import data.localdb.ArtDbContext;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+
+import extensions.ResourceBundleHelper;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -63,7 +67,7 @@ public class SapSettingsController {
 
     private ArtDbContext database = AppComponents.getDbContext();
     private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
-    ResourceBundle bundle = ResourceBundle.getBundle("lang");
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
 
     /**
@@ -170,7 +174,7 @@ public class SapSettingsController {
 
         try {
             // create a new FXML loader with the SapSettingsFormController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/modal/SapSettingsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
@@ -229,7 +233,7 @@ public class SapSettingsController {
     public void newSapConnectionAction() {
         try {
             // create a new FXML loader with the NewSapSettingDialogView
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/modal/SapSettingsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 

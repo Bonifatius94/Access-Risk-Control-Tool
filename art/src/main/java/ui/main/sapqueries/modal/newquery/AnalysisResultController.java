@@ -11,6 +11,8 @@ import data.entities.CriticalAccessQuery;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
+import extensions.ResourceBundleHelper;
+
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -30,7 +32,6 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import ui.App;
-import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
 import ui.main.patterns.modal.PatternsFormController;
@@ -77,7 +78,7 @@ public class AnalysisResultController {
      */
     @FXML
     public void initialize() {
-        bundle = ResourceBundle.getBundle("lang");
+        bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
         // Add the detail column
         viewPatternDetailsColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.OPEN_IN_NEW, (CriticalAccessEntry entry) -> {

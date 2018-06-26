@@ -28,9 +28,9 @@ public class H2AccountsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // create new database accounts
-            context.createDatabaseUser(new DbUser("FooAdmin", new HashSet(Arrays.asList(DbUserRole.Admin, DbUserRole.DataAnalyst))), "foobar");
-            context.createDatabaseUser(new DbUser("FooDataAnalyst", new HashSet(Arrays.asList(DbUserRole.Viewer, DbUserRole.DataAnalyst))), "foobar");
-            context.createDatabaseUser(new DbUser("FooViewer", new HashSet(Arrays.asList(DbUserRole.Viewer))), "foobar");
+            context.createDatabaseUser(new DbUser("FooAdmin", new HashSet<>(Arrays.asList(DbUserRole.Admin, DbUserRole.DataAnalyst))), "foobar");
+            context.createDatabaseUser(new DbUser("FooDataAnalyst", new HashSet<>(Arrays.asList(DbUserRole.Viewer, DbUserRole.DataAnalyst))), "foobar");
+            context.createDatabaseUser(new DbUser("FooViewer", new HashSet<>(Arrays.asList(DbUserRole.Viewer))), "foobar");
 
             // query accounts
             List<DbUser> users = context.getDatabaseUsers();
@@ -52,7 +52,7 @@ public class H2AccountsTest {
 
             // create new user as viewer
             String username = "FOO";
-            DbUser foo = new DbUser(username, new HashSet(Arrays.asList(DbUserRole.Viewer)));
+            DbUser foo = new DbUser(username, new HashSet<>(Arrays.asList(DbUserRole.Viewer)));
             context.createDatabaseUser(foo, "foobar");
 
             // check if an additional user was created
@@ -91,7 +91,7 @@ public class H2AccountsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // create new user as viewer
-            DbUser foo = new DbUser(username, new HashSet(Arrays.asList(DbUserRole.Viewer)));
+            DbUser foo = new DbUser(username, new HashSet<>(Arrays.asList(DbUserRole.Viewer)));
             context.createDatabaseUser(foo, oldPassword);
 
             // check if an additional user was created
@@ -138,7 +138,7 @@ public class H2AccountsTest {
 
             // create new user as viewer
             String username = "FOO";
-            DbUser foo = new DbUser(username, new HashSet(Arrays.asList(DbUserRole.Viewer)));
+            DbUser foo = new DbUser(username, new HashSet<>(Arrays.asList(DbUserRole.Viewer)));
             context.createDatabaseUser(foo, "foobar");
 
             // query new user
@@ -170,7 +170,7 @@ public class H2AccountsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // create new user as viewer
-            DbUser user = new DbUser(username, new HashSet(Arrays.asList(DbUserRole.Viewer)));
+            DbUser user = new DbUser(username, new HashSet<>(Arrays.asList(DbUserRole.Viewer)));
             context.createDatabaseUser(user, password);
 
             // check if first login role was assigned

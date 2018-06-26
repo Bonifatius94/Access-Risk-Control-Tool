@@ -2,10 +2,14 @@ package ui.main.sapqueries.modal.choosers;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
+
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 import data.entities.Configuration;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+
+import extensions.ResourceBundleHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -177,7 +181,7 @@ public class ConfigChooserController {
     private void viewConfigDetails(Configuration configuration) {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapqueries/modal/details/ConfigDetailsView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 

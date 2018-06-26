@@ -2,11 +2,11 @@ package ui.main.configs;
 
 import com.jfoenix.controls.JFXButton;
 
-import data.entities.AccessPattern;
 import data.entities.Configuration;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+
+import extensions.ResourceBundleHelper;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -25,10 +25,10 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
 
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
@@ -65,7 +65,7 @@ public class ConfigsController {
     public void initialize() throws Exception {
 
         // load the ResourceBundle
-        bundle = ResourceBundle.getBundle("lang");
+        bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
         // show an item count (+ selected)
         itemCount.textProperty().bind(Bindings.concat(Bindings.size(configsTable.getSelectionModel().getSelectedItems()).asString("%s / "),
@@ -244,7 +244,7 @@ public class ConfigsController {
     private void openConfigurationForm(Configuration configuration) {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/ConfigsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 

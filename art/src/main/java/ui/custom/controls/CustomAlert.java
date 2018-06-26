@@ -1,5 +1,7 @@
 package ui.custom.controls;
 
+import extensions.ResourceBundleHelper;
+
 import java.util.ResourceBundle;
 
 import javafx.scene.control.Alert;
@@ -10,11 +12,10 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-
 public class CustomAlert extends Alert {
 
     private CustomWindow window;
-    private ResourceBundle bundle = ResourceBundle.getBundle("lang");
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
     private String title;
     private String contentText;

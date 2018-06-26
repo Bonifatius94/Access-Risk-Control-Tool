@@ -9,6 +9,8 @@ import data.entities.SapConfiguration;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import extensions.ResourceBundleHelper;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -83,7 +85,7 @@ public class SapQueriesController {
     public void initialize() throws Exception {
 
         // load the ResourceBundle
-        bundle = ResourceBundle.getBundle("lang");
+        bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
         // initialize the table
         initializeQueriesTable();
@@ -219,7 +221,7 @@ public class SapQueriesController {
     private void openQuery(CriticalAccessQuery query) {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/details/SapQueryDetailView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
@@ -284,7 +286,7 @@ public class SapQueriesController {
     public void addAction() {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/newquery/NewSapQueryView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
