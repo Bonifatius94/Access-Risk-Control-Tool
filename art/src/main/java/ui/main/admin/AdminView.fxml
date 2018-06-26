@@ -22,14 +22,9 @@
                         <PropertyValueFactory property="username"/>
                     </cellValueFactory>
                 </PTableColumn>
-                <PTableColumn text="%dbUserRoles" percentageWidth="0.3">
+                <PTableColumn text="%dbUserRoles" percentageWidth="0.6">
                     <cellValueFactory>
                         <PropertyValueFactory property="roles"/>
-                    </cellValueFactory>
-                </PTableColumn>
-                <PTableColumn text="%dbUserPassword" percentageWidth="0.3" fx:id="passwordColumn">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="password"/>
                     </cellValueFactory>
                 </PTableColumn>
                 <PTableColumn percentageWidth="0.1" fx:id="deleteColumn" resizable="false" sortable="false">
@@ -37,50 +32,52 @@
             </columns>
         </TableView>
         <VBox spacing="20" VBox.vgrow="ALWAYS">
-            <Label text="%details" style="-fx-font-size: 2em"/>
-            <VBox spacing="20" style="-fx-padding: 0 0 10 0">
-                <HBox spacing="10">
-                    <VBox spacing="6">
-                        <JFXTextField promptText="%dbUserName" fx:id="tfDbUserName" prefWidth="250">
+            <VBox spacing="40">
+                <Label text="%details" style="-fx-font-size: 2em"/>
+                <VBox spacing="20" style="-fx-padding: 0 0 10 0">
+                    <HBox spacing="10">
+                        <VBox spacing="6">
+                            <JFXTextField promptText="%dbUserName" fx:id="tfDbUserName" prefWidth="250">
+                                <validators>
+                                    <RequiredFieldValidator message="%required">
+                                        <MaterialDesignIconView glyphName="ALERT"/>
+                                    </RequiredFieldValidator>
+                                </validators>
+                            </JFXTextField>
+                            <HBox fx:id="usernameValidationBox" visible="false">
+                                <Label fx:id="usernameValidationLabel" styleClass="warning-text"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <MaterialDesignIconView glyphName="ALERT"/>
+                            </HBox>
+                        </VBox>
+                        <Label>
+                            <graphic>
+                                <MaterialDesignIconView glyphName="INFORMATION" size="20"/>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%usernameTooltip"/>
+                            </tooltip>
+                        </Label>
+                    </HBox>
+                    <HBox spacing="10">
+                        <JFXTextField promptText="%dbUserPassword" fx:id="tfDbUserPassword" prefWidth="250">
                             <validators>
                                 <RequiredFieldValidator message="%required">
                                     <MaterialDesignIconView glyphName="ALERT"/>
                                 </RequiredFieldValidator>
                             </validators>
                         </JFXTextField>
-                        <HBox fx:id="usernameValidationBox" visible="false">
-                            <Label fx:id="usernameValidationLabel" styleClass="warning-text"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <MaterialDesignIconView glyphName="ALERT"/>
-                        </HBox>
-                    </VBox>
-                    <Label>
-                        <graphic>
-                            <MaterialDesignIconView glyphName="INFORMATION" size="20"/>
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="%usernameTooltip"/>
-                        </tooltip>
-                    </Label>
-                </HBox>
-                <HBox spacing="10">
-                    <JFXTextField promptText="%dbUserPassword" fx:id="tfDbUserPassword" prefWidth="250">
-                        <validators>
-                            <RequiredFieldValidator message="%required">
-                                <MaterialDesignIconView glyphName="ALERT"/>
-                            </RequiredFieldValidator>
-                        </validators>
-                    </JFXTextField>
-                    <JFXButton fx:id="addToClipboardButton" onAction="#copyPasswordToClipboard" prefHeight="30"
-                               styleClass="round-button">
-                        <graphic>
-                            <MaterialDesignIconView glyphName="CLIPBOARD" size="20"/>
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="%addToClipboard"/>
-                        </tooltip>
-                    </JFXButton>
-                </HBox>
+                        <JFXButton fx:id="addToClipboardButton" onAction="#copyPasswordToClipboard" prefHeight="30"
+                                   styleClass="round-button">
+                            <graphic>
+                                <MaterialDesignIconView glyphName="CLIPBOARD" size="20"/>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%addToClipboard"/>
+                            </tooltip>
+                        </JFXButton>
+                    </HBox>
+                </VBox>
             </VBox>
             <VBox spacing="20">
                 <JFXCheckBox fx:id="adminCheckbox" onAction="#adminSelected" text="%admin">

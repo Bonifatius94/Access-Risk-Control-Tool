@@ -62,9 +62,6 @@ public class AdminController {
     public PTableColumn<DbUser, JFXButton> deleteColumn;
 
     @FXML
-    public PTableColumn<DbUser, String> passwordColumn;
-
-    @FXML
     private HBox usernameValidationBox;
 
     @FXML
@@ -107,7 +104,11 @@ public class AdminController {
         // listen for selects on userTable
         userTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                editUser(newValue);
+                try {
+                    editUser(newValue);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }));
 
@@ -299,7 +300,7 @@ public class AdminController {
                 customAlert.showAndWait();
             } else {
 
-                if (!copiedToClipboard) {
+                if (!copiedToClipboard && newUserMode.getValue()) {
                     // ask if user has written down the password
                     CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("passwordNotedTitle"), bundle.getString("passwordNotedMessage"),
                         bundle.getString("alreadyDone"), bundle.getString("back"));
@@ -343,12 +344,23 @@ public class AdminController {
      *
      * @param newValue is the user , who is going to be edited
      */
-    private void editUser(DbUser newValue) {
+    private void editUser(DbUser newValue) throws Exception {
 
         // user is edited
         this.editDbUser = newValue;
 
         tfDbUserName.setText(editDbUser.getUsername());
+
+        // set the checkboxes disabled if the selected user is the current user
+        if (database.getCurrentUser().getUsername().equalsIgnoreCase(editDbUser.getUsername())) {
+            adminCheckbox.setDisable(true);
+            viewerCheckbox.setDisable(true);
+            dataAnalystCheckbox.setDisable(true);
+        } else {
+            adminCheckbox.setDisable(false);
+            viewerCheckbox.setDisable(false);
+            dataAnalystCheckbox.setDisable(false);
+        }
 
         // set the correct roles
         adminCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.Admin));
