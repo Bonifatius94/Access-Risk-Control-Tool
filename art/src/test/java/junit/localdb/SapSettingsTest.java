@@ -64,7 +64,6 @@ public class SapSettingsTest {
     }
 
     @Test
-    @Disabled
     public void testUpdateSapConfig() {
 
         boolean ret = false;
@@ -92,8 +91,6 @@ public class SapSettingsTest {
             ex.printStackTrace();
         }
 
-        // TODO: test logic for archiving sap config on update
-
         assert(ret);
     }
 
@@ -106,7 +103,7 @@ public class SapSettingsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query sap config
-            SapConfiguration config = context.getSapConfigs(false).stream().findFirst().get();
+            SapConfiguration config = context.getSapConfigs(true).stream().filter(x -> x.isArchived() == true).findFirst().get();
             Integer id = config.getId();
 
             // apply changes to sap config
@@ -117,7 +114,7 @@ public class SapSettingsTest {
             context.updateSapConfig(config);
 
             // query updated data
-            config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(id)).findFirst().get();
+            config = context.getSapConfigs(true).stream().filter(x -> x.getId().equals(id)).findFirst().get();
 
             // check if config was inserted successfully
             ret = config.getLanguage().equals(newLanguage);
@@ -125,8 +122,6 @@ public class SapSettingsTest {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-        // TODO: test logic for archiving sap config on update
 
         assert(false);
     }
@@ -167,17 +162,17 @@ public class SapSettingsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query sap config
-            SapConfiguration config = context.getSapConfigs(false).stream().findFirst().get();
+            SapConfiguration config = context.getSapConfigs(true).stream().filter(x -> x.isArchived() == true).findFirst().get();
             Integer id = config.getId();
 
             // insert into database
             context.deleteSapConfig(config);
 
             // query updated data
-            config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
+            config = context.getSapConfigs(true).stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
 
             // check if config was inserted successfully
-            ret = config == null;
+            ret = config.isArchived() == true;
 
         } catch (Exception ex) {
             ex.printStackTrace();
