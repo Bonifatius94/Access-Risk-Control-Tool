@@ -1,5 +1,8 @@
 package ui;
 
+import extensions.ResourceBundleHelper;
+import extensions.Utf8Control;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
@@ -15,7 +18,6 @@ import tools.tracing.TraceLevel;
 import tools.tracing.TraceMode;
 import tools.tracing.TraceOut;
 
-import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 
 
@@ -90,7 +92,7 @@ public class App extends Application {
         TraceOut.enter();
 
         // load the FirstUseWizwardView
-        ResourceBundle bundle = ResourceBundle.getBundle("lang");
+        ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("login/firstuse/FirstUseWizardView.fxml"), bundle);
         CustomWindow window = loader.load();
 
@@ -121,7 +123,7 @@ public class App extends Application {
         TraceOut.enter();
 
         // load the LoginView
-        ResourceBundle bundle = ResourceBundle.getBundle("lang");
+        ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("login/LoginView.fxml"), bundle);
         CustomWindow window = loader.load();
 

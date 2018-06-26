@@ -3,10 +3,13 @@ package ui.login.firstuse;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
+
 import data.entities.DbUser;
-import data.entities.DbUserRole;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+
+import extensions.ResourceBundleHelper;
 
 import java.util.ResourceBundle;
 
@@ -19,8 +22,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.CustomWindow;
@@ -198,7 +199,7 @@ public class FirstUseWizardController {
     public void closeAndStartApp(ActionEvent event) {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../../main/MainView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 

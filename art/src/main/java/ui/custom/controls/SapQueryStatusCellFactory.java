@@ -6,6 +6,8 @@ import data.entities.CriticalAccessQuery;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
+import extensions.ResourceBundleHelper;
+
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -16,7 +18,7 @@ import javafx.scene.control.Tooltip;
 import javafx.util.Callback;
 
 public class SapQueryStatusCellFactory implements Callback<TableColumn<CriticalAccessQuery, Set<CriticalAccessEntry>>, TableCell<CriticalAccessQuery, Set<CriticalAccessEntry>>> {
-    private ResourceBundle bundle = ResourceBundle.getBundle("lang");
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
     /**
      * Sets the graphic of the cell as a label with the right icon whether CriticalAccessEntries are present.

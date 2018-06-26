@@ -2,6 +2,8 @@ package ui.main.statusbar;
 
 import data.entities.DbUser;
 
+import extensions.ResourceBundleHelper;
+
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
@@ -41,7 +43,7 @@ public class StatusBarController {
     public void openAboutView() {
         try {
             // load the AboutView
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../about/AboutView.fxml"), bundle);
             CustomWindow window = loader.load();
 

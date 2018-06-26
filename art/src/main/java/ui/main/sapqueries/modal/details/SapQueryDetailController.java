@@ -7,6 +7,8 @@ import data.entities.CriticalAccessQuery;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
+import extensions.ResourceBundleHelper;
+
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
@@ -18,13 +20,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import ui.App;
 import ui.custom.controls.CustomWindow;
 import ui.main.sapqueries.SapQueriesController;
 import ui.main.sapqueries.modal.newquery.AnalysisResultController;
 import ui.main.sapqueries.modal.newquery.NewSapQueryController;
 import ui.main.sapsettings.modal.SapSettingsFormController;
-import ui.main.whitelists.modal.WhitelistFormController;
 
 
 public class SapQueryDetailController {
@@ -54,7 +56,7 @@ public class SapQueryDetailController {
     public MaterialDesignIconView statusIcon;
 
 
-    ResourceBundle bundle = ResourceBundle.getBundle("lang");
+    ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
     private CriticalAccessQuery query;
     private SapQueriesController parentController;
 
@@ -155,7 +157,7 @@ public class SapQueryDetailController {
      */
     public void openSapConfigDetails() throws Exception {
         // create a new FXML loader with the SapSettingsFormController
-        ResourceBundle bundle = ResourceBundle.getBundle("lang");
+        ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/modal/SapSettingsFormView.fxml"), bundle);
         CustomWindow customWindow = loader.load();
 

@@ -8,6 +8,7 @@ import data.entities.AccessPattern;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
+import extensions.ResourceBundleHelper;
 import io.msoffice.excel.AccessPatternImportHelper;
 
 import java.io.File;
@@ -79,7 +80,7 @@ public class PatternsController {
     public void initialize() throws Exception {
 
         // load the ResourceBundle
-        bundle = ResourceBundle.getBundle("lang");
+        bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
         // initialize the table
         initializePatternsTable();
@@ -220,7 +221,7 @@ public class PatternsController {
     public void openAccessPatternForm(AccessPattern accessPattern) {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/PatternsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 

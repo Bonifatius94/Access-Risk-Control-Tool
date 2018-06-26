@@ -3,9 +3,12 @@ package ui.main.sapqueries.modal.newquery;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXProgressBar;
+
 import data.entities.Configuration;
 import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
+
+import extensions.ResourceBundleHelper;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -13,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -78,7 +80,7 @@ public class NewSapQueryController {
      */
     @FXML
     public void initialize() {
-        bundle = ResourceBundle.getBundle("lang");
+        bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
         initializeConfigChooser();
 

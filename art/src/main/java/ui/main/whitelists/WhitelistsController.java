@@ -6,6 +6,7 @@ import data.entities.WhitelistEntry;
 
 import data.localdb.ArtDbContext;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import extensions.ResourceBundleHelper;
 import io.msoffice.excel.WhitelistImportHelper;
 
 import java.io.File;
@@ -72,7 +73,7 @@ public class WhitelistsController {
 
     ArtDbContext database = AppComponents.getDbContext();
     private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
-    private ResourceBundle bundle = ResourceBundle.getBundle("lang");
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
     /**
      * this function is automatically called by FXML loader , its starts initialize.
@@ -192,7 +193,7 @@ public class WhitelistsController {
 
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/whitelists/modal/WhitelistFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
