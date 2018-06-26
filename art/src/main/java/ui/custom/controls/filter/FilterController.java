@@ -6,7 +6,10 @@ import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -30,12 +33,8 @@ public class FilterController {
     @FXML
     private JFXButton applyFilterButton;
 
-    @FXML
-    private JFXButton resetFilterButton;
-
-
-    public SimpleObjectProperty<LocalDate> startDateProperty;
-    public SimpleObjectProperty<LocalDate> endDateProperty;
+    public SimpleObjectProperty<ZonedDateTime> startDateProperty;
+    public SimpleObjectProperty<ZonedDateTime> endDateProperty;
     public SimpleStringProperty searchStringProperty;
     public SimpleBooleanProperty showArchivedProperty;
     public SimpleBooleanProperty shouldFilterProperty;
@@ -54,38 +53,52 @@ public class FilterController {
         shouldFilterProperty = new SimpleBooleanProperty();
 
         // bind the properties to the actual inputs
-        startDateProperty.bind(startDatePicker.valueProperty());
-        endDateProperty.bind(endDatePicker.valueProperty());
         searchStringProperty.bind(searchStringInput.textProperty());
         showArchivedProperty.bind(showArchivedToggle.selectedProperty());
         shouldFilterProperty.bind(applyFilterButton.pressedProperty());
 
-        // startDate not after endDate
+        // startDate binding
         startDatePicker.valueProperty().addListener((ol, oldValue, newValue) -> {
+
+            // startDate not after endDate
             if (endDatePicker.getValue() != null) {
                 if (newValue != null && endDatePicker.getValue().toEpochDay() < newValue.toEpochDay()) {
                     startDatePicker.setValue(endDatePicker.getValue());
                 }
             }
+            if (startDatePicker.getValue() != null) {
+                startDateProperty.setValue(startDatePicker.getValue().atStartOfDay(ZoneOffset.UTC));
+            }
         });
 
-        // endDate not before startDate
+        // endDate binding
         endDatePicker.valueProperty().addListener((ol, oldValue, newValue) -> {
+
+            // endDate not before startDate
             if (startDatePicker.getValue() != null) {
                 if (newValue != null && startDatePicker.getValue().toEpochDay() > newValue.toEpochDay()) {
                     endDatePicker.setValue(startDatePicker.getValue());
                 }
             }
+            if (endDatePicker.getValue() != null) {
+                endDateProperty.setValue(endDatePicker.getValue().atStartOfDay(ZoneOffset.UTC));
+            }
         });
+
     }
 
     /**
-     * Resets the filters completely.
+     * Resets the filters completely and lets the parent know that it should filter.
      */
     public void resetFilter() {
         searchStringInput.setText("");
         startDatePicker.setValue(null);
         endDatePicker.setValue(null);
         showArchivedToggle.selectedProperty().set(false);
+
+        shouldFilterProperty.unbind();
+        shouldFilterProperty.setValue(true);
+        shouldFilterProperty.setValue(false);
+        shouldFilterProperty.bind(applyFilterButton.pressedProperty());
     }
 }

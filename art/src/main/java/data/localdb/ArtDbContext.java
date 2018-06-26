@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.NativeQuery;
+import tools.tracing.TraceLevel;
 import tools.tracing.TraceOut;
 
 public class ArtDbContext extends H2ContextBase implements IArtDbContext {
@@ -39,15 +40,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         super(getDefaultDatabaseFilePath(), username, password);
     }
 
-    @Deprecated
-    public ArtDbContext(String filePath, String username, String password) throws Exception {
-        super(filePath, username, password);
-    }
-
     private static String getDefaultDatabaseFilePath() {
 
         String currentExeFolder = System.getProperty("user.dir");
-        return Paths.get(currentExeFolder, "art.h2").toAbsolutePath().toString();
+        String databasePath = Paths.get(currentExeFolder, "art.h2").toAbsolutePath().toString();
+
+        TraceOut.writeInfo(databasePath, TraceLevel.Verbose);
+        return databasePath;
     }
 
     // ===================================
@@ -363,11 +362,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("Pattern.createdAt >= :start");
+            conditions.add("PARSEDATETIME(Pattern.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("Pattern.createdAt <= :end");
+            conditions.add("PARSEDATETIME(Pattern.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -453,11 +452,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("Whitelist.createdAt >= :start");
+            conditions.add("PARSEDATETIME(Whitelist.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("Whitelist.createdAt <= :end");
+            conditions.add("PARSEDATETIME(Whitelist.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -537,11 +536,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("SapConfig.createdAt >= :start");
+            conditions.add("PARSEDATETIME(SapConfig.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("SapConfig.createdAt <= :end");
+            conditions.add("PARSEDATETIME(SapConfig.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -629,11 +628,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("Config.createdAt >= :start");
+            conditions.add("PARSEDATETIME(Config.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("Config.createdAt <= :end");
+            conditions.add("PARSEDATETIME(Config.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -723,11 +722,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         if (start != null) {
-            conditions.add("Query.createdAt >= :start");
+            conditions.add("PARSEDATETIME(Query.createdAt, 'yyyy-MM-dd', 'en') >= PARSEDATETIME(:start, 'yyyy-MM-dd', 'en')");
         }
 
         if (end != null) {
-            conditions.add("Query.createdAt <= :end");
+            conditions.add("PARSEDATETIME(Query.createdAt, 'yyyy-MM-dd', 'en') <= PARSEDATETIME(:end, 'yyyy-MM-dd', 'en')");
         }
 
         if (conditions.size() > 0) {
@@ -1329,13 +1328,14 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
             users = results.stream().map(x -> {
 
+                // parse data fields
                 String username = (String)x[0];
+                boolean isAdmin = (boolean)x[1];
+                boolean isDataAnalyst = (boolean)x[2];
+                boolean isViewer = (boolean)x[3];
+                boolean isFirstLogin = (boolean)x[4];
 
-                Set<DbUserRole> roles = (((String) x[1]) != null && !((String) x[1]).isEmpty())
-                    ? Arrays.stream(((String) x[1]).split(",")).map(y -> DbUserRole.parseRole(y)).collect(Collectors.toSet())
-                    : new HashSet<>();
-
-                return new DbUser(username, roles);
+                return new DbUser(username, isAdmin, isDataAnalyst, isViewer, isFirstLogin);
 
             }).collect(Collectors.toList());
 
@@ -1380,6 +1380,9 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                 // grant privileges to the database account according to given roles
                 user.getRoles().forEach(role -> addDbRole(session, user.getUsername(), role));
 
+                // add entry in DbUsers table
+                createDbUserEntry(session, user);
+
                 session.flush();
                 transaction.commit();
 
@@ -1413,7 +1416,19 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
             try {
 
-                // create a new database account
+                transaction = session.beginTransaction();
+
+                // update DbUser table
+                if (getDatabaseUsers().size() > 0) {
+                    updateDbUserEntry(session, user);
+                } else {
+                    createDbUserEntry(session, user);
+                }
+
+                session.flush();
+                transaction.commit();
+
+                // get the existing database account
                 DbUser original = getDatabaseUsers().stream().filter(x -> x.getUsername().equals(user.getUsername().toUpperCase())).findFirst().orElse(null);
 
                 if (original != null) {
@@ -1445,6 +1460,34 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         }
 
         TraceOut.leave();
+    }
+
+    private void createDbUserEntry(Session session, DbUser user) {
+
+        final String createDbUserSql =
+            "INSERT INTO DbUsers (USERNAME, ISADMIN, ISDATAANALYST, ISVIEWER, ISFIRSTLOGIN) "
+                + "VALUES (:username, :isAdmin, :isDataAnalyst, :isViewer, 1)";
+
+        session.createNativeQuery(createDbUserSql)
+            .setParameter("username", user.getUsername().toUpperCase())
+            .setParameter("isAdmin", user.getRoles().contains(DbUserRole.Admin))
+            .setParameter("isDataAnalyst", user.getRoles().contains(DbUserRole.DataAnalyst))
+            .setParameter("isViewer", user.getRoles().contains(DbUserRole.Viewer))
+            .executeUpdate();
+    }
+
+    private void updateDbUserEntry(Session session, DbUser user) {
+
+        // update DbUser entry flags
+        final String updateDbUserSql =
+            "UPDATE DbUsers SET ISADMIN = :isAdmin, ISDATAANALYST = :isDataAnalyst, ISVIEWER = :isViewer WHERE USERNAME = :username";
+
+        session.createNativeQuery(updateDbUserSql)
+            .setParameter("username", user.getUsername().toUpperCase())
+            .setParameter("isAdmin", user.getRoles().contains(DbUserRole.Admin))
+            .setParameter("isDataAnalyst", user.getRoles().contains(DbUserRole.DataAnalyst))
+            .setParameter("isViewer", user.getRoles().contains(DbUserRole.Viewer))
+            .executeUpdate();
     }
 
     private void addDbRole(Session session, String username, DbUserRole role) {
@@ -1549,6 +1592,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 // delete database account
                 session.createNativeQuery("DROP USER " + username).executeUpdate();
+                session.createNativeQuery("DELETE FROM DbUsers WHERE Username = :username").setParameter("username", username.toUpperCase()).executeUpdate();
 
                 session.flush();
                 transaction.commit();
@@ -1583,6 +1627,44 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         TraceOut.leave();
         return user;
+    }
+
+    /**
+     * This method sets the first login flag of the current user.
+     *
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    @Override
+    public void setFirstLoginOfCurrentUser(DbUser user, boolean flag) throws Exception {
+
+        try (Session session = getSessionFactory().openSession()) {
+
+            Transaction transaction = null;
+
+            try {
+
+                transaction = session.beginTransaction();
+
+                final String sql = "UPDATE DbUsers SET IsFirstLogin = :isFirstLogin WHERE Username = :username";
+                session.createNativeQuery(sql)
+                    .setParameter("username", getCurrentUser().getUsername())
+                    .setParameter("isFirstLogin", flag)
+                    .executeUpdate();
+
+                session.flush();
+                transaction.commit();
+
+                user.setFirstLogin(flag);
+
+            } catch (Exception ex) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                throw ex;
+            }
+        }
     }
 
 }

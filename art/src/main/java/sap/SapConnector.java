@@ -38,8 +38,8 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
      * Creates a new SapConnector with the given configuration, username and password.
      *
      * @param sapConfig the configuration
-     * @param username the username
-     * @param password the password
+     * @param username  the username
+     * @param password  the password
      * @throws Exception caused by an error during sap server destination initialization
      */
     public SapConnector(SapConfiguration sapConfig, String username, String password) throws Exception {
@@ -67,27 +67,27 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
     // =============================
 
     /**
-    /** This method pings the sap server specified in the sap server config.
-     *
+     * /** This method pings the sap server specified in the sap server config.
      * @return a boolean value that indicates whether the ping was successful
+     * @throws JCoException if the ping fails
      */
-    public boolean canPingServer() {
+    public boolean canPingServer() throws JCoException {
 
         TraceOut.enter();
 
-        boolean ret = true;
+        //boolean ret = true;
+        boolean ret = false;
+        //try {
 
-        try {
+        // try to ping the sap server (if the ping fails an exception is thrown -> program enters catch block and returns false)
+        JCoDestination destination = JCoDestinationManager.getDestination(sessionKey);
+        destination.ping();
 
-            // try to ping the sap server (if the ping fails an exception is thrown -> program enters catch block and returns false)
-            JCoDestination destination = JCoDestinationManager.getDestination(sessionKey);
-            destination.ping();
+        //} catch (JCoException ex) {
 
-        } catch (JCoException ex) {
-
-            TraceOut.writeException(ex);
-            ret = false;
-        }
+        //    TraceOut.writeException(ex);
+        ret = true;
+        // }
 
         TraceOut.leave();
         return ret;
@@ -138,7 +138,7 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
     /**
      * This method runs a SAP query for the given pattern and applies the given whitelist to the results of the query afterwards.
      *
-     * @param pattern the pattern to run the query with
+     * @param pattern   the pattern to run the query with
      * @param whitelist the whitelist to be applied to query results
      * @return the list of CriticalAccesses (users)
      */
