@@ -4,19 +4,33 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
+import data.entities.AccessPattern;
 import data.entities.DbUser;
 import data.entities.DbUserRole;
 import data.localdb.ArtDbContext;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 
+import javafx.scene.control.TextFormatter;
+import javafx.scene.layout.HBox;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
@@ -26,26 +40,47 @@ import ui.custom.controls.PTableColumn;
 public class AdminController {
     @FXML
     public TableView<DbUser> userTable;
+
     @FXML
     public JFXTextField tfDbUserName;
+
     @FXML
-    public JFXPasswordField tfDbUserPassword;
+    public JFXTextField tfDbUserPassword;
+
     @FXML
     public JFXCheckBox adminCheckbox;
+
     @FXML
     public JFXCheckBox viewerCheckbox;
+
     @FXML
     public JFXCheckBox dataAnalystCheckbox;
+
     @FXML
     public PTableColumn<DbUser, JFXButton> deleteColumn;
+
     @FXML
     public PTableColumn<DbUser, String> passwordColumn;
 
-    ArtDbContext database = AppComponents.getDbContext();
+    @FXML
+    private HBox usernameValidationBox;
+
+    @FXML
+    private JFXButton addButton;
+
+    @FXML
+    private JFXButton applyButton;
+
+    @FXML
+    private Label usernameValidationLabel;
+
+
+    private List<DbUser> addedUsers;
+    private ArtDbContext database = AppComponents.getDbContext();
+    private ResourceBundle bundle = ResourceBundle.getBundle("lang");
+    private SimpleBooleanProperty newUserMode = new SimpleBooleanProperty();
 
     private DbUser editDbUser;
-
-    private DbUser oldDbUser;
 
     private Set<DbUserRole> dbUserRoleSet = new HashSet<>();
 
@@ -54,8 +89,12 @@ public class AdminController {
      */
     public void initialize() {
 
+        addedUsers = new ArrayList<>();
+
         initializeColumns();
         initializeCheckboxes();
+        initializeValidation();
+
         editDbUser = new DbUser("", dbUserRoleSet);
 
         userTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
@@ -63,8 +102,60 @@ public class AdminController {
                 editUser(newValue);
             }
         }));
+
+        // transform typed text to uppercase
+        tfDbUserName.setTextFormatter(new TextFormatter<>((change) -> {
+            change.setText(change.getText().toUpperCase());
+            return change;
+        }));
+
+        // bind applyButton to the selectedItemProperty
+        applyButton.disableProperty().bind(Bindings.isNull(userTable.getSelectionModel().selectedItemProperty()));
+
+        // set newUserMode to false
+        newUserMode.setValue(false);
+
+        // bind table disable to newUserMode
+        userTable.disableProperty().bind(newUserMode);
+
+        // bind add button disable property to newUserMode
+        addButton.disableProperty().bind(newUserMode);
+
+        // bin username textfield to newUserMode
+        tfDbUserName.editableProperty().bind(newUserMode);
+
         tableRefresh();
 
+    }
+
+    /**
+     * Initializes the validation.
+     */
+    private void initializeValidation() {
+        // validate the input with regex and display error message
+        tfDbUserName.textProperty().addListener((ol, oldValue, newValue) -> {
+            if (newValue.isEmpty()) {
+                usernameValidationBox.setVisible(false);
+            } else {
+                try {
+                    if (!newValue.equals(oldValue)) {
+                        if (!newValue.matches("([A-Z]{3,}+(_|\\w)*)")) {
+                            usernameValidationLabel.setText(bundle.getString("usernameInvalid"));
+                            usernameValidationBox.setVisible(true);
+                        } else if (userTable.isDisabled() && database.getDatabaseUsers().stream().map(x -> x.getUsername()).collect(Collectors.toList()).contains(newValue)) {
+                            // not an edit, new user
+                            usernameValidationLabel.setText(bundle.getString("usernameAlreadyExists"));
+                            usernameValidationBox.setVisible(true);
+                        } else {
+                            usernameValidationBox.setVisible(false);
+                        }
+                        tfDbUserName.validate();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**
@@ -82,23 +173,18 @@ public class AdminController {
     private void initializeColumns() {
         deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (DbUser user) -> {
             try {
-                //check if the currently active user, is going to be deleted
-                if (user.getUsername().equals(database.getCurrentUser().getUsername().toUpperCase())) {
-                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "You can not delete yourself", "It is not possible to delete the currently active USer", "Ok", "Ok");
+                //check if the currently active user is going to be deleted
+                if (user.getUsername().equalsIgnoreCase(database.getCurrentUser().getUsername())) {
+                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("deleteSelfTitle"), bundle.getString("deleteSelfMessage"));
                     customAlert.showAndWait();
                 } else {
-                    //Confirmation dialog if the admin really wants to delete the selected user
-                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, "Do you really want to delete user: " + user.getUsername() + " ?",
-                        "By clicking Ok the user will be deleted, if you changed your mind or missclicked press cancel", "Ok", "Cancel");
-                    String buttonText = customAlert.showAndWait().get().getText();
-                    if (buttonText.equals("Ok")) {
-                        if (database.getDatabaseUsers().contains(user)) {
-                            database.deleteDatabaseUser(user.getUsername());
-                            tableRefresh();
-                        } else {
-                            //if the user was not saved (in database) due to an eventual error
-                            userTable.getItems().remove(user);
-                        }
+                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                        bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+
+                    // delete the user
+                    if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                        database.deleteDatabaseUser(user.getUsername());
+                        tableRefresh();
                     }
                 }
                 initializeCheckboxes();
@@ -155,80 +241,125 @@ public class AdminController {
     }
 
     /**
-     * adds new User with a initial password , that password should be changed by this user.
+     * Adds new User with a random initial password.
      */
     public void addNewUser() {
+
+        // prevent empty rows
+        tableRefresh();
+        newUserMode.setValue(true);
+
+        // reset checkboxes
         initializeCheckboxes();
+
+        // enable password field
+        tfDbUserPassword.setDisable(false);
+
+        // create a new user with random password and add him to the table
         DbUser newDbUser = new DbUser("", new HashSet<>());
-        tfDbUserPassword.clear();
+        tfDbUserPassword.setText(generateFirstPassword(15));
         userTable.getItems().add(newDbUser);
+
+        addedUsers.add(newDbUser);
+
         userTable.refresh();
         userTable.getSelectionModel().select(newDbUser);
-
     }
 
     /**
-     * Save user Changes to the table and the db.
+     * Saves user Changes to the database and refreshes the table.
      */
-    public void saveUserChanges() {
-        if (!tfDbUserName.getText().equals("") || !tfDbUserPassword.getText().equals("")) {
-            try {
-                //check if the user already exists
-                Boolean userExists = false;
-                this.editDbUser.setUsername(tfDbUserName.getText());
-                List<DbUser> dbUserList = database.getDatabaseUsers();
-                for (DbUser db : dbUserList) {
-                    if (db.getUsername().equals(this.editDbUser.getUsername().toUpperCase())) {
-                        userExists = true;
-                    }
-                }
-                //if the user exists update roles
-                if (userExists) {
-                    database.updateUserRoles(editDbUser);
-                } else {
-                    //else create new user with password
+    public void saveUserChanges() throws Exception {
+        if ((userTable.isDisabled() && tfDbUserName.validate() && tfDbUserPassword.validate() && !usernameValidationBox.isVisible())
+            || (!userTable.isDisabled() && tfDbUserName.validate() && !usernameValidationBox.isVisible())) {
+            if (!adminCheckbox.isSelected() && !dataAnalystCheckbox.isSelected() && !viewerCheckbox.isSelected()) {
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("selectRolesTitle"), bundle.getString("selectRolesMessage"));
+                customAlert.showAndWait();
+            } else {
+                editDbUser.setUsername(tfDbUserName.getText());
+
+                // not an edit, new user
+                if (userTable.isDisabled()) {
                     database.createDatabaseUser(this.editDbUser, tfDbUserPassword.getText());
+                } else {
+                    database.updateUserRoles(editDbUser);
                 }
+
+                // enable user table
+                newUserMode.setValue(false);
+
                 tableRefresh();
-            } catch (Exception e) {
-                e.printStackTrace();
-
             }
-        } else {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, "Missing input", "User always need an Username and a password", "Ok", "Ok");
-            customAlert.showAndWait();
         }
-
     }
 
     /**
-     * initializes all fields with the user data.
+     * Initializes all fields with the user data.
      *
      * @param newValue is the user , who is going to be edited
      */
     private void editUser(DbUser newValue) {
-        this.oldDbUser = new DbUser(newValue.getUsername(), newValue.getRoles());
+
+        // user is edited
         this.editDbUser = newValue;
-        tfDbUserPassword.setDisable(true);
+
+        // set inputs to new user inputs
+        if (!addedUsers.contains(newValue)) {
+            tfDbUserPassword.setDisable(true);
+            tfDbUserPassword.setText("");
+        } else {
+            tfDbUserPassword.setDisable(false);
+            tfDbUserPassword.setEditable(false);
+        }
+
         tfDbUserName.setText(editDbUser.getUsername());
+
+        // set the correct roles
         adminCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.Admin));
         viewerCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.Viewer));
         dataAnalystCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.DataAnalyst));
-        if (editDbUser.getUsername().equals("")) {
-            tfDbUserPassword.setDisable(false);
-        }
     }
 
     /**
-     * reloads all users from database and fills Tableview.
+     * Reloads all users from the database to the table.
      */
     private void tableRefresh() {
         try {
-            userTable.getItems().clear();
-            userTable.getItems().addAll(database.getDatabaseUsers());
-            userTable.refresh();
+            List<DbUser> items = database.getDatabaseUsers();
+            ObservableList<DbUser> list = FXCollections.observableList(items);
+
+            userTable.getSelectionModel().clearSelection();
+            userTable.setItems(list);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * Generates a random password with the given length.
+     *
+     * @param length the length of the password
+     * @return a randomly generated password
+     */
+    private String generateFirstPassword(int length) {
+        final String lowercase = "abcdefghjklmnpqrstuvwxyz";
+        final String uppercase = lowercase.toUpperCase();
+        final String digits = "0123456789";
+        final String special = "!@#$%&_-+<>?/";
+
+        Random random = new SecureRandom();
+        StringBuilder sb = new StringBuilder();
+        sb.append(lowercase).append(uppercase).append(digits);
+        sb.append(special);
+
+        char[] characters = sb.toString().toCharArray();
+        char[] pw = new char[length];
+        for (int i = 0; i < length; i++) {
+            pw[i] = characters[random.nextInt(characters.length)];
+            System.out.println(pw[i]);
+        }
+
+        return new String(pw);
     }
 }

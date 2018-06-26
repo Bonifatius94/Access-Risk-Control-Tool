@@ -9,6 +9,8 @@
 <?import com.jfoenix.validation.RequiredFieldValidator?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.admin.AdminController"
       spacing="10">
     <HBox VBox.vgrow="ALWAYS" spacing="30" style="-fx-padding: 20">
@@ -34,29 +36,52 @@
                 </PTableColumn>
             </columns>
         </TableView>
-        <VBox VBox.vgrow="ALWAYS" spacing="35" >
-            <JFXTextField promptText="%dbUserName" fx:id="tfDbUserName" prefWidth="250">
-                <validators>
-                    <RequiredFieldValidator message="%required">
-                        <MaterialDesignIconView glyphName="ALERT"/>
-                    </RequiredFieldValidator>
-                </validators>
-            </JFXTextField>
-            <JFXPasswordField promptText="%dbUserPassword" fx:id="tfDbUserPassword" prefWidth="250">
-                <validators>
-                    <RequiredFieldValidator message="%required">
-                        <MaterialDesignIconView glyphName="ALERT"/>
-                    </RequiredFieldValidator>
-                </validators>
-            </JFXPasswordField>
-            <JFXCheckBox fx:id="adminCheckbox" onAction="#adminSelected" text="%admin">
-            </JFXCheckBox>
-            <JFXCheckBox fx:id="viewerCheckbox" onAction="#viewerSelected" text="%viewer">
-            </JFXCheckBox>
-            <JFXCheckBox fx:id="dataAnalystCheckbox" onAction="#dataAnalystSelected" text="%dataAnalyst">
-            </JFXCheckBox>
-            <HBox spacing="30" HBox.hgrow="ALWAYS" >
-                <JFXButton styleClass="round-button"
+        <VBox spacing="20" VBox.vgrow="ALWAYS">
+            <Label text="%details" style="-fx-font-size: 2em"/>
+            <VBox spacing="20" style="-fx-padding: 0 0 10 0">
+                <HBox spacing="10">
+                    <VBox spacing="6">
+                        <JFXTextField promptText="%dbUserName" fx:id="tfDbUserName" prefWidth="250">
+                            <validators>
+                                <RequiredFieldValidator message="%required">
+                                    <MaterialDesignIconView glyphName="ALERT"/>
+                                </RequiredFieldValidator>
+                            </validators>
+                        </JFXTextField>
+                        <HBox fx:id="usernameValidationBox" visible="false">
+                            <Label fx:id="usernameValidationLabel" styleClass="warning-text"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <MaterialDesignIconView glyphName="ALERT"/>
+                        </HBox>
+                    </VBox>
+                    <Label>
+                        <graphic>
+                            <MaterialDesignIconView glyphName="INFORMATION" size="20"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%usernameTooltip"/>
+                        </tooltip>
+                    </Label>
+                </HBox>
+                <JFXTextField promptText="%dbUserPassword" fx:id="tfDbUserPassword" prefWidth="250">
+                    <validators>
+                        <RequiredFieldValidator message="%required">
+                            <MaterialDesignIconView glyphName="ALERT"/>
+                        </RequiredFieldValidator>
+                    </validators>
+                </JFXTextField>
+            </VBox>
+            <VBox spacing="20">
+                <JFXCheckBox fx:id="adminCheckbox" onAction="#adminSelected" text="%admin">
+                </JFXCheckBox>
+                <JFXCheckBox fx:id="viewerCheckbox" onAction="#viewerSelected" text="%viewer">
+                </JFXCheckBox>
+                <JFXCheckBox fx:id="dataAnalystCheckbox" onAction="#dataAnalystSelected" text="%dataAnalyst">
+                </JFXCheckBox>
+            </VBox>
+            <Separator/>
+            <HBox spacing="10" HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT">
+                <JFXButton styleClass="round-button" fx:id="addButton"
                            onAction="#addNewUser" prefHeight="30">
                     <graphic>
                         <MaterialDesignIconView glyphName="PLUS"/>
@@ -65,13 +90,13 @@
                         <Tooltip text="%addUser"/>
                     </tooltip>
                 </JFXButton>
-                <JFXButton styleClass="round-button"
+                <JFXButton styleClass="round-button" fx:id="applyButton"
                            onAction="#saveUserChanges" prefHeight="30">
                     <graphic>
                         <MaterialDesignIconView glyphName="CHECK"/>
                     </graphic>
                     <tooltip>
-                        <Tooltip text="%saveUserChanges"/>
+                        <Tooltip text="%applyChanges"/>
                     </tooltip>
                 </JFXButton>
             </HBox>
