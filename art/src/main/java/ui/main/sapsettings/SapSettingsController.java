@@ -1,9 +1,13 @@
 package ui.main.sapsettings;
 
 import com.jfoenix.controls.JFXButton;
+
 import data.entities.SapConfiguration;
 import data.localdb.ArtDbContext;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+
+import extensions.ResourceBundleHelper;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,6 +23,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
@@ -62,7 +67,7 @@ public class SapSettingsController {
 
     private ArtDbContext database = AppComponents.getDbContext();
     private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
-    ResourceBundle bundle = ResourceBundle.getBundle("lang");
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
 
     /**
@@ -70,7 +75,11 @@ public class SapSettingsController {
      */
     @FXML
     public void initialize() throws Exception {
+
         initializeTableColumn();
+
+        // replace Placeholder of PatternsTable with other message
+        sapConnectionTable.setPlaceholder(new Label(bundle.getString("noEntries")));
 
         filterController.shouldFilterProperty.addListener((obs, oldValue, newValue) -> {
             if (newValue) {
@@ -125,18 +134,24 @@ public class SapSettingsController {
      */
     private void initializeTableColumn() {
         // Add the delete column
-        deleteConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (SapConfiguration sapConfiguration) -> {
-            try {
-                database.deleteSapConfig(sapConfiguration);
-                updateSapSettingsTable();
-            } catch (Exception e) {
-                e.printStackTrace();
+        deleteConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (SapConfiguration sapConfiguration) -> {
+
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                try {
+                    database.deleteSapConfig(sapConfiguration);
+                    updateSapSettingsTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             return sapConfiguration;
         }));
 
         // Add the edit column
-        editConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (SapConfiguration sapConfiguration) -> {
+        editConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (SapConfiguration sapConfiguration) -> {
             editConfig(sapConfiguration);
             return sapConfiguration;
         }));
@@ -159,7 +174,7 @@ public class SapSettingsController {
 
         try {
             // create a new FXML loader with the SapSettingsFormController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/modal/SapSettingsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
@@ -218,7 +233,7 @@ public class SapSettingsController {
     public void newSapConnectionAction() {
         try {
             // create a new FXML loader with the NewSapSettingDialogView
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/modal/SapSettingsFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
@@ -273,12 +288,20 @@ public class SapSettingsController {
      */
     public void deleteAction() throws Exception {
         if (sapConnectionTable.getSelectionModel().getSelectedItems() != null && sapConnectionTable.getSelectionModel().getSelectedItems().size() != 0) {
-            // TODO show delete alert
-            for (SapConfiguration config : sapConnectionTable.getSelectionModel().getSelectedItems()) {
-                database.deleteSapConfig(config);
+            CustomAlert customAlert;
+            if (sapConnectionTable.getSelectionModel().getSelectedItems().size() == 1) {
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                    bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+            } else {
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteMultipleConfirmTitle"),
+                    bundle.getString("deleteMultipleConfirmMessage"), "Ok", "Cancel");
             }
-            updateSapSettingsTable();
-
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                for (SapConfiguration config : sapConnectionTable.getSelectionModel().getSelectedItems()) {
+                    database.deleteSapConfig(config);
+                }
+                updateSapSettingsTable();
+            }
         }
     }
 }

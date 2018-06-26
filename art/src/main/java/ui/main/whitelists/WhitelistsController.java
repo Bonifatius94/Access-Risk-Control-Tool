@@ -6,6 +6,7 @@ import data.entities.WhitelistEntry;
 
 import data.localdb.ArtDbContext;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import extensions.ResourceBundleHelper;
 import io.msoffice.excel.WhitelistImportHelper;
 
 import java.io.File;
@@ -72,7 +73,7 @@ public class WhitelistsController {
 
     ArtDbContext database = AppComponents.getDbContext();
     private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
-    private ResourceBundle bundle = ResourceBundle.getBundle("lang");
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
     /**
      * this function is automatically called by FXML loader , its starts initialize.
@@ -81,6 +82,9 @@ public class WhitelistsController {
     public void initialize() throws Exception {
 
         initializeColumns();
+
+        // replace Placeholder of PatternsTable with other message
+        whitelistTable.setPlaceholder(new Label(bundle.getString("noEntries")));
 
         // catch row double click
         whitelistTable.setRowFactory(tv -> {
@@ -138,20 +142,25 @@ public class WhitelistsController {
      */
     private void initializeColumns() {
 
-        deleteWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (Whitelist whitelist) -> {
+        deleteWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (Whitelist whitelist) -> {
 
-            try {
-                database.deleteWhitelist(whitelist);
-                updateWhitelistTable();
-            } catch (Exception e) {
-                e.printStackTrace();
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                try {
+                    database.deleteWhitelist(whitelist);
+                    updateWhitelistTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             return whitelist;
         }));
         deleteWhitelistColumn.setSortable(false);
 
         // Add the edit column
-        editWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (Whitelist whitelist) -> {
+        editWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (Whitelist whitelist) -> {
             editDialogWhitelist(whitelist);
             return whitelist;
         }));
@@ -184,7 +193,7 @@ public class WhitelistsController {
 
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
+            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/whitelists/modal/WhitelistFormView.fxml"), bundle);
             CustomWindow customWindow = loader.load();
 
@@ -243,8 +252,14 @@ public class WhitelistsController {
      */
     public void deleteWhitelist() throws Exception {
         if (whitelistTable.getSelectionModel().getSelectedItems() != null && whitelistTable.getSelectionModel().getSelectedItems().size() != 0) {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
-                bundle.getString("deleteConfirmMessage") + " (" + whitelistTable.getSelectionModel().getSelectedItems().size() + ")", "Ok", "Cancel");
+            CustomAlert customAlert;
+            if (whitelistTable.getSelectionModel().getSelectedItems().size() == 1) {
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                    bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+            } else {
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteMultipleConfirmTitle"),
+                    bundle.getString("deleteMultipleConfirmMessage"), "Ok", "Cancel");
+            }
 
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 // deletes whitelists from DB

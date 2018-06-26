@@ -13,7 +13,8 @@ import data.entities.AccessProfileCondition;
 import data.entities.ConditionLinkage;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+
+import extensions.ResourceBundleHelper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -33,7 +34,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -99,16 +99,33 @@ public class PatternsFormController {
     private JFXButton deleteSelectedTableTabButton;
 
     @FXML
+    private JFXButton addConditionButton;
+
+    @FXML
+    private JFXButton applyPopertyChangesButton;
+
+    @FXML
+    private JFXButton saveButton;
+
+    @FXML
+    private JFXButton addPropertyButton;
+
+    @FXML
+    private JFXButton copyPropertyButton;
+
+    @FXML
     private Label atLeastOneCondWarning;
 
     private PatternsController parentController;
 
     private AccessPattern accessPattern;
-    private AccessPattern originalPattern;
 
     private List<TableViewWithAccessCondition> conditionTables;
     private TableView<AccessPatternConditionProperty> selectedTable;
+    private List<PTableColumn<AccessPatternConditionProperty, JFXButton>> deleteColumns;
     private AccessPatternConditionProperty selectedProperty;
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
+    private int maxEntries = 10; // the maximum entries per table
 
 
     /**
@@ -119,6 +136,9 @@ public class PatternsFormController {
 
         // initialize conditionTables
         this.conditionTables = new ArrayList<>();
+
+        // initialize delete columns
+        this.deleteColumns = new ArrayList<>();
 
         // set condition input items
         this.conditionTypeInput.getItems().setAll("Condition", "Profile");
@@ -292,6 +312,9 @@ public class PatternsFormController {
                     addConditionTableTab(condition);
                 }
 
+                this.selectedTable = conditionTables.get(0).getTableView();
+
+
                 // preselect correct linkage
                 this.linkageInput.getSelectionModel().select(pattern.getLinkage());
             } else {
@@ -306,9 +329,6 @@ public class PatternsFormController {
                 this.profileInput.setText(pattern.getConditions().stream().findFirst().get().getProfileCondition().getProfile());
             }
         }
-
-        // save the original pattern as deep copy
-        this.originalPattern = new AccessPattern(this.accessPattern);
     }
 
     /**
@@ -346,15 +366,7 @@ public class PatternsFormController {
             authFieldValue1Input.validate();
 
         } else {
-
-            // reset form
-            authObjectInput.setText("");
-            authFieldInput.setText("");
-            authFieldValue1Input.setText("");
-            authFieldValue2Input.setText("");
-            authFieldValue3Input.setText("");
-            authFieldValue4Input.setText("");
-
+            resetDetails();
         }
 
     }
@@ -396,89 +408,113 @@ public class PatternsFormController {
      */
     public void saveChanges(ActionEvent event) throws Exception {
 
-        // replace the useCaseId and the description with the text field values
-        this.accessPattern.setUsecaseId(this.useCaseIdInput.getText());
-        this.accessPattern.setDescription(this.descriptionInput.getText());
-        this.accessPattern.setLinkage(linkageInput.getValue());
+        if (validateBeforeSubmit()) {
+            // replace the useCaseId and the description with the text field values
+            this.accessPattern.setUsecaseId(this.useCaseIdInput.getText());
+            this.accessPattern.setDescription(this.descriptionInput.getText());
+            this.accessPattern.setLinkage(linkageInput.getValue());
 
-        // execute only if the pattern is no profile
-        if (this.conditionTypeInput.getSelectionModel().getSelectedItem().equals("Condition")) {
+            // execute only if the pattern is no profile
+            if (this.conditionTypeInput.getSelectionModel().getSelectedItem().equals("Condition")) {
 
-            // copy conditions to the list
-            for (TableViewWithAccessCondition tableViewWithAccessCondition : conditionTables) {
+                // copy conditions to the list
+                for (TableViewWithAccessCondition tableViewWithAccessCondition : conditionTables) {
 
-                // add table if it is not empty
-                if (tableViewWithAccessCondition.getTableView().getItems() != null && tableViewWithAccessCondition.getTableView().getItems().size() != 0) {
+                    List<AccessPatternConditionProperty> items = tableViewWithAccessCondition.getTableView().getItems();
+                    items = items.stream().filter(x -> x.getAuthObject() != null).collect(Collectors.toList());
 
-                    if (tableViewWithAccessCondition.getAccessCondition().getId() == null) {
+                    // add table if it is not empty
+                    if (items != null && items.size() != 0) {
 
-                        AccessPatternCondition patternCondition = new AccessPatternCondition();
-                        AccessCondition accessCondition = new AccessCondition();
+                        if (tableViewWithAccessCondition.getAccessCondition().getId() == null) {
 
-                        // set patternCondition Id
-                        if (tableViewWithAccessCondition.getAccessCondition().getPatternCondition() != null) {
-                            patternCondition.setId(tableViewWithAccessCondition.getAccessCondition().getPatternCondition().getId());
+                            AccessPatternCondition patternCondition = new AccessPatternCondition();
+                            AccessCondition accessCondition = new AccessCondition();
+
+                            // set patternCondition Id
+                            if (tableViewWithAccessCondition.getAccessCondition().getPatternCondition() != null) {
+                                patternCondition.setId(tableViewWithAccessCondition.getAccessCondition().getPatternCondition().getId());
+                            }
+
+                            // set accessCondition Id
+                            accessCondition.setId(tableViewWithAccessCondition.getAccessCondition().getId());
+
+                            // add properties to patternCondition
+                            patternCondition.setProperties(items);
+
+                            // add patternConditon to accessCondition
+                            accessCondition.setPatternCondition(patternCondition);
+
+                            accessPattern.getConditions().add(accessCondition);
+
+                        } else {
+
+                            AccessCondition accessCondition = tableViewWithAccessCondition.getAccessCondition();
+                            AccessPatternCondition patternCondition = tableViewWithAccessCondition.getAccessCondition().getPatternCondition();
+
+                            List<AccessPatternConditionProperty> properties = new ArrayList<>();
+                            properties.addAll(items);
+
+                            patternCondition.setProperties(properties);
+                            accessCondition.setPatternCondition(patternCondition);
                         }
-
-                        // set accessCondition Id
-                        accessCondition.setId(tableViewWithAccessCondition.getAccessCondition().getId());
-
-                        // add properties to patternCondition
-                        patternCondition.setProperties(tableViewWithAccessCondition.getTableView().getItems());
-
-                        // add patternConditon to accessCondition
-                        accessCondition.setPatternCondition(patternCondition);
-
-                        accessPattern.getConditions().add(accessCondition);
 
                     } else {
 
-                        AccessCondition accessCondition = tableViewWithAccessCondition.getAccessCondition();
-                        AccessPatternCondition patternCondition = tableViewWithAccessCondition.getAccessCondition().getPatternCondition();
+                        if (tableViewWithAccessCondition.getAccessCondition().getId() != null) {
+                            accessPattern.getConditions().remove(tableViewWithAccessCondition.getAccessCondition());
+                        }
 
-                        List<AccessPatternConditionProperty> properties = new ArrayList<>();
-                        properties.addAll(tableViewWithAccessCondition.getTableView().getItems());
-
-                        patternCondition.setProperties(properties);
-                        accessCondition.setPatternCondition(patternCondition);
                     }
-
-                } else {
-
-                    if (tableViewWithAccessCondition.getAccessCondition().getId() != null) {
-                        accessPattern.getConditions().remove(tableViewWithAccessCondition.getAccessCondition());
-                    }
-
                 }
+            } else {
+
+                // overwrite the profile
+                AccessCondition accessCondition = new AccessCondition();
+                AccessProfileCondition profileCond = new AccessProfileCondition();
+
+                profileCond.setProfile(this.profileInput.getText());
+                accessCondition.setProfileCondition(profileCond);
+
+                List<AccessCondition> conditions = new ArrayList<>();
+                conditions.add(accessCondition);
+
+                accessPattern.setConditions(conditions);
             }
-        } else {
 
-            // overwrite the profile
-            AccessCondition accessCondition = new AccessCondition();
-            AccessProfileCondition profileCond = new AccessProfileCondition();
+            // save the pattern to the database
 
-            profileCond.setProfile(this.profileInput.getText());
-            accessCondition.setProfileCondition(profileCond);
+            // new pattern, id is null
+            if (accessPattern.getId() == null) {
+                AppComponents.getDbContext().createPattern(accessPattern);
+            } else {
+                AppComponents.getDbContext().updatePattern(accessPattern);
+            }
 
-            List<AccessCondition> conditions = new ArrayList<>();
-            conditions.add(accessCondition);
-
-            accessPattern.setConditions(conditions);
+            // refresh the patternsTable in the parentController
+            parentController.updatePatternsTable();
+            close(event);
         }
+    }
 
-        // save the pattern to the database
+    /**
+     * Checks if all inputs are valid before submitting.
+     */
+    private boolean validateBeforeSubmit() {
+        // basic input validation
+        boolean result = useCaseIdInput.validate() && descriptionInput.validate() && conditionTypeInput.getValue() != null;
 
-        // new pattern, id is null
-        if (accessPattern.getId() == null) {
-            AppComponents.getDbContext().createPattern(accessPattern);
+        // profile validation
+        if (conditionTypeInput.getValue() != null && this.conditionTypeInput.getValue().equals("Profile")) {
+            return result && profileInput.validate();
         } else {
-            AppComponents.getDbContext().updatePattern(accessPattern);
+            // pattern validation
+            // at least one table with one item
+            boolean tableEmpty = conditionTables.get(0) != null
+                && !conditionTables.get(0).getTableView().getItems().stream().filter(x -> x.getAuthObject() != null).collect(Collectors.toList()).isEmpty();
+
+            return result && linkageInput.getValue() != null && tableEmpty;
         }
-
-        // refresh the patternsTable in the parentController
-        parentController.updatePatternsTable();
-        close(event);
-
     }
 
     /**
@@ -488,9 +524,6 @@ public class PatternsFormController {
      */
     @SuppressWarnings("unchecked") // TODO: remove this annotation if possible
     public void addConditionTableTab(AccessCondition condition) {
-
-        // get the resource bundle for internationalization
-        ResourceBundle bundle = ResourceBundle.getBundle("lang");
 
         // AuthObject Column
         PTableColumn<AccessPatternConditionProperty, String> authObject = new PTableColumn<>();
@@ -538,9 +571,12 @@ public class PatternsFormController {
             conditionTable.getItems().remove(accessPatternConditionProperty);
 
             //remove the property from the condition (call by reference)
-            condition.getPatternCondition().getProperties().remove(accessPatternConditionProperty);
+            if (condition.getPatternCondition() != null) {
+                condition.getPatternCondition().getProperties().remove(accessPatternConditionProperty);
+            }
             return accessPatternConditionProperty;
         }));
+        deleteColumns.add(deleteColumn);
 
         // listen to selects on conditionPropertiesTable
         conditionTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -565,33 +601,14 @@ public class PatternsFormController {
         // presort table
         conditionTable.getSortOrder().addAll(authObject, authObjectProperty);
 
-        // create add button
-        JFXButton addButton = new JFXButton();
-        addButton.setOnAction(event -> {
-            conditionTable.getItems().add(new AccessPatternConditionProperty());
-            conditionTable.requestFocus();
-            conditionTable.getSelectionModel().selectLast();
-            conditionTable.getFocusModel().focus(conditionTable.getItems().size() - 1);
-            conditionTable.scrollTo(conditionTable.getItems().size() - 1);
-        });
-        MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.PLUS);
-        addButton.setGraphic(view);
-        addButton.setTooltip(new Tooltip(bundle.getString("addProperty")));
-        addButton.getStyleClass().add("round-button");
-        addButton.setMinHeight(30);
-        addButton.setPrefHeight(30);
-
-        // disable button on 10 entries
-        addButton.disableProperty().bind(Bindings.size(conditionTable.getItems()).isEqualTo(10));
-
         // add warning label on 10 entries
         Label warningTextItemLimit = new Label(bundle.getString("warningTextItemLimit"));
-        warningTextItemLimit.visibleProperty().bind(Bindings.size(conditionTable.getItems()).isEqualTo(10));
+        warningTextItemLimit.visibleProperty().bind(Bindings.size(conditionTable.getItems()).isEqualTo(maxEntries));
 
         // box for the button
         HBox buttonBox = new HBox();
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
-        buttonBox.getChildren().addAll(warningTextItemLimit, addButton);
+        buttonBox.getChildren().addAll(warningTextItemLimit);
         buttonBox.setSpacing(20);
         buttonBox.setPadding(new Insets(0, 20, 0, 0));
         HBox.setHgrow(buttonBox, Priority.ALWAYS);
@@ -610,6 +627,29 @@ public class PatternsFormController {
         // "bind" the table to the tab
         tab.setOnSelectionChanged((event) -> {
             this.selectedTable = conditionTable;
+
+            // bind addPropertyButton
+            this.addPropertyButton.disableProperty().bind(
+                Bindings.or(Bindings.size(selectedTable.getItems()).isEqualTo(maxEntries),
+                    Bindings.or(Bindings.isEmpty(authObjectInput.textProperty()),
+                        Bindings.or(Bindings.isEmpty(authFieldInput.textProperty()),
+                            Bindings.isEmpty(authFieldValue1Input.textProperty())))));
+
+            // bind copyPropertyButton
+            this.copyPropertyButton.disableProperty().bind(
+                Bindings.or(Bindings.isNull(selectedTable.getSelectionModel().selectedItemProperty()),
+                Bindings.or(Bindings.size(selectedTable.getItems()).isEqualTo(maxEntries),
+                    Bindings.or(Bindings.isEmpty(authObjectInput.textProperty()),
+                        Bindings.or(Bindings.isEmpty(authFieldInput.textProperty()),
+                            Bindings.isEmpty(authFieldValue1Input.textProperty()))))));
+
+            // bind applyPropertyButton
+            this.applyPopertyChangesButton.disableProperty().bind(
+                Bindings.or(Bindings.isNull(selectedTable.getSelectionModel().selectedItemProperty()),
+                    Bindings.or(Bindings.size(selectedTable.getItems()).isEqualTo(maxEntries),
+                        Bindings.or(Bindings.isEmpty(authObjectInput.textProperty()),
+                            Bindings.or(Bindings.isEmpty(authFieldInput.textProperty()),
+                                Bindings.isEmpty(authFieldValue1Input.textProperty()))))));
         });
 
         this.conditionTabs.getTabs().add(tab);
@@ -618,8 +658,7 @@ public class PatternsFormController {
     /**
      * Edits the selected condition property.
      */
-    public void editConditionProperty() {
-
+    public void applyChanges() {
         if (selectedProperty != null && authObjectInput.validate() && authFieldInput.validate() && authFieldValue1Input.validate()) {
 
             // store all the new values from the textFields
@@ -630,11 +669,108 @@ public class PatternsFormController {
             selectedProperty.setValue3(authFieldValue3Input.getText());
             selectedProperty.setValue4(authFieldValue4Input.getText());
 
-            this.selectedTable.refresh();
-
+            selectedTable.getSelectionModel().clearSelection();
+            resetDetails();
         }
     }
 
+    /**
+     * Adds a property to the selected table.
+     */
+    public void addConditionProperty() {
+        // create the property to add and give it the parameters
+        AccessPatternConditionProperty propertyToAdd = new AccessPatternConditionProperty();
+        propertyToAdd.setAuthObject(authObjectInput.getText());
+        propertyToAdd.setAuthObjectProperty(authFieldInput.getText());
+        propertyToAdd.setValue1(authFieldValue1Input.getText());
+        propertyToAdd.setValue2(authFieldValue2Input.getText());
+        propertyToAdd.setValue3(authFieldValue3Input.getText());
+        propertyToAdd.setValue4(authFieldValue4Input.getText());
+
+        selectedTable.getItems().add(propertyToAdd);
+        selectedTable.requestFocus();
+        selectedTable.scrollTo(selectedTable.getItems().size() - 1);
+        selectedTable.getSelectionModel().clearSelection();
+        
+        resetDetails();
+    }
+
+
+    /**
+     * Copies the currently selected property.
+     */
+    public void copyConditionProperty() {
+        if (selectedProperty != null) {
+            // create the property to add and give it the parameters
+            AccessPatternConditionProperty propertyToAdd = new AccessPatternConditionProperty();
+            propertyToAdd.setAuthObject(authObjectInput.getText());
+            propertyToAdd.setAuthObjectProperty(authFieldInput.getText());
+            propertyToAdd.setValue1(authFieldValue1Input.getText());
+            propertyToAdd.setValue2(authFieldValue2Input.getText());
+            propertyToAdd.setValue3(authFieldValue3Input.getText());
+            propertyToAdd.setValue4(authFieldValue4Input.getText());
+
+            selectedTable.getItems().add(propertyToAdd);
+            selectedTable.requestFocus();
+            selectedTable.getSelectionModel().selectLast();
+            selectedTable.getFocusModel().focus(selectedTable.getItems().size() - 1);
+            selectedTable.scrollTo(selectedTable.getItems().size() - 1);
+        }
+    }
+
+
+    /**
+     * Resets the details.
+     */
+    private void resetDetails() {
+        authObjectInput.setText("");
+        authFieldInput.setText("");
+        authFieldValue1Input.setText("");
+        authFieldValue2Input.setText("");
+        authFieldValue3Input.setText("");
+        authFieldValue4Input.setText("");
+    }
+
+    /**
+     * Makes all inputs not editable and hides the buttons.
+     *
+     * @param editable whether the components should be editable
+     */
+    public void setEditable(boolean editable) {
+
+        // disable everything
+        if (!editable) {
+
+            // make text fields uneditable
+            useCaseIdInput.setEditable(false);
+            descriptionInput.setEditable(false);
+
+            authObjectInput.setEditable(false);
+            authFieldInput.setEditable(false);
+            authFieldValue1Input.setEditable(false);
+            authFieldValue2Input.setEditable(false);
+            authFieldValue3Input.setEditable(false);
+            authFieldValue4Input.setEditable(false);
+            profileInput.setEditable(false);
+
+            // disable combo boxes
+            linkageInput.setDisable(true);
+            conditionTypeInput.setDisable(true);
+
+            // remove buttons
+            addConditionButton.setVisible(false);
+            deleteSelectedTableTabButton.setVisible(false);
+            saveButton.setVisible(false);
+            applyPopertyChangesButton.setVisible(false);
+            addPropertyButton.setVisible(false);
+            copyPropertyButton.setVisible(false);
+
+            // remove delete column
+            for (PTableColumn column : deleteColumns) {
+                column.setVisible(false);
+            }
+        }
+    }
 
     /**
      * Stores a TableView and an AccessCondition which is needed for updating a pattern correctly.

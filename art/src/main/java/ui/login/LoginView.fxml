@@ -14,7 +14,7 @@
 <?import javafx.scene.control.Tooltip?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
-              fx:controller="ui.login.LoginController" title="%login">
+              fx:controller="ui.login.LoginController" title="%login" windowState="NoResize">
     <VBox HBox.hgrow="ALWAYS" style="-fx-padding: 20" spacing="20" alignment="CENTER" styleClass="login-window">
         <ImageView fitWidth="180" fitHeight="180">
             <image>

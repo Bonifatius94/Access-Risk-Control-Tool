@@ -2,10 +2,14 @@ package ui.main.whitelists.modal;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
+
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 import data.localdb.ArtDbContext;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+
+import extensions.ResourceBundleHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,18 +19,18 @@ import java.util.stream.Collectors;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
+
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
 import ui.custom.controls.PTableColumn;
 import ui.main.whitelists.WhitelistsController;
+
 
 public class WhitelistFormController {
 
@@ -72,7 +76,7 @@ public class WhitelistFormController {
     private ArtDbContext whitelistDatabase = AppComponents.getDbContext();
     private Whitelist whitelist;
     private Whitelist whitelistOld;
-    private ResourceBundle bundle = ResourceBundle.getBundle("lang");
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
     /**
      * Automatically called by FXML loader, starts initialize Columns.
@@ -318,6 +322,7 @@ public class WhitelistFormController {
             saveButton.setVisible(false);
             addButton.setVisible(false);
             applyButton.setVisible(false);
+            copyButton.setVisible(false);
         } else {
             tfWhitelistName.setEditable(true);
             tfDescription.setEditable(true);
@@ -326,6 +331,7 @@ public class WhitelistFormController {
             saveButton.setVisible(true);
             addButton.setVisible(true);
             applyButton.setVisible(true);
+            copyButton.setVisible(true);
         }
     }
 }

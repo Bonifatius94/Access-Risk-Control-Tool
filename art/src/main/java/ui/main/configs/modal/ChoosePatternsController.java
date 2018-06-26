@@ -7,10 +7,11 @@ import data.entities.AccessPattern;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import extensions.ResourceBundleHelper;
+
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
@@ -73,7 +74,7 @@ public class ChoosePatternsController {
     public void initialize() {
 
         // load the ResourceBundle
-        bundle = ResourceBundle.getBundle("lang");
+        bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
         // initialize the tables
         initializePatternsTables();

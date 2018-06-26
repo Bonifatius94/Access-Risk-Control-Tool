@@ -1,0 +1,249 @@
+package ui.main.sapqueries.modal.newquery;
+
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXCheckBox;
+import com.jfoenix.controls.JFXComboBox;
+
+import data.entities.AccessPattern;
+import data.entities.CriticalAccessEntry;
+import data.entities.CriticalAccessQuery;
+
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+
+import extensions.ResourceBundleHelper;
+
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+
+import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Callback;
+
+import ui.App;
+import ui.custom.controls.ButtonCell;
+import ui.custom.controls.CustomWindow;
+import ui.main.patterns.modal.PatternsFormController;
+
+
+public class AnalysisResultController {
+
+    @FXML
+    private MaterialDesignIconView statusIcon;
+
+    @FXML
+    private Label criticalAccessCount;
+
+    @FXML
+    private TableView<CriticalAccessEntry> resultTable;
+
+    @FXML
+    private JFXComboBox exportFormatChooser;
+
+    @FXML
+    public TableColumn<CriticalAccessEntry, JFXButton> viewPatternDetailsColumn;
+
+    @FXML
+    public TableColumn<CriticalAccessEntry, AccessPattern> conditionTypeColumn;
+
+    @FXML
+    public TableColumn<CriticalAccessEntry, AccessPattern> usecaseIdColumn;
+
+    @FXML
+    public TableColumn<CriticalAccessEntry, AccessPattern> descriptionColumn;
+
+    @FXML
+    public JFXCheckBox includePatternsCheckbox;
+
+    @FXML
+    public JFXCheckBox includeWhitelistCheckbox;
+
+
+    private CriticalAccessQuery resultQuery;
+    private ResourceBundle bundle;
+
+    /**
+     * Initializes the controller.
+     */
+    @FXML
+    public void initialize() {
+        bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
+
+        // Add the detail column
+        viewPatternDetailsColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.OPEN_IN_NEW, (CriticalAccessEntry entry) -> {
+            viewAccessPatternDetails(entry.getAccessPattern());
+            return entry;
+        }));
+
+        initializeConditionTypeColumn();
+
+        initializeUsecaseIdColumn();
+
+        initializeDescriptionColumn();
+
+    }
+
+    /**
+     * Initializes the usecaseId Column.
+     */
+    private void initializeUsecaseIdColumn() {
+        usecaseIdColumn.setCellFactory((col -> new TableCell<CriticalAccessEntry, AccessPattern>() {
+
+            @Override
+            protected void updateItem(AccessPattern entry, boolean empty) {
+
+                // display nothing if the row is empty, otherwise the item count
+                setText((empty || entry == null) ? "" : "" + entry.getUsecaseId());
+            }
+        }));
+    }
+
+    /**
+     * Initializes the description Column.
+     */
+    private void initializeDescriptionColumn() {
+        descriptionColumn.setCellFactory((col -> new TableCell<CriticalAccessEntry, AccessPattern>() {
+
+            @Override
+            protected void updateItem(AccessPattern entry, boolean empty) {
+
+                // display nothing if the row is empty, otherwise the item count
+                setText((empty || entry == null) ? "" : "" + entry.getDescription());
+            }
+        }));
+    }
+
+    /**
+     * Exports the results with the given parameters (format, includePatterns, includeWhitelist).
+     */
+    public void exportResults() {
+        System.out.println("Format: " + includePatternsCheckbox.isSelected());
+        System.out.println("Include patterns: " + includePatternsCheckbox.isSelected());
+        System.out.println("Include whitelist: " + includeWhitelistCheckbox.isSelected());
+    }
+
+    /**
+     * Gives the controller the result query.
+     *
+     * @param query the result query
+     */
+    public void giveResultQuery(CriticalAccessQuery query) throws Exception {
+        resultQuery = query;
+
+        // set the label
+        if (query.getEntries() != null && query.getEntries().size() != 0) {
+            criticalAccessCount.setText(bundle.getString("criticalAccessCount") + " " + query.getEntries().size());
+            statusIcon.setIcon(MaterialDesignIcon.CLOSE);
+            statusIcon.setStyle("-fx-fill: -fx-error");
+        } else {
+            criticalAccessCount.setText(bundle.getString("noCriticalAccess"));
+            statusIcon.setIcon(MaterialDesignIcon.CHECK);
+            statusIcon.setStyle("-fx-fill: -fx-success");
+        }
+
+        this.resultTable.setItems(FXCollections.observableList(new ArrayList<>(query.getEntries())));
+        this.resultTable.getSortOrder().add(usecaseIdColumn);
+    }
+
+    /**
+     * Opens a modal edit dialog for the selected AccessPattern.
+     *
+     * @param accessPattern the selected AccessPattern
+     */
+    public void viewAccessPatternDetails(AccessPattern accessPattern) {
+        try {
+            // create a new FXML loader
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../../patterns/modal/PatternsFormView.fxml"), bundle);
+            CustomWindow customWindow = loader.load();
+
+            // build the scene and add it to the stage
+            Scene scene = new Scene(customWindow, 1050, 750);
+            scene.getStylesheets().add("css/dark-theme.css");
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(App.primaryStage);
+            customWindow.initStage(stage);
+
+            stage.show();
+
+            // give the dialog the sapConfiguration
+            PatternsFormController patternView = loader.getController();
+            patternView.giveSelectedAccessPattern(accessPattern);
+            patternView.setEditable(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Initializes the conditionType Column.
+     */
+    private void initializeConditionTypeColumn() {
+        // sets the icon of the condition to pattern or profile
+        conditionTypeColumn.setCellFactory(new Callback<TableColumn<CriticalAccessEntry, AccessPattern>, TableCell<CriticalAccessEntry, AccessPattern>>() {
+            public TableCell<CriticalAccessEntry, AccessPattern> call(TableColumn<CriticalAccessEntry, AccessPattern> param) {
+                TableCell<CriticalAccessEntry, AccessPattern> cell = new TableCell<CriticalAccessEntry, AccessPattern>() {
+                    protected void updateItem(AccessPattern item, boolean empty) {
+
+                        // display nothing if the row is empty, otherwise the item count
+                        if (empty || item == null) {
+
+                            // nothing to display
+                            setText("");
+                            setGraphic(null);
+
+                        } else {
+
+                            // add the icon
+                            MaterialDesignIconView iconView = new MaterialDesignIconView();
+                            iconView.setStyle("-fx-font-size: 1.6em");
+
+                            // wrapper label for showing a tooltip
+                            Label wrapper = new Label();
+                            wrapper.setGraphic(iconView);
+
+                            if (item.getConditions().stream().findFirst().get().getProfileCondition() == null) {
+
+                                // pattern
+                                iconView.setIcon(MaterialDesignIcon.VIEW_GRID);
+                                wrapper.setTooltip(new Tooltip(bundle.getString("patternCondition")));
+
+                            } else {
+
+                                // profile
+                                iconView.setIcon(MaterialDesignIcon.ACCOUNT_BOX_OUTLINE);
+                                wrapper.setTooltip(new Tooltip(bundle.getString("profileCondition")));
+
+                            }
+
+                            setGraphic(wrapper);
+
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+    }
+
+    /**
+     * Hides the stage.
+     *
+     * @param event the given ActionEvent
+     */
+    public void close(ActionEvent event) {
+        (((Button) event.getSource()).getScene().getWindow()).hide();
+    }
+}

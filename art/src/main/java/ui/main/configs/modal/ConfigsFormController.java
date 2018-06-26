@@ -11,6 +11,7 @@ import data.entities.Whitelist;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import extensions.ResourceBundleHelper;
 import io.msoffice.excel.AccessPatternImportHelper;
 
 import java.io.File;
@@ -88,7 +89,7 @@ public class ConfigsFormController {
     @FXML
     public void initialize() {
 
-        bundle = ResourceBundle.getBundle("lang");
+        bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
         initializePatternsTable();
 

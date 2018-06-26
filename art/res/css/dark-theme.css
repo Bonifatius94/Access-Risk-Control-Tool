@@ -7,8 +7,8 @@
 /* Define custom color variables which are used throughout the whole application */
 * {
     -fx-primary: #4C9687;
-    -fx-error: #853149;
-    -fx-success: #55854B;
+    -fx-error: #c82d49;
+    -fx-success: #689e5d;
     -fx-text: white;
     -fx-alternatetext: #303030;
     -fx-background: #484848;
@@ -492,6 +492,17 @@ alternative design with separators left and right of complete header bar
 
 .status-bar .database-icon {
     -fx-fill: -fx-success;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Tooltip Styling                                                             *
+ *                                                                             *
+ ******************************************************************************/
+
+.tooltip {
+    -fx-font-size: 1.1em;
 }
 
 .warning-text {

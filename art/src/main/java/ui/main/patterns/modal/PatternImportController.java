@@ -5,6 +5,8 @@ import com.jfoenix.controls.JFXCheckBox;
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 
+import extensions.ResourceBundleHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -55,7 +57,7 @@ public class PatternImportController {
         selectedPatterns = new ArrayList<>();
 
         // load the ResourceBundle
-        bundle = ResourceBundle.getBundle("lang");
+        bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
         // initialize the table
         initializeTableColumns();
