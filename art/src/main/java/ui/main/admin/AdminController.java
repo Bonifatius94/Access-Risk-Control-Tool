@@ -30,6 +30,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 
 import javafx.scene.control.TextFormatter;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
@@ -74,65 +76,83 @@ public class AdminController {
     @FXML
     private Label usernameValidationLabel;
 
+    @FXML
+    private JFXButton addToClipboardButton;
 
-    private List<DbUser> addedUsers;
+
     private ArtDbContext database = AppComponents.getDbContext();
     private ResourceBundle bundle = ResourceBundle.getBundle("lang");
+    private DbUser editDbUser;
+    private Set<DbUserRole> dbUserRoleSet = new HashSet<>();
+
+    // stores if a new user is currently added
     private SimpleBooleanProperty newUserMode = new SimpleBooleanProperty();
 
-    private DbUser editDbUser;
-
-    private Set<DbUserRole> dbUserRoleSet = new HashSet<>();
+    private boolean copiedToClipboard;
 
     /**
      * is called by the FXMl and initializes all parts of the window.
      */
     public void initialize() {
 
-        addedUsers = new ArrayList<>();
+        editDbUser = new DbUser("", dbUserRoleSet);
+
+        copiedToClipboard = false;
 
         initializeColumns();
         initializeCheckboxes();
         initializeValidation();
+        initializeBindings();
 
-        editDbUser = new DbUser("", dbUserRoleSet);
-
+        // listen for selects on userTable
         userTable.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 editUser(newValue);
             }
         }));
 
-        // transform typed text to uppercase
+        // transform typed text to of userNameInput to uppercase
         tfDbUserName.setTextFormatter(new TextFormatter<>((change) -> {
             change.setText(change.getText().toUpperCase());
             return change;
         }));
 
-        // bind applyButton to the selectedItemProperty
-        applyButton.disableProperty().bind(Bindings.isNull(userTable.getSelectionModel().selectedItemProperty()));
+        tableRefresh();
+    }
+
+    /**
+     * Initializes all bindings for the view.
+     */
+    private void initializeBindings() {
 
         // set newUserMode to false
         newUserMode.setValue(false);
 
+        // bind applyButton to the selectedItemProperty
+        applyButton.disableProperty().bind(Bindings.isNull(userTable.getSelectionModel().selectedItemProperty()));
+
         // bind table disable to newUserMode
         userTable.disableProperty().bind(newUserMode);
 
-        // bind add button disable property to newUserMode
+        // bind add button disable editable property to newUserMode
         addButton.disableProperty().bind(newUserMode);
 
-        // bin username textfield to newUserMode
+        // bind username textfield editable to newUserMode
         tfDbUserName.editableProperty().bind(newUserMode);
 
-        tableRefresh();
+        // bind password textfield disable to newUserMode
+        tfDbUserPassword.disableProperty().bind(Bindings.not(newUserMode));
 
+        // bind addToClipboardButton disable to newUserMode
+        addToClipboardButton.disableProperty().bind(Bindings.not(newUserMode));
     }
 
     /**
      * Initializes the validation.
      */
     private void initializeValidation() {
-        // validate the input with regex and display error message
+
+        // validate the userNameInput with regex and display error messages
         tfDbUserName.textProperty().addListener((ol, oldValue, newValue) -> {
             if (newValue.isEmpty()) {
                 usernameValidationBox.setVisible(false);
@@ -252,45 +272,70 @@ public class AdminController {
         // reset checkboxes
         initializeCheckboxes();
 
-        // enable password field
-        tfDbUserPassword.setDisable(false);
-
         // create a new user with random password and add him to the table
         DbUser newDbUser = new DbUser("", new HashSet<>());
         tfDbUserPassword.setText(generateFirstPassword(15));
         userTable.getItems().add(newDbUser);
 
-        addedUsers.add(newDbUser);
-
         userTable.refresh();
         userTable.getSelectionModel().select(newDbUser);
+
+        // show required message
+        tfDbUserName.validate();
     }
 
     /**
      * Saves user Changes to the database and refreshes the table.
      */
     public void saveUserChanges() throws Exception {
-        if ((userTable.isDisabled() && tfDbUserName.validate() && tfDbUserPassword.validate() && !usernameValidationBox.isVisible())
-            || (!userTable.isDisabled() && tfDbUserName.validate() && !usernameValidationBox.isVisible())) {
+
+        // check that all inputs are filled in
+        if ((newUserMode.getValue() && tfDbUserName.validate() && tfDbUserPassword.validate() && !usernameValidationBox.isVisible())
+            || (!newUserMode.getValue() && tfDbUserName.validate() && !usernameValidationBox.isVisible())) {
+
+            // check if at least one checkbox is enabled
             if (!adminCheckbox.isSelected() && !dataAnalystCheckbox.isSelected() && !viewerCheckbox.isSelected()) {
                 CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("selectRolesTitle"), bundle.getString("selectRolesMessage"));
                 customAlert.showAndWait();
             } else {
-                editDbUser.setUsername(tfDbUserName.getText());
 
-                // not an edit, new user
-                if (userTable.isDisabled()) {
-                    database.createDatabaseUser(this.editDbUser, tfDbUserPassword.getText());
+                if (!copiedToClipboard) {
+                    // ask if user has written down the password
+                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("passwordNotedTitle"), bundle.getString("passwordNotedMessage"),
+                        bundle.getString("alreadyDone"), bundle.getString("back"));
+
+                    if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                        saveUserToDatabase();
+                    }
                 } else {
-                    database.updateUserRoles(editDbUser);
+
+                    saveUserToDatabase();
                 }
-
-                // enable user table
-                newUserMode.setValue(false);
-
-                tableRefresh();
             }
         }
+    }
+
+    /**
+     * Saves the current user to the database.
+     */
+    private void saveUserToDatabase() throws Exception {
+        // set the username
+        editDbUser.setUsername(tfDbUserName.getText());
+
+        // not an edit, new user
+        if (newUserMode.getValue()) {
+            database.createDatabaseUser(this.editDbUser, tfDbUserPassword.getText());
+        } else {
+            // edit user roles
+            database.updateUserRoles(editDbUser);
+        }
+
+        // enable user table
+        newUserMode.setValue(false);
+        tfDbUserPassword.setText("");
+
+        this.copiedToClipboard = false;
+        tableRefresh();
     }
 
     /**
@@ -302,15 +347,6 @@ public class AdminController {
 
         // user is edited
         this.editDbUser = newValue;
-
-        // set inputs to new user inputs
-        if (!addedUsers.contains(newValue)) {
-            tfDbUserPassword.setDisable(true);
-            tfDbUserPassword.setText("");
-        } else {
-            tfDbUserPassword.setDisable(false);
-            tfDbUserPassword.setEditable(false);
-        }
 
         tfDbUserName.setText(editDbUser.getUsername());
 
@@ -335,6 +371,15 @@ public class AdminController {
         }
     }
 
+    /**
+     * Copies the current password to the clipboard.
+     */
+    public void copyPasswordToClipboard() {
+        final ClipboardContent clipboardContent = new ClipboardContent();
+        clipboardContent.putString(tfDbUserPassword.getText());
+        Clipboard.getSystemClipboard().setContent(clipboardContent);
+        this.copiedToClipboard = true;
+    }
 
     /**
      * Generates a random password with the given length.

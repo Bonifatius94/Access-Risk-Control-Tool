@@ -63,13 +63,24 @@
                         </tooltip>
                     </Label>
                 </HBox>
-                <JFXTextField promptText="%dbUserPassword" fx:id="tfDbUserPassword" prefWidth="250">
-                    <validators>
-                        <RequiredFieldValidator message="%required">
-                            <MaterialDesignIconView glyphName="ALERT"/>
-                        </RequiredFieldValidator>
-                    </validators>
-                </JFXTextField>
+                <HBox spacing="10">
+                    <JFXTextField promptText="%dbUserPassword" fx:id="tfDbUserPassword" prefWidth="250">
+                        <validators>
+                            <RequiredFieldValidator message="%required">
+                                <MaterialDesignIconView glyphName="ALERT"/>
+                            </RequiredFieldValidator>
+                        </validators>
+                    </JFXTextField>
+                    <JFXButton fx:id="addToClipboardButton" onAction="#copyPasswordToClipboard" prefHeight="30"
+                               styleClass="round-button">
+                        <graphic>
+                            <MaterialDesignIconView glyphName="CLIPBOARD" size="20"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%addToClipboard"/>
+                        </tooltip>
+                    </JFXButton>
+                </HBox>
             </VBox>
             <VBox spacing="20">
                 <JFXCheckBox fx:id="adminCheckbox" onAction="#adminSelected" text="%admin">
