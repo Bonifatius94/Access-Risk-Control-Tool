@@ -6,6 +6,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -112,8 +113,28 @@ public class CustomAlert extends Alert {
 
         getDialogPane().setHeader(window);
 
+        // initialize content
+        initContent();
+
         // initialize the buttons
         initButtons();
+    }
+
+    /**
+     * Creates a new label with the given text and adds it to the DialogPane.
+     */
+    private void initContent() {
+
+        // set max width of the content
+        getDialogPane().setMaxWidth(400);
+
+        // content text
+        if (contentText != null) {
+            Label contentLabel = new Label(contentText);
+            contentLabel.setStyle("-fx-font-size: 1.1em");
+            contentLabel.setWrapText(true);
+            getDialogPane().setContent(contentLabel);
+        }
     }
 
     /**
@@ -121,10 +142,6 @@ public class CustomAlert extends Alert {
      * Uses default values when no buttonTexts are given.
      */
     private void initButtons() {
-        // content text
-        if (contentText != null) {
-            getDialogPane().setContentText(contentText);
-        }
 
         // initialize buttons
         if (getAlertType() == AlertType.CONFIRMATION) {
