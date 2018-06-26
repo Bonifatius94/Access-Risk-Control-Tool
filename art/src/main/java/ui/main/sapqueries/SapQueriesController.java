@@ -271,7 +271,7 @@ public class SapQueriesController {
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 // archive all selected items
                 for (CriticalAccessQuery query : queriesTable.getSelectionModel().getSelectedItems()) {
-                    query.setArchived(true);
+                    archiveQuery(query);
                 }
             }
             updateQueriesTable();
@@ -310,8 +310,9 @@ public class SapQueriesController {
 
     private void archiveQuery(CriticalAccessQuery query) throws Exception {
         if (query != null) {
+
             query.setArchived(true);
-            // TODO: update item
+            AppComponents.getDbContext().updateRecord(query);
 
             updateQueriesTable();
         }
