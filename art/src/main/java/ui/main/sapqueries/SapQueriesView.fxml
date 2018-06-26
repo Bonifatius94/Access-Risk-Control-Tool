@@ -5,42 +5,60 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.control.cell.*?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.sapqueries.SapQueriesController"
+<?import ui.custom.controls.PTableColumn?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ui.main.sapqueries.SapQueriesController"
       spacing="10">
-
-    <!-- TODO: change style of this label -->
-    <!--<Label text="Recently Executed Queries:" />-->
-
-    <JFXTreeTableView VBox.vgrow="ALWAYS">
-        <columnResizePolicy><JFXTreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+    <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
+    <TableView VBox.vgrow="ALWAYS" fx:id="queriesTable">
         <columns>
-            <JFXTreeTableColumn text="Date">
+            <PTableColumn text="?" fx:id="queryStatusColumn" percentageWidth="0.08">
                 <cellValueFactory>
-                    <PropertyValueFactory property="Date" />
+                    <PropertyValueFactory property="entries"/>
                 </cellValueFactory>
-            </JFXTreeTableColumn>
-            <JFXTreeTableColumn text="Configuration">
+            </PTableColumn>
+            <PTableColumn text="%configuration" percentageWidth="0.27" fx:id="configurationColumn"
+                          styleClass="align-left">
                 <cellValueFactory>
-                    <PropertyValueFactory property="Configuration" />
+                    <PropertyValueFactory property="config"/>
                 </cellValueFactory>
-            </JFXTreeTableColumn>
-            <JFXTreeTableColumn text="Whitelist">
+            </PTableColumn>
+            <PTableColumn text="%sapSettings" percentageWidth="0.28" fx:id="sapConfigurationColumn"
+                          styleClass="align-left">
                 <cellValueFactory>
-                    <PropertyValueFactory property="Whitelist" />
+                    <PropertyValueFactory property="sapConfig"/>
                 </cellValueFactory>
-            </JFXTreeTableColumn>
-            <JFXTreeTableColumn text="SAP Settings">
+            </PTableColumn>
+            <PTableColumn text="%createdAt" percentageWidth="0.2" fx:id="createdAtColumn">
                 <cellValueFactory>
-                    <PropertyValueFactory property="SapSettings" />
+                    <PropertyValueFactory property="createdAt"/>
                 </cellValueFactory>
-            </JFXTreeTableColumn>
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.07" fx:id="editColumn" resizable="false" sortable="false">
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.1" fx:id="archiveColumn" resizable="false" sortable="false">
+            </PTableColumn>
         </columns>
-
-        <!-- TODO: implement columns here ... -->
-    </JFXTreeTableView>
+    </TableView>
 
     <HBox alignment="BOTTOM_RIGHT" spacing="10">
-        <JFXButton text="View Details ..." prefWidth="100" />
-        <JFXButton text="New Query ..."   prefWidth="100" />
+        <Label fx:id="itemCount"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <JFXButton text="%newAnalysis" onAction="#addAction" prefWidth="130">
+            <graphic>
+                <MaterialDesignIconView glyphName="PLUS"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton text="%details" onAction="#editAction" prefWidth="130">
+            <graphic>
+                <MaterialDesignIconView glyphName="OPEN_IN_NEW"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton text="%archive" onAction="#archiveAction" prefWidth="130">
+            <graphic>
+                <MaterialDesignIconView glyphName="ARCHIVE"/>
+            </graphic>
+        </JFXButton>
     </HBox>
 </VBox>

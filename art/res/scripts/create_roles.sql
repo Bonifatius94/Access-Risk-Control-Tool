@@ -4,8 +4,11 @@ CREATE ROLE Admin;
 CREATE ROLE DataAnalyst;
 CREATE ROLE Viewer;
 
+-- this role is just a dummy that shows if the user has already logged in or not
+CREATE ROLE FirstLogin;
+
 -- grant privileges to admin role
-GRANT SELECT ON DbUsers TO Admin;
+GRANT ALL ON DbUsers TO Admin;
 
 -- grant privileges to data analyst role
 GRANT ALL ON CriticalAccessQueries TO DataAnalyst;
@@ -20,7 +23,7 @@ GRANT ALL ON AccessPatternConditions TO DataAnalyst;
 GRANT ALL ON AccessProfileConditions TO DataAnalyst;
 GRANT ALL ON AccessPatternConditionProperties TO DataAnalyst;
 GRANT ALL ON SapConfigurations TO DataAnalyst;
-GRANT SELECT ON DbUsers TO DataAnalyst;
+GRANT ALL ON DbUsers TO DataAnalyst;
 
 -- grant privileges to viewer role
 GRANT ALL ON CriticalAccessQueries TO Viewer;
@@ -35,7 +38,7 @@ GRANT SELECT ON AccessPatternConditions TO Viewer;
 GRANT SELECT ON AccessProfileConditions TO Viewer;
 GRANT SELECT ON AccessPatternConditionProperties TO Viewer;
 GRANT SELECT ON SapConfigurations TO Viewer;
-GRANT SELECT ON DbUsers TO Viewer;
+GRANT ALL ON DbUsers TO Viewer;
 
 -- remove privileges for public role (only registered users can access data)
 REVOKE ALL ON CriticalAccessQueries FROM PUBLIC;

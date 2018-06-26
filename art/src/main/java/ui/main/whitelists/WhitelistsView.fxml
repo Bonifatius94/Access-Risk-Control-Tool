@@ -1,18 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
-<?import com.jfoenix.controls.*?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import ui.custom.controls.PTableColumn?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.Label?>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ui.main.whitelists.WhitelistsController"
+      spacing="10" fx:id="whitelistViewFxId">
+    <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
+    <TableView VBox.vgrow="ALWAYS" fx:id="whitelistTable">
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.whitelists.WhitelistsController"
-      spacing="10">
-    <JFXTreeTableView VBox.vgrow="ALWAYS">
-        <!-- TODO: implement columns here ... -->
-    </JFXTreeTableView>
+        <columns>
+            <PTableColumn text="%whitelistName" resizable="false" percentageWidth="0.15" styleClass="align-left">
+                <cellValueFactory>
+                    <PropertyValueFactory property="name"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%description" resizable="false" percentageWidth="0.3" styleClass="align-left">
+                <cellValueFactory>
+                    <PropertyValueFactory property="description"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%numberOfEntries" resizable="false" percentageWidth="0.1" fx:id="entryCountColumn">
+                <cellValueFactory>
+                    <PropertyValueFactory property="entries"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%creationDate" fx:id="creationColumn" resizable="false" percentageWidth="0.2">
+                <cellValueFactory>
+                    <PropertyValueFactory property="createdAt"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%archived" resizable="false" percentageWidth="0.15">
+                <cellValueFactory>
+                    <PropertyValueFactory property="isArchived"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.05" resizable="false" fx:id="editWhitelistColumn">
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.05" resizable="false" fx:id="deleteWhitelistColumn">
+            </PTableColumn>
+        </columns>
+    </TableView>
 
     <HBox alignment="BOTTOM_RIGHT" spacing="10">
-        <JFXButton text="Clone ..." prefWidth="100" />
-        <JFXButton text="New ..." prefWidth="100" />
-        <JFXButton text="Edit ..." prefWidth="100" />
-        <JFXButton text="Delete" prefWidth="100" />
+        <Label fx:id="itemCount"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <JFXButton text="%import" prefWidth="130" onAction="#importWhitelist">
+            <graphic>
+                <MaterialDesignIconView glyphName="IMPORT"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton text="%clone" prefWidth="130" onAction="#cloneWhitelist">
+            <graphic>
+                <MaterialDesignIconView glyphName="CONTENT_COPY"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton text="%newEntry" prefWidth="130" onAction="#newWhitelist">
+            <graphic>
+                <MaterialDesignIconView glyphName="PLUS"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton text="%edit" prefWidth="130" onAction="#editWhitelist">
+          <graphic>
+              <MaterialDesignIconView glyphName="PENCIL"/>
+          </graphic>
+        </JFXButton>
+        <JFXButton text="%delete" prefWidth="130" onAction="#deleteWhitelist" styleClass="warning-button">
+            <graphic>
+                <MaterialDesignIconView glyphName="DELETE"/>
+            </graphic>
+        </JFXButton>
     </HBox>
 </VBox>

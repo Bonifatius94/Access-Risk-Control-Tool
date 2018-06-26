@@ -22,6 +22,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
@@ -37,6 +39,7 @@ import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.ConditionTypeCellFactory;
+import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.filter.FilterController;
 import ui.main.patterns.modal.PatternImportController;
@@ -119,19 +122,8 @@ public class PatternsController {
      */
     private void initializePatternsTable() {
 
-        // replace Placeholder of PatternsTable with addButton
-        JFXButton addButton = new JFXButton();
-        addButton.setOnAction(event -> {
-            addAction();
-        });
-        MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.PLUS);
-        addButton.setGraphic(view);
-        addButton.setTooltip(new Tooltip(bundle.getString("firstPattern")));
-        addButton.getStyleClass().add("round-button");
-        addButton.setMinHeight(30);
-        addButton.setPrefHeight(30);
-
-        patternsTable.setPlaceholder(addButton);
+        // replace Placeholder of PatternsTable with other message
+        patternsTable.setPlaceholder(new Label(bundle.getString("noEntries")));
 
         // catch row double click
         patternsTable.setRowFactory(tv -> {
@@ -161,18 +153,24 @@ public class PatternsController {
     private void initializeTableColumns() {
 
         // Add the delete column
-        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (AccessPattern accessPattern) -> {
-            try {
-                AppComponents.getDbContext().deletePattern(accessPattern);
-                updatePatternsTable();
-            } catch (Exception e) {
-                e.printStackTrace();
+        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (AccessPattern accessPattern) -> {
+
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                try {
+                    AppComponents.getDbContext().deletePattern(accessPattern);
+                    updatePatternsTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             return accessPattern;
         }));
 
         // Add the edit column
-        editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (AccessPattern accessPattern) -> {
+        editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (AccessPattern accessPattern) -> {
             openAccessPatternForm(accessPattern);
             return accessPattern;
         }));
@@ -283,11 +281,21 @@ public class PatternsController {
      */
     public void deleteAction() throws Exception {
         if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getSelectionModel().getSelectedItems().size() != 0) {
-
-            for (AccessPattern pattern : patternsTable.getSelectionModel().getSelectedItems()) {
-                AppComponents.getDbContext().deletePattern(pattern);
+            CustomAlert customAlert;
+            if (patternsTable.getSelectionModel().getSelectedItems().size() == 1) {
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                    bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+            } else {
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteMultipleConfirmTitle"),
+                    bundle.getString("deleteMultipleConfirmMessage"), "Ok", "Cancel");
             }
-            updatePatternsTable();
+
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                for (AccessPattern pattern : patternsTable.getSelectionModel().getSelectedItems()) {
+                    AppComponents.getDbContext().deletePattern(pattern);
+                }
+                updatePatternsTable();
+            }
         }
     }
 

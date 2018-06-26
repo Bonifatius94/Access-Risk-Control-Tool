@@ -18,6 +18,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -30,6 +32,7 @@ import javafx.stage.Stage;
 import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 import ui.custom.controls.filter.FilterController;
 import ui.main.configs.modal.ConfigsFormController;
@@ -109,22 +112,11 @@ public class ConfigsController {
      */
     private void initializeConfigsTable() {
 
+        // replace Placeholder of PatternsTable with other message
+        configsTable.setPlaceholder(new Label(bundle.getString("noEntries")));
+
         // initialize table columns
         initializeTableColumns();
-
-        // replace Placeholder of PatternsTable with addButton
-        JFXButton addButton = new JFXButton();
-        addButton.setOnAction(event -> {
-            addAction();
-        });
-        MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.PLUS);
-        addButton.setGraphic(view);
-        addButton.setTooltip(new Tooltip(bundle.getString("firstPattern")));
-        addButton.getStyleClass().add("round-button");
-        addButton.setMinHeight(30);
-        addButton.setPrefHeight(30);
-
-        configsTable.setPlaceholder(addButton);
 
         // catch row double click
         configsTable.setRowFactory(tv -> {
@@ -155,18 +147,24 @@ public class ConfigsController {
     private void initializeTableColumns() {
 
         // Add the delete column
-        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (Configuration configuration) -> {
-            try {
-                AppComponents.getDbContext().deleteConfig(configuration);
-                updateConfigsTable();
-            } catch (Exception e) {
-                e.printStackTrace();
+        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (Configuration configuration) -> {
+
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                try {
+                    AppComponents.getDbContext().deleteConfig(configuration);
+                    updateConfigsTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             return configuration;
         }));
 
         // Add the edit column
-        editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, (Configuration configuration) -> {
+        editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (Configuration configuration) -> {
             openConfigurationForm(configuration);
             return configuration;
         }));
@@ -211,13 +209,23 @@ public class ConfigsController {
      */
     public void deleteAction() throws Exception {
         if (configsTable.getSelectionModel().getSelectedItems() != null && configsTable.getSelectionModel().getSelectedItems().size() != 0) {
-
-            // remove all selected items
-            for (Configuration config : configsTable.getSelectionModel().getSelectedItems()) {
-                AppComponents.getDbContext().deleteConfig(config);
+            CustomAlert customAlert;
+            if (configsTable.getSelectionModel().getSelectedItems().size() == 1) {
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                    bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+            } else {
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteMultipleConfirmTitle"),
+                    bundle.getString("deleteMultipleConfirmMessage"), "Ok", "Cancel");
             }
 
-            updateConfigsTable();
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                // remove all selected items
+                for (Configuration config : configsTable.getSelectionModel().getSelectedItems()) {
+                    AppComponents.getDbContext().deleteConfig(config);
+                }
+
+                updateConfigsTable();
+            }
         }
     }
 
