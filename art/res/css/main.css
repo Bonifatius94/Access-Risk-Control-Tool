@@ -1,28 +1,10 @@
-/*******************************************************************************
- *                                                                             *
- * Main .css file for the light theme                                           *
- *                                                                             *
- ******************************************************************************/
-
-/* Define custom color variables which are used throughout the whole application */
-* {
-    -fx-primary: #4C9687;
-    -fx-error: #853149;
-    -fx-success: #55854B;
-    -fx-text: #484848;
-    -fx-alternatetext: #303030;
-    -fx-background: #DDDDDD;
-    -fx-light: #AAAAAA;
-    -fx-select: derive(-fx-primary, 40%);
-    -fx-primary-darker: derive(-fx-primary, -30%);
-    -fx-primary-lighter: derive(-fx-primary, 30%);
-}
+@import 'dark.css';
 
 /*
  *	Apply google Roboto font to all UI components
  */
 
-.root {
+.main-root {
     -fx-font-family: "Roboto";
     -fx-font-smoothing-type: gray;
     -fx-background-color: -fx-background;
@@ -40,13 +22,10 @@
     -fx-text-fill: -fx-text;
     -fx-cursor: hand;
     -jfx-disable-visual-focus: false;
+    -jfx-button-type: RAISED;
 }
 
-.jfx-button:hover {
-    -fx-background-color: -fx-primary-lighter;
-}
-
-.jfx-button:focused {
+.jfx-button:hover, .jfx-button:focused  {
     -fx-background-color: -fx-primary-lighter;
 }
 
@@ -55,13 +34,26 @@
     -fx-background-color: -fx-background;
     -fx-text-fill: white;
     -jfx-disable-visual-focus: true;
+    -jfx-button-type: FLAT;
 }
 
-.closeWindowButton:hover {
+.warning-button {
     -fx-background-color: -fx-error;
 }
 
-.closeWindowButton:focused {
+.round-button {
+    -fx-background-radius: 100%;
+}
+
+.round-button .glyph-icon {
+    -fx-font-size: 15;
+}
+
+.warning-button:hover, .warning-button:focused {
+    -fx-background-color: derive(-fx-error, 30%);
+}
+
+.closeWindowButton:hover, .closeWindowButton:focused {
     -fx-background-color: -fx-error;
 }
 
@@ -94,6 +86,11 @@
 .jfx-tab-pane .headers-region {
     -fx-background-color: -fx-primary;
     -fx-cursor: hand;
+}
+
+/* have to set the disabled opacity manually */
+.jfx-tab-pane:disabled > * {
+    -fx-opacity: 0.6;
 }
 
 .jfx-tab-pane .headers-region .tab {
@@ -147,7 +144,7 @@
     -fx-text-fill: -fx-text !important;
 }
 
-.jfx-combo-box .cell {
+.jfx-combo-box .cell, .jfx-combo-box .text-field {
     -fx-text-fill: -fx-text !important;
 }
 
@@ -184,72 +181,6 @@
 
 /*******************************************************************************
 *                                                                             *
-* Material TreeTableView                                                      *
-*                                                                             *
-******************************************************************************/
-
-.jfx-tree-table-view {
-    -fx-background-color: -fx-background;
-}
-
-.tree-table-view .jfx-rippler {
-    -jfx-rippler-fill: -fx-text;
-}
-
-.tree-table-view:focused .tree-table-row-cell:selected {
-    -fx-background-color: -fx-primary;
-    -fx-table-cell-border-color: -fx-tree-table-color;
-    -fx-text-fill: -fx-text;
-}
-
-.jfx-tree-table-view .column-header {
-    -fx-background-color: -fx-primary-darker;
-    -fx-border-color: -fx-text;
-    -fx-border-width: 0 1 0 0;
-}
-
-/* hack for making every separator in the header the same width */
-.tree-table-view .column-header:last-visible {
-    -fx-border-color: -fx-text;
-    -fx-border-width: 0 0 0 0;
-}
-
-/*
-alternative design with separators left and right of complete header bar
-
-.jfx-tree-table-view .column-header {
-    -fx-background-color: -fx-primary-darker;
-    -fx-border-color: -fx-text;
-    -fx-border-width: 0 0 0 1;
-}
-
-.tree-table-view .column-header:last-visible {
-    -fx-border-color: -fx-text;
-    -fx-border-width: 0 1 0 1;
-}
-*/
-
-.jfx-tree-table-view .column-header .label {
-    -fx-text-fill: -fx-text;
-    -fx-padding: 10 0 10 0;
-}
-
-.tree-table-view .column-overlay {
-    -fx-background-color: -fx-background;
-}
-
-.jfx-tree-table-view .table-row-cell {
-    -fx-border-color: -fx-text;
-    -fx-table-cell-border-color: -fx-text;
-}
-
-.jfx-tree-table-view .column-header-background {
-    -fx-border-width: 0 0 0 0;
-}
-
-
-/*******************************************************************************
-*                                                                             *
 * Material TableView                                                          *
 *                                                                             *
 ******************************************************************************/
@@ -261,6 +192,8 @@ alternative design with separators left and right of complete header bar
 .table-view {
     -fx-background-color: -fx-background;
     -fx-table-rippler-color: -fx-text;
+    -fx-shadow: derive(-fx-background, -30%);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow, 5, 0, 3, 3);
 }
 
 .table-view .column-header,
@@ -309,21 +242,19 @@ alternative design with separators left and right of complete header bar
     -fx-background-color: -fx-table-rippler-color;
 }
 
-.table-row-cell > .disclosure-node > .arrow {
+.table-view .table-row-cell > .disclosure-node > .arrow {
     -fx-background-color: -fx-text-fill;
     -fx-padding: 0.333333em 0.229em 0.333333em 0.229em; /* 4 */
     -fx-shape: "M 0 -3.5 L 4 0 L 0 3.5 z";
 }
 
 .table-view .table-row-cell {
-    -fx-padding: 5 0 5 0;
     -fx-border-color: TRANSPARENT;
     -fx-table-cell-border-color: TRANSPARENT;
 }
 
 .table-view .jfx-button {
-    -fx-padding: 8;
-    -fx-background-radius: 50%;
+    -fx-background-radius: 100%;
 }
 
 /* odd rows */
@@ -331,19 +262,18 @@ alternative design with separators left and right of complete header bar
     -fx-background-color: derive(-fx-background, 10%);
 }
 
-.table-view:focused .table-row-cell:selected {
-    -fx-background-color: -fx-select;
+.table-view .table-row-cell:selected {
+    -fx-background-color: -fx-select !important;
     -fx-table-cell-border-color: -fx-primary;
     -fx-text-fill: -fx-text;
 }
 
 /* remove blue border from first entry of tableView on focus */
 .table-view:focused .table-row-cell:focused {
-    -fx-background-color: -fx-select;
     -fx-background-insets: 0, 0 0 1 0;
 }
 
-.table-view:focused .table-row-cell:selected .table-cell {
+.table-view .table-row-cell:selected .table-cell {
     -fx-text-fill: -fx-text;
 }
 
@@ -391,6 +321,41 @@ alternative design with separators left and right of complete header bar
 
 /*******************************************************************************
  *                                                                             *
+ * Material DatePicker                                                         *
+ *                                                                             *
+ ******************************************************************************/
+
+.jfx-date-picker {
+    -jfx-default-color: -fx-primary;
+}
+
+.jfx-date-picker .date-cell:hover {
+    -fx-cursor: hand;
+    -fx-background-color: -fx-primary-lighter;
+}
+
+/*
+.jfx-date-picker .date-picker-popup {
+    -fx-background-color: -fx-background;
+}
+*/
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Material ToggleButton                                                       *
+ *                                                                             *
+ ******************************************************************************/
+
+.jfx-toggle-button {
+    -jfx-toggle-color: -fx-primary;
+    -jfx-untoggle-color: -fx-light;
+    -fx-text-fill: -fx-text;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
  * Material Icons                                                              *
  *                                                                             *
  ******************************************************************************/
@@ -409,4 +374,53 @@ alternative design with separators left and right of complete header bar
 
 .windowLabel {
     -fx-font-weight: bold;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Login Views extra styling                                                   *
+ *                                                                             *
+ ******************************************************************************/
+
+.first-use-wizard .label {
+    -fx-font-size: 110%;
+    -fx-line-spacing: 2;
+}
+
+.login-window .label {
+    -fx-font-size: 110%;
+    -fx-line-spacing: 2;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * StatusBar Styling                                                           *
+ *                                                                             *
+ ******************************************************************************/
+
+.status-bar {
+    -fx-padding: 10;
+    -fx-background-color: derive(-fx-background, -30%);
+    -fx-font-size: 110%;
+}
+
+.status-bar .database-icon {
+    -fx-fill: -fx-success;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Tooltip Styling                                                             *
+ *                                                                             *
+ ******************************************************************************/
+
+.tooltip {
+    -fx-font-size: 1.1em;
+}
+
+.warning-text {
+    -fx-text-fill: red;
 }

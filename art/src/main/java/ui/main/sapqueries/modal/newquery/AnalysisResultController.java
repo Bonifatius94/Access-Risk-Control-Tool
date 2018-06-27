@@ -32,6 +32,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import ui.App;
+import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomWindow;
 import ui.main.patterns.modal.PatternsFormController;
@@ -163,20 +164,8 @@ public class AnalysisResultController {
      */
     public void viewAccessPatternDetails(AccessPattern accessPattern) {
         try {
-            // create a new FXML loader
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../../patterns/modal/PatternsFormView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 1050, 750);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternsFormView.fxml", "patternDetails", 1200, 750);
 
             // give the dialog the sapConfiguration
             PatternsFormController patternView = loader.getController();

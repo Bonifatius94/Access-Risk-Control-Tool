@@ -53,7 +53,7 @@ public class SapSettingsFormController {
     private SapConfiguration sapConfig;
     private SapConfiguration oldSapConfig;
 
-    private ArtDbContext database = AppComponents.getDbContext();
+    private ArtDbContext database = AppComponents.getInstance().getDbContext();
 
     private SapSettingsController parentController;
     private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
@@ -87,7 +87,7 @@ public class SapSettingsFormController {
             }
 
             close(event);
-            parentController.updateSapSettingsTable();
+            parentController.updateTable();
         }
     }
 

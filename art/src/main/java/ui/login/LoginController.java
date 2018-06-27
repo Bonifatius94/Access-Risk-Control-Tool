@@ -13,16 +13,14 @@ import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.HBox;
 
+import javafx.stage.Stage;
 import ui.App;
 import ui.AppComponents;
-import ui.custom.controls.CustomWindow;
 
 
 public class LoginController {
@@ -80,7 +78,7 @@ public class LoginController {
     /**
      * Handles the database login.
      */
-    public void login(ActionEvent event) {
+    public void login(ActionEvent event) throws Exception {
 
         if (System.currentTimeMillis() - startTime > penaltyTime) {
 
@@ -88,8 +86,14 @@ public class LoginController {
             errorLabel.setText(bundle.getString("databaseLoginError") + " " + (maxAttempts - loginAttempts) + ")");
 
             if (validateBeforeSubmit()) {
-                if (AppComponents.tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
-                    startApplication(event);
+                if (AppComponents.getInstance().tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
+
+                    if (isFirstLogin()) {
+                        showFirstLoginView(event);
+                    } else {
+                        startApplication(event);
+                    }
+
                 } else {
                     // reset the attempts and show penalty error
                     if (loginAttempts++ == maxAttempts) {
@@ -101,6 +105,10 @@ public class LoginController {
                 }
             }
         }
+    }
+
+    private boolean isFirstLogin() throws Exception {
+        return AppComponents.getInstance().getDbContext().getCurrentUser().isFirstLogin();
     }
 
     /**
@@ -146,25 +154,21 @@ public class LoginController {
     /**
      * Starts the application by opening the MainView.
      */
-    private void startApplication(ActionEvent event) {
-        try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../main/MainView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
+    private void startApplication(ActionEvent event) throws Exception {
+        AppComponents.getInstance()
+            .showScene("ui/main/MainView.fxml", "art", App.primaryStage, null, null, 1050, 750);
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 1050, 750);
-            scene.getStylesheets().add("css/dark-theme.css");
-            App.primaryStage.setScene(scene);
-            App.primaryStage.setTitle(bundle.getString("art"));
-            customWindow.initStage(App.primaryStage);
+        close(event);
+    }
 
-            close(event);
-            App.primaryStage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    /**
+     * Shows a login window where the user has to change his password.
+     */
+    private void showFirstLoginView(ActionEvent event) throws Exception {
+        AppComponents.getInstance()
+            .showScene("ui/login/firstlogin/FirstLoginView.fxml", "firstLogin", new Stage(), App.primaryStage, null);
+
+        close(event);
     }
 
     /**

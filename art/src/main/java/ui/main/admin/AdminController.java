@@ -2,16 +2,13 @@ package ui.main.admin;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
-import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
-import data.entities.AccessPattern;
 import data.entities.DbUser;
 import data.entities.DbUserRole;
 import data.localdb.ArtDbContext;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -34,12 +31,13 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
 import ui.AppComponents;
+import ui.IUpdateTable;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
 import ui.custom.controls.PTableColumn;
 
 
-public class AdminController {
+public class AdminController implements IUpdateTable {
     @FXML
     public TableView<DbUser> userTable;
 
@@ -80,7 +78,7 @@ public class AdminController {
     private JFXButton addToClipboardButton;
 
 
-    private ArtDbContext database = AppComponents.getDbContext();
+    private ArtDbContext database = AppComponents.getInstance().getDbContext();
     private ResourceBundle bundle = ResourceBundle.getBundle("lang");
     private DbUser editDbUser;
     private Set<DbUserRole> dbUserRoleSet = new HashSet<>();
@@ -93,7 +91,7 @@ public class AdminController {
     /**
      * is called by the FXMl and initializes all parts of the window.
      */
-    public void initialize() {
+    public void initialize() throws Exception {
 
         editDbUser = new DbUser("", dbUserRoleSet);
 
@@ -120,8 +118,6 @@ public class AdminController {
             change.setText(change.getText().toUpperCase());
             return change;
         }));
-
-        tableRefresh();
     }
 
     /**
@@ -166,7 +162,7 @@ public class AdminController {
             } else {
                 try {
                     if (!newValue.equals(oldValue)) {
-                        if (!newValue.matches("([A-Z]{3,}+(_|\\w)*)")) {
+                        if (!newValue.matches("([A-Z]{3,}+(_|\\w)*)") || !AppComponents.isUserRole(newValue)) {
                             usernameValidationLabel.setText(bundle.getString("usernameInvalid"));
                             usernameValidationBox.setVisible(true);
                         } else if (userTable.isDisabled() && database.getDatabaseUsers().stream().map(x -> x.getUsername()).collect(Collectors.toList()).contains(newValue)) {
@@ -211,7 +207,7 @@ public class AdminController {
                     // delete the user
                     if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                         database.deleteDatabaseUser(user.getUsername());
-                        tableRefresh();
+                        updateTable();
                     }
                 }
                 initializeCheckboxes();
@@ -270,10 +266,10 @@ public class AdminController {
     /**
      * Adds new User with a random initial password.
      */
-    public void addNewUser() {
+    public void addNewUser() throws Exception {
 
         // prevent empty rows
-        tableRefresh();
+        updateTable();
         newUserMode.setValue(true);
 
         // reset checkboxes
@@ -344,7 +340,7 @@ public class AdminController {
         initializeCheckboxes();
 
         this.copiedToClipboard = false;
-        tableRefresh();
+        updateTable();
     }
 
     /**
@@ -379,16 +375,12 @@ public class AdminController {
     /**
      * Reloads all users from the database to the table.
      */
-    private void tableRefresh() {
-        try {
-            List<DbUser> items = database.getDatabaseUsers();
-            ObservableList<DbUser> list = FXCollections.observableList(items);
+    public void updateTable() throws Exception {
+        List<DbUser> items = database.getDatabaseUsers();
+        ObservableList<DbUser> list = FXCollections.observableList(items);
 
-            userTable.getSelectionModel().clearSelection();
-            userTable.setItems(list);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        userTable.getSelectionModel().clearSelection();
+        userTable.setItems(list);
     }
 
     /**
@@ -422,7 +414,6 @@ public class AdminController {
         char[] pw = new char[length];
         for (int i = 0; i < length; i++) {
             pw[i] = characters[random.nextInt(characters.length)];
-            System.out.println(pw[i]);
         }
 
         return new String(pw);
@@ -431,7 +422,7 @@ public class AdminController {
     /**
      * Cancels the user creation.
      */
-    public void cancelUserCreation() {
+    public void cancelUserCreation() throws Exception {
         newUserMode.setValue(false);
 
         // reset all inputs
@@ -439,6 +430,6 @@ public class AdminController {
         tfDbUserPassword.setText("");
         initializeCheckboxes();
 
-        tableRefresh();
+        updateTable();
     }
 }

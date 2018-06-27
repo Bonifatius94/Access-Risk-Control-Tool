@@ -1,24 +1,11 @@
 package ui;
 
-//for testing
-
-import data.entities.CriticalAccessQuery;
-import extensions.ResourceBundleHelper;
-import io.csvexport.CsvExport;
-
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -28,9 +15,6 @@ import settings.UserSettingsHelper;
 import tools.tracing.TraceLevel;
 import tools.tracing.TraceMode;
 import tools.tracing.TraceOut;
-
-import ui.custom.controls.CustomAlert;
-import ui.custom.controls.CustomWindow;
 
 
 public class App extends Application {
@@ -48,7 +32,6 @@ public class App extends Application {
         // init logging tool
         TraceOut.enable("log.trc.txt", TraceMode.Overwrite, TraceLevel.All);
         TraceOut.enter();
-
 
         // init global exception handling
         Thread.currentThread().setUncaughtExceptionHandler(this::unhandledExceptionOccurred);
@@ -85,7 +68,7 @@ public class App extends Application {
      * Global error handling.
      *
      * @param thread the thread the error occurred in
-     * @param e      the error
+     * @param e the error
      */
     private void unhandledExceptionOccurred(Thread thread, Throwable e) {
 
@@ -121,25 +104,7 @@ public class App extends Application {
 
         TraceOut.enter();
 
-        // load the FirstUseWizwardView
-        ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("login/firstuse/FirstUseWizardView.fxml"), bundle);
-        CustomWindow window = loader.load();
-
-        // build the scene and add it to the stage
-        Scene scene = new Scene(window);
-        scene.getStylesheets().add("css/dark-theme.css");
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(App.primaryStage);
-        window.initStage(stage);
-        window.setTitle(bundle.getString("art"));
-
-        // add the icons to the stage
-        addIconsToStage(stage);
-
-        stage.show();
+        AppComponents.getInstance().showScene("ui/login/firstuse/FirstUseWizardView.fxml", "firstUse");
 
         TraceOut.leave();
     }
@@ -153,25 +118,7 @@ public class App extends Application {
 
         TraceOut.enter();
 
-        // load the LoginView
-        ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/login/LoginView.fxml"), bundle);
-        CustomWindow window = loader.load();
-
-        // build the scene and add it to the stage
-        Scene scene = new Scene(window);
-        scene.getStylesheets().add("css/dark-theme.css");
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(App.primaryStage);
-        window.initStage(stage);
-        window.setTitle(bundle.getString("login"));
-
-        // add the icons to the stage
-        addIconsToStage(stage);
-
-        stage.show();
+        AppComponents.getInstance().showScene("ui/login/LoginView.fxml", "login");
 
         TraceOut.leave();
     }
@@ -193,6 +140,6 @@ public class App extends Application {
     private void onAppClosing(WindowEvent e) {
 
         // close database
-        AppComponents.getDbContext().close();
+        AppComponents.getInstance().getDbContext().close();
     }
 }

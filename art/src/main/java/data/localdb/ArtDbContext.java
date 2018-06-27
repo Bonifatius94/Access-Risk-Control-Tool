@@ -1466,13 +1466,14 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         final String createDbUserSql =
             "INSERT INTO DbUsers (USERNAME, ISADMIN, ISDATAANALYST, ISVIEWER, ISFIRSTLOGIN) "
-                + "VALUES (:username, :isAdmin, :isDataAnalyst, :isViewer, 1)";
+                + "VALUES (:username, :isAdmin, :isDataAnalyst, :isViewer, :isFirstLogin)";
 
         session.createNativeQuery(createDbUserSql)
             .setParameter("username", user.getUsername().toUpperCase())
             .setParameter("isAdmin", user.getRoles().contains(DbUserRole.Admin))
             .setParameter("isDataAnalyst", user.getRoles().contains(DbUserRole.DataAnalyst))
             .setParameter("isViewer", user.getRoles().contains(DbUserRole.Viewer))
+            .setParameter("isFirstLogin", user.isFirstLogin())
             .executeUpdate();
     }
 
@@ -1647,7 +1648,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 final String sql = "UPDATE DbUsers SET IsFirstLogin = :isFirstLogin WHERE Username = :username";
                 session.createNativeQuery(sql)
-                    .setParameter("username", getCurrentUser().getUsername())
+                    .setParameter("username", getCurrentUser().getUsername().toUpperCase())
                     .setParameter("isFirstLogin", flag)
                     .executeUpdate();
 
