@@ -1,11 +1,12 @@
 package ui;
 
 //for testing
+
 import data.entities.CriticalAccessQuery;
+import extensions.ResourceBundleHelper;
 import io.csvexport.CsvExport;
 
-import extensions.ResourceBundleHelper;
-
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -14,7 +15,9 @@ import java.util.ResourceBundle;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -26,6 +29,7 @@ import tools.tracing.TraceLevel;
 import tools.tracing.TraceMode;
 import tools.tracing.TraceOut;
 
+import ui.custom.controls.CustomAlert;
 import ui.custom.controls.CustomWindow;
 
 
@@ -45,8 +49,6 @@ public class App extends Application {
         TraceOut.enable("log.trc.txt", TraceMode.Overwrite, TraceLevel.All);
         TraceOut.enter();
 
-        //TODO: entferne Csv export ist nur zum Testen da
-        CsvExport.startCsvExport(new CriticalAccessQuery());
 
         // init global exception handling
         Thread.currentThread().setUncaughtExceptionHandler(this::unhandledExceptionOccurred);
@@ -81,8 +83,9 @@ public class App extends Application {
 
     /**
      * Global error handling.
+     *
      * @param thread the thread the error occurred in
-     * @param e the error
+     * @param e      the error
      */
     private void unhandledExceptionOccurred(Thread thread, Throwable e) {
 
@@ -111,6 +114,7 @@ public class App extends Application {
 
     /**
      * Shows the FirstUseWizardView.
+     *
      * @throws Exception fxmloader fails to init
      */
     private void showFirstUseWizardView() throws Exception {
@@ -142,6 +146,7 @@ public class App extends Application {
 
     /**
      * Shows the LoginView.
+     *
      * @throws Exception fxmloader fails to init
      */
     private void showLoginView() throws Exception {
@@ -173,6 +178,7 @@ public class App extends Application {
 
     /**
      * Adds the icons to the given stage.
+     *
      * @param stage the given stage
      */
     private void addIconsToStage(Stage stage) {

@@ -3,6 +3,7 @@ package io.csvexport;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -14,92 +15,78 @@ public class CsvExport {
 
     /**
      * Starts Csv Export with an criticalAccessQuery.
-     *
      * @param criticalAccessQuery is the result of an anlysis
-     * @throws IOException caused by wrong filename or
+     * @param file is the File, where the critical entries are written in
+     * @param separator is a chosen separator
+     * @throws IOException caused by incompatible file type or failed write process and other I/O exceptions
      */
-    public static void startCsvExport(CriticalAccessQuery criticalAccessQuery) throws IOException {
-        //TODO: richtiger export implementierung bzw. wie kann mann das mit ner auswahl machen ???
+    public static void startCsvExport(CriticalAccessQuery criticalAccessQuery, File file, char separator) throws IOException {
 
-        FileWriter csvWriter = new FileWriter("example.csv"/* TODO: woher kommt der File Name ???*/);
-        CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withHeader("CriticalUserID", "CriticalUserName"));
-        csvPrinter.printRecord("stuff", "stuff");
-
-
-        //TODO: real print funktion Needs to be Tested
+        FileWriter csvWriter = new FileWriter(file);
+        CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withDelimiter(separator).withHeader("CriticalUserID", "CriticalUserName"));
 
         for (CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
-            csvPrinter.printRecord(criticalAccessEntry.getId(), criticalAccessEntry.getUsername());
+            csvPrinter.printRecord(criticalAccessEntry.getAccessPattern().getUsecaseId(), criticalAccessEntry.getUsername());
         }
 
         csvPrinter.flush();
-
     }
 
     /**
      * Starts Csv Export with an criticalAccessQuery.
-     *
-     * @param criticalAccessQuery the result of an analysis
-     * @param whitelistId         is the given id of an Whitelist which was used by the analysis.
-     * @throws IOException if an error while file writing occurred
+     * @param criticalAccessQuery is the result of an anlysis
+     * @param filepath is the filepath, of target file
+     * @param separator is a chosen separator
+     * @throws IOException caused by incompatible file type or failed write process and other I/O exceptions
      */
-    public static void startCsvExport(CriticalAccessQuery criticalAccessQuery, int whitelistId) throws IOException {
-        //TODO: implement
+    public static void startCsvExport(CriticalAccessQuery criticalAccessQuery, String filepath, char separator) throws IOException {
 
-        FileWriter csvWriter = new FileWriter("example.csv"/* TODO: woher kommt der File Name ???*/);
-        CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withHeader("CriticalUserID", "CriticalUserName", "WhitelistID"));
-
-        //TODO: real print funktion Needs to be Tested
+        FileWriter csvWriter = new FileWriter(filepath);
+        CSVPrinter csvPrinter;
+        csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withDelimiter(separator).withHeader("CriticalUserID", "CriticalUserName"));
 
         for (CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
-            csvPrinter.printRecord(criticalAccessEntry.getId(), criticalAccessEntry.getUsername(), whitelistId);
+            csvPrinter.printRecord(criticalAccessEntry.getAccessPattern().getUsecaseId(), criticalAccessEntry.getUsername());
         }
-
         csvPrinter.flush();
 
     }
-    /*
+
     /**
-     * @param criticalAccessQuery
-     * @param whitelistID
-     * @param accessPatternID
-     * @throws IOException
-     *
-    public static void StartCsvExport(CriticalAccessQuery criticalAccessQuery, int whitelistID, int accessPatternID) throws IOException {
+     * Starts Csv Export with an criticalAccessQuery. Separator is by default a comma
+     * @param criticalAccessQuery is the result of an anlysis
+     * @param filepath is the filepath, of the target file
+     * @throws IOException caused by incompatible file type or failed write process and other I/O exceptions
+     */
+    public static void startCsvExport(CriticalAccessQuery criticalAccessQuery, String filepath) throws IOException {
 
-        //TODO: implement
+        FileWriter csvWriter = new FileWriter(filepath);
+        CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withHeader("CriticalUserID", "CriticalUserName"));
 
-        FileWriter csvWriter = new FileWriter("example.csv"/* TODO: woher kommt der File Name ???);
-        CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withHeader("CriticalUserID", "CriticalUserName", "WhitelistID", "AccessPatternID"));
-
-        //TODO: real print funktion Needs to be Tested
 
         for (CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
-            csvPrinter.printRecord(criticalAccessEntry.getId(), criticalAccessEntry.getUsername(), whitelistID, accessPatternID);
+            csvPrinter.printRecord(criticalAccessEntry.getAccessPattern().getUsecaseId(), criticalAccessEntry.getUsername());
         }
-
         csvPrinter.flush();
     }
 
     /**
-     * @param criticalAccessQuery
-     * @param whitelistID
-     * @param accessPatternId
-     * @param configurationID
-     * @throws IOException
-     *
-    public static void startCsvExport(CriticalAccessQuery criticalAccessQuery, int whitelistID, int accessPatternId, int configurationID) throws IOException {
-        //TODO: implement
+     * Starts Csv Export with an criticalAccessQuery.
+     * @param criticalAccessQuery is the result of an anlysis
+     * @param file is the File, where the critical entries are written in
+     * @throws IOException caused by incompatible file type or failed write process and other I/O exceptions
+     */
+    public static void startCsvExport(CriticalAccessQuery criticalAccessQuery, File file) throws IOException {
 
-        FileWriter csvWriter = new FileWriter("example.csv"/* TODO: woher kommt der File Name ???*);
-        CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withHeader("CriticalUserID", "CriticalUserName", "WhitelistID", "AccessPatternID", "ConfigurationID"));
-
-        //TODO: real print funktion Needs to be Tested
+        FileWriter csvWriter = new FileWriter(file);
+        CSVPrinter csvPrinter;
+        csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withHeader("CriticalUserID", "CriticalUserName"));
 
         for (CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
-            csvPrinter.printRecord(criticalAccessEntry.getId(), criticalAccessEntry.getUsername(), whitelistID, configurationID);
+            csvPrinter.printRecord(criticalAccessEntry.getAccessPattern().getUsecaseId(), criticalAccessEntry.getUsername());
         }
-
         csvPrinter.flush();
-    }*/
+
+    }
+
 }
