@@ -11,23 +11,23 @@
             <Insets topRightBottomLeft="10" />
         </padding>
 
-        <Tab text="%sapQueriesTabTitle" >
+        <Tab text="%sapQueriesTabTitle" fx:id="sapQueriesTab">
             <fx:include fx:id="sapQueries" source="sapqueries/SapQueriesView.fxml" />
         </Tab>
-        <Tab text="%sapSettingsTabTitle">
+        <Tab text="%sapSettingsTabTitle" fx:id="sapSettingsTab">
             <fx:include fx:id="sapSettings" source="sapsettings/SapSettingsView.fxml" />
         </Tab>
-        <Tab text="%configurationsTabTitle">
+        <Tab text="%configurationsTabTitle" fx:id="configurationsTab">
             <fx:include fx:id="configs" source="configs/ConfigsView.fxml" />
         </Tab>
-        <Tab text="%patternsTabTitle">
+        <Tab text="%patternsTabTitle" fx:id="patternsTab">
             <fx:include fx:id="patterns" source="patterns/PatternsView.fxml" />
         </Tab>
-        <Tab text="%whitelistsTabTitle">
+        <Tab text="%whitelistsTabTitle" fx:id="whitelistsTab">
             <fx:include fx:id="whitelists" source="whitelists/WhitelistsView.fxml" />
         </Tab>
-        <Tab text="%userManagement">
-            <fx:include fx:id="admin" source="admin/AdminView.fxml" />
+        <Tab text="%userManagement" fx:id="usersTab">
+            <fx:include fx:id="users" source="admin/AdminView.fxml" />
         </Tab>
     </JFXTabPane>
     <fx:include source="statusbar/StatusBarView.fxml"/>
