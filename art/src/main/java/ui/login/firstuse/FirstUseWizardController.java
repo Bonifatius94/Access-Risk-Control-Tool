@@ -110,7 +110,7 @@ public class FirstUseWizardController {
                 usernameValidationBox.setVisible(false);
             } else {
                 if (!newValue.equals(oldValue)) {
-                    if (!newValue.matches("([A-Z]{3,}+(_|\\w)*)")) {
+                    if (!newValue.matches("([A-Z]{3,}+(_|\\w)*)") || !AppComponents.isUserRole(newValue)) {
                         usernameValidationBox.setVisible(true);
                     } else {
                         usernameValidationBox.setVisible(false);

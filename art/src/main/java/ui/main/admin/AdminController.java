@@ -162,7 +162,7 @@ public class AdminController implements IUpdateTable {
             } else {
                 try {
                     if (!newValue.equals(oldValue)) {
-                        if (!newValue.matches("([A-Z]{3,}+(_|\\w)*)")) {
+                        if (!newValue.matches("([A-Z]{3,}+(_|\\w)*)") || !AppComponents.isUserRole(newValue)) {
                             usernameValidationLabel.setText(bundle.getString("usernameInvalid"));
                             usernameValidationBox.setVisible(true);
                         } else if (userTable.isDisabled() && database.getDatabaseUsers().stream().map(x -> x.getUsername()).collect(Collectors.toList()).contains(newValue)) {
