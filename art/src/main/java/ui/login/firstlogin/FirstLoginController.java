@@ -77,12 +77,15 @@ public class FirstLoginController {
 
                 DbUser currentUser = AppComponents.getInstance().getDbContext().getCurrentUser();
 
+                // remove first login from user
+                AppComponents.getInstance().getDbContext().setFirstLoginOfCurrentUser(currentUser, false);
+
                 // change password of user
                 AppComponents.getInstance().getDbContext().changePassword(currentUser.getUsername(), passwordInput.getText());
 
-                // remove first login from user
-                // TODO: fix this
-                AppComponents.getInstance().getDbContext().setFirstLoginOfCurrentUser(currentUser, false);
+                // log out and in again
+                AppComponents.getInstance().getDbContext().close();
+                AppComponents.getInstance().tryInitDbContext(currentUser.getUsername(), passwordInput.getText());
 
                 // start the app
                 startApplication(event);
