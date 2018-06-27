@@ -176,7 +176,6 @@ public class ConfigurationTest {
     }
 
     @Test
-    @Disabled
     public void testDeleteConfigurationWithArchiving() {
 
         boolean ret = false;
@@ -185,7 +184,7 @@ public class ConfigurationTest {
 
             // query config
             Configuration activeConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
-            Configuration archivedConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
+            Configuration archivedConfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
 
             // use activeConfig in query
             // get  sapconfiguration
