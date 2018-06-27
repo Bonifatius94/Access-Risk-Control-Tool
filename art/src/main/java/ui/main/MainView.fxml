@@ -6,25 +6,28 @@
 <?import javafx.geometry.*?>
 
 <CustomWindow xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="ui.main.MainController" windowState="CanResize" title="%art">
-    <JFXTabPane CustomWindow.vgrow="ALWAYS">
+    <JFXTabPane CustomWindow.vgrow="ALWAYS" fx:id="mainTabs">
         <padding>
             <Insets topRightBottomLeft="10" />
         </padding>
 
-        <Tab text="SAP Queries">
-            <fx:include source="sapqueries/SapQueriesView.fxml" />
+        <Tab text="%sapQueriesTabTitle" fx:id="sapQueriesTab">
+            <fx:include fx:id="sapQueries" source="sapqueries/SapQueriesView.fxml" />
         </Tab>
-        <Tab text="SAP Settings">
-            <fx:include source="sapsettings/SapSettingsView.fxml" />
+        <Tab text="%sapSettingsTabTitle" fx:id="sapSettingsTab">
+            <fx:include fx:id="sapSettings" source="sapsettings/SapSettingsView.fxml" />
         </Tab>
-        <Tab text="Configurations">
-            <fx:include source="configs/ConfigsView.fxml" />
+        <Tab text="%configurationsTabTitle" fx:id="configurationsTab">
+            <fx:include fx:id="configs" source="configs/ConfigsView.fxml" />
         </Tab>
-        <Tab text="Patterns">
-            <fx:include source="patterns/PatternsView.fxml" />
+        <Tab text="%patternsTabTitle" fx:id="patternsTab">
+            <fx:include fx:id="patterns" source="patterns/PatternsView.fxml" />
         </Tab>
-        <Tab text="Whitelists">
-            <fx:include source="whitelists/WhitelistsView.fxml" />
+        <Tab text="%whitelistsTabTitle" fx:id="whitelistsTab">
+            <fx:include fx:id="whitelists" source="whitelists/WhitelistsView.fxml" />
+        </Tab>
+        <Tab text="%userManagement" fx:id="usersTab">
+            <fx:include fx:id="users" source="admin/AdminView.fxml" />
         </Tab>
     </JFXTabPane>
     <fx:include source="statusbar/StatusBarView.fxml"/>

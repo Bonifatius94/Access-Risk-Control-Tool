@@ -308,17 +308,18 @@ ALTER TABLE CRITICALACCESSENTRIES
 --   ON CRITICALACCESSENTRIES (QUERYID ASC);
 
 -- ========================================
---           create view DbUsers
+--          create table DbUsers
 -- ========================================
-CREATE VIEW DbUsers AS
-SELECT DISTINCT
-    Users.Name AS User,
-    GROUP_CONCAT(Rights.GrantedRole) AS Roles
-FROM INFORMATION_SCHEMA.Users
-LEFT OUTER JOIN INFORMATION_SCHEMA.Rights
-    ON Users.Name = Rights.Grantee
-WHERE Rights.Grantee IS NULL OR GranteeType = 'USER'
-GROUP BY Users.Name;
+CREATE TABLE DbUsers
+(
+   USERNAME         VARCHAR(2147483647)     NOT NULL,
+   ISADMIN          BIT                     NOT NULL,
+   ISDATAANALYST    BIT                     NOT NULL,
+   ISVIEWER         BIT                     NOT NULL,
+   ISFIRSTLOGIN     BIT                     NOT NULL,
+
+   PRIMARY KEY (USERNAME)
+);
 
 -- ========================================
 --        Marco Tröster, 21.06.2018

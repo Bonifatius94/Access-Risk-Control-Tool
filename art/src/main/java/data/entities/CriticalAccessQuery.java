@@ -36,9 +36,9 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
     /**
      * This constructor create a new instance with the given parameters.
      *
-     * @param config the config of the new instance
+     * @param config    the config of the new instance
      * @param sapConfig the sap config of the new instance
-     * @param entries the critical entries of the new instance
+     * @param entries   the critical entries of the new instance
      */
     public CriticalAccessQuery(Configuration config, SapConfiguration sapConfig, Set<CriticalAccessEntry> entries) {
 
@@ -63,7 +63,7 @@ public class CriticalAccessQuery implements IReferenceAware, ICreationFlagsHelpe
     @JoinColumn(name = "SapConfigId")
     private SapConfiguration sapConfig;
 
-    @OneToMany(mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<CriticalAccessEntry> entries = new HashSet<>();
 
     @Column(nullable = false)

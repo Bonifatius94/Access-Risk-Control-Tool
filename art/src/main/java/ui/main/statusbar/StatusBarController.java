@@ -2,6 +2,8 @@ package ui.main.statusbar;
 
 import data.entities.DbUser;
 
+import extensions.ResourceBundleHelper;
+
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
@@ -21,6 +23,8 @@ public class StatusBarController {
     @FXML
     private Label loggedInUserLabel;
 
+    ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
+
     /**
      * Initializes the view.
      */
@@ -28,7 +32,7 @@ public class StatusBarController {
     public void initialize() {
         try {
             // set the label text to the current user details
-            DbUser currentUser = AppComponents.getDbContext().getCurrentUser();
+            DbUser currentUser = AppComponents.getInstance().getDbContext().getCurrentUser();
             loggedInUserLabel.setText(currentUser.getUsername() + " - " + currentUser.getRoles().stream().map(x -> x.toString()).reduce((x, y) -> x + ", " + y).get());
         } catch (Exception e) {
             e.printStackTrace();
@@ -38,27 +42,18 @@ public class StatusBarController {
     /**
      * Opens the AboutView when the ? icon is clicked.
      */
-    public void openAboutView() {
-        try {
-            // load the AboutView
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../about/AboutView.fxml"), bundle);
-            CustomWindow window = loader.load();
+    public void openAboutView() throws Exception {
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(window);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            window.initStage(stage);
+        AppComponents.getInstance().showScene("ui/main/about/AboutView.fxml", "about");
 
-            window.setTitle(bundle.getString("about"));
+    }
 
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    /**
+     * Opens the SettingsView when the gear icon is clicked.
+     */
+    public void openSettingsView() throws Exception {
+
+        AppComponents.getInstance().showScene("ui/main/settings/SettingsView.fxml", "settings");
+
     }
 }

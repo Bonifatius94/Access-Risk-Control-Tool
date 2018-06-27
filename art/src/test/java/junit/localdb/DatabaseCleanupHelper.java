@@ -19,11 +19,11 @@ public class DatabaseCleanupHelper {
 
     private void deleteDatabase() throws Exception {
 
-        String databasePath;
+        String databasePath = "art.h2.mv.db";
 
-        try (ArtDbContext context = new ArtDbContext("test", "test")) {
-            databasePath = context.getFilePath();
-        }
+        //try (ArtDbContext context = new ArtDbContext("test", "test")) {
+        //    databasePath = context.getFilePath();
+        //}
 
         File database = new File(databasePath);
 

@@ -59,6 +59,8 @@ public abstract class H2ContextBase implements Closeable {
     private String username;
     private String password;
 
+    private final String filePassword = "<4KHhSVpG{cb~E]:d;%Su,!re^k39#668ncR=mh^9AssGP<{gR\")m)&&ZNeX!fus=tt,Z~$Ed#tS-P9!*k/[vvnPt?*DJ)W*G%~3";
+
     // +++++++++++++++++++++++++++++++
     // ++     Session Initiation    ++
     // +++++++++++++++++++++++++++++++
@@ -81,9 +83,9 @@ public abstract class H2ContextBase implements Closeable {
 
         builder.applySetting(Environment.DRIVER, "org.h2.Driver");
         builder.applySetting(Environment.DIALECT, "org.hibernate.dialect.H2Dialect");
-        builder.applySetting(Environment.URL, "jdbc:h2:file:" + filePath);
+        builder.applySetting(Environment.URL, "jdbc:h2:file:" + filePath + ";CIPHER=AES");
         builder.applySetting(Environment.USER, username);
-        builder.applySetting(Environment.PASS, password);
+        builder.applySetting(Environment.PASS, filePassword + " " + password);
         //builder.applySetting(Environment.SHOW_SQL, "true");
 
         // apply annotated data entity classes

@@ -53,11 +53,11 @@
 }
 
 .dialog-pane .button-bar .cancel-button:focused {
-    -fx-background-color: derive(-fx-background, 30%) !important;
+    -fx-background-color: derive(-fx-background, -40%) !important;
 }
 
 .dialog-pane .button-bar .cancel-button:hover {
-    -fx-background-color: -fx-error !important;
+    -fx-background-color: derive(-fx-background, 10%) !important;
 }
 
 /* style different dialogs differently */

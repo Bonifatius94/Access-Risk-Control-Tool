@@ -302,4 +302,13 @@ public interface IArtDbContext {
      */
     DbUser getCurrentUser() throws Exception;
 
+    /**
+     * This method sets the first login flag of the current user.
+     *
+     * @param user the current logged-in user
+     * @param flag the first login flag to be set
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    public void setFirstLoginOfCurrentUser(DbUser user, boolean flag) throws Exception;
+
 }

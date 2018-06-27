@@ -14,7 +14,7 @@
     <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
     <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable">
         <columns>
-            <PTableColumn text="?" fx:id="conditionTypeColumn" percentageWidth="0.06" resizable="false" >
+            <PTableColumn text="?" fx:id="conditionTypeColumn" percentageWidth="0.06" resizable="false">
                 <cellValueFactory>
                     <PropertyValueFactory property="conditions"/>
                 </cellValueFactory>
@@ -29,7 +29,7 @@
                     <PropertyValueFactory property="description"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="#" fx:id="conditionCountColumn" percentageWidth="0.1" resizable="false" >
+            <PTableColumn text="#" fx:id="conditionCountColumn" percentageWidth="0.1" resizable="false">
                 <cellValueFactory>
                     <PropertyValueFactory property="conditions"/>
                 </cellValueFactory>
@@ -42,24 +42,29 @@
     </TableView>
 
     <HBox alignment="BOTTOM_RIGHT" spacing="10">
-        <Label fx:id="itemCount" />
-        <Region HBox.hgrow="ALWAYS" />
-        <JFXButton text="Clone" onAction="#cloneAction" prefWidth="100">
+        <Label fx:id="itemCount"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <JFXButton text="%import" onAction="#importAction" prefWidth="130">
+            <graphic>
+                <MaterialDesignIconView glyphName="IMPORT"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton text="%clone" onAction="#cloneAction" prefWidth="130">
             <graphic>
                 <MaterialDesignIconView glyphName="CONTENT_COPY"/>
             </graphic>
         </JFXButton>
-        <JFXButton text="New..." onAction="#addAction" prefWidth="100">
+        <JFXButton text="%newEntry" onAction="#addAction" prefWidth="130">
             <graphic>
                 <MaterialDesignIconView glyphName="PLUS"/>
             </graphic>
         </JFXButton>
-        <JFXButton text="Edit..." onAction="#editAction" prefWidth="100">
+        <JFXButton text="%edit" onAction="#editAction" prefWidth="130">
             <graphic>
                 <MaterialDesignIconView glyphName="PENCIL"/>
             </graphic>
         </JFXButton>
-        <JFXButton text="Delete" onAction="#deleteAction" prefWidth="100" styleClass="warning-button">
+        <JFXButton text="%delete" onAction="#deleteAction" prefWidth="130" styleClass="warning-button">
             <graphic>
                 <MaterialDesignIconView glyphName="DELETE"/>
             </graphic>

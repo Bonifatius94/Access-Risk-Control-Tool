@@ -3,25 +3,21 @@ package ui.login.firstuse;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
+
 import data.entities.DbUser;
-import data.entities.DbUserRole;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
-
-import java.util.ResourceBundle;
 
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import ui.App;
 import ui.AppComponents;
-import ui.custom.controls.CustomWindow;
 
 
 public class FirstUseWizardController {
@@ -56,6 +52,9 @@ public class FirstUseWizardController {
     @FXML
     private JFXButton finishButton;
 
+    @FXML
+    private HBox usernameValidationBox;
+
     /**
      * Initializes the view with all needed bindings.
      */
@@ -78,6 +77,12 @@ public class FirstUseWizardController {
         createUserButton.defaultButtonProperty().bind(Bindings.isNotEmpty(usernameInput.textProperty()));
         finishButton.defaultButtonProperty().bind(finishButton.focusedProperty());
 
+        // transform typed text to uppercase
+        usernameInput.setTextFormatter(new TextFormatter<>((change) -> {
+            change.setText(change.getText().toUpperCase());
+            return change;
+        }));
+
         initializeValidation();
     }
 
@@ -98,6 +103,22 @@ public class FirstUseWizardController {
      * Initializes the validation for userCreation inputs.
      */
     private void initializeValidation() {
+
+        // validate the input with regex and display error message
+        usernameInput.textProperty().addListener((ol, oldValue, newValue) -> {
+            if (newValue.isEmpty()) {
+                usernameValidationBox.setVisible(false);
+            } else {
+                if (!newValue.equals(oldValue)) {
+                    if (!newValue.matches("([A-Z]{3,}+(_|\\w)*)") || !AppComponents.isUserRole(newValue)) {
+                        usernameValidationBox.setVisible(true);
+                    } else {
+                        usernameValidationBox.setVisible(false);
+                    }
+                    usernameInput.validate();
+                }
+            }
+        });
 
         usernameInput.focusedProperty().addListener((o, oldVal, newVal) -> {
             if (!newVal) {
@@ -125,7 +146,7 @@ public class FirstUseWizardController {
      * @return if the inputs are valid
      */
     private boolean validateBeforeCreate() {
-        return usernameInput.validate() && passwordInput.validate() && passwordInputPlain.validate();
+        return usernameInput.validate() && passwordInput.validate() && passwordInputPlain.validate() && !usernameValidationBox.isVisible();
     }
 
     /**
@@ -144,14 +165,13 @@ public class FirstUseWizardController {
 
         if (validateBeforeCreate()) {
 
-            if (AppComponents.tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
+            if (AppComponents.getInstance().tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
 
                 try {
 
                     // give the first user the Admin user role
-                    DbUser currentUser = AppComponents.getDbContext().getCurrentUser();
-                    currentUser.addRole(DbUserRole.Admin);
-                    AppComponents.getDbContext().updateUserRoles(currentUser);
+                    DbUser currentUser = new DbUser(usernameInput.getText(), true, false, false, false);
+                    AppComponents.getInstance().getDbContext().updateUserRoles(currentUser);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -171,20 +191,11 @@ public class FirstUseWizardController {
      */
     public void closeAndStartApp(ActionEvent event) {
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/MainView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 1050, 750);
-            scene.getStylesheets().add("css/dark-theme.css");
-            App.primaryStage.setScene(scene);
-            App.primaryStage.setTitle(bundle.getString("art"));
-            customWindow.initStage(App.primaryStage);
+            AppComponents.getInstance()
+                .showScene("ui/main/MainView.fxml", "art", App.primaryStage, null, null, 1050, 750);
 
             close(event);
-            App.primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -10,7 +10,7 @@
     <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
         <Label fx:id="loggedInUserLabel"/>
     </HBox>
-    <HBox HBox.hgrow="ALWAYS" alignment="CENTER">
+    <HBox alignment="CENTER">
         <Label text="%copyright"/>
     </HBox>
     <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT" spacing="20">
@@ -20,6 +20,14 @@
             </tooltip>
             <graphic>
                 <MaterialDesignIconView glyphName="ACCESS_POINT" size="20" styleClass="database-icon"/>
+            </graphic>
+        </Label>
+        <Label onMouseClicked="#openSettingsView" style="-fx-cursor: hand">
+            <tooltip>
+                <Tooltip text="%settings"/>
+            </tooltip>
+            <graphic>
+                <MaterialDesignIconView glyphName="SETTINGS" size="20"/>
             </graphic>
         </Label>
         <Label onMouseClicked="#openAboutView" style="-fx-cursor: hand">
