@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.HBox;
 
+import javafx.stage.Stage;
 import ui.App;
 import ui.AppComponents;
 
@@ -77,7 +78,7 @@ public class LoginController {
     /**
      * Handles the database login.
      */
-    public void login(ActionEvent event) {
+    public void login(ActionEvent event) throws Exception {
 
         if (System.currentTimeMillis() - startTime > penaltyTime) {
 
@@ -86,7 +87,13 @@ public class LoginController {
 
             if (validateBeforeSubmit()) {
                 if (AppComponents.getInstance().tryInitDbContext(usernameInput.getText(), passwordInput.getText())) {
-                    startApplication(event);
+
+                    if (isFirstLogin()) {
+                        showFirstLoginView(event);
+                    } else {
+                        startApplication(event);
+                    }
+
                 } else {
                     // reset the attempts and show penalty error
                     if (loginAttempts++ == maxAttempts) {
@@ -98,6 +105,10 @@ public class LoginController {
                 }
             }
         }
+    }
+
+    private boolean isFirstLogin() throws Exception {
+        return AppComponents.getInstance().getDbContext().getCurrentUser().isFirstLogin();
     }
 
     /**
@@ -143,16 +154,21 @@ public class LoginController {
     /**
      * Starts the application by opening the MainView.
      */
-    private void startApplication(ActionEvent event) {
-        try {
+    private void startApplication(ActionEvent event) throws Exception {
+        AppComponents.getInstance()
+            .showScene("ui/main/MainView.fxml", "art", App.primaryStage, null, null, 1050, 750);
 
-            AppComponents.getInstance()
-                .showScene("ui/main/MainView.fxml","art", App.primaryStage, null, null, 1050, 750);
+        close(event);
+    }
 
-            close(event);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    /**
+     * Shows a login window where the user has to change his password.
+     */
+    private void showFirstLoginView(ActionEvent event) throws Exception {
+        AppComponents.getInstance()
+            .showScene("ui/login/firstlogin/FirstLoginView.fxml", "firstLogin", new Stage(), App.primaryStage, null);
+
+        close(event);
     }
 
     /**
