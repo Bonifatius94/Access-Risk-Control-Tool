@@ -87,7 +87,7 @@ public class SapSettingsFormController {
             }
 
             close(event);
-            parentController.updateSapSettingsTable();
+            parentController.updateTable();
         }
     }
 

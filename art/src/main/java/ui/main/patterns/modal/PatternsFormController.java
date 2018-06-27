@@ -492,7 +492,7 @@ public class PatternsFormController {
             }
 
             // refresh the patternsTable in the parentController
-            parentController.updatePatternsTable();
+            parentController.updateTable();
             close(event);
         }
     }

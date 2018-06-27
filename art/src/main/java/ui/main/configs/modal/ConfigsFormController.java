@@ -387,7 +387,7 @@ public class ConfigsFormController {
             }
 
             // refresh the configsTable in the parentController
-            parentController.updateConfigsTable();
+            parentController.updateTable();
             close(event);
         }
     }

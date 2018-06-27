@@ -26,13 +26,14 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 import ui.AppComponents;
+import ui.IUpdateTable;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
 import ui.custom.controls.filter.FilterController;
 import ui.main.configs.modal.ConfigsFormController;
 
 
-public class ConfigsController {
+public class ConfigsController implements IUpdateTable {
 
     @FXML
     private TableView<Configuration> configsTable;
@@ -72,22 +73,18 @@ public class ConfigsController {
         filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
             if (newValue) {
                 try {
-                    updateConfigsTable();
+                    updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-
-        // fill table with all entries from the database
-        updateConfigsTable();
-
     }
 
     /**
      * Updates the configsTable items from the database, taking filters into account.
      */
-    public void updateConfigsTable() throws Exception {
+    public void updateTable() throws Exception {
 
         List<Configuration> configs = AppComponents.getInstance().getDbContext().getFilteredConfigs(filterController.showArchivedProperty.getValue(),
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
@@ -149,7 +146,7 @@ public class ConfigsController {
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 try {
                     AppComponents.getInstance().getDbContext().deleteConfig(configuration);
-                    updateConfigsTable();
+                    updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -185,7 +182,7 @@ public class ConfigsController {
                 AppComponents.getInstance().getDbContext().createConfig(clonedConfiguration);
             }
 
-            updateConfigsTable();
+            updateTable();
         }
     }
 
@@ -218,7 +215,7 @@ public class ConfigsController {
                     AppComponents.getInstance().getDbContext().deleteConfig(config);
                 }
 
-                updateConfigsTable();
+                updateTable();
             }
         }
     }

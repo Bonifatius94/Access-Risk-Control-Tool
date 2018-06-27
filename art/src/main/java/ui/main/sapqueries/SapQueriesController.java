@@ -23,7 +23,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
@@ -32,20 +31,17 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
-import ui.App;
 import ui.AppComponents;
+import ui.IUpdateTable;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
-import ui.custom.controls.CustomWindow;
 import ui.custom.controls.SapQueryStatusCellFactory;
 import ui.custom.controls.filter.FilterController;
 import ui.main.sapqueries.modal.details.SapQueryDetailController;
 import ui.main.sapqueries.modal.newquery.NewSapQueryController;
 
-public class SapQueriesController {
+public class SapQueriesController implements IUpdateTable {
 
     @FXML
     public TableView<CriticalAccessQuery> queriesTable;
@@ -94,20 +90,18 @@ public class SapQueriesController {
         filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
             if (newValue) {
                 try {
-                    updateQueriesTable();
+                    updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-
-        updateQueriesTable();
     }
 
     /**
      * Updates the queriesTable items from the database, taking filters into account.
      */
-    public void updateQueriesTable() throws Exception {
+    public void updateTable() throws Exception {
         List<CriticalAccessQuery> patterns = AppComponents.getInstance().getDbContext().getFilteredCriticalAccessQueries(filterController.showArchivedProperty.getValue(),
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
             filterController.endDateProperty.getValue(), 0);
@@ -261,7 +255,7 @@ public class SapQueriesController {
                     archiveQuery(query);
                 }
             }
-            updateQueriesTable();
+            updateTable();
         }
     }
 
@@ -287,7 +281,7 @@ public class SapQueriesController {
             query.setArchived(true);
             AppComponents.getInstance().getDbContext().updateRecord(query);
 
-            updateQueriesTable();
+            updateTable();
         }
     }
 }

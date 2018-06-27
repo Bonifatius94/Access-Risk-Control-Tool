@@ -107,7 +107,7 @@ public class SettingsController {
             //show restart prompt
             CustomAlert alert = new CustomAlert(Alert.AlertType.CONFIRMATION,
                 bundle.getString("restartAlertTitle"), bundle.getString("restartAlertMessage"),
-                "%restart", "%selfRestart");
+                bundle.getString("restart"), bundle.getString("selfRestart"));
 
             if (alert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 // restart the app

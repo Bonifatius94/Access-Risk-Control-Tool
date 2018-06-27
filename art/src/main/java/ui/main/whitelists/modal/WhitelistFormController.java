@@ -235,14 +235,14 @@ public class WhitelistFormController {
                 whitelist.setDescription(tfDescription.getText());
                 if (whitelist.isArchived()) {
                     whitelistDatabase.createWhitelist(whitelist);
-                    parentController.updateWhitelistTable();
+                    parentController.updateTable();
 
                 } else if (whitelist.getId() == null) {
                     whitelistDatabase.createWhitelist(whitelist);
-                    parentController.updateWhitelistTable();
+                    parentController.updateTable();
                 } else {
                     whitelistDatabase.updateWhitelist(whitelist);
-                    parentController.updateWhitelistTable();
+                    parentController.updateTable();
                 }
 
                 ((Stage) whitelistEditTable.getScene().getWindow()).close();

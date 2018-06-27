@@ -21,7 +21,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
@@ -32,20 +31,18 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import ui.App;
 import ui.AppComponents;
+import ui.IUpdateTable;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.ConditionTypeCellFactory;
 import ui.custom.controls.CustomAlert;
-import ui.custom.controls.CustomWindow;
 import ui.custom.controls.filter.FilterController;
 import ui.main.patterns.modal.PatternImportController;
 import ui.main.patterns.modal.PatternsFormController;
 
 
-public class PatternsController {
+public class PatternsController implements IUpdateTable {
 
     @FXML
     public TableView<AccessPattern> patternsTable;
@@ -87,21 +84,18 @@ public class PatternsController {
         filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
             if (newValue) {
                 try {
-                    updatePatternsTable();
+                    updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-
-        // fill table with all entries from the database
-        updatePatternsTable();
     }
 
     /**
      * Updates the patternsTable items from the database, taking filters into account.
      */
-    public void updatePatternsTable() throws Exception {
+    public void updateTable() throws Exception {
 
         List<AccessPattern> patterns = AppComponents.getInstance().getDbContext().getFilteredPatterns(filterController.showArchivedProperty.getValue(),
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
@@ -160,7 +154,7 @@ public class PatternsController {
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 try {
                     AppComponents.getInstance().getDbContext().deletePattern(accessPattern);
-                    updatePatternsTable();
+                    updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -243,7 +237,7 @@ public class PatternsController {
                 AppComponents.getInstance().getDbContext().createPattern(clonedPattern);
             }
 
-            updatePatternsTable();
+            updateTable();
         }
     }
 
@@ -274,7 +268,7 @@ public class PatternsController {
                 for (AccessPattern pattern : patternsTable.getSelectionModel().getSelectedItems()) {
                     AppComponents.getInstance().getDbContext().deletePattern(pattern);
                 }
-                updatePatternsTable();
+                updateTable();
             }
         }
     }

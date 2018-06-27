@@ -173,7 +173,7 @@ public class PatternImportController {
                     AppComponents.getInstance().getDbContext().createPattern(pattern);
                 }
 
-                patternsController.updatePatternsTable();
+                patternsController.updateTable();
             }
         }
     }

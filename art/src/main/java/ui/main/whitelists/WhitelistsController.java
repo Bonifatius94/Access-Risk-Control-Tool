@@ -10,7 +10,6 @@ import extensions.ResourceBundleHelper;
 import io.msoffice.excel.WhitelistImportHelper;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -23,7 +22,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
@@ -33,19 +31,17 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import ui.App;
 import ui.AppComponents;
+import ui.IUpdateTable;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
-import ui.custom.controls.CustomWindow;
 import ui.custom.controls.PTableColumn;
 import ui.custom.controls.filter.FilterController;
 import ui.main.whitelists.modal.WhitelistFormController;
 
-public class WhitelistsController {
+public class WhitelistsController implements IUpdateTable {
 
     @FXML
     public TableView<Whitelist> whitelistTable;
@@ -110,14 +106,12 @@ public class WhitelistsController {
         filterController.shouldFilterProperty.addListener((obs, oldValue, newValue) -> {
             if (newValue) {
                 try {
-                    updateWhitelistTable();
+                    updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-
-        updateWhitelistTable();
     }
 
     /**
@@ -125,7 +119,7 @@ public class WhitelistsController {
      *
      * @throws Exception if a Database error occurred.
      */
-    public void updateWhitelistTable() throws Exception {
+    public void updateTable() throws Exception {
         List<Whitelist> whitelists = database.getFilteredWhitelists(filterController.showArchivedProperty.getValue(), filterController.searchStringProperty.getValue(),
             filterController.startDateProperty.getValue(), filterController.startDateProperty.getValue(), 0);
         ObservableList<Whitelist> list = FXCollections.observableList(whitelists);
@@ -150,7 +144,7 @@ public class WhitelistsController {
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 try {
                     database.deleteWhitelist(whitelist);
-                    updateWhitelistTable();
+                    updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -240,7 +234,7 @@ public class WhitelistsController {
                 for (Whitelist whitelist : whitelistTable.getSelectionModel().getSelectedItems()) {
                     database.deleteWhitelist(whitelist);
                 }
-                updateWhitelistTable();
+                updateTable();
             }
         }
     }
@@ -264,7 +258,7 @@ public class WhitelistsController {
                 whitelistToAdd.setDescription("Clone - " + whitelist.getDescription());
                 database.createWhitelist(whitelistToAdd);
             }
-            updateWhitelistTable();
+            updateTable();
         }
     }
 
@@ -282,7 +276,7 @@ public class WhitelistsController {
                 WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
                 Whitelist importedWhitelist = whitelistImportHelper.importWhitelist(path);
                 startImportDialog(importedWhitelist);
-                updateWhitelistTable();
+                updateTable();
 
             } catch (Exception e) {
                 e.printStackTrace();
