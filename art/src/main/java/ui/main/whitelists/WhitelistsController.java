@@ -287,10 +287,14 @@ public class WhitelistsController implements IUpdateTable {
     /**
      * Starts a dialog do edit imported whitelist.
      *
-     * @param whitelist is the imported Whitlsit
+     * @param whitelist is the imported Whitelist
      */
-    private void startImportDialog(Whitelist whitelist) {
-        editDialogWhitelist(whitelist);
+    private void startImportDialog(Whitelist whitelist) throws Exception {
+        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "importWhitelist", 900, 650);
+
+        WhitelistFormController editDialogController = loader.getController();
+        editDialogController.giveSelectedWhitelist(whitelist);
+        editDialogController.setParentController(this);
     }
 
 }

@@ -12,7 +12,9 @@ import data.entities.Whitelist;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import extensions.ResourceBundleHelper;
+
 import io.msoffice.excel.AccessPatternImportHelper;
+import io.msoffice.excel.WhitelistImportHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,6 +48,7 @@ import ui.custom.controls.ConditionTypeCellFactory;
 import ui.custom.controls.CustomAlert;
 import ui.main.configs.ConfigsController;
 import ui.main.patterns.modal.PatternImportController;
+import ui.main.whitelists.modal.WhitelistFormController;
 
 
 public class ConfigsFormController {
@@ -329,7 +332,25 @@ public class ConfigsFormController {
      * Opens a dialog which lets you choose a Whitelist file to import and imports that into the application.
      */
     public void importWhitelist() {
-        // TODO add import from Franz
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Excel files (*.xlsx)", "*.xlsx");
+        fileChooser.getExtensionFilters().add(extensionFilter);
+        File file = fileChooser.showOpenDialog(App.primaryStage);
+        if (file != null) {
+            String path = file.getPath();
+            try {
+                WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
+                Whitelist importedWhitelist = whitelistImportHelper.importWhitelist(path);
+
+                FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "importWhitelist", 900, 650);
+
+                WhitelistFormController editDialogController = loader.getController();
+                editDialogController.giveSelectedWhitelist(importedWhitelist);
+                editDialogController.setConfigsFormController(this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -374,6 +395,11 @@ public class ConfigsFormController {
                 if (pattern.getId() == null) {
                     AppComponents.getInstance().getDbContext().createPattern(pattern);
                 }
+            }
+
+            // check if the whitelist was imported so it has to be created first
+            if (whitelistChooser.getValue().getId() == null) {
+                AppComponents.getInstance().getDbContext().createWhitelist(whitelistChooser.getValue());
             }
 
             this.configuration.setPatterns(patternsTable.getItems());

@@ -29,6 +29,7 @@ import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
 import ui.custom.controls.PTableColumn;
+import ui.main.configs.modal.ConfigsFormController;
 import ui.main.whitelists.WhitelistsController;
 
 
@@ -77,6 +78,7 @@ public class WhitelistFormController {
     private Whitelist whitelist;
     private Whitelist whitelistOld;
     private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
+    private ConfigsFormController configsFormController;
 
     /**
      * Automatically called by FXML loader, starts initialize Columns.
@@ -233,16 +235,20 @@ public class WhitelistFormController {
                 whitelist.getEntries().addAll(whitelistEditTable.getItems().stream().filter(x -> x.getUsecaseId() != null).collect(Collectors.toList()));
                 whitelist.setName(tfWhitelistName.getText());
                 whitelist.setDescription(tfDescription.getText());
-                if (whitelist.isArchived()) {
-                    whitelistDatabase.createWhitelist(whitelist);
-                    parentController.updateTable();
+                if (parentController != null) {
+                    if (whitelist.isArchived()) {
+                        whitelistDatabase.createWhitelist(whitelist);
+                        parentController.updateTable();
 
-                } else if (whitelist.getId() == null) {
-                    whitelistDatabase.createWhitelist(whitelist);
-                    parentController.updateTable();
-                } else {
-                    whitelistDatabase.updateWhitelist(whitelist);
-                    parentController.updateTable();
+                    } else if (whitelist.getId() == null) {
+                        whitelistDatabase.createWhitelist(whitelist);
+                        parentController.updateTable();
+                    } else {
+                        whitelistDatabase.updateWhitelist(whitelist);
+                        parentController.updateTable();
+                    }
+                } else if (configsFormController != null) {
+                    configsFormController.setWhitelist(whitelist);
                 }
 
                 ((Stage) whitelistEditTable.getScene().getWindow()).close();
@@ -301,13 +307,18 @@ public class WhitelistFormController {
         this.parentController = parentController;
     }
 
+
+    public void setConfigsFormController(ConfigsFormController configsFormController) {
+        this.configsFormController = configsFormController;
+    }
+
     /**
      * Checks if Whitelist name and whitelist Description is empty.
      *
      * @return true if name or description is empty.
      */
     private boolean checkNameAndDescription() {
-        return tfDescription.getText().equals("") || tfWhitelistName.getText().equals("");
+        return tfDescription.validate() || tfWhitelistName.validate();
     }
 
     /**
