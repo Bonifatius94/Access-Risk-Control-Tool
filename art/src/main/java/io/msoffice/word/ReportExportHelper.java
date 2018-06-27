@@ -92,7 +92,7 @@ public class ReportExportHelper implements IReportExportHelper {
 
                 // replaceBookmark(document, "CreatedAt", );
 
-                // write pie chart
+                // write Blog chart
                 BlockChart chart = new BlockChart();
                 chart.writeChartToDocumentAccesPattern(document, sortedEntries);
                 chart.writeChartToDocumentUser(document, sortedEntries);
