@@ -15,29 +15,45 @@
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.main.settings.SettingsController">
     <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
-        <VBox spacing="30" HBox.hgrow="ALWAYS">
+        <VBox spacing="30" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
             <HBox spacing="20" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
                 <Label text="%languageSettings"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <JFXComboBox fx:id="languageChooser"/>
             </HBox>
             <HBox spacing="20" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-                <Label text="Primary"/>
+                <Label text="%primary"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <JFXColorPicker fx:id="primaryColorChooser"/>
             </HBox>
         </VBox>
+        <Label fx:id="restartLabel" text="%restartLabel" wrapText="true" maxWidth="250"/>
         <Separator/>
         <HBox spacing="20" alignment="BASELINE_RIGHT" HBox.hgrow="ALWAYS">
-            <JFXButton onAction="#saveChanges" prefWidth="120" text="%save">
+            <JFXButton onAction="#resetToDefault" styleClass="round-button" prefHeight="30">
+                <graphic>
+                    <MaterialDesignIconView glyphName="REFRESH"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%resetToDefault"/>
+                </tooltip>
+            </JFXButton>
+            <Region HBox.hgrow="ALWAYS"/>
+            <JFXButton onAction="#saveChanges" styleClass="round-button" prefHeight="30">
                 <graphic>
                     <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
                 </graphic>
+                <tooltip>
+                    <Tooltip text="%save"/>
+                </tooltip>
             </JFXButton>
-            <JFXButton onAction="#close" prefWidth="120" text="%cancel">
+            <JFXButton onAction="#close" styleClass="round-button" prefHeight="30">
                 <graphic>
                     <MaterialDesignIconView glyphName="CLOSE"/>
                 </graphic>
+                <tooltip>
+                    <Tooltip text="%cancel"/>
+                </tooltip>
             </JFXButton>
         </HBox>
     </VBox>
