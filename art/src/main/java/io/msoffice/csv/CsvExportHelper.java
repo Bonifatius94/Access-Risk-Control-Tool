@@ -1,4 +1,4 @@
-package io.csvexport;
+package io.msoffice.csv;
 
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
@@ -6,12 +6,14 @@ import data.entities.CriticalAccessQuery;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-public class CsvExport {
+public class CsvExportHelper {
 
     /**
      * Starts Csv Export with an criticalAccessQuery.
@@ -21,14 +23,21 @@ public class CsvExport {
      * @param language is the language of the export format
      * @throws IOException caused by incompatible file type or failed write process and other I/O exceptions
      */
-    public void startCsvExport(CriticalAccessQuery criticalAccessQuery, File file, Locale language) throws IOException {
+    public void exportCsv(CriticalAccessQuery criticalAccessQuery, File file, Locale language) throws IOException {
 
         try (FileWriter csvWriter = new FileWriter(file)) {
 
             // prepare csv format
             char separator = language.equals(Locale.GERMAN) ? ';' : ',';
-            CSVFormat format = CSVFormat.DEFAULT.withDelimiter(separator).withHeader("CriticalUserID", "CriticalUserName");
 
+            // TODO: make csv headers customizable in settings
+            String[] headers = language.equals(Locale.GERMAN)
+                ? new String[] { "Veletzte Pattern-ID", "Kritischer Benutzer"}
+                : new String[] {"Violated Pattern ID", "Critical Username"};
+
+            CSVFormat format = CSVFormat.DEFAULT.withDelimiter(separator).withHeader(headers);
+
+            // open csv output stream writer
             try (CSVPrinter csvPrinter = new CSVPrinter(csvWriter, format)) {
 
                 // write critical access entries to file
@@ -36,7 +45,7 @@ public class CsvExport {
                     csvPrinter.printRecord(criticalAccessEntry.getAccessPattern().getUsecaseId(), criticalAccessEntry.getUsername());
                 }
 
-                // make sure the output stream gets flushed
+                // make sure the output stream gets flushed, so everything is written to the output file
                 csvPrinter.flush();
             }
         }
