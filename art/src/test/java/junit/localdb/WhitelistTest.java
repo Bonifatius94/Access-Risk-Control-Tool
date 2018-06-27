@@ -42,7 +42,6 @@ public class WhitelistTest {
     }
 
     @Test
-    @Disabled
     public void testCreateWhitelist() {
 
         boolean ret = false;
@@ -53,16 +52,17 @@ public class WhitelistTest {
             List<Whitelist> whitelists = context.getWhitelists(false);
             int countBefore = (whitelists != null) ? whitelists.size() : 0;
 
-            // insert a whitelist
-            Whitelist whitelist = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");
-            whitelist.setName("a name");
+            // insert a whitelist through the whitelistHelper
+            Whitelist whitelist = new WhitelistImportHelper().importWhitelist("D:\\UNIversitaet\\Informatik\\Softwareprojekt\\dev\\art\\Example - Whitelist.xlsx");
+            whitelist.setName("a test name");
             whitelist.setDescription("a test description");
-            System.out.println(whitelist);
+
+            //  System.out.println(whitelist);
             context.createWhitelist(whitelist);
 
             // query whitelists after insertion
             whitelists = context.getWhitelists(false);
-            System.out.println(whitelist);
+            //System.out.println(whitelist);
             int countAfter = (whitelists != null) ? whitelists.size() : 0;
 
             // compare counts
@@ -72,7 +72,7 @@ public class WhitelistTest {
             ex.printStackTrace();
         }
 
-        //TODO: Fix bug caused a merge
+        //TODO: Ask if the whitelistImportHelper works
 
         assert (ret);
     }
