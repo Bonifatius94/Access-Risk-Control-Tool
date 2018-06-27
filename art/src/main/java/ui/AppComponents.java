@@ -1,5 +1,6 @@
 package ui;
 
+import data.entities.DbUserRole;
 import data.localdb.ArtDbContext;
 
 import extensions.ResourceBundleHelper;
@@ -159,5 +160,13 @@ public class AppComponents {
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_128.png")));
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_256.png")));
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_512.png")));
+    }
+
+
+    /**
+     * Returns if the string is an already defined DbUserRole.
+     */
+    public static boolean isUserRole(String username) {
+        return !(username.equalsIgnoreCase(DbUserRole.Viewer.toString()) || username.equalsIgnoreCase(DbUserRole.DataAnalyst.toString()) || username.equalsIgnoreCase(DbUserRole.Admin.toString()));
     }
 }
