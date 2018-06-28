@@ -72,8 +72,6 @@ public class WhitelistTest {
             ex.printStackTrace();
         }
 
-        //TODO: Ask if the whitelistImportHelper works
-
         assert (ret);
     }
 

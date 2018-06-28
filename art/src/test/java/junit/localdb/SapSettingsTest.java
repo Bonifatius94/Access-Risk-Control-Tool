@@ -95,7 +95,6 @@ public class SapSettingsTest {
     }
 
     @Test
-    @Disabled
     public void testUpdateSapConfigWithArchiving() {
 
         boolean ret = false;
@@ -123,7 +122,7 @@ public class SapSettingsTest {
             ex.printStackTrace();
         }
 
-        assert (false);
+        assert (ret);
     }
 
     @Test
