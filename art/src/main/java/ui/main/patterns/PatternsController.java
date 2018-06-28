@@ -289,7 +289,7 @@ public class PatternsController implements IUpdateTable {
 
             // import patterns with the AccessPatternImportHelper
             AccessPatternImportHelper importHelper = new AccessPatternImportHelper();
-            List<AccessPattern> importedPatterns = importHelper.importAuthorizationPattern(selectedFile.getAbsolutePath());
+            List<AccessPattern> importedPatterns = importHelper.importAccessPatterns(selectedFile.getAbsolutePath());
 
             // give the dialog the controller and the patterns
             PatternImportController importController = loader.getController();

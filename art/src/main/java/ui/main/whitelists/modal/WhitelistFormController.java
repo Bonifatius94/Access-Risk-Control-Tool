@@ -73,11 +73,11 @@ public class WhitelistFormController {
     private JFXButton copyButton;
 
 
-    private WhitelistsController parentController;
     private ArtDbContext whitelistDatabase = AppComponents.getInstance().getDbContext();
     private Whitelist whitelist;
     private Whitelist whitelistOld;
     private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
+    private WhitelistsController whitelistsController;
     private ConfigsFormController configsFormController;
 
     /**
@@ -230,24 +230,22 @@ public class WhitelistFormController {
      */
     @FXML
     private void saveEditWhitelist() throws Exception {
-        if (!checkNameAndDescription()) {
+        if (checkNameAndDescription()) {
             if (!whitelistEditTable.getItems().isEmpty()) {
                 whitelist.getEntries().addAll(whitelistEditTable.getItems().stream().filter(x -> x.getUsecaseId() != null).collect(Collectors.toList()));
                 whitelist.setName(tfWhitelistName.getText());
                 whitelist.setDescription(tfDescription.getText());
-                if (parentController != null) {
-                    if (whitelist.isArchived()) {
-                        whitelistDatabase.createWhitelist(whitelist);
-                        parentController.updateTable();
 
-                    } else if (whitelist.getId() == null) {
+                // dialog was called from WhitelistsView
+                if (whitelistsController != null) {
+                    if (whitelist.getId() == null) {
                         whitelistDatabase.createWhitelist(whitelist);
-                        parentController.updateTable();
+                        whitelistsController.updateTable();
                     } else {
                         whitelistDatabase.updateWhitelist(whitelist);
-                        parentController.updateTable();
+                        whitelistsController.updateTable();
                     }
-                } else if (configsFormController != null) {
+                } else if (configsFormController != null) { // dialog was called from ConfigsFormController
                     configsFormController.setWhitelist(whitelist);
                 }
 
@@ -301,10 +299,10 @@ public class WhitelistFormController {
     /**
      * Sets the parent controller.
      *
-     * @param parentController the parent controller
+     * @param whitelistsController the parent controller
      */
-    public void setParentController(WhitelistsController parentController) {
-        this.parentController = parentController;
+    public void setWhitelistsController(WhitelistsController whitelistsController) {
+        this.whitelistsController = whitelistsController;
     }
 
 
@@ -318,7 +316,7 @@ public class WhitelistFormController {
      * @return true if name or description is empty.
      */
     private boolean checkNameAndDescription() {
-        return tfDescription.validate() || tfWhitelistName.validate();
+        return tfDescription.validate() && tfWhitelistName.validate();
     }
 
     /**

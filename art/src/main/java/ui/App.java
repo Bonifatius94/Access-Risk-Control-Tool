@@ -66,6 +66,7 @@ public class App extends Application {
 
     /**
      * Global error handling.
+     *
      * @param thread the thread the error occurred in
      * @param e the error
      */
@@ -96,6 +97,7 @@ public class App extends Application {
 
     /**
      * Shows the FirstUseWizardView.
+     *
      * @throws Exception fxmloader fails to init
      */
     private void showFirstUseWizardView() throws Exception {
@@ -109,6 +111,7 @@ public class App extends Application {
 
     /**
      * Shows the LoginView.
+     *
      * @throws Exception fxmloader fails to init
      */
     private void showLoginView() throws Exception {
@@ -122,6 +125,7 @@ public class App extends Application {
 
     /**
      * Adds the icons to the given stage.
+     *
      * @param stage the given stage
      */
     private void addIconsToStage(Stage stage) {

@@ -691,7 +691,7 @@ public class PatternsFormController {
         selectedTable.requestFocus();
         selectedTable.scrollTo(selectedTable.getItems().size() - 1);
         selectedTable.getSelectionModel().clearSelection();
-        
+
         resetDetails();
     }
 

@@ -189,7 +189,7 @@ public class WhitelistsController implements IUpdateTable {
             FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "newWhitelist", 900, 650);
 
             WhitelistFormController whitelistFormController = loader.getController();
-            whitelistFormController.setParentController(this);
+            whitelistFormController.setWhitelistsController(this);
             whitelistFormController.giveSelectedWhitelist(null);
         } catch (Exception e) {
             e.printStackTrace();
@@ -209,7 +209,7 @@ public class WhitelistsController implements IUpdateTable {
 
             WhitelistFormController editDialogController = loader.getController();
             editDialogController.giveSelectedWhitelist(whitelist);
-            editDialogController.setParentController(this);
+            editDialogController.setWhitelistsController(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -276,8 +276,6 @@ public class WhitelistsController implements IUpdateTable {
                 WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
                 Whitelist importedWhitelist = whitelistImportHelper.importWhitelist(path);
                 startImportDialog(importedWhitelist);
-                updateTable();
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -294,7 +292,7 @@ public class WhitelistsController implements IUpdateTable {
 
         WhitelistFormController editDialogController = loader.getController();
         editDialogController.giveSelectedWhitelist(whitelist);
-        editDialogController.setParentController(this);
+        editDialogController.setWhitelistsController(this);
     }
 
 }

@@ -13,28 +13,38 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
 import extensions.ResourceBundleHelper;
 
+import io.msoffice.ExportHelper;
+import io.msoffice.ReportExportType;
+import io.msoffice.excel.AccessPatternExportHelper;
+import io.msoffice.excel.WhitelistExportHelper;
+
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.stage.FileChooser;
 import javafx.util.Callback;
+
+import settings.UserSettings;
 
 import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
-import ui.custom.controls.CustomWindow;
 import ui.main.patterns.modal.PatternsFormController;
 
 
@@ -50,7 +60,10 @@ public class AnalysisResultController {
     private TableView<CriticalAccessEntry> resultTable;
 
     @FXML
-    private JFXComboBox exportFormatChooser;
+    private JFXComboBox<ReportExportType> exportFormatChooser;
+
+    @FXML
+    private JFXComboBox<Locale> exportLanguageChooser;
 
     @FXML
     public TableColumn<CriticalAccessEntry, JFXButton> viewPatternDetailsColumn;
@@ -88,11 +101,16 @@ public class AnalysisResultController {
         }));
 
         initializeConditionTypeColumn();
-
         initializeUsecaseIdColumn();
-
         initializeDescriptionColumn();
 
+        // init export format chooser
+        exportFormatChooser.setItems(FXCollections.observableList(Arrays.asList(ReportExportType.Word, ReportExportType.Pdf, ReportExportType.Csv)));
+        exportFormatChooser.getSelectionModel().select(ReportExportType.Word);
+
+        // init export languages chooser
+        exportLanguageChooser.setItems(FXCollections.observableList(UserSettings.getAvailableLocales()));
+        exportLanguageChooser.getSelectionModel().select(Locale.GERMAN);
     }
 
     /**
@@ -126,12 +144,85 @@ public class AnalysisResultController {
     }
 
     /**
-     * Exports the results with the given parameters (format, includePatterns, includeWhitelist).
+     * Exports the query results with the given format / language.
      */
-    public void exportResults() {
-        System.out.println("Format: " + includePatternsCheckbox.isSelected());
-        System.out.println("Include patterns: " + includePatternsCheckbox.isSelected());
-        System.out.println("Include whitelist: " + includeWhitelistCheckbox.isSelected());
+    public void exportResults() throws Exception {
+
+        ReportExportType exportType = exportFormatChooser.getSelectionModel().getSelectedItem();
+        Locale exportLanguage = exportLanguageChooser.getSelectionModel().getSelectedItem();
+
+        String extension;
+        String description;
+
+        switch (exportType) {
+            case Csv:
+                extension = "*.csv";
+                description = "CSV files (*.csv)";
+                break;
+            case Word:
+                extension = "*.docx";
+                description = "MS Word files (*.docx)";
+                break;
+            case Pdf:
+                extension = "*.pdf";
+                description = "PDF files (*.pdf)";
+                break;
+            default:
+                throw new IllegalArgumentException("unknown export type");
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter(description, extension);
+        fileChooser.getExtensionFilters().add(extensionFilter);
+        // TODO: check if the parent stage is correct
+        File file = fileChooser.showSaveDialog(App.primaryStage);
+
+        if (file != null) {
+
+            // export the query results to the chosen output file
+            new ExportHelper().exportDocument(resultQuery, file, exportType, exportLanguage);
+        }
+    }
+
+    /**
+     * Exports the whitelist used for the analysis.
+     */
+    public void exportWhitelist() throws Exception {
+
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Excel files (*.xlsx)", "*.xlsx");
+        fileChooser.getExtensionFilters().add(extensionFilter);
+        // TODO: check if the parent stage is correct
+        File file = fileChooser.showSaveDialog(App.primaryStage);
+
+        if (file != null) {
+
+            // export the whitelist to the chosen output file
+            new WhitelistExportHelper().exportWhitelist(file.getAbsolutePath(), resultQuery.getConfig().getWhitelist());
+        }
+    }
+
+    /**
+     * Exports the access patterns used for the analysis.
+     */
+    public void exportPatterns() throws Exception {
+
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Excel files (*.xlsx)", "*.xlsx");
+        fileChooser.getExtensionFilters().add(extensionFilter);
+        // TODO: check if the parent stage is correct
+        File file = fileChooser.showSaveDialog(App.primaryStage);
+
+        if (file != null) {
+
+            // order patterns by usecase id
+            List<AccessPattern> patterns =
+                resultQuery.getConfig().getPatterns().stream()
+                .sorted(Comparator.comparing(AccessPattern::getUsecaseId)).collect(Collectors.toList());
+
+            // export the patterns to the chosen output file
+            new AccessPatternExportHelper().exportAccessPatterns(file.getAbsolutePath(), patterns);
+        }
     }
 
     /**
