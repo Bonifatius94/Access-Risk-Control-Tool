@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import ui.custom.controls.CustomWindow?>
+<?import ui.custom.controls.PTableColumn?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<CustomWindow xmlns="http://javafx.com/javafx"
+              xmlns:fx="http://javafx.com/fxml"
+              fx:controller="ui.main.sapqueries.modal.choosers.SapConfigChooserController">
+    <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
+        <fx:include source="../../../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
+        <TableView VBox.vgrow="ALWAYS" fx:id="sapSettingsTable">
+            <columns>
+                <PTableColumn percentageWidth="0.4" resizable="false" text="Server">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="serverDestination"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn percentageWidth="0.15" resizable="false" text="Sys Nr">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="sysNr"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn percentageWidth="0.15" resizable="false" text="JCO Client">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="client"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn percentageWidth="0.15" resizable="false" text="Language">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="language"/>
+                    </cellValueFactory>
+                </PTableColumn>
+                <PTableColumn percentageWidth="0.15" resizable="false" text="Pool Capacity">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="poolCapacity"/>
+                    </cellValueFactory>
+                </PTableColumn>
+            </columns>
+        </TableView>
+        <Separator />
+        <HBox alignment="BASELINE_RIGHT" spacing="10">
+            <JFXButton text="%ok" onAction="#chooseSapConfig" prefWidth="100">
+                <graphic>
+                    <MaterialDesignIconView glyphName="CHECK"/>
+                </graphic>
+            </JFXButton>
+            <JFXButton text="%cancel" onAction="#close" prefWidth="100">
+                <graphic>
+                    <MaterialDesignIconView glyphName="CLOSE"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
+    </VBox>
+</CustomWindow>

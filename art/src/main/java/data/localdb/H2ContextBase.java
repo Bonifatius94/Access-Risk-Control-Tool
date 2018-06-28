@@ -4,7 +4,6 @@ import java.io.Closeable;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,11 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Environment;
 
 public abstract class H2ContextBase implements Closeable {
 
@@ -28,12 +31,18 @@ public abstract class H2ContextBase implements Closeable {
      * @param username the username for login
      * @param password the password for login
      */
-    public H2ContextBase(String filePath, String username, String password) {
+    public H2ContextBase(String filePath, String username, String password) throws Exception {
 
         this.filePath = filePath;
         this.username = username;
         this.password = password;
+
+        boolean isNewDatabase = !new File(getFilePath()).exists();
         sessionFactory = initSessionFactory(filePath, username, password);
+
+        if (isNewDatabase) {
+            createNewDatabase();
+        }
     }
 
     // +++++++++++++++++++++++++++++++
@@ -45,6 +54,8 @@ public abstract class H2ContextBase implements Closeable {
 
     private String username;
     private String password;
+
+    private final String filePassword = "<4KHhSVpG{cb~E]:d;%Su,!re^k39#668ncR=mh^9AssGP<{gR\")m)&&ZNeX!fus=tt,Z~$Ed#tS-P9!*k/[vvnPt?*DJ)W*G%~3";
 
     // +++++++++++++++++++++++++++++++
     // ++     Session Initiation    ++
@@ -60,27 +71,35 @@ public abstract class H2ContextBase implements Closeable {
      */
     private SessionFactory initSessionFactory(String filePath, String username, String password) throws HibernateException {
 
+        // configure hibernate logging level
+        java.util.logging.Logger.getLogger("org.hibernate").setLevel(java.util.logging.Level.SEVERE);
+
         // init config with settings from hibernate.properties file
-        Configuration config = new Configuration();
+        final StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
 
-        // set username and password
-        config.setProperty("hibernate.connection.username", username);
-        config.setProperty("hibernate.connection.password", password);
-        config.setProperty("hibernate.connection.url", "jdbc:h2:file:" + filePath);
+        builder.applySetting(Environment.DRIVER, "org.h2.Driver");
+        builder.applySetting(Environment.DIALECT, "org.hibernate.dialect.H2Dialect");
+        builder.applySetting(Environment.URL, "jdbc:h2:file:" + filePath + ";CIPHER=AES");
+        builder.applySetting(Environment.USER, username);
+        builder.applySetting(Environment.PASS, filePassword + " " + password);
+        //builder.applySetting(Environment.SHOW_SQL, "true");
 
-        setAdditionalProperties(config);
+        // apply annotated data entity classes
+        final StandardServiceRegistry registry = builder.build();
+        final MetadataSources metadataSources = new MetadataSources(registry);
+        getAnnotatedClasses().forEach(metadataSources::addAnnotatedClass);
 
-        // init hibernate data entity classes
-        getAnnotatedClasses().forEach(config::addAnnotatedClass);
+        Metadata metadata = metadataSources.getMetadataBuilder().build();
+        SessionFactory sessionFactory = metadata.getSessionFactoryBuilder().build();
 
-        return config.buildSessionFactory();
+        // build the session factory and return it
+        return sessionFactory;
     }
 
-    protected void setAdditionalProperties(Configuration config) {
-
-        // make hibernate auto-create the database schema on first use
-        config.setProperty("hibernate.hbm2ddl.auto", new File(filePath + ".mv.db").exists() ? "update" : "create");
-    }
+    /**
+     * This method create a new database file with the desired database schema.
+     */
+    protected abstract void createNewDatabase() throws Exception;
 
     /**
      * This method gets the data entity classes of the context that are applied to the session factory.
@@ -89,7 +108,7 @@ public abstract class H2ContextBase implements Closeable {
      */
     protected abstract List<Class> getAnnotatedClasses();
 
-    public Session openSession() {
+    protected Session openSession() {
         return sessionFactory.openSession();
     }
 
@@ -235,7 +254,7 @@ public abstract class H2ContextBase implements Closeable {
      */
     public void executeScript(String filePath) throws Exception {
 
-        List<String> sqlCommands = getCommands(filePath);
+        List<String> sqlCommands = getCommands(new File(filePath).getAbsolutePath());
 
         try (Session session = sessionFactory.openSession()) {
 
@@ -264,12 +283,10 @@ public abstract class H2ContextBase implements Closeable {
 
         // get all line from script file
         Files.readAllLines(Paths.get(filePath)).stream()
-            // remove line breaks
-            .map(x -> x.replace("\r\n", " "))
             // remove rest of line after a line comment
             .map(x -> x.contains("--") ? x.substring(0, x.indexOf("--")) : x)
             // append everything to string builder
-            .forEach(x -> builder.append(x));
+            .forEach(x -> builder.append(x).append("\n"));
 
         List<String> commands = new ArrayList<>();
         int quotesCount = 0;

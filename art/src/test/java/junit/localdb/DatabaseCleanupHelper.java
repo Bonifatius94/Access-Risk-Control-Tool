@@ -3,8 +3,6 @@ package junit.localdb;
 import data.localdb.ArtDbContext;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class DatabaseCleanupHelper {
 
@@ -19,13 +17,13 @@ public class DatabaseCleanupHelper {
         System.out.println(" done");
     }
 
-    private void deleteDatabase() {
+    private void deleteDatabase() throws Exception {
 
-        String databasePath;
+        String databasePath = "art.h2.mv.db";
 
-        try (ArtDbContext context = new ArtDbContext("test", "test")) {
-            databasePath = context.getFilePath();
-        }
+        //try (ArtDbContext context = new ArtDbContext("test", "test")) {
+        //    databasePath = context.getFilePath();
+        //}
 
         File database = new File(databasePath);
 
@@ -36,11 +34,10 @@ public class DatabaseCleanupHelper {
 
     private void createDatabaseWithTestDataSeed() throws Exception {
 
-        String currentExeFolder = System.getProperty("user.dir");
-        Path scriptPath = Paths.get(currentExeFolder, "target", "test-classes", "scripts", "create_test_data_seed.sql");
+        String scriptPath = getClass().getClassLoader().getResource("scripts/create_test_data_seed.sql").getFile();
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
-            context.executeScript(scriptPath.toAbsolutePath().toString());
+            context.executeScript(scriptPath);
         }
     }
 

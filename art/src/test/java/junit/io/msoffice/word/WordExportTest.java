@@ -1,25 +1,27 @@
 package junit.io.msoffice.word;
 
-import data.entities.AccessCondition;
 import data.entities.AccessPattern;
-import data.entities.ConditionLinkage;
 import data.entities.Configuration;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
+
 import io.msoffice.excel.AccessPatternImportHelper;
 import io.msoffice.excel.WhitelistImportHelper;
-import io.msoffice.word.ReportExportHelper;
-import io.msoffice.word.ReportExportType;
-import org.junit.jupiter.api.Test;
+import io.msoffice.word.PdfExportHelper;
+import io.msoffice.word.WordExportHelper;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Locale;
+
+import org.junit.jupiter.api.Test;
+
 
 public class WordExportTest {
 
@@ -54,13 +56,20 @@ public class WordExportTest {
                 ))
             );
 
-          //  System.out.println(query.getEntries().iterator().next().getAccessPattern());
+            // set createdAt + createdBy of query
+            query.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), "TESTUSER");
 
             // export data as docx format
-            new ReportExportHelper().exportReport(query, "out.docx", ReportExportType.Word);
+            new WordExportHelper().exportDocument(query, new File("out_de.docx"), Locale.GERMAN);
+
+            // export data as docx format
+            new WordExportHelper().exportDocument(query, new File("out_en.docx"), Locale.ENGLISH);
 
             // export data as pdf format
-         //   new ReportExportHelper().exportReport(query, "out.pdf", ReportExportType.Pdf);
+            new PdfExportHelper().exportDocument(query, new File("out_de.pdf"), Locale.GERMAN);
+
+            // export data as pdf format
+            new PdfExportHelper().exportDocument(query, new File("out_en.pdf"), Locale.ENGLISH);
 
             // if no exception occurred, the test was successful
             ret = true;
@@ -69,7 +78,7 @@ public class WordExportTest {
             ex.printStackTrace();
         }
 
-        assert(true);
+        assert(ret);
     }
 
 }

@@ -1,4 +1,4 @@
-package io.msoffice.word;
+package io.msoffice;
 
 public enum ReportExportType {
     Word,

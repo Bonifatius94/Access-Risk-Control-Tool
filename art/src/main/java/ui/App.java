@@ -2,20 +2,19 @@ package ui;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ResourceBundle;
+import java.util.Locale;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+
+import settings.UserSettings;
+import settings.UserSettingsHelper;
 
 import tools.tracing.TraceLevel;
 import tools.tracing.TraceMode;
 import tools.tracing.TraceOut;
-
-import ui.custom.controls.CustomWindow;
 
 
 public class App extends Application {
@@ -37,6 +36,9 @@ public class App extends Application {
         // init global exception handling
         Thread.currentThread().setUncaughtExceptionHandler(this::unhandledExceptionOccurred);
 
+        // apply user settings
+        applyUserSettings();
+
         // add the icons to the primary stage
         addIconsToStage(primaryStage);
 
@@ -52,7 +54,7 @@ public class App extends Application {
 
         // close the database connection if the primaryStage (MainView) is closed
         primaryStage.setOnHidden(event -> {
-            AppComponents.getDbContext().close();
+            onAppClosing(event);
         });
 
         TraceOut.leave();
@@ -64,6 +66,7 @@ public class App extends Application {
 
     /**
      * Global error handling.
+     *
      * @param thread the thread the error occurred in
      * @param e the error
      */
@@ -80,70 +83,49 @@ public class App extends Application {
         TraceOut.writeException(e);
     }
 
+    private void applyUserSettings() throws Exception {
+
+        // get user settings
+        UserSettings settings = new UserSettingsHelper().loadUserSettings();
+
+        // write properties to trace
+        settings.entrySet().forEach(x -> TraceOut.writeInfo("user setting '" + x.getKey() + "' = '" + x.getValue() + "'", TraceLevel.Verbose));
+
+        // apply settings
+        Locale.setDefault(settings.getLanguage());
+    }
+
     /**
      * Shows the FirstUseWizardView.
+     *
      * @throws Exception fxmloader fails to init
      */
     private void showFirstUseWizardView() throws Exception {
 
         TraceOut.enter();
 
-        // load the FirstUseWizwardView
-        ResourceBundle bundle = ResourceBundle.getBundle("lang");
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("login/firstuse/FirstUseWizardView.fxml"), bundle);
-        CustomWindow window = loader.load();
-
-        // build the scene and add it to the stage
-        Scene scene = new Scene(window);
-        scene.getStylesheets().add("css/dark-theme.css");
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(App.primaryStage);
-        window.initStage(stage);
-        window.setTitle(bundle.getString("art"));
-
-        // add the icons to the stage
-        addIconsToStage(stage);
-
-        stage.show();
+        AppComponents.getInstance().showScene("ui/login/firstuse/FirstUseWizardView.fxml", "firstUse");
 
         TraceOut.leave();
     }
 
     /**
      * Shows the LoginView.
+     *
      * @throws Exception fxmloader fails to init
      */
     private void showLoginView() throws Exception {
 
         TraceOut.enter();
 
-        // load the LoginView
-        ResourceBundle bundle = ResourceBundle.getBundle("lang");
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("login/LoginView.fxml"), bundle);
-        CustomWindow window = loader.load();
-
-        // build the scene and add it to the stage
-        Scene scene = new Scene(window);
-        scene.getStylesheets().add("css/dark-theme.css");
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(App.primaryStage);
-        window.initStage(stage);
-        window.setTitle(bundle.getString("login"));
-
-        // add the icons to the stage
-        addIconsToStage(stage);
-
-        stage.show();
+        AppComponents.getInstance().showScene("ui/login/LoginView.fxml", "login");
 
         TraceOut.leave();
     }
 
     /**
      * Adds the icons to the given stage.
+     *
      * @param stage the given stage
      */
     private void addIconsToStage(Stage stage) {
@@ -153,5 +135,11 @@ public class App extends Application {
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_128.png")));
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_256.png")));
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/art_512.png")));
+    }
+
+    private void onAppClosing(WindowEvent e) {
+
+        // close database
+        AppComponents.getInstance().getDbContext().close();
     }
 }
