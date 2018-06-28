@@ -17,7 +17,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
@@ -26,19 +25,15 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-
-import ui.App;
 import ui.AppComponents;
+import ui.IUpdateTable;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
-import ui.custom.controls.CustomWindow;
 import ui.custom.controls.filter.FilterController;
 import ui.main.configs.modal.ConfigsFormController;
 
 
-public class ConfigsController {
+public class ConfigsController implements IUpdateTable {
 
     @FXML
     private TableView<Configuration> configsTable;
@@ -78,24 +73,20 @@ public class ConfigsController {
         filterController.shouldFilterProperty.addListener((o, oldValue, newValue) -> {
             if (newValue) {
                 try {
-                    updateConfigsTable();
+                    updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-
-        // fill table with all entries from the database
-        updateConfigsTable();
-
     }
 
     /**
      * Updates the configsTable items from the database, taking filters into account.
      */
-    public void updateConfigsTable() throws Exception {
+    public void updateTable() throws Exception {
 
-        List<Configuration> configs = AppComponents.getDbContext().getFilteredConfigs(filterController.showArchivedProperty.getValue(),
+        List<Configuration> configs = AppComponents.getInstance().getDbContext().getFilteredConfigs(filterController.showArchivedProperty.getValue(),
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
             filterController.endDateProperty.getValue(), 0);
         ObservableList<Configuration> list = FXCollections.observableList(configs);
@@ -154,8 +145,8 @@ public class ConfigsController {
 
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 try {
-                    AppComponents.getDbContext().deleteConfig(configuration);
-                    updateConfigsTable();
+                    AppComponents.getInstance().getDbContext().deleteConfig(configuration);
+                    updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -188,10 +179,10 @@ public class ConfigsController {
                 clonedConfiguration.setWhitelist(configToClone.getWhitelist());
 
                 // save the new item to the config
-                AppComponents.getDbContext().createConfig(clonedConfiguration);
+                AppComponents.getInstance().getDbContext().createConfig(clonedConfiguration);
             }
 
-            updateConfigsTable();
+            updateTable();
         }
     }
 
@@ -221,10 +212,10 @@ public class ConfigsController {
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 // remove all selected items
                 for (Configuration config : configsTable.getSelectionModel().getSelectedItems()) {
-                    AppComponents.getDbContext().deleteConfig(config);
+                    AppComponents.getInstance().getDbContext().deleteConfig(config);
                 }
 
-                updateConfigsTable();
+                updateTable();
             }
         }
     }
@@ -245,26 +236,10 @@ public class ConfigsController {
         try {
             // create a new FXML loader with the SapSettingsEditDialogController
             ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("modal/ConfigsFormView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
+            FXMLLoader loader;
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 800, 800);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            // set stage name
-            if (configuration == null) {
-                customWindow.setTitle(bundle.getString("newConfigTitle"));
-            } else {
-                customWindow.setTitle(bundle.getString("editConfigTitle"));
-            }
-
-            stage.show();
+            loader = AppComponents.getInstance()
+                .showScene("ui/main/configs/modal/ConfigsFormView.fxml", configuration == null ? "newConfigTitle" : "editConfigTitle", 800, 800);
 
             // give the dialog the sapConfiguration
             ConfigsFormController configForm = loader.getController();

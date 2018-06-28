@@ -10,7 +10,6 @@ import extensions.ResourceBundleHelper;
 import io.msoffice.excel.WhitelistImportHelper;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -23,7 +22,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
@@ -33,19 +31,17 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import ui.App;
 import ui.AppComponents;
+import ui.IUpdateTable;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
-import ui.custom.controls.CustomWindow;
 import ui.custom.controls.PTableColumn;
 import ui.custom.controls.filter.FilterController;
 import ui.main.whitelists.modal.WhitelistFormController;
 
-public class WhitelistsController {
+public class WhitelistsController implements IUpdateTable {
 
     @FXML
     public TableView<Whitelist> whitelistTable;
@@ -71,7 +67,7 @@ public class WhitelistsController {
     @FXML
     public FilterController filterController;
 
-    ArtDbContext database = AppComponents.getDbContext();
+    ArtDbContext database = AppComponents.getInstance().getDbContext();
     private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
     private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
@@ -110,14 +106,12 @@ public class WhitelistsController {
         filterController.shouldFilterProperty.addListener((obs, oldValue, newValue) -> {
             if (newValue) {
                 try {
-                    updateWhitelistTable();
+                    updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-
-        updateWhitelistTable();
     }
 
     /**
@@ -125,7 +119,7 @@ public class WhitelistsController {
      *
      * @throws Exception if a Database error occurred.
      */
-    public void updateWhitelistTable() throws Exception {
+    public void updateTable() throws Exception {
         List<Whitelist> whitelists = database.getFilteredWhitelists(filterController.showArchivedProperty.getValue(), filterController.searchStringProperty.getValue(),
             filterController.startDateProperty.getValue(), filterController.startDateProperty.getValue(), 0);
         ObservableList<Whitelist> list = FXCollections.observableList(whitelists);
@@ -150,7 +144,7 @@ public class WhitelistsController {
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 try {
                     database.deleteWhitelist(whitelist);
-                    updateWhitelistTable();
+                    updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -192,25 +186,12 @@ public class WhitelistsController {
     public void newWhitelist() {
 
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/whitelists/modal/WhitelistFormView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
-
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 900, 650);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "newWhitelist", 900, 650);
 
             WhitelistFormController whitelistFormController = loader.getController();
-            whitelistFormController.setParentController(this);
+            whitelistFormController.setWhitelistsController(this);
             whitelistFormController.giveSelectedWhitelist(null);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -223,26 +204,13 @@ public class WhitelistsController {
     private void editDialogWhitelist(Whitelist whitelist) {
 
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/whitelists/modal/WhitelistFormView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "editWhitelist", 900, 650);
 
-            // give parameters to the dialog
             WhitelistFormController editDialogController = loader.getController();
             editDialogController.giveSelectedWhitelist(whitelist);
-            editDialogController.setParentController(this);
-        } catch (IOException e) {
+            editDialogController.setWhitelistsController(this);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -266,7 +234,7 @@ public class WhitelistsController {
                 for (Whitelist whitelist : whitelistTable.getSelectionModel().getSelectedItems()) {
                     database.deleteWhitelist(whitelist);
                 }
-                updateWhitelistTable();
+                updateTable();
             }
         }
     }
@@ -290,7 +258,7 @@ public class WhitelistsController {
                 whitelistToAdd.setDescription("Clone - " + whitelist.getDescription());
                 database.createWhitelist(whitelistToAdd);
             }
-            updateWhitelistTable();
+            updateTable();
         }
     }
 
@@ -308,8 +276,6 @@ public class WhitelistsController {
                 WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
                 Whitelist importedWhitelist = whitelistImportHelper.importWhitelist(path);
                 startImportDialog(importedWhitelist);
-                updateWhitelistTable();
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -319,10 +285,14 @@ public class WhitelistsController {
     /**
      * Starts a dialog do edit imported whitelist.
      *
-     * @param whitelist is the imported Whitlsit
+     * @param whitelist is the imported Whitelist
      */
-    private void startImportDialog(Whitelist whitelist) {
-        editDialogWhitelist(whitelist);
+    private void startImportDialog(Whitelist whitelist) throws Exception {
+        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "importWhitelist", 900, 650);
+
+        WhitelistFormController editDialogController = loader.getController();
+        editDialogController.giveSelectedWhitelist(whitelist);
+        editDialogController.setWhitelistsController(this);
     }
 
 }

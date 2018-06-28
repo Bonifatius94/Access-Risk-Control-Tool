@@ -54,7 +54,7 @@ public class DbUser {
 
     private String username;
     private Set<DbUserRole> roles = new HashSet<>();
-    private boolean isFirstLogin = false;
+    private boolean isFirstLogin = true;
 
     // =============================
     //      getters / setters

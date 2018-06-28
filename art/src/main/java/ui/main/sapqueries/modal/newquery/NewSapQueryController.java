@@ -23,24 +23,19 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import sap.ISapConnector;
 import sap.SapConnector;
 
-import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.AutoCompleteComboBoxListener;
 import ui.custom.controls.CustomAlert;
-import ui.custom.controls.CustomWindow;
 import ui.main.sapqueries.SapQueriesController;
 import ui.main.sapqueries.modal.choosers.ConfigChooserController;
 import ui.main.sapqueries.modal.choosers.SapConfigChooserController;
@@ -98,7 +93,7 @@ public class NewSapQueryController {
         // change the items of the autocomplete according to the input
         configChooser.getEditor().textProperty().addListener((event) -> {
             try {
-                List<Configuration> result = AppComponents.getDbContext().getFilteredConfigs(false, configChooser.getEditor().getText(), null, null, 5);
+                List<Configuration> result = AppComponents.getInstance().getDbContext().getFilteredConfigs(false, configChooser.getEditor().getText(), null, null, 5);
                 if (result.size() != 0) {
                     ObservableList<Configuration> items = FXCollections.observableArrayList(result);
                     configChooser.setItems(items);
@@ -123,7 +118,7 @@ public class NewSapQueryController {
         // change the items of the autocomplete according to the input
         sapSettingsChooser.getEditor().textProperty().addListener((event) -> {
             try {
-                List<SapConfiguration> result = AppComponents.getDbContext().getFilteredSapConfigs(false, configChooser.getEditor().getText(), null, null, 5);
+                List<SapConfiguration> result = AppComponents.getInstance().getDbContext().getFilteredSapConfigs(false, configChooser.getEditor().getText(), null, null, 5);
                 if (result.size() != 0) {
                     ObservableList<SapConfiguration> items = FXCollections.observableArrayList(result);
                     sapSettingsChooser.setItems(items);
@@ -142,22 +137,8 @@ public class NewSapQueryController {
      */
     public void chooseConfig() {
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../choosers/ConfigChooserView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 1100, 700);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            customWindow.setTitle(bundle.getString("chooseConfig"));
-
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/choosers/ConfigChooserView.fxml", "chooseConfig", 1100, 700);
 
             ConfigChooserController configChooser = loader.getController();
             configChooser.setParentController(this);
@@ -171,22 +152,8 @@ public class NewSapQueryController {
      */
     public void chooseSapSettings() {
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../choosers/SapConfigChooserView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 900, 600);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            customWindow.setTitle(bundle.getString("chooseSapSettings"));
-
-            stage.show();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/choosers/SapConfigChooserView.fxml", "chooseSapSettings", 900, 600);
 
             SapConfigChooserController sapSettingsChooser = loader.getController();
             sapSettingsChooser.setParentController(this);
@@ -201,22 +168,8 @@ public class NewSapQueryController {
     public void openLoginDialog() {
         if (sapSettingsChooser.getValue() != null && configChooser.getValue() != null && tryToConnect()) {
             try {
-                // create a new FXML loader with the SapSettingsEditDialogController
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("SapLoginView.fxml"), bundle);
-                CustomWindow customWindow = loader.load();
 
-                // build the scene and add it to the stage
-                Scene scene = new Scene(customWindow);
-                scene.getStylesheets().add("css/dark-theme.css");
-                Stage stage = new Stage();
-                stage.setScene(scene);
-                stage.initModality(Modality.WINDOW_MODAL);
-                stage.initOwner(App.primaryStage);
-                customWindow.initStage(stage);
-
-                customWindow.setTitle(bundle.getString("sapLogin"));
-
-                stage.show();
+                FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/SapLoginView.fxml", "sapLogin");
 
                 SapLoginController loginController = loader.getController();
                 loginController.setParentController(this);
@@ -314,26 +267,11 @@ public class NewSapQueryController {
         runQueryTask.setOnSucceeded(e -> {
                 try {
                     // save the query to the database
-                    AppComponents.getDbContext().createSapQuery(runQueryTask.getValue());
+                    AppComponents.getInstance().getDbContext().createSapQuery(runQueryTask.getValue());
 
-                    parentController.updateQueriesTable();
+                    parentController.updateTable();
 
-                    // open the analysisResultView and give it the results
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("AnalysisResultView.fxml"), bundle);
-                    CustomWindow customWindow = loader.load();
-
-                    // build the scene and add it to the stage
-                    Scene scene = new Scene(customWindow);
-                    scene.getStylesheets().add("css/dark-theme.css");
-                    Stage stage = new Stage();
-                    stage.setScene(scene);
-                    stage.initModality(Modality.WINDOW_MODAL);
-                    stage.initOwner(App.primaryStage);
-                    customWindow.initStage(stage);
-
-                    customWindow.setTitle(bundle.getString("analysisResultTitle"));
-
-                    stage.show();
+                    FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/AnalysisResultView.fxml", "analysisResultTitle");
 
                     AnalysisResultController resultController = loader.getController();
                     resultController.giveResultQuery(runQueryTask.getValue());

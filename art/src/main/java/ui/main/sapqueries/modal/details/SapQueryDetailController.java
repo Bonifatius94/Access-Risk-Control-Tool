@@ -22,6 +22,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import ui.App;
+import ui.AppComponents;
 import ui.custom.controls.CustomWindow;
 import ui.main.sapqueries.SapQueriesController;
 import ui.main.sapqueries.modal.newquery.AnalysisResultController;
@@ -100,53 +101,20 @@ public class SapQueryDetailController {
     /**
      * Opens the config details in a modal window.
      */
-    public void openConfigDetails() {
-        try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../details/ConfigDetailsView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
+    public void openConfigDetails() throws Exception {
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow, 1050, 650);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
+        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/details/ConfigDetailsView.fxml", "configDetails", 1050, 650);
 
-            customWindow.setTitle(bundle.getString("configDetails"));
-
-            stage.show();
-
-            // give the dialog the sapConfiguration
-            ConfigDetailsController configDetails = loader.getController();
-            configDetails.giveConfiguration(query.getConfig());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ConfigDetailsController configDetails = loader.getController();
+        configDetails.giveConfiguration(query.getConfig());
     }
 
     /**
      * Opens the AnalysisResultView with the current query.
      */
     public void openResultDetails() throws Exception {
-        // open the analysisResultView and give it the results
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapqueries/modal/newquery/AnalysisResultView.fxml"), bundle);
-        CustomWindow customWindow = loader.load();
 
-        // build the scene and add it to the stage
-        Scene scene = new Scene(customWindow);
-        scene.getStylesheets().add("css/dark-theme.css");
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(App.primaryStage);
-        customWindow.initStage(stage);
-
-        customWindow.setTitle(bundle.getString("analysisResultTitle"));
-
-        stage.show();
+        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/AnalysisResultView.fxml", "analysisResultTitle");
 
         AnalysisResultController resultController = loader.getController();
         resultController.giveResultQuery(query);
@@ -156,24 +124,11 @@ public class SapQueryDetailController {
      * Opens the SapConfig details in a modal, uneditable window.
      */
     public void openSapConfigDetails() throws Exception {
-        // create a new FXML loader with the SapSettingsFormController
-        ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/main/sapsettings/modal/SapSettingsFormView.fxml"), bundle);
-        CustomWindow customWindow = loader.load();
 
-        // build the scene and add it to the stage
-        Scene scene = new Scene(customWindow);
-        scene.getStylesheets().add("css/dark-theme.css");
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(App.primaryStage);
-        customWindow.initStage(stage);
-        stage.show();
-
-        customWindow.setTitle(bundle.getString("detailSapSettingsTitle"));
+        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapsettings/modal/SapSettingsFormView.fxml", "detailSapSettingsTitle");
 
         SapSettingsFormController sapView = loader.getController();
+        sapView.giveSelectedSapConfig(query.getSapConfig());
         sapView.setEditable(false);
     }
 
@@ -182,24 +137,10 @@ public class SapQueryDetailController {
      */
     public void rerunQuery(ActionEvent event) {
         try {
-            // create a new FXML loader with the SapSettingsEditDialogController
-            ResourceBundle bundle = ResourceBundle.getBundle("lang");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../newquery/NewSapQueryView.fxml"), bundle);
-            CustomWindow customWindow = loader.load();
 
-            // build the scene and add it to the stage
-            Scene scene = new Scene(customWindow);
-            scene.getStylesheets().add("css/dark-theme.css");
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(App.primaryStage);
-            customWindow.initStage(stage);
-
-            customWindow.setTitle(bundle.getString("newAnalysis"));
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/NewSapQueryView.fxml", "newAnalysis");
 
             close(event);
-            stage.show();
 
             // give the dialog the sapConfiguration
             NewSapQueryController newQuery = loader.getController();

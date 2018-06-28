@@ -68,7 +68,7 @@ public class SapConfigChooserController {
      */
     public void updateSapConfigsTable() throws Exception {
 
-        List<SapConfiguration> sapConfigs = AppComponents.getDbContext().getFilteredSapConfigs(filterController.showArchivedProperty.getValue(),
+        List<SapConfiguration> sapConfigs = AppComponents.getInstance().getDbContext().getFilteredSapConfigs(filterController.showArchivedProperty.getValue(),
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
             filterController.endDateProperty.getValue(), 0);
         ObservableList<SapConfiguration> list = FXCollections.observableList(sapConfigs);

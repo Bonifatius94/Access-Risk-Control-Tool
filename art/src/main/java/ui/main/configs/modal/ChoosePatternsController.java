@@ -218,7 +218,7 @@ public class ChoosePatternsController {
      */
     private void updateAllPatternsTable() throws Exception {
 
-        List<AccessPattern> patterns = AppComponents.getDbContext().getFilteredPatterns(filterController.showArchivedProperty.getValue(),
+        List<AccessPattern> patterns = AppComponents.getInstance().getDbContext().getFilteredPatterns(filterController.showArchivedProperty.getValue(),
             filterController.searchStringProperty.getValue(), filterController.startDateProperty.getValue(),
             filterController.endDateProperty.getValue(), 0);
 
