@@ -116,7 +116,6 @@ public class ConfigurationTest {
     }
 
     @Test
-    @Disabled
     public void testUpdateConfigurationWithArchiving() {
 
         boolean ret = false;
@@ -124,30 +123,31 @@ public class ConfigurationTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query config
-            Configuration activeConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
-            Configuration archivedConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
+            Configuration archivedConfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
 
             // apply changes to configs
-            AccessPattern patternToRemove = activeConfig.getPatterns().stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
-            activeConfig.getPatterns().remove(patternToRemove);
+            AccessPattern patternToRemove = archivedConfig.getPatterns().stream().filter(x -> x.getId().equals(new Integer(6))).findFirst().get();
+            archivedConfig.getPatterns().remove(patternToRemove);
 
             final String newName = "a new name";
             final String newDescription = "a new description";
-            activeConfig.setName(newName);
-            activeConfig.setDescription(newDescription);
+            archivedConfig.setName(newName);
+            archivedConfig.setDescription(newDescription);
 
             // update configs
-            context.updateConfig(activeConfig);
+            context.updateConfig(archivedConfig);
             context.updateConfig(archivedConfig);
 
-            // test to see if the configurations were updateted corret
+            // test to see if the update worked
+            Configuration testconfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
+            ret = !testconfig.getPatterns().stream().anyMatch(x -> x.getId().equals(new Integer(6)));
 
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        assert (false);
+        assert (ret);
     }
 
     @Test
