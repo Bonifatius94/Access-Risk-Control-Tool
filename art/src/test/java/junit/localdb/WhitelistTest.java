@@ -211,6 +211,7 @@ public class WhitelistTest {
 
             // delete whitelist
             context.deleteWhitelist(whitelist);
+            // TODO: cannot execute this statement as the statement "session.flush();" in line 1240, ArtDbContext is not executebale
 
             // query whitelist again. check if everything was deleted
             whitelist = context.getWhitelists(true).stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
