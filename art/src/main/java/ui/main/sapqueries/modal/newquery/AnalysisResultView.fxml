@@ -55,16 +55,30 @@
                     <Label text="%format"/>
                     <JFXComboBox fx:id="exportFormatChooser"/>
                 </VBox>
-                <HBox alignment="CENTER_LEFT" spacing="40">
-                    <JFXCheckBox fx:id="includePatternsCheckbox" text="%includePatterns"/>
-                    <JFXCheckBox fx:id="includeWhitelistCheckbox" text="%includeWhitelist"/>
-                </HBox>
-                <Region HBox.hgrow="ALWAYS"/>
-                <JFXButton onAction="#exportResults" text="%export">
+                <VBox alignment="CENTER_LEFT" spacing="5" minWidth="100">
+                    <Label text="%exportLanguage"/>
+                    <JFXComboBox fx:id="exportLanguageChooser" />
+                </VBox>
+                <JFXButton onAction="#exportResults" text="%exportResults">
                     <graphic>
                         <MaterialDesignIconView glyphName="EXPORT"/>
                     </graphic>
                 </JFXButton>
+                <Region HBox.hgrow="ALWAYS"/>
+                <JFXButton onAction="#exportWhitelist" text="%exportWhitelist">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="EXPORT"/>
+                    </graphic>
+                </JFXButton>
+                <JFXButton onAction="#exportPatterns" text="%exportPatterns">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="EXPORT"/>
+                    </graphic>
+                </JFXButton>
+                <!--<HBox alignment="CENTER_LEFT" spacing="40">
+                    <JFXCheckBox fx:id="includePatternsCheckbox" text="%includePatterns"/>
+                    <JFXCheckBox fx:id="includeWhitelistCheckbox" text="%includeWhitelist"/>
+                </HBox>-->
             </HBox>
         </VBox>
         <Separator />

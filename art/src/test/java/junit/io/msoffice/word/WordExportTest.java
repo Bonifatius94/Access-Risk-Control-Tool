@@ -34,7 +34,7 @@ public class WordExportTest {
 
             // get access patterns from excel file
             AccessPatternImportHelper helper = new AccessPatternImportHelper();
-            List<AccessPattern> patterns = helper.importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
+            List<AccessPattern> patterns = helper.importAccessPatterns("Example - Zugriffsmuster.xlsx");
 
             // get whitelist from excel file
             Whitelist whitelist = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");

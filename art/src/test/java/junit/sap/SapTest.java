@@ -63,7 +63,7 @@ public class SapTest {
         try {
 
             // parsing test patterns from excel file
-            List<AccessPattern> patterns = new AccessPatternImportHelper().importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
+            List<AccessPattern> patterns = new AccessPatternImportHelper().importAccessPatterns("Example - Zugriffsmuster.xlsx");
 
             // parsing test whitelist from excel file
             Whitelist whitelist = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");

@@ -29,7 +29,7 @@ public class CsvExportTest {
         try {
 
             // get access patterns from excel file
-            List<AccessPattern> patterns = new AccessPatternImportHelper().importAuthorizationPattern("Example - Zugriffsmuster.xlsx");
+            List<AccessPattern> patterns = new AccessPatternImportHelper().importAccessPatterns("Example - Zugriffsmuster.xlsx");
 
             // get whitelist from excel file
             Whitelist whitelist = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");
