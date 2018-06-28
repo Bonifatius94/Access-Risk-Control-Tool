@@ -33,7 +33,7 @@ public class AccessPatternExportHelper {
      * @throws Exception caused by a file stream error or a data error due to invalid config data
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public void exportAuthorizationPattern(String filePath, List<AccessPattern> patterns) throws Exception {
+    public void exportAccessPatterns(String filePath, List<AccessPattern> patterns) throws Exception {
 
         // create new workbook and worksheet
         XSSFWorkbook workbook = new XSSFWorkbook();
