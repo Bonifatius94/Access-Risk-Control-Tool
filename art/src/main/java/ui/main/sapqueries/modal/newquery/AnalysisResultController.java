@@ -13,6 +13,11 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
 import extensions.ResourceBundleHelper;
 
+import io.msoffice.ExportHelper;
+import io.msoffice.ReportExportType;
+import io.msoffice.excel.AccessPatternExportHelper;
+import io.msoffice.excel.WhitelistExportHelper;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,10 +27,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import io.msoffice.ExportHelper;
-import io.msoffice.ReportExportType;
-import io.msoffice.excel.AccessPatternExportHelper;
-import io.msoffice.excel.WhitelistExportHelper;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -40,7 +41,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
 import settings.UserSettings;
-import settings.UserSettingsHelper;
+
 import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
