@@ -124,7 +124,6 @@ public class WhitelistTest {
     }
 
     @Test
-    @Disabled
     public void testUpdateWhitelistWithArchiving() {
 
         boolean ret = false;
@@ -162,13 +161,12 @@ public class WhitelistTest {
                 && whitelist.getEntries().size() == 6
                 && entry1.getUsecaseId().equals(newUsecaseId) && entry1.getUsername().equals(newUsername);
 
-            // TODO: add a test for archiving logic (old whitelist was used by a sap query)
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        assert (false);
+        assert (ret);
     }
 
     @Test
@@ -224,7 +222,7 @@ public class WhitelistTest {
             ex.printStackTrace();
         }
 
-        assert (false);
+        assert (ret);
     }
 
 }

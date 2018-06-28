@@ -75,8 +75,6 @@ public class ConfigurationTest {
             // check if test data was queried successfully
             ret = configs.size() == 3 && configs.stream().anyMatch(x -> x.getName().equals(configName) && x.getDescription().equals(configDescription) && x.getPatterns().size() == 2);
 
-            // TODO: test if creation fails if the pattern does not exist (error is desired)
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
