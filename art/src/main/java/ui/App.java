@@ -43,14 +43,15 @@ public class App extends Application {
         // add the icons to the primary stage
         addIconsToStage(primaryStage);
 
+        // setup flexible app dependencies (sapjco)
+        if (isSetupPreparationRequired()) {
+            new AppSetupHelper().setupApp();
+        }
+
         // show view according to existence of the database file
         if (isFirstUse()) {
-
-            new AppSetupHelper().setupApp();
             showFirstUseWizardView();
-
         } else {
-
             showLoginView();
         }
 
@@ -63,6 +64,10 @@ public class App extends Application {
         });
 
         TraceOut.leave();
+    }
+
+    private boolean isSetupPreparationRequired() {
+        return !Files.exists(Paths.get("lib", "sapjco3.jar"));
     }
 
     private boolean isFirstUse() {

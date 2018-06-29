@@ -12,16 +12,23 @@ import io.msoffice.excel.WhitelistImportHelper;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import sap.SapConnector;
+import setup.AppSetupHelper;
 
 @SuppressWarnings("all")
 public class SapTest {
 
+    @BeforeAll
+    public static void prepareSapjcoDependencies() throws Exception {
+
+        new AppSetupHelper().setupApp();
+    }
+
     @Test
-    @Disabled
     public void testLogin() {
 
         boolean ret = false;
@@ -48,7 +55,6 @@ public class SapTest {
     }
 
     @Test
-    @Disabled
     public void testSapQuery() {
 
         boolean ret = false;

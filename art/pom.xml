@@ -15,15 +15,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!-- import sapjco as local repository -->
-    <!-- import command: mvn org.apache.maven.plugins:maven-install-plugin:2.3.1:install-file -Dfile=sapjco/sapjco3.jar -DgroupId=com.sap.conn -DartifactId=sapjco -Dversion=3 -Dpackaging=jar -DlocalRepositoryPath=sapjco -->
-    <repositories>
-        <repository>
-            <id>com.sap.conn</id>
-            <url>file://${project.basedir}/./sapjco</url>
-        </repository>
-    </repositories>
-
     <!-- all dependencies we need for the project-->
     <dependencies>
         <!-- use newer maven compiler to handle java 8 features (JavaFX, Lambda, ...) -->
@@ -85,6 +76,8 @@
             <groupId>com.sap.conn</groupId>
             <artifactId>sapjco</artifactId>
             <version>3</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/sapjco3.jar</systemPath>
         </dependency>
 
         <!-- hibernate ORM -->
@@ -202,6 +195,7 @@
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
+                            <!-- include additional dependencies in CLASSPATH -->
                             <Class-Path>lib/sapjco3.jar</Class-Path>
                         </manifestEntries>
                     </archive>
