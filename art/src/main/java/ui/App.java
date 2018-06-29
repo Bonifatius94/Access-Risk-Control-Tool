@@ -12,6 +12,7 @@ import javafx.stage.WindowEvent;
 import settings.UserSettings;
 import settings.UserSettingsHelper;
 
+import setup.AppSetupHelper;
 import tools.tracing.TraceLevel;
 import tools.tracing.TraceMode;
 import tools.tracing.TraceOut;
@@ -43,10 +44,14 @@ public class App extends Application {
         addIconsToStage(primaryStage);
 
         // show view according to existence of the database file
-        if (databaseFileExists()) {
-            showLoginView();
-        } else {
+        if (isFirstUse()) {
+
+            new AppSetupHelper().setupApp();
             showFirstUseWizardView();
+
+        } else {
+
+            showLoginView();
         }
 
         // make the primaryStage available from other classes
@@ -60,8 +65,8 @@ public class App extends Application {
         TraceOut.leave();
     }
 
-    private boolean databaseFileExists() {
-        return Files.exists(Paths.get("art.h2.mv.db"));
+    private boolean isFirstUse() {
+        return !Files.exists(Paths.get("art.h2.mv.db"));
     }
 
     /**
