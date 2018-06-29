@@ -2,7 +2,6 @@ package setup;
 
 import extensions.OperatingSystemHelper;
 
-import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class AppSetupHelper {
@@ -18,14 +17,13 @@ public class AppSetupHelper {
 
         // get host operating system
         OperatingSystemHelper.OperatingSystem operatingSystem = new OperatingSystemHelper().getOperatingSystem();
+        System.out.println("operating system: " + operatingSystem);
 
         // unzip sap jco redistributable archive depending on the host operating system
         String sapJcoRedistResourceZipFile = getSapJcoZipResource(operatingSystem);
+        System.out.println("sap dependencies zip file: " + sapJcoRedistResourceZipFile);
+        System.out.println("lib destination folder: " + SAP_JCO_ROOT_DIR);
         new ZipHelper().unzipResouceFile(sapJcoRedistResourceZipFile, SAP_JCO_ROOT_DIR);
-
-        // rename sapjco3.jar file to sapjco-3.jar
-        //Files.delete(Paths.get(SAP_JCO_ROOT_DIR, "sapjco-3.jar"));
-        //Files.move(Paths.get(SAP_JCO_ROOT_DIR, "sapjco3.jar"), Paths.get(SAP_JCO_ROOT_DIR, "sapjco-3.jar"));
     }
 
     private String getSapJcoZipResource(OperatingSystemHelper.OperatingSystem operatingSystem) {
