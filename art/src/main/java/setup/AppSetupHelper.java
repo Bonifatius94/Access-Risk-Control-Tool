@@ -2,6 +2,7 @@ package setup;
 
 import extensions.OperatingSystemHelper;
 
+import java.io.InputStream;
 import java.nio.file.Paths;
 
 public class AppSetupHelper {
@@ -23,7 +24,8 @@ public class AppSetupHelper {
         String sapJcoRedistResourceZipFile = getSapJcoZipResource(operatingSystem);
         System.out.println("sap dependencies zip file: " + sapJcoRedistResourceZipFile);
         System.out.println("lib destination folder: " + SAP_JCO_ROOT_DIR);
-        new ZipHelper().unzipResouceFile(sapJcoRedistResourceZipFile, SAP_JCO_ROOT_DIR);
+        InputStream archiveInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(sapJcoRedistResourceZipFile);
+        new ZipHelper().unzipResouceFile(archiveInputStream, SAP_JCO_ROOT_DIR);
     }
 
     private String getSapJcoZipResource(OperatingSystemHelper.OperatingSystem operatingSystem) {

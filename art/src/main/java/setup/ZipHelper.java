@@ -2,6 +2,7 @@ package setup;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
@@ -14,11 +15,11 @@ public class ZipHelper {
     /**
      * This method unzips a *.zip file from resources and writes it to the given output file.
      *
-     * @param resourcePath the path to the zip resource
+     * @param inputStream the input stream of the zip archive
      * @param outputDirectoryPath the output directory path
      * @throws Exception caused by errors while reading / writing files etc.
      */
-    public void unzipResouceFile(String resourcePath, String outputDirectoryPath) throws Exception {
+    public void unzipResouceFile(InputStream inputStream, String outputDirectoryPath) throws Exception {
 
         // get output directory handle
         File outputDir = new File(outputDirectoryPath);
@@ -29,7 +30,7 @@ public class ZipHelper {
         }
 
         // load zip resource as stream
-        try (ZipInputStream zipStream = new ZipInputStream(getClass().getClassLoader().getResourceAsStream(resourcePath))) {
+        try (ZipInputStream zipStream = new ZipInputStream(inputStream)) {
 
             ZipEntry zipEntry;
 

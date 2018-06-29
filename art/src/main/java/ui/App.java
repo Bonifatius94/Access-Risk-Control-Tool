@@ -5,6 +5,8 @@ import java.nio.file.Paths;
 import java.util.Locale;
 
 import javafx.application.Application;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -16,6 +18,7 @@ import setup.AppSetupHelper;
 import tools.tracing.TraceLevel;
 import tools.tracing.TraceMode;
 import tools.tracing.TraceOut;
+import ui.custom.controls.CustomAlert;
 
 
 public class App extends Application {
@@ -34,34 +37,46 @@ public class App extends Application {
         TraceOut.enable("log.trc.txt", TraceMode.Overwrite, TraceLevel.All);
         TraceOut.enter();
 
-        // init global exception handling
-        Thread.currentThread().setUncaughtExceptionHandler(this::unhandledExceptionOccurred);
+        try {
 
-        // apply user settings
-        applyUserSettings();
+            // init global exception handling
+            Thread.currentThread().setUncaughtExceptionHandler(this::unhandledExceptionOccurred);
 
-        // add the icons to the primary stage
-        addIconsToStage(primaryStage);
+            // apply user settings
+            applyUserSettings();
 
-        // setup flexible app dependencies (sapjco)
-        if (isSetupPreparationRequired()) {
-            new AppSetupHelper().setupApp();
+            // add the icons to the primary stage
+            addIconsToStage(primaryStage);
+
+            // setup flexible app dependencies (sapjco)
+            if (isSetupPreparationRequired()) {
+                new AppSetupHelper().setupApp();
+            }
+
+            // show view according to existence of the database file
+            if (isFirstUse()) {
+                showFirstUseWizardView();
+            } else {
+                showLoginView();
+            }
+
+            // make the primaryStage available from other classes
+            this.primaryStage = primaryStage;
+
+            // close the database connection if the primaryStage (MainView) is closed
+            primaryStage.setOnHidden(event -> {
+                onAppClosing(event);
+            });
+
+        } catch (Exception ex) {
+
+            // write error to trace
+            ex.printStackTrace();
+            TraceOut.writeException(ex);
+
+            // close app
+            primaryStage.close();
         }
-
-        // show view according to existence of the database file
-        if (isFirstUse()) {
-            showFirstUseWizardView();
-        } else {
-            showLoginView();
-        }
-
-        // make the primaryStage available from other classes
-        this.primaryStage = primaryStage;
-
-        // close the database connection if the primaryStage (MainView) is closed
-        primaryStage.setOnHidden(event -> {
-            onAppClosing(event);
-        });
 
         TraceOut.leave();
     }
