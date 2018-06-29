@@ -33,33 +33,10 @@ public class SapTest {
     public static void prepareSapjcoDependencies() throws Exception {
 
         try {
-
-            // get host operating system
-            OperatingSystemHelper.OperatingSystem operatingSystem = new OperatingSystemHelper().getOperatingSystem();
-            System.out.println("operating system: " + operatingSystem);
-
-            // unzip sap jco redistributable archive depending on the host operating system
-            String sapJcoRedistResourceZipFile = Paths.get(System.getProperty("user.dir"), "res", getSapJcoZipResource(operatingSystem)).toAbsolutePath().toString();
-            System.out.println("sap dependencies zip file: " + sapJcoRedistResourceZipFile);
-            System.out.println("lib destination folder: " + AppSetupHelper.SAP_JCO_ROOT_DIR);
-
-            try (FileInputStream archiveInputStream = new FileInputStream(new File(sapJcoRedistResourceZipFile))) {
-                new ZipHelper().unzipResouceFile(archiveInputStream, AppSetupHelper.SAP_JCO_ROOT_DIR);
-            }
-
+            new AppSetupHelper().setupApp();
         } catch (Exception ex) {
             ex.printStackTrace();
             throw ex;
-        }
-    }
-
-    private static String getSapJcoZipResource(OperatingSystemHelper.OperatingSystem operatingSystem) {
-
-        switch (operatingSystem) {
-            case Windows: return "redist/sapjco3-NTAMD64-3.0.18.zip";
-            case Linux:   return "redist/sapjco3-linuxx86_64-3.0.18.zip";
-            case Mac:     return "redist/sapjco3-darwinintel64-3.0.18.zip";
-            default: throw new IllegalArgumentException("unsupported operating system detected");
         }
     }
 

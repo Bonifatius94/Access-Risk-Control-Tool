@@ -18,13 +18,10 @@ public class AppSetupHelper {
 
         // get host operating system
         OperatingSystemHelper.OperatingSystem operatingSystem = new OperatingSystemHelper().getOperatingSystem();
-        System.out.println("operating system: " + operatingSystem);
 
         // unzip sap jco redistributable archive depending on the host operating system
         String sapJcoRedistResourceZipFile = getSapJcoZipResource(operatingSystem);
-        System.out.println("sap dependencies zip file: " + sapJcoRedistResourceZipFile);
-        System.out.println("lib destination folder: " + SAP_JCO_ROOT_DIR);
-        InputStream archiveInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(sapJcoRedistResourceZipFile);
+        InputStream archiveInputStream = getClass().getClassLoader().getResourceAsStream(sapJcoRedistResourceZipFile);
         new ZipHelper().unzipResouceFile(archiveInputStream, SAP_JCO_ROOT_DIR);
     }
 
