@@ -25,7 +25,12 @@ public class SapTest {
     @BeforeAll
     public static void prepareSapjcoDependencies() throws Exception {
 
-        new AppSetupHelper().setupApp();
+        try {
+            new AppSetupHelper().setupApp();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw ex;
+        }
     }
 
     @Test
