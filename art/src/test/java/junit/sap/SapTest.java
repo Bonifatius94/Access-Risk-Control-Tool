@@ -33,8 +33,13 @@ public class SapTest {
     public static void prepareSapjcoDependencies() throws Exception {
 
         try {
+
             new AppSetupHelper().setupApp();
+
+
+
         } catch (Exception ex) {
+
             ex.printStackTrace();
             throw ex;
         }

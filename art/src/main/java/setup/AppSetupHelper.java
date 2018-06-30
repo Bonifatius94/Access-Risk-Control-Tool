@@ -16,6 +16,8 @@ public class AppSetupHelper {
      */
     public void setupApp() throws Exception {
 
+        System.out.println(System.getProperty("user.dir"));
+
         // get host operating system
         OperatingSystemHelper.OperatingSystem operatingSystem = new OperatingSystemHelper().getOperatingSystem();
 
