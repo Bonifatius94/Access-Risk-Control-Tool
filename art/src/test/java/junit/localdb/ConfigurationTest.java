@@ -106,7 +106,7 @@ public class ConfigurationTest {
 
             // test to see if the update worked
             Configuration testconfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
-            ret = !testconfig.getPatterns().stream().anyMatch(x -> x.getId().equals(new Integer(3)));
+            ret = testconfig.getPatterns().stream().noneMatch(x -> x.getId().equals(new Integer(3)));
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -140,7 +140,7 @@ public class ConfigurationTest {
 
             // test to see if the update worked
             Configuration testconfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
-            ret = !testconfig.getPatterns().stream().anyMatch(x -> x.getId().equals(new Integer(6)));
+            ret = testconfig.getPatterns().stream().noneMatch(x -> x.getId().equals(new Integer(6)));
 
 
         } catch (Exception ex) {
@@ -205,8 +205,8 @@ public class ConfigurationTest {
             //test to see if the config was deleted correct
             Configuration testactiveconfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
             Configuration testarchivedconfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
-            ret = !testactiveconfig.getPatterns().stream().anyMatch(x -> x.equals(activeConfig));
-            ret = ret == !testactiveconfig.getPatterns().stream().anyMatch(x -> x.equals(archivedConfig));
+            ret = testactiveconfig.getPatterns().stream().noneMatch(x -> x.equals(activeConfig));
+            ret = ret == testactiveconfig.getPatterns().stream().noneMatch(x -> x.equals(archivedConfig));
 
         } catch (Exception ex) {
             ex.printStackTrace();

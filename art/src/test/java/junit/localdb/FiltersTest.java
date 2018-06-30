@@ -46,8 +46,6 @@ public class FiltersTest {
             patterns = context.getFilteredPatterns(true, "SAP_ALL", null, ZonedDateTime.now(), 10);
             ret = ret && patterns.size() == 2 && patterns.stream().map(x -> x.getId()).collect(Collectors.toList()).containsAll(Arrays.asList(1, 4));
 
-            // TODO: add test for start / end of createdAt and limit
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -77,8 +75,6 @@ public class FiltersTest {
             // test wildcard filter: username (entries)
             whitelists = context.getFilteredWhitelists(false, "zt2111", null, ZonedDateTime.now(), 10);
             ret = ret && whitelists.size() == 2 && whitelists.stream().map(x -> x.getId()).collect(Collectors.toList()).containsAll(Arrays.asList(1, 3));
-
-            // TODO: add test for start / end of createdAt and limit
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -110,8 +106,6 @@ public class FiltersTest {
             configs = context.getFilteredConfigs(true, "Whitelist", null, ZonedDateTime.now(), 10);
             ret = ret && configs.size() == 4 && configs.stream().map(x -> x.getId()).collect(Collectors.toList()).containsAll(Arrays.asList(1, 2, 3, 4));
 
-            // TODO: add test for start / end of createdAt and limit
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -133,8 +127,6 @@ public class FiltersTest {
             // test wildcard filter: description
             sapConfigs = context.getFilteredSapConfigs(false, "Descr", null, ZonedDateTime.now(), 10);
             ret = ret && sapConfigs.size() == 1 && sapConfigs.stream().anyMatch(x -> x.getId().equals(1));
-
-            // TODO: add test for start / end of createdAt and limit
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -173,8 +165,6 @@ public class FiltersTest {
             // test wildcard filter: critical access entry username
             queries = context.getFilteredCriticalAccessQueries(true, "foo123", null, ZonedDateTime.now(), 10);
             ret = ret && queries.size() == 2 && queries.stream().map(x -> x.getId()).collect(Collectors.toList()).containsAll(Arrays.asList(1, 2));
-
-            // TODO: add test for start / end of createdAt and limit
 
         } catch (Exception ex) {
             ex.printStackTrace();

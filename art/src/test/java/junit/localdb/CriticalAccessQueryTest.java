@@ -5,7 +5,9 @@ import data.localdb.ArtDbContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -26,16 +28,12 @@ public class CriticalAccessQueryTest {
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
-            // get configuration and sapconfiguration
-            Configuration config = context.getConfigs(false).stream().findFirst().get();
+            // get objects for the query constructor
+            Configuration config = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
             SapConfiguration sapconfig = context.getSapConfigs(false).stream().findFirst().get();
 
             // create the query
             CriticalAccessQuery query = new CriticalAccessQuery();
-            query.setConfig(config);
-            query.setSapConfig(sapconfig);
-            String author = "querytest";
-            query.setCreatedBy(author);
 
             // insert query into database
             context.createSapQuery(query);
@@ -44,7 +42,10 @@ public class CriticalAccessQueryTest {
             List<CriticalAccessQuery> queries = context.getFilteredCriticalAccessQueries(false, null, null, null, null);
 
             // check if new query was inserted
-            ret = queries.stream().anyMatch(x -> x.getConfig().equals(config) && x.getSapConfig().equals(sapconfig) && x.getCreatedBy().equals(author));
+            ret = queries.stream().anyMatch(x -> x.getConfig().equals(config) && x.getSapConfig().equals(sapconfig));
+
+            // execute query
+
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -61,16 +62,15 @@ public class CriticalAccessQueryTest {
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
-            // get configuration and sapconfiguration
-            Configuration config = context.getConfigs(false).stream().findFirst().get();
+            // get objects for the query constructor
+            Configuration config = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
             SapConfiguration sapconfig = context.getSapConfigs(false).stream().findFirst().get();
+            AccessPattern pattern = config.getPatterns().stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
+            Set entries = new HashSet();
+            entries.add(new CriticalAccessEntry(pattern, "raboof"));
 
             // create the query
-            CriticalAccessQuery query = new CriticalAccessQuery();
-            query.setConfig(config);
-            query.setSapConfig(sapconfig);
-            String author = "QUERYTEST";
-            query.setCreatedBy(author);
+            CriticalAccessQuery query = new CriticalAccessQuery(config, sapconfig, entries);
 
             // insert query into database
             context.createSapQuery(query);
@@ -79,42 +79,7 @@ public class CriticalAccessQueryTest {
             List<CriticalAccessQuery> queries = context.getFilteredCriticalAccessQueries(false, null, null, null, null);
 
             // check if new query was inserted
-            ret = queries.stream().anyMatch(x -> x.getConfig().equals(config) && x.getCreatedBy().equals(author));
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        assert (ret);
-    }
-
-    @Test
-    @Disabled
-    public void testUpdateCriticalAccessQueries() {
-
-        boolean ret = false;
-
-        try (ArtDbContext context = new ArtDbContext("test", "test")) {
-
-            // get configuration and sapconfiguration
-            Configuration config = context.getConfigs(false).stream().findFirst().get();
-            SapConfiguration sapconfig = context.getSapConfigs(false).stream().findFirst().get();
-
-            // create the query
-            CriticalAccessQuery query = new CriticalAccessQuery();
-            query.setConfig(config);
-            query.setSapConfig(sapconfig);
-            String author = "querytest";
-            query.setCreatedBy(author);
-
-            // insert query into database
-            context.createSapQuery(query);
-
-            // query updated data
-            List<CriticalAccessQuery> queries = context.getFilteredCriticalAccessQueries(true, null, null, null, null);
-
-            // check if new query was inserted
-            ret = queries.stream().anyMatch(x -> x.getSapConfig().equals(sapconfig));
+            ret = queries.stream().anyMatch(x -> x.getConfig().equals(config) && x.getSapConfig().equals(sapconfig) && x.getEntries().equals(entries));
 
         } catch (Exception ex) {
             ex.printStackTrace();
