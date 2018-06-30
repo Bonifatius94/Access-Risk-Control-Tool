@@ -6,30 +6,26 @@ import data.entities.CriticalAccessQuery;
 import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 
-import extensions.OperatingSystemHelper;
 import extensions.progess.IProgressListener;
 
 import io.msoffice.excel.AccessPatternImportHelper;
 import io.msoffice.excel.WhitelistImportHelper;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import sap.SapConnector;
 
 import setup.AppSetupHelper;
-import setup.ZipHelper;
 
 @SuppressWarnings("all")
 public class SapTest {
 
     @BeforeAll
+    @Disabled
     public static void prepareSapjcoDependencies() throws Exception {
 
         try {
@@ -46,6 +42,7 @@ public class SapTest {
     }
 
     @Test
+    @Disabled
     public void testLogin() {
 
         boolean ret = false;
@@ -72,6 +69,7 @@ public class SapTest {
     }
 
     @Test
+    @Disabled
     public void testSapQuery() {
 
         boolean ret = false;
