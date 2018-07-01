@@ -63,6 +63,7 @@
             <version>4.0.13-alpha</version>
             <scope>test</scope>
         </dependency>
+
         <!-- common csv export  -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -73,7 +74,7 @@
         <!-- sap jco connector lib (linked as local jar file in /lib folder) -->
         <dependency>
             <groupId>com.sap.conn</groupId>
-            <artifactId>jco</artifactId>
+            <artifactId>sapjco</artifactId>
             <version>3</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/sapjco3.jar</systemPath>
@@ -119,16 +120,24 @@
             <version>3.5.2</version>
         </dependency>
 
-
         <!-- Dependency for Icon Collections -->
         <dependency>
             <groupId>de.jensd</groupId>
             <artifactId>fontawesomefx</artifactId>
             <version>8.9</version>
         </dependency>
+
+        <!-- dependency to determine host operating system and processor architecture -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.7</version>
+        </dependency>
     </dependencies>
 
     <build>
+        <finalName>AccessRiskTool</finalName>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -161,6 +170,7 @@
                 </executions>
             </plugin>
 
+            <!-- unit testing -->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
@@ -173,6 +183,7 @@
                 </dependencies>
             </plugin>
 
+            <!-- maven jar export packaging -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -181,9 +192,35 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <mainClass>ui.App</mainClass>
+                            <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
+                        <manifestEntries>
+                            <!-- include additional dependencies in CLASSPATH -->
+                            <Class-Path>lib/sapjco3.jar</Class-Path>
+                        </manifestEntries>
                     </archive>
                 </configuration>
+            </plugin>
+
+            <!-- maven dependency copy (for jar export) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.5.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <!-- exclude junit, we need runtime dependency only -->
+                            <includeScope>runtime</includeScope>
+                            <outputDirectory>${project.build.directory}/lib/</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 

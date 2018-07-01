@@ -85,9 +85,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     @Override
     protected void createNewDatabase() throws Exception {
 
+        TraceOut.enter();
+
         // execute sql scripts
-        executeScript(getClass().getClassLoader().getResource("scripts/create_schema.sql").getPath());
-        executeScript(getClass().getClassLoader().getResource("scripts/create_roles.sql").getPath());
+        executeScript("scripts/create_schema.sql");
+        executeScript("scripts/create_roles.sql");
+
+        TraceOut.leave();
     }
 
     // ============================================
@@ -872,7 +876,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // get configs referencing the original pattern
         Set<Configuration> originalConfigs =
             getConfigs(true).stream()
-                .filter(x -> x.getPatterns().stream().anyMatch(y -> x.getId().equals(y.getId())))
+                .filter(x -> x.getPatterns().stream().anyMatch(y -> y.getId().equals(originalId)))
                 .collect(Collectors.toSet());
 
         // get critical access queries referencing a config that references the original pattern
@@ -884,22 +888,23 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // copy configs where the original pattern is referenced
         originalConfigs.forEach(originalConfig -> {
 
-            // switch pattern references
-            Set<AccessPattern> patterns = originalConfig.getPatterns();
-            patterns.remove(pattern);
-            patterns.add(archived);
-
+            // correct references (original -> archived)
             if (originalConfig.isArchived()) {
 
-                // reference new archived pattern
+                Set<AccessPattern> patterns = new HashSet<>(originalConfig.getPatterns());
+                patterns.stream().filter(x -> x.getId().equals(pattern.getId())).collect(Collectors.toSet()).forEach(x -> patterns.remove(x));
+                patterns.add(archived);
                 originalConfig.setPatterns(patterns);
                 session.update(originalConfig);
 
             } else {
 
-                Configuration copy = new Configuration(originalConfig);
+                Set<AccessPattern> patterns = new HashSet<>(originalConfig.getPatterns());
+                patterns.stream().filter(x -> x.getId().equals(pattern.getId())).collect(Collectors.toSet()).forEach(x -> patterns.remove(x));
+                patterns.add(archived);
 
                 // prepare and insert copy
+                Configuration copy = new Configuration(originalConfig);
                 copy.setWhitelist(originalConfig.getWhitelist());
                 copy.setPatterns(patterns);
                 copy.setArchived(true);

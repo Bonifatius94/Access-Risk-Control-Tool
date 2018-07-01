@@ -34,10 +34,8 @@ public class DatabaseCleanupHelper {
 
     private void createDatabaseWithTestDataSeed() throws Exception {
 
-        String scriptPath = getClass().getClassLoader().getResource("scripts/create_test_data_seed.sql").getFile();
-
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
-            context.executeScript(scriptPath);
+            context.executeScript("scripts/create_test_data_seed.sql");
         }
     }
 

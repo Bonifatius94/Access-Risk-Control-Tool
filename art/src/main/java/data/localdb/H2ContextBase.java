@@ -1,12 +1,16 @@
 package data.localdb;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -16,7 +20,9 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import tools.tracing.TraceOut;
 
 public abstract class H2ContextBase implements Closeable {
 
@@ -55,7 +61,7 @@ public abstract class H2ContextBase implements Closeable {
     private String username;
     private String password;
 
-    private final String filePassword = "<4KHhSVpG{cb~E]:d;%Su,!re^k39#668ncR=mh^9AssGP<{gR\")m)&&ZNeX!fus=tt,Z~$Ed#tS-P9!*k/[vvnPt?*DJ)W*G%~3";
+    private static final String filePassword = "<4KHhSVpG{cb~E]:d;%Su,!re^k39#668ncR=mh^9AssGP<{gR\")m)&&ZNeX!fus=tt,Z~$Ed#tS-P9!*k/[vvnPt?*DJ)W*G%~3";
 
     // +++++++++++++++++++++++++++++++
     // ++     Session Initiation    ++
@@ -74,26 +80,21 @@ public abstract class H2ContextBase implements Closeable {
         // configure hibernate logging level
         java.util.logging.Logger.getLogger("org.hibernate").setLevel(java.util.logging.Level.SEVERE);
 
-        // init config with settings from hibernate.properties file
-        final StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
+        // prepare settings for config
+        Properties settings = new Properties();
+        settings.setProperty(Environment.URL, "jdbc:h2:file:" + filePath + ";CIPHER=AES");
+        settings.setProperty(Environment.USER, username);
+        settings.setProperty(Environment.PASS, filePassword + " " + password);
 
-        builder.applySetting(Environment.DRIVER, "org.h2.Driver");
-        builder.applySetting(Environment.DIALECT, "org.hibernate.dialect.H2Dialect");
-        builder.applySetting(Environment.URL, "jdbc:h2:file:" + filePath + ";CIPHER=AES");
-        builder.applySetting(Environment.USER, username);
-        builder.applySetting(Environment.PASS, filePassword + " " + password);
-        //builder.applySetting(Environment.SHOW_SQL, "true");
+        // init config with settings from hibernate.properties file
+        Configuration config = new Configuration();
+        config.setProperties(settings);
 
         // apply annotated data entity classes
-        final StandardServiceRegistry registry = builder.build();
-        final MetadataSources metadataSources = new MetadataSources(registry);
-        getAnnotatedClasses().forEach(metadataSources::addAnnotatedClass);
-
-        Metadata metadata = metadataSources.getMetadataBuilder().build();
-        SessionFactory sessionFactory = metadata.getSessionFactoryBuilder().build();
+        getAnnotatedClasses().forEach(config::addAnnotatedClass);
 
         // build the session factory and return it
-        return sessionFactory;
+        return config.buildSessionFactory();
     }
 
     /**
@@ -249,12 +250,15 @@ public abstract class H2ContextBase implements Closeable {
     /**
      * This method executes a sql script. Therefore it gets all statement from the script and executes them in one transaction.
      *
-     * @param filePath the file path of the script to be executed
+     * @param resourcePath the file path of the script resource to be executed
      * @throws Exception caused by file errors while reading the script or while executing the sql commands
      */
-    public void executeScript(String filePath) throws Exception {
+    public void executeScript(String resourcePath) throws Exception {
 
-        List<String> sqlCommands = getCommands(new File(filePath).getAbsolutePath());
+        TraceOut.enter();
+
+        TraceOut.writeInfo("Script Path: '" + resourcePath + "'");
+        List<String> sqlCommands = getCommands(resourcePath);
 
         try (Session session = sessionFactory.openSession()) {
 
@@ -275,14 +279,16 @@ public abstract class H2ContextBase implements Closeable {
                 throw ex;
             }
         }
+
+        TraceOut.leave();
     }
 
-    private List<String> getCommands(String filePath) throws Exception {
+    private List<String> getCommands(String resourcePath) throws Exception {
 
         StringBuilder builder = new StringBuilder();
 
         // get all line from script file
-        Files.readAllLines(Paths.get(filePath)).stream()
+        getLinesFromResource(resourcePath).stream()
             // remove rest of line after a line comment
             .map(x -> x.contains("--") ? x.substring(0, x.indexOf("--")) : x)
             // append everything to string builder
@@ -313,6 +319,24 @@ public abstract class H2ContextBase implements Closeable {
         }
 
         return commands;
+    }
+
+    private List<String> getLinesFromResource(String resourcePath) throws Exception {
+
+        List<String> lines = null;
+
+        try (InputStream resource = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
+
+            try (InputStreamReader inReader = new InputStreamReader(resource, StandardCharsets.UTF_8)) {
+
+                try (BufferedReader bufReader = new BufferedReader(inReader)) {
+
+                    lines = bufReader.lines().collect(Collectors.toList());
+                }
+            }
+        }
+
+        return lines;
     }
 
     // +++++++++++++++++++++++++++++++

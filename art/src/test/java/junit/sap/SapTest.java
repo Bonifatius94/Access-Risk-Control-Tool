@@ -7,18 +7,39 @@ import data.entities.SapConfiguration;
 import data.entities.Whitelist;
 
 import extensions.progess.IProgressListener;
+
 import io.msoffice.excel.AccessPatternImportHelper;
 import io.msoffice.excel.WhitelistImportHelper;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import sap.SapConnector;
 
+import setup.AppSetupHelper;
+
 @SuppressWarnings("all")
 public class SapTest {
+
+    @BeforeAll
+    @Disabled
+    public static void prepareSapjcoDependencies() throws Exception {
+
+        try {
+
+            new AppSetupHelper().setupApp();
+
+
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+            throw ex;
+        }
+    }
 
     @Test
     @Disabled

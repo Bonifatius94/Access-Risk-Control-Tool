@@ -189,7 +189,7 @@ public class TraceOut {
     public static void writeException(Throwable throwable, TraceLevel level) {
 
         if (isEnabled && TraceOut.level.ordinal() >= level.ordinal()) {
-            writeToTrace("ERROR", throwable.getMessage());
+            writeToTrace("ERROR", throwable.toString());
         }
     }
 
