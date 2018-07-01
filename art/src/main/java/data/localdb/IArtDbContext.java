@@ -72,6 +72,16 @@ public interface IArtDbContext {
     List<CriticalAccessQuery> getSapQueries(boolean includeArchived) throws Exception;
 
     /**
+     * This method selects all already executed sap queries from the local database.
+     *
+     * @param query the query to be related to
+     * @param includeArchived determines whether archived records are also loaded
+     * @return a list of already executed sap queries
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    List<CriticalAccessQuery> getRelatedSapQueries(CriticalAccessQuery query, boolean includeArchived) throws Exception;
+
+    /**
      * This method selects all configurations from the local database that are not archived with history flag.
      *
      * @param includeArchived determines whether archived records are also loaded

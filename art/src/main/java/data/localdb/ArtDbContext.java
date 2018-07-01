@@ -214,6 +214,28 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     }
 
     /**
+     * This method selects all already executed sap queries from the local database.
+     *
+     * @param query the query to be related to
+     * @param includeArchived determines whether archived records are also loaded
+     * @return a list of already executed sap queries
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    @Override
+    public List<CriticalAccessQuery> getRelatedSapQueries(CriticalAccessQuery query, boolean includeArchived) throws Exception {
+
+        TraceOut.enter();
+
+        List<CriticalAccessQuery> queries =
+            getSapQueries(includeArchived).stream()
+            .filter(x -> x.getConfig().getId().equals(query.getConfig().getId()) && x.getSapConfig().getId().equals(query.getSapConfig().getId()))
+            .collect(Collectors.toList());
+
+        TraceOut.leave();
+        return queries;
+    }
+
+    /**
      * This method selects all configurations from the local database that are not archived with history flag.
      *
      * @param includeArchived determines whether archived records are also loaded
