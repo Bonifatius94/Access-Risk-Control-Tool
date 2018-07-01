@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.hibernate.HibernateException;
@@ -19,6 +20,7 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import tools.tracing.TraceOut;
 
@@ -59,7 +61,7 @@ public abstract class H2ContextBase implements Closeable {
     private String username;
     private String password;
 
-    private final String filePassword = "<4KHhSVpG{cb~E]:d;%Su,!re^k39#668ncR=mh^9AssGP<{gR\")m)&&ZNeX!fus=tt,Z~$Ed#tS-P9!*k/[vvnPt?*DJ)W*G%~3";
+    private static final String filePassword = "<4KHhSVpG{cb~E]:d;%Su,!re^k39#668ncR=mh^9AssGP<{gR\")m)&&ZNeX!fus=tt,Z~$Ed#tS-P9!*k/[vvnPt?*DJ)W*G%~3";
 
     // +++++++++++++++++++++++++++++++
     // ++     Session Initiation    ++
@@ -78,26 +80,21 @@ public abstract class H2ContextBase implements Closeable {
         // configure hibernate logging level
         java.util.logging.Logger.getLogger("org.hibernate").setLevel(java.util.logging.Level.SEVERE);
 
-        // init config with settings from hibernate.properties file
-        final StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
+        // prepare settings for config
+        Properties settings = new Properties();
+        settings.setProperty(Environment.URL, "jdbc:h2:file:" + filePath + ";CIPHER=AES");
+        settings.setProperty(Environment.USER, username);
+        settings.setProperty(Environment.PASS, filePassword + " " + password);
 
-        builder.applySetting(Environment.DRIVER, "org.h2.Driver");
-        builder.applySetting(Environment.DIALECT, "org.hibernate.dialect.H2Dialect");
-        builder.applySetting(Environment.URL, "jdbc:h2:file:" + filePath + ";CIPHER=AES");
-        builder.applySetting(Environment.USER, username);
-        builder.applySetting(Environment.PASS, filePassword + " " + password);
-        //builder.applySetting(Environment.SHOW_SQL, "true");
+        // init config with settings from hibernate.properties file
+        Configuration config = new Configuration();
+        config.setProperties(settings);
 
         // apply annotated data entity classes
-        final StandardServiceRegistry registry = builder.build();
-        final MetadataSources metadataSources = new MetadataSources(registry);
-        getAnnotatedClasses().forEach(metadataSources::addAnnotatedClass);
-
-        Metadata metadata = metadataSources.getMetadataBuilder().build();
-        SessionFactory sessionFactory = metadata.getSessionFactoryBuilder().build();
+        getAnnotatedClasses().forEach(config::addAnnotatedClass);
 
         // build the session factory and return it
-        return sessionFactory;
+        return config.buildSessionFactory();
     }
 
     /**
