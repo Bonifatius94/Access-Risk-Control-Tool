@@ -1160,23 +1160,24 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 transaction = session.beginTransaction();
 
-                Set<Configuration> configsToArchive = new HashSet<>(pattern.getConfigurations());
+                Set<Configuration> configsToArchive =
+                    getConfigs(false).stream()
+                    .filter(x -> x.getPatterns().stream().anyMatch(y -> y.getId().equals(pattern.getId())))
+                    .collect(Collectors.toSet());
 
                 // remove pattern from active configs referencing it and archive those configs
                 for (Configuration config : configsToArchive) {
 
-                    if (!config.isArchived()) {
+                    Set<AccessPattern> patterns = new HashSet<>(config.getPatterns());
+                    patterns.stream().filter(x -> x.getId().equals(pattern.getId())).collect(Collectors.toList()).forEach(x -> patterns.remove(x));
+                    config.setPatterns(patterns);
+                    config.adjustReferences();
 
-                        Set<AccessPattern> patterns = new HashSet<>(config.getPatterns());
-                        patterns.stream().filter(x -> x.getId().equals(pattern.getId())).collect(Collectors.toList()).forEach(x -> patterns.remove(x));
-                        config.setPatterns(patterns);
-
-                        if (archive) {
-                            archiveConfig(session, config);
-                        }
-
-                        session.update(config);
+                    if (archive) {
+                        archiveConfig(session, config);
                     }
+
+                    session.update(config);
                 }
 
                 if (archive) {
