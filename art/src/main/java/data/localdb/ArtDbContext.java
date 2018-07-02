@@ -935,7 +935,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         whitelist.adjustReferences();
 
         // check if the whitelist has already been used by a critical access query
-        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
+        boolean archive = getSapQueries(true).stream()
+            .anyMatch(x -> x.getConfig().getWhitelist() != null && whitelist.getId().equals(x.getConfig().getWhitelist().getId()));
 
         try (Session session = openSession()) {
 
@@ -1159,16 +1160,24 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 transaction = session.beginTransaction();
 
-                // remove pattern from active configs referencing it
-                pattern.getConfigurations().forEach(config -> {
+                Set<Configuration> configsToArchive = new HashSet<>(pattern.getConfigurations());
+
+                // remove pattern from active configs referencing it and archive those configs
+                for (Configuration config : configsToArchive) {
 
                     if (!config.isArchived()) {
 
-                        config.getPatterns().remove(pattern);
-                        config.adjustReferences();
+                        Set<AccessPattern> patterns = new HashSet<>(config.getPatterns());
+                        patterns.stream().filter(x -> x.getId().equals(pattern.getId())).collect(Collectors.toList()).forEach(x -> patterns.remove(x));
+                        config.setPatterns(patterns);
+
+                        if (archive) {
+                            archiveConfig(session, config);
+                        }
+
                         session.update(config);
                     }
-                });
+                }
 
                 if (archive) {
 
@@ -1213,7 +1222,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         whitelist.adjustReferences();
 
         // check if the whitelist has already been used by a critical access query
-        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
+        boolean archive = getSapQueries(true).stream()
+            .anyMatch(x -> x.getConfig().getWhitelist() != null && x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
 
         try (Session session = openSession()) {
 
@@ -1223,12 +1233,22 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 transaction = session.beginTransaction();
 
-                // remove whitelist from active configs referencing it
-                getConfigs(false).forEach(config -> {
+                List<Configuration> configsToArchive =
+                    getConfigs(false).stream()
+                    .filter(x -> x.getWhitelist() != null && x.getWhitelist().getId().equals(whitelist.getId()))
+                    .collect(Collectors.toList());
+
+                // remove whitelist from active configs referencing it and archive those configs
+                for (Configuration config : configsToArchive) {
 
                     config.setWhitelist(null);
+
+                    if (archive) {
+                        archiveConfig(session, config);
+                    }
+
                     session.update(config);
-                });
+                }
 
                 if (archive) {
 

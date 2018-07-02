@@ -18,6 +18,7 @@ import io.msoffice.ReportExportType;
 import io.msoffice.excel.AccessPatternExportHelper;
 import io.msoffice.excel.WhitelistExportHelper;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -181,6 +182,11 @@ public class AnalysisResultController {
 
             // export the query results to the chosen output file
             new ExportHelper().exportDocument(resultQuery, file, exportType, exportLanguage);
+
+            // open exported file with a suitable program
+            if (file.exists() && Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(file);
+            }
         }
     }
 
@@ -199,6 +205,11 @@ public class AnalysisResultController {
 
             // export the whitelist to the chosen output file
             new WhitelistExportHelper().exportWhitelist(file.getAbsolutePath(), resultQuery.getConfig().getWhitelist());
+
+            // open exported file with a suitable program
+            if (file.exists() && Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(file);
+            }
         }
     }
 
@@ -222,6 +233,11 @@ public class AnalysisResultController {
 
             // export the patterns to the chosen output file
             new AccessPatternExportHelper().exportAccessPatterns(file.getAbsolutePath(), patterns);
+
+            // open exported file with a suitable program
+            if (file.exists() && Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(file);
+            }
         }
     }
 
