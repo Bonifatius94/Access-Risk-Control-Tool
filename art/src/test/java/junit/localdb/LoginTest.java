@@ -14,8 +14,8 @@ public class LoginTest {
     @Test
     public void testLogin() {
 
-        assert(testLogin("TestDataAnalyst", "foobar", true));
-        assert(testLogin("foo", "123", false));
+        assert (testLogin("TestDataAnalyst", "foobar", true));
+        assert (testLogin("foo", "123", false));
     }
 
     private boolean testLogin(String username, String password, boolean expectedResult) {

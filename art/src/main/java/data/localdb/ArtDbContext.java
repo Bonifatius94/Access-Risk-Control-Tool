@@ -1160,16 +1160,25 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 transaction = session.beginTransaction();
 
-                // remove pattern from active configs referencing it
-                pattern.getConfigurations().forEach(config -> {
+                Set<Configuration> configsToArchive =
+                    getConfigs(false).stream()
+                    .filter(x -> x.getPatterns().stream().anyMatch(y -> y.getId().equals(pattern.getId())))
+                    .collect(Collectors.toSet());
 
-                    if (!config.isArchived()) {
+                // remove pattern from active configs referencing it and archive those configs
+                for (Configuration config : configsToArchive) {
 
-                        config.getPatterns().remove(pattern);
-                        config.adjustReferences();
-                        session.update(config);
+                    Set<AccessPattern> patterns = new HashSet<>(config.getPatterns());
+                    patterns.stream().filter(x -> x.getId().equals(pattern.getId())).collect(Collectors.toList()).forEach(x -> patterns.remove(x));
+                    config.setPatterns(patterns);
+                    config.adjustReferences();
+
+                    if (archive) {
+                        archiveConfig(session, config);
                     }
-                });
+
+                    session.update(config);
+                }
 
                 if (archive) {
 
@@ -1225,12 +1234,22 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 transaction = session.beginTransaction();
 
-                // remove whitelist from active configs referencing it
-                getConfigs(false).forEach(config -> {
+                List<Configuration> configsToArchive =
+                    getConfigs(false).stream()
+                    .filter(x -> x.getWhitelist() != null && x.getWhitelist().getId().equals(whitelist.getId()))
+                    .collect(Collectors.toList());
+
+                // remove whitelist from active configs referencing it and archive those configs
+                for (Configuration config : configsToArchive) {
 
                     config.setWhitelist(null);
+
+                    if (archive) {
+                        archiveConfig(session, config);
+                    }
+
                     session.update(config);
-                });
+                }
 
                 if (archive) {
 

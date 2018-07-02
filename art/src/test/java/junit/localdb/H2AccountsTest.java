@@ -110,7 +110,7 @@ public class H2AccountsTest {
         try (ArtDbContext context = new ArtDbContext(username, oldPassword)) {
 
             // login with old password must not be successful
-            assert(false);
+            assert (false);
 
         } catch (Exception ex) {
             // nothing to do here ...
@@ -175,7 +175,7 @@ public class H2AccountsTest {
 
             // check if first login role was assigned
             ret = context.getDatabaseUsers().stream().anyMatch(x -> x.getUsername().equals(username.toUpperCase()) && x.isFirstLogin());
-            assert(ret);
+            assert (ret);
 
         } catch (Exception ex) {
             ex.printStackTrace();
