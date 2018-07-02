@@ -4,8 +4,8 @@
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>490</x>
-      <y>170</y>
+      <x>440</x>
+      <y>50</y>
       <w>100</w>
       <h>30</h>
     </coordinates>
@@ -16,8 +16,8 @@ bg=orange</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>950</x>
-      <y>170</y>
+      <x>900</x>
+      <y>50</y>
       <w>100</w>
       <h>30</h>
     </coordinates>
@@ -28,8 +28,8 @@ bg=red</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>990</x>
-      <y>240</y>
+      <x>940</x>
+      <y>120</y>
       <w>20</w>
       <h>230</h>
     </coordinates>
@@ -40,8 +40,8 @@ bg=red</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>990</x>
-      <y>190</y>
+      <x>940</x>
+      <y>70</y>
       <w>30</w>
       <h>70</h>
     </coordinates>
@@ -51,8 +51,8 @@ bg=red</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>990</x>
-      <y>460</y>
+      <x>940</x>
+      <y>340</y>
       <w>30</w>
       <h>60</h>
     </coordinates>
@@ -62,31 +62,31 @@ bg=red</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>540</x>
-      <y>250</y>
+      <x>490</x>
+      <y>130</y>
       <w>470</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;
-loadWhitelist(U.whitelistPath)</panel_attributes>
+loadAccessPattern(U.accessPatternPath)</panel_attributes>
     <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
   </element>
   <element>
     <id>UMLFrame</id>
     <coordinates>
-      <x>380</x>
-      <y>150</y>
+      <x>330</x>
+      <y>20</y>
       <w>800</w>
-      <h>400</h>
+      <h>390</h>
     </coordinates>
-    <panel_attributes>Load whitelist</panel_attributes>
+    <panel_attributes>Load accesspattern</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>530</x>
-      <y>240</y>
+      <x>480</x>
+      <y>120</y>
       <w>20</w>
       <h>230</h>
     </coordinates>
@@ -97,10 +97,10 @@ bg=yellow</panel_attributes>
   <element>
     <id>UMLFrame</id>
     <coordinates>
-      <x>480</x>
-      <y>290</y>
-      <w>590</w>
-      <h>140</h>
+      <x>390</x>
+      <y>170</y>
+      <w>630</w>
+      <h>130</h>
     </coordinates>
     <panel_attributes>halign=left
 alt
@@ -117,8 +117,8 @@ Success
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>530</x>
-      <y>190</y>
+      <x>480</x>
+      <y>70</y>
       <w>30</w>
       <h>70</h>
     </coordinates>
@@ -128,32 +128,32 @@ Success
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>540</x>
-      <y>300</y>
+      <x>490</x>
+      <y>180</y>
       <w>470</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
-error("The attempt to load a whitelists failed")</panel_attributes>
+error("The attempt to load the accesspattern failed")</panel_attributes>
     <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>540</x>
-      <y>370</y>
+      <x>490</x>
+      <y>250</y>
       <w>470</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
-load whitelist</panel_attributes>
+load accesspattern</panel_attributes>
     <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>530</x>
-      <y>460</y>
+      <x>480</x>
+      <y>340</y>
       <w>30</w>
       <h>60</h>
     </coordinates>
