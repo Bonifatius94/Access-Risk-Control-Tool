@@ -80,7 +80,7 @@
         </VBox>
         <Separator/>
         <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="10">
-            <JFXButton text="%rerun" onAction="#rerunQuery">
+            <JFXButton text="%rerun" onAction="#rerunQuery" fx:id="analysisButton">
                 <graphic>
                     <MaterialDesignIconView glyphName="REFRESH"/>
                 </graphic>

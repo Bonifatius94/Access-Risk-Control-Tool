@@ -1,9 +1,11 @@
 package ui.main.sapqueries.modal.details;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 
 import data.entities.CriticalAccessQuery;
 
+import data.entities.DbUserRole;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
@@ -56,14 +58,19 @@ public class SapQueryDetailController {
     @FXML
     public MaterialDesignIconView statusIcon;
 
+    @FXML
+    public JFXButton analysisButton;
+
 
     ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
     private CriticalAccessQuery query;
     private SapQueriesController parentController;
 
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
 
+        // hide analysis button if user is not a viewer
+        analysisButton.setVisible(AppComponents.getInstance().getDbContext().getCurrentUser().getRoles().contains(DbUserRole.Viewer));
     }
 
     /**

@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXButton;
 import data.entities.Configuration;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
+import data.entities.DbUserRole;
 import data.entities.SapConfiguration;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
@@ -72,6 +73,8 @@ public class SapQueriesController implements IUpdateTable {
     @FXML
     public FilterController filterController;
 
+    @FXML
+    public JFXButton analysisButton;
 
     private ResourceBundle bundle;
     private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
@@ -98,6 +101,9 @@ public class SapQueriesController implements IUpdateTable {
                 }
             }
         });
+
+        // hide analysis button if user is not a viewer
+        analysisButton.setVisible(AppComponents.getInstance().getDbContext().getCurrentUser().getRoles().contains(DbUserRole.Viewer));
     }
 
     /**
