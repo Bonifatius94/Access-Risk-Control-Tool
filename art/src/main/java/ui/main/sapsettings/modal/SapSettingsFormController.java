@@ -188,7 +188,7 @@ public class SapSettingsFormController {
         });
         tfPoolCapacity.focusedProperty().addListener((o, oldVal, newVal) -> {
             if (!newVal) {
-                tfLanguage.validate();
+                tfPoolCapacity.validate();
             }
         });
         hostServerField.focusedProperty().addListener((o, oldVal, newVal) -> {
