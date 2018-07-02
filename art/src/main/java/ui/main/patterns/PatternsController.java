@@ -34,9 +34,10 @@ import javafx.stage.FileChooser;
 import ui.App;
 import ui.AppComponents;
 import ui.IUpdateTable;
-import ui.custom.controls.ButtonCell;
 import ui.custom.controls.ConditionTypeCellFactory;
 import ui.custom.controls.CustomAlert;
+import ui.custom.controls.DisableDeleteButtonCell;
+import ui.custom.controls.DisableEditButtonCell;
 import ui.custom.controls.filter.FilterController;
 import ui.main.patterns.modal.PatternImportController;
 import ui.main.patterns.modal.PatternsFormController;
@@ -124,7 +125,9 @@ public class PatternsController implements IUpdateTable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     AccessPattern pattern = row.getItem();
-                    openAccessPatternForm(pattern);
+                    if (!pattern.isArchived()) {
+                        openAccessPatternForm(pattern);
+                    }
                 }
             });
             return row;
@@ -146,7 +149,7 @@ public class PatternsController implements IUpdateTable {
     private void initializeTableColumns() {
 
         // Add the delete column
-        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (AccessPattern accessPattern) -> {
+        deleteColumn.setCellFactory(DisableDeleteButtonCell.forTableColumn((AccessPattern accessPattern) -> {
 
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
                 bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
@@ -163,8 +166,12 @@ public class PatternsController implements IUpdateTable {
         }));
 
         // Add the edit column
-        editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (AccessPattern accessPattern) -> {
-            openAccessPatternForm(accessPattern);
+        editColumn.setCellFactory(DisableEditButtonCell.forTableColumn((AccessPattern accessPattern) -> {
+            if (accessPattern.isArchived()) {
+                viewAccessPatternDetails(accessPattern);
+            } else {
+                openAccessPatternForm(accessPattern);
+            }
             return accessPattern;
         }));
 
@@ -220,6 +227,28 @@ public class PatternsController implements IUpdateTable {
             PatternsFormController patternEdit = loader.getController();
             patternEdit.giveSelectedAccessPattern(accessPattern);
             patternEdit.setParentController(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Opens a modal details dialog for the selected AccessPattern.
+     *
+     * @param accessPattern the selected AccessPattern
+     */
+    public void viewAccessPatternDetails(AccessPattern accessPattern) {
+
+        try {
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternsFormView.fxml", "patternDetails", 1200, 750);
+
+            // give the dialog the sapConfiguration
+            PatternsFormController patternView = loader.getController();
+            patternView.giveSelectedAccessPattern(accessPattern);
+
+            // don't allow editing
+            patternView.setEditable(false);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -285,7 +314,7 @@ public class PatternsController implements IUpdateTable {
 
         if (selectedFile != null) {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternImportView.fxml","importPatterns");
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternImportView.fxml", "importPatterns");
 
             // import patterns with the AccessPatternImportHelper
             AccessPatternImportHelper importHelper = new AccessPatternImportHelper();

@@ -21,9 +21,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 /**
  * This class represents an auth pattern (simple or complex).
  *
@@ -31,7 +28,7 @@ import org.hibernate.annotations.FetchMode;
  */
 @Entity
 @Table(name = "AccessPatterns")
-public class AccessPattern implements IReferenceAware, ICreationFlagsHelper {
+public class AccessPattern implements IReferenceAware, IDataEntity {
 
     // =============================
     //        constructors

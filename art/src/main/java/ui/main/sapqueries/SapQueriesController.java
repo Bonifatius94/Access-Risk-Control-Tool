@@ -36,6 +36,8 @@ import ui.AppComponents;
 import ui.IUpdateTable;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
+import ui.custom.controls.DisableArchiveButtonCell;
+import ui.custom.controls.DisableDeleteButtonCell;
 import ui.custom.controls.SapQueryStatusCellFactory;
 import ui.custom.controls.filter.FilterController;
 import ui.main.sapqueries.modal.details.SapQueryDetailController;
@@ -149,7 +151,7 @@ public class SapQueriesController implements IUpdateTable {
      */
     private void initializeTableColumns() {
         // Add the delete column
-        archiveColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.ARCHIVE, bundle.getString("archive"), (CriticalAccessQuery query) -> {
+        archiveColumn.setCellFactory(DisableArchiveButtonCell.forTableColumn((CriticalAccessQuery query) -> {
 
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("archiveConfirmTitle"),
                 bundle.getString("archiveConfirmMessage"), "Ok", "Cancel");
@@ -215,7 +217,7 @@ public class SapQueriesController implements IUpdateTable {
     private void openQuery(CriticalAccessQuery query) {
         try {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/details/SapQueryDetailView.fxml","queryDetails");
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/details/SapQueryDetailView.fxml", "queryDetails");
 
             // give the dialog the query
             SapQueryDetailController queryDetail = loader.getController();
@@ -265,7 +267,7 @@ public class SapQueriesController implements IUpdateTable {
     public void addAction() {
         try {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/NewSapQueryView.fxml","newAnalysis");
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/NewSapQueryView.fxml", "newAnalysis");
 
             // give the dialog the query
             NewSapQueryController newQuery = loader.getController();
