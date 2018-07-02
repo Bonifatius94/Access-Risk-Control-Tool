@@ -935,7 +935,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         whitelist.adjustReferences();
 
         // check if the whitelist has already been used by a critical access query
-        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
+        boolean archive = getSapQueries(true).stream()
+            .anyMatch(x -> x.getConfig().getWhitelist() != null && whitelist.getId().equals(x.getConfig().getWhitelist().getId()));
 
         try (Session session = openSession()) {
 
@@ -1213,7 +1214,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         whitelist.adjustReferences();
 
         // check if the whitelist has already been used by a critical access query
-        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
+        boolean archive = getSapQueries(true).stream()
+            .anyMatch(x -> x.getConfig().getWhitelist() != null && x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
 
         try (Session session = openSession()) {
 
