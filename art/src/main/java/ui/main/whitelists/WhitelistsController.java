@@ -145,12 +145,17 @@ public class WhitelistsController implements IUpdateTable {
                 bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
 
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+
                 try {
                     database.deleteWhitelist(whitelist);
                     updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+            } else {
+                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("alreadyArchived"), "", "Ok", "Ok");
+                alert.showAndWait();
             }
             return whitelist;
         }));
@@ -251,32 +256,29 @@ public class WhitelistsController implements IUpdateTable {
     public void deleteWhitelist() throws Exception {
         if (whitelistTable.getSelectionModel().getSelectedItems() != null && whitelistTable.getSelectionModel().getSelectedItems().size() != 0) {
             CustomAlert customAlert;
-            if (whitelistTable.getSelectionModel().getSelectedItems().size() == 1) {
-                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
-                    bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+            if (whitelistTable.getSelectionModel().getSelectedItem().isArchived()) {
+                customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("alreadyArchived"), "", "Ok", "Ok");
+                customAlert.showAndWait();
             } else {
-                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteMultipleConfirmTitle"),
-                    bundle.getString("deleteMultipleConfirmMessage"), "Ok", "Cancel");
-            }
-
-            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
-                // deletes whitelists from DB
-                for (Whitelist whitelist : whitelistTable.getSelectionModel().getSelectedItems()) {
-                    database.deleteWhitelist(whitelist);
+                if (whitelistTable.getSelectionModel().getSelectedItems().size() == 1) {
+                    customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                        bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+                } else {
+                    customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteMultipleConfirmTitle"),
+                        bundle.getString("deleteMultipleConfirmMessage"), "Ok", "Cancel");
                 }
-                updateTable();
+
+                if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                    // deletes whitelists from DB
+                    for (Whitelist whitelist : whitelistTable.getSelectionModel().getSelectedItems()) {
+                        database.deleteWhitelist(whitelist);
+                    }
+                    updateTable();
+                }
             }
         }
     }
 
-    /**
-     * This function is called from a button press and starts edit.
-     */
-    public void editWhitelist() {
-        if (whitelistTable.getSelectionModel().getSelectedItem() != null) {
-            editDialogWhitelist(whitelistTable.getSelectionModel().getSelectedItem());
-        }
-    }
 
     /**
      * clones a selected Whitelist.
@@ -285,6 +287,7 @@ public class WhitelistsController implements IUpdateTable {
         if (whitelistTable.getSelectionModel().getSelectedItems() != null && whitelistTable.getSelectionModel().getSelectedItems().size() != 0) {
             for (Whitelist whitelist : whitelistTable.getSelectionModel().getSelectedItems()) {
                 Whitelist whitelistToAdd = new Whitelist(whitelist);
+                whitelistToAdd.setArchived(false);
                 whitelistToAdd.setDescription("Clone - " + whitelist.getDescription());
                 database.createWhitelist(whitelistToAdd);
             }
@@ -307,7 +310,13 @@ public class WhitelistsController implements IUpdateTable {
                 Whitelist importedWhitelist = whitelistImportHelper.importWhitelist(path);
                 startImportDialog(importedWhitelist);
             } catch (Exception e) {
-                e.printStackTrace();
+                if (e.toString().contains("NullPointerException")) {
+                    CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileType"), bundle.getString("selectFileCarefully"), "Ok", "Ok");
+                    alert.showAndWait();
+                } else {
+                    e.printStackTrace();
+                }
+                //if()
             }
         }
     }
