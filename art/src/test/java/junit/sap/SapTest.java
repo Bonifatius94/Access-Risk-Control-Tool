@@ -24,7 +24,7 @@ import setup.AppSetupHelper;
 @SuppressWarnings("all")
 public class SapTest {
 
-    @BeforeAll
+    /*@BeforeAll
     @Disabled
     public static void prepareSapjcoDependencies() throws Exception {
 
@@ -32,14 +32,12 @@ public class SapTest {
 
             new AppSetupHelper().setupApp();
 
-
-
         } catch (Exception ex) {
 
             ex.printStackTrace();
             throw ex;
         }
-    }
+    }*/
 
     @Test
     @Disabled

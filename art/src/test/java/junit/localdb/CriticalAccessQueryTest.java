@@ -21,31 +21,17 @@ public class CriticalAccessQueryTest {
     }
 
     @Test
-    @Disabled
     public void testQueryCriticalAccessQueries() {
 
         boolean ret = false;
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
-            // get objects for the query constructor
-            Configuration config = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
-            SapConfiguration sapconfig = context.getSapConfigs(false).stream().findFirst().get();
-
-            // create the query
-            CriticalAccessQuery query = new CriticalAccessQuery();
-
-            // insert query into database
-            context.createSapQuery(query);
-
             // query updated data
-            List<CriticalAccessQuery> queries = context.getFilteredCriticalAccessQueries(false, null, null, null, null);
+            List<CriticalAccessQuery> queries = context.getSapQueries(false);
 
             // check if new query was inserted
-            ret = queries.stream().anyMatch(x -> x.getConfig().equals(config) && x.getSapConfig().equals(sapconfig));
-
-            // execute query
-
+            ret = queries.size() == 2;
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -55,31 +41,40 @@ public class CriticalAccessQueryTest {
     }
 
     @Test
-    @Disabled
     public void testCreateCriticalAccessQueries() {
 
         boolean ret = false;
 
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
-            // get objects for the query constructor
-            Configuration config = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
-            SapConfiguration sapconfig = context.getSapConfigs(false).stream().findFirst().get();
-            AccessPattern pattern = config.getPatterns().stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
+            // retrieve config + sap config (used by the new query)
+            Configuration config = context.getConfigs(false).stream().filter(x -> x.getId().equals(1)).findFirst().get();
+            SapConfiguration sapConfig = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(1)).findFirst().get();
+
+            // prepare query entries
+            AccessPattern violatedPattern = config.getPatterns().stream().filter(x -> x.getId().equals(3)).findFirst().get();
             Set entries = new HashSet();
-            entries.add(new CriticalAccessEntry(pattern, "raboof"));
+            final String criticalUser = "raboof";
+            CriticalAccessEntry entry = new CriticalAccessEntry(violatedPattern, criticalUser);
+            entries.add(entry);
 
             // create the query
-            CriticalAccessQuery query = new CriticalAccessQuery(config, sapconfig, entries);
+            CriticalAccessQuery query = new CriticalAccessQuery(config, sapConfig, entries);
 
             // insert query into database
+            int queriesCount = context.getSapQueries(true).size();
             context.createSapQuery(query);
 
             // query updated data
-            List<CriticalAccessQuery> queries = context.getFilteredCriticalAccessQueries(false, null, null, null, null);
+            List<CriticalAccessQuery> queries = context.getSapQueries(false);
 
             // check if new query was inserted
-            ret = queries.stream().anyMatch(x -> x.getConfig().equals(config) && x.getSapConfig().equals(sapconfig) && x.getEntries().equals(entries));
+            ret = queries.stream()
+                .anyMatch(x -> x.getConfig().getId().equals(config.getId())
+                               && x.getSapConfig().getId().equals(sapConfig.getId())
+                               && x.getEntries().stream().anyMatch(y -> y.getAccessPattern().getId().equals(violatedPattern.getId())
+                                                                        && y.getUsername().equalsIgnoreCase(criticalUser)))
+                && context.getSapQueries(true).size() == queriesCount + 1;
 
         } catch (Exception ex) {
             ex.printStackTrace();

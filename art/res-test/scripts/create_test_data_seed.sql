@@ -150,6 +150,9 @@ INSERT INTO SapConfigurations (ID, DESCRIPTION, CLIENT, CREATEDAT, CREATEDBY, IS
 -- archived config
 INSERT INTO SapConfigurations (ID, DESCRIPTION, CLIENT, CREATEDAT, CREATEDBY, ISARCHIVED, LANGUAGE, POOLCAPACITY, SERVERDESTINATION, SYSNR) VALUES (2, 'a description', '001', '2018-06-08T15:09:15', 'test', 1, 'EN', '0', 'ec2-54-209-137-85.compute-1.amazonaws.com', '00');
 
+-- active config (that is not referenced by a query)
+INSERT INTO SapConfigurations (ID, DESCRIPTION, CLIENT, CREATEDAT, CREATEDBY, ISARCHIVED, LANGUAGE, POOLCAPACITY, SERVERDESTINATION, SYSNR) VALUES (3, 'a description', '001', '2018-06-08T15:09:15', 'test', 0, 'EN', '0', 'ec2-54-209-137-85.compute-1.amazonaws.com', '00');
+
 -- ==============================
 --        configurations
 -- ==============================
@@ -159,12 +162,12 @@ INSERT INTO Configurations (ID, CREATEDAT, CREATEDBY, DESCRIPTION, ISARCHIVED, N
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (1, 1);
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (1, 3);
 
-INSERT INTO Configurations (ID, CREATEDAT, CREATEDBY, DESCRIPTION, ISARCHIVED, NAME, WHITELISTID) VALUES (2, '2018-06-08T15:09:15', 'test', 'a test description', 0, 'foo config 2', 2);
+INSERT INTO Configurations (ID, CREATEDAT, CREATEDBY, DESCRIPTION, ISARCHIVED, NAME, WHITELISTID) VALUES (2, '2018-06-08T15:09:15', 'test', 'a test description', 0, 'foo config 2', 1);
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (2, 1);
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (2, 2);
 
 -- archived configs
-INSERT INTO Configurations (ID, CREATEDAT, CREATEDBY, DESCRIPTION, ISARCHIVED, NAME, WHITELISTID) VALUES (3, '2018-06-08T15:09:15', 'test', 'a test description', 1, 'foo config 1', 1);
+INSERT INTO Configurations (ID, CREATEDAT, CREATEDBY, DESCRIPTION, ISARCHIVED, NAME, WHITELISTID) VALUES (3, '2018-06-08T15:09:15', 'test', 'a test description', 1, 'foo config 1', 2);
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (3, 4);
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (3, 6);
 
@@ -192,6 +195,6 @@ VALUES (5, 'foobar;', 6, 2);
 
 -- ==============================
 -- authors: Marco Tröster,
---          Joshua SChreibeis
--- last modified: 12.06.2018
+--          Joshua Schreibeis
+-- last modified: 02.07.2018
 -- ==============================

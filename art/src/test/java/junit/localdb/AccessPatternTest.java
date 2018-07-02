@@ -374,6 +374,7 @@ public class AccessPatternTest {
     }
 
     @Test
+    @Disabled
     public void deletePattern() {
 
         boolean ret = false;

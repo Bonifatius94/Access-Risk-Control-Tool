@@ -122,11 +122,11 @@ public class FiltersTest {
 
             // test wildcard filter: server destination
             List<SapConfiguration> sapConfigs = context.getFilteredSapConfigs(true, "Amazonaws.cOm", null, ZonedDateTime.now(), 10);
-            ret = sapConfigs.size() == 2 && sapConfigs.stream().map(x -> x.getId()).collect(Collectors.toList()).containsAll(Arrays.asList(1, 2));
+            ret = sapConfigs.size() == 3 && sapConfigs.stream().map(x -> x.getId()).collect(Collectors.toList()).containsAll(Arrays.asList(1, 2));
 
             // test wildcard filter: description
             sapConfigs = context.getFilteredSapConfigs(false, "Descr", null, ZonedDateTime.now(), 10);
-            ret = ret && sapConfigs.size() == 1 && sapConfigs.stream().anyMatch(x -> x.getId().equals(1));
+            ret = ret && sapConfigs.size() == 2 && sapConfigs.stream().anyMatch(x -> x.getId().equals(1));
 
         } catch (Exception ex) {
             ex.printStackTrace();
