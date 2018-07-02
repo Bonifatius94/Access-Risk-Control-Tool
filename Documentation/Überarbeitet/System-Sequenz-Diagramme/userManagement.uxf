@@ -147,7 +147,7 @@ createUser(newUsername, newRoles)</panel_attributes>
       <x>340</x>
       <y>190</y>
       <w>730</w>
-      <h>100</h>
+      <h>250</h>
     </coordinates>
     <panel_attributes>halign=left
 opt
