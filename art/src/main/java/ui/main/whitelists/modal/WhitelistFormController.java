@@ -231,27 +231,34 @@ public class WhitelistFormController {
     @FXML
     private void saveEditWhitelist() throws Exception {
         if (checkNameAndDescription()) {
-            if (!whitelistEditTable.getItems().isEmpty()) {
-                whitelist.getEntries().addAll(whitelistEditTable.getItems().stream().filter(x -> x.getUsecaseId() != null).collect(Collectors.toList()));
-                whitelist.setName(tfWhitelistName.getText());
-                whitelist.setDescription(tfDescription.getText());
+            if (!whitelist.isArchived()) {
 
-                // dialog was called from WhitelistsView
-                if (whitelistsController != null) {
-                    if (whitelist.getId() == null) {
-                        whitelistDatabase.createWhitelist(whitelist);
-                        whitelistsController.updateTable();
-                    } else {
-                        whitelistDatabase.updateWhitelist(whitelist);
-                        whitelistsController.updateTable();
+                if (!whitelistEditTable.getItems().isEmpty()) {
+                    whitelist.getEntries().addAll(whitelistEditTable.getItems().stream().filter(x -> x.getUsecaseId() != null).collect(Collectors.toList()));
+                    whitelist.setName(tfWhitelistName.getText());
+                    whitelist.setDescription(tfDescription.getText());
+
+                    // dialog was called from WhitelistsView
+                    if (whitelistsController != null) {
+
+                        if (whitelist.getId() == null) {
+                            whitelistDatabase.createWhitelist(whitelist);
+                            whitelistsController.updateTable();
+                        } else {
+                            whitelistDatabase.updateWhitelist(whitelist);
+                            whitelistsController.updateTable();
+                        }
+                    } else if (configsFormController != null) { // dialog was called from ConfigsFormController
+                        configsFormController.setWhitelist(whitelist);
                     }
-                } else if (configsFormController != null) { // dialog was called from ConfigsFormController
-                    configsFormController.setWhitelist(whitelist);
-                }
 
-                ((Stage) whitelistEditTable.getScene().getWindow()).close();
+                    ((Stage) whitelistEditTable.getScene().getWindow()).close();
+                } else {
+                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("whitelistEmptyAlertTitle"), bundle.getString("whitelistEmptyAlertMessage"), "Ok", "Ok");
+                    customAlert.showAndWait();
+                }
             } else {
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("whitelistEmptyAlertTitle"), bundle.getString("whitelistEmptyAlertMessage"), "Ok", "Ok");
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("alreadyArchived"), "", "Ok", "Ok");
                 customAlert.showAndWait();
             }
         }
@@ -263,6 +270,8 @@ public class WhitelistFormController {
     @FXML
     private void cancelEditWhitelist() {
         if (!whitelist.equals(whitelistOld)) {
+            System.out.println(whitelist.equals(whitelistOld));
+
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"), bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 ((Stage) whitelistEditTable.getScene().getWindow()).close();
