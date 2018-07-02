@@ -16,12 +16,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 @Entity
 @Table(name = "Whitelists")
-public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
+public class Whitelist implements IReferenceAware, IDataEntity {
 
     // =============================
     //         constructors
@@ -34,9 +31,9 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
     /**
      * This constructor creates a new instance with the given parameters.
      *
-     * @param name the name of the new instance
+     * @param name        the name of the new instance
      * @param description the description of the new instance
-     * @param entries the whitelist entries of the new instance
+     * @param entries     the whitelist entries of the new instance
      */
     public Whitelist(String name, String description, List<WhitelistEntry> entries) {
 
@@ -191,6 +188,24 @@ public class Whitelist implements IReferenceAware, ICreationFlagsHelper {
         builder.append("\r\nCreatedAt = ").append(getCreatedAt()).append(", CreatedBy = ").append(createdBy).append(", IsArchived = ").append(isArchived());
 
         return builder.toString();
+    }
+
+    /**
+     * This functions tests if to whitelist are equal(id , description , name and entries).
+     *
+     * @param whitelist the on equality tested whitelist.
+     * @return true if the Whitelists are equal, if they are not than it returns false.
+     */
+    public boolean equals(Whitelist whitelist) {
+        if (whitelist == this) {
+            return true;
+        }
+        if (whitelist.getEntries().containsAll(this.getEntries()) && whitelist.getName().equals(this.getName()) && whitelist.getDescription().equals(this.getDescription())
+            && whitelist.getId().equals(this.getId()) && this.getCreatedBy().equals(whitelist.getCreatedBy())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

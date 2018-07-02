@@ -35,8 +35,9 @@ import sap.SapConnector;
 
 import ui.AppComponents;
 import ui.IUpdateTable;
-import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
+import ui.custom.controls.DisableDeleteButtonCell;
+import ui.custom.controls.DisableEditButtonCell;
 import ui.custom.controls.filter.FilterController;
 import ui.main.sapsettings.modal.SapSettingsFormController;
 
@@ -96,7 +97,9 @@ public class SapSettingsController implements IUpdateTable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     SapConfiguration sapConfiguration = row.getItem();
-                    editConfig(sapConfiguration);
+                    if (!sapConfiguration.isArchived()) {
+                        editConfig(sapConfiguration);
+                    }
                 }
             });
             return row;
@@ -128,7 +131,7 @@ public class SapSettingsController implements IUpdateTable {
      */
     private void initializeTableColumn() {
         // Add the delete column
-        deleteConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (SapConfiguration sapConfiguration) -> {
+        deleteConfigColumn.setCellFactory(DisableDeleteButtonCell.forTableColumn((SapConfiguration sapConfiguration) -> {
 
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
                 bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
@@ -145,8 +148,12 @@ public class SapSettingsController implements IUpdateTable {
         }));
 
         // Add the edit column
-        editConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (SapConfiguration sapConfiguration) -> {
-            editConfig(sapConfiguration);
+        editConfigColumn.setCellFactory(DisableEditButtonCell.forTableColumn((SapConfiguration sapConfiguration) -> {
+            if (sapConfiguration.isArchived()) {
+                viewSapConfigDetails(sapConfiguration);
+            } else {
+                editConfig(sapConfiguration);
+            }
             return sapConfiguration;
         }));
 
@@ -173,6 +180,30 @@ public class SapSettingsController implements IUpdateTable {
             SapSettingsFormController sapEdit = loader.getController();
             sapEdit.giveSelectedSapConfig(sapConfiguration);
             sapEdit.setParentController(this);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Opens a new window in which an SapConfiguration details are shown.
+     *
+     * @param sapConfiguration the SapConfiguration to edit.
+     */
+    private void viewSapConfigDetails(SapConfiguration sapConfiguration) {
+
+        try {
+
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapsettings/modal/SapSettingsFormView.fxml", "details");
+
+            SapSettingsFormController sapEdit = loader.getController();
+            sapEdit.giveSelectedSapConfig(sapConfiguration);
+            sapEdit.setParentController(this);
+
+            // don't allow editing
+            sapEdit.setEditable(false);
 
         } catch (Exception e) {
 
