@@ -73,9 +73,6 @@ public class SapQueriesController implements IUpdateTable {
     @FXML
     public FilterController filterController;
 
-    @FXML
-    public JFXButton analysisButton;
-
     private ResourceBundle bundle;
     private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
 
@@ -83,7 +80,7 @@ public class SapQueriesController implements IUpdateTable {
      * Initializes the controller.
      */
     @FXML
-    public void initialize() throws Exception {
+    public void initialize() {
 
         // load the ResourceBundle
         bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
@@ -101,9 +98,6 @@ public class SapQueriesController implements IUpdateTable {
                 }
             }
         });
-
-        // hide analysis button if user is not a viewer
-        analysisButton.setVisible(AppComponents.getInstance().getDbContext().getCurrentUser().getRoles().contains(DbUserRole.Viewer));
     }
 
     /**

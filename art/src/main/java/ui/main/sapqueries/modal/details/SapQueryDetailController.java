@@ -58,19 +58,13 @@ public class SapQueryDetailController {
     @FXML
     public MaterialDesignIconView statusIcon;
 
-    @FXML
-    public JFXButton analysisButton;
-
 
     ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
     private CriticalAccessQuery query;
     private SapQueriesController parentController;
 
     @FXML
-    public void initialize() throws Exception {
-
-        // hide analysis button if user is not a viewer
-        analysisButton.setVisible(AppComponents.getInstance().getDbContext().getCurrentUser().getRoles().contains(DbUserRole.Viewer));
+    public void initialize() {
     }
 
     /**

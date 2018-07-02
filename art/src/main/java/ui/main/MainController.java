@@ -85,7 +85,7 @@ public class MainController {
         boolean admin = currentUser.getRoles().contains(DbUserRole.Admin);
 
         // add the tabs according to the role
-        if (analyst || viewer) {
+        if (viewer) {
             mainTabs.getTabs().add(sapQueriesTab);
         }
         if (analyst) {
