@@ -35,8 +35,9 @@ import javafx.stage.FileChooser;
 import ui.App;
 import ui.AppComponents;
 import ui.IUpdateTable;
-import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
+import ui.custom.controls.DisableDeleteButtonCell;
+import ui.custom.controls.DisableEditButtonCell;
 import ui.custom.controls.PTableColumn;
 import ui.custom.controls.filter.FilterController;
 import ui.main.whitelists.modal.WhitelistFormController;
@@ -88,7 +89,9 @@ public class WhitelistsController implements IUpdateTable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Whitelist whitelist = row.getItem();
-                    editDialogWhitelist(whitelist);
+                    if (!whitelist.isArchived()) {
+                        editDialogWhitelist(whitelist);
+                    }
                 }
             });
             return row;
@@ -136,7 +139,7 @@ public class WhitelistsController implements IUpdateTable {
      */
     private void initializeColumns() {
 
-        deleteWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (Whitelist whitelist) -> {
+        deleteWhitelistColumn.setCellFactory(DisableDeleteButtonCell.forTableColumn((Whitelist whitelist) -> {
 
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
                 bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
@@ -154,8 +157,12 @@ public class WhitelistsController implements IUpdateTable {
         deleteWhitelistColumn.setSortable(false);
 
         // Add the edit column
-        editWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (Whitelist whitelist) -> {
-            editDialogWhitelist(whitelist);
+        editWhitelistColumn.setCellFactory(DisableEditButtonCell.forTableColumn((Whitelist whitelist) -> {
+            if (whitelist.isArchived()) {
+                viewWhitelistDetails(whitelist);
+            } else {
+                editDialogWhitelist(whitelist);
+            }
             return whitelist;
         }));
         editWhitelistColumn.setSortable(false);
@@ -210,6 +217,29 @@ public class WhitelistsController implements IUpdateTable {
             WhitelistFormController editDialogController = loader.getController();
             editDialogController.giveSelectedWhitelist(whitelist);
             editDialogController.setWhitelistsController(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * This functions starts Whitelist detail view and Controller.
+     *
+     * @param whitelist is a Whitelist needed for Whitelist Detail dialog.
+     */
+    private void viewWhitelistDetails(Whitelist whitelist) {
+
+        try {
+
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "details", 900, 650);
+
+            WhitelistFormController editDialogController = loader.getController();
+            editDialogController.giveSelectedWhitelist(whitelist);
+            editDialogController.setWhitelistsController(this);
+
+            // don't allow editing
+            editDialogController.setEditable(false);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

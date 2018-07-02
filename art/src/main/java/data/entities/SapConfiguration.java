@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "SapConfigurations")
-public class SapConfiguration implements ICreationFlagsHelper {
+public class SapConfiguration implements IDataEntity {
 
     // =============================
     //         constructors

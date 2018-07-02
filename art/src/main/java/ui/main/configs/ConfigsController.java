@@ -27,10 +27,12 @@ import javafx.scene.control.TableView;
 
 import ui.AppComponents;
 import ui.IUpdateTable;
-import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
+import ui.custom.controls.DisableDeleteButtonCell;
+import ui.custom.controls.DisableEditButtonCell;
 import ui.custom.controls.filter.FilterController;
 import ui.main.configs.modal.ConfigsFormController;
+import ui.main.sapqueries.modal.details.ConfigDetailsController;
 
 
 public class ConfigsController implements IUpdateTable {
@@ -115,7 +117,9 @@ public class ConfigsController implements IUpdateTable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Configuration configuration = row.getItem();
-                    openConfigurationForm(configuration);
+                    if (!configuration.isArchived()) {
+                        openConfigurationForm(configuration);
+                    }
                 }
             });
             return row;
@@ -138,7 +142,7 @@ public class ConfigsController implements IUpdateTable {
     private void initializeTableColumns() {
 
         // Add the delete column
-        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (Configuration configuration) -> {
+        deleteColumn.setCellFactory(DisableDeleteButtonCell.forTableColumn((Configuration configuration) -> {
 
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
                 bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
@@ -155,8 +159,12 @@ public class ConfigsController implements IUpdateTable {
         }));
 
         // Add the edit column
-        editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (Configuration configuration) -> {
-            openConfigurationForm(configuration);
+        editColumn.setCellFactory(DisableEditButtonCell.forTableColumn((Configuration configuration) -> {
+            if (configuration.isArchived()) {
+                viewConfigDetails(configuration);
+            } else {
+                openConfigurationForm(configuration);
+            }
             return configuration;
         }));
 
@@ -245,6 +253,23 @@ public class ConfigsController implements IUpdateTable {
             ConfigsFormController configForm = loader.getController();
             configForm.giveSelectedConfiguration(configuration);
             configForm.setParentController(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Opens the config details in a modal window.
+     * @param configuration the configuration which details should be shown
+     */
+    private void viewConfigDetails(Configuration configuration) {
+        try {
+
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/details/ConfigDetailsView.fxml","configDetails", 1050, 650);
+
+            // give the dialog the sapConfiguration
+            ConfigDetailsController configDetails = loader.getController();
+            configDetails.giveConfiguration(configuration);
         } catch (Exception e) {
             e.printStackTrace();
         }

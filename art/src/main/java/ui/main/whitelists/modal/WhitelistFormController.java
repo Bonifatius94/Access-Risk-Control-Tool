@@ -263,10 +263,18 @@ public class WhitelistFormController {
     @FXML
     private void cancelEditWhitelist() {
         if (!whitelist.equals(whitelistOld)) {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"), bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
-            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+
+            // check if dialog is in edit mode
+            if (applyButton.isVisible()) {
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"), bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
+                if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                    ((Stage) whitelistEditTable.getScene().getWindow()).close();
+                }
+            } else {
                 ((Stage) whitelistEditTable.getScene().getWindow()).close();
             }
+        } else {
+            ((Stage) whitelistEditTable.getScene().getWindow()).close();
         }
     }
 
