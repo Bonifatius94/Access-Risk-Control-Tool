@@ -218,6 +218,7 @@ public class SapSettingsFormController {
             tfPoolCapacity.setEditable(false);
             hostServerField.setEditable(false);
             descriptionField.setEditable(false);
+            tfLanguage.setEditable(false);
             connectButton.setVisible(false);
             saveButton.setVisible(false);
         } else {
@@ -226,6 +227,7 @@ public class SapSettingsFormController {
             tfPoolCapacity.setEditable(true);
             hostServerField.setEditable(true);
             descriptionField.setEditable(true);
+            tfLanguage.setEditable(true);
             connectButton.setVisible(true);
             saveButton.setVisible(true);
         }
