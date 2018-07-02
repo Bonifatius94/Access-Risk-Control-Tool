@@ -195,15 +195,6 @@ public class ConfigsController implements IUpdateTable {
     }
 
     /**
-     * Opens the edit dialog with the selected item.
-     */
-    public void editAction() {
-        if (configsTable.getSelectionModel().getSelectedItems() != null && configsTable.getSelectionModel().getSelectedItems().size() != 0) {
-            openConfigurationForm(configsTable.getSelectionModel().getSelectedItem());
-        }
-    }
-
-    /**
      * Deletes the item from the table.
      */
     public void deleteAction() throws Exception {

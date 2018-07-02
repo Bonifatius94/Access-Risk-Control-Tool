@@ -271,16 +271,6 @@ public class SapSettingsController implements IUpdateTable {
 
     }
 
-
-    /**
-     * Opens the edit dialog with the currently selected SapConfiguration.
-     */
-    public void editAction() {
-        if (sapConnectionTable.getSelectionModel().getSelectedItem() != null) {
-            editConfig(sapConnectionTable.getSelectionModel().getSelectedItem());
-        }
-    }
-
     /**
      * Deletes the currently selected SapConfigurations.
      */

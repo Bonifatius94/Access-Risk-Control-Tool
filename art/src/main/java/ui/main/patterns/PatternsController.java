@@ -271,15 +271,6 @@ public class PatternsController implements IUpdateTable {
     }
 
     /**
-     * Opens the edit dialog with the selected item.
-     */
-    public void editAction() {
-        if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getSelectionModel().getSelectedItems().size() != 0) {
-            openAccessPatternForm(patternsTable.getSelectionModel().getSelectedItem());
-        }
-    }
-
-    /**
      * Deletes the item from the table.
      */
     public void deleteAction() throws Exception {
