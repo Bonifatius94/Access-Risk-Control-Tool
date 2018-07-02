@@ -63,16 +63,9 @@ public class MainController {
 
         initializeAccessRestriction();
 
-        updateAllTables();
+        initTableUpdates();
 
-        // update the tables on tab change
-        mainTabs.getSelectionModel().selectedItemProperty().addListener((ol, oldValue, newValue) -> {
-            try {
-                updateAllTables();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        updateAllTables();
     }
 
     /**
@@ -104,7 +97,7 @@ public class MainController {
     }
 
     /**
-     * Update all tables (maybe find a more efficient way).
+     * Update all tables.
      */
     private void updateAllTables() throws Exception {
         sapQueriesController.updateTable();
@@ -113,5 +106,59 @@ public class MainController {
         patternsController.updateTable();
         whitelistsController.updateTable();
         usersController.updateTable();
+    }
+
+    /**
+     * Initialize table updates on tab change.
+     */
+    private void initTableUpdates() {
+
+        sapQueriesTab.setOnSelectionChanged((event -> {
+            try {
+                sapQueriesController.updateTable();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }));
+
+        sapSettingsTab.setOnSelectionChanged((event -> {
+            try {
+                sapSettingsController.updateTable();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }));
+
+        configurationsTab.setOnSelectionChanged((event -> {
+            try {
+                configsController.updateTable();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }));
+
+        patternsTab.setOnSelectionChanged((event -> {
+            try {
+                patternsController.updateTable();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }));
+
+        whitelistsTab.setOnSelectionChanged((event -> {
+            try {
+                whitelistsController.updateTable();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }));
+
+        usersTab.setOnSelectionChanged((event -> {
+            try {
+                usersController.updateTable();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }));
     }
 }
