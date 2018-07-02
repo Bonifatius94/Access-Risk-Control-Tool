@@ -35,90 +35,90 @@ public class PrivilegesTest {
         // ============================================
 
         //IArtDbContext.createSapQuery()
-        assert (testPrivilegesCreateSapQuery("TestAdmin", "foobar", true));
-        assert (testPrivilegesCreateSapQuery("TestDataAnalyst", "foobar", true));
+        assert (testPrivilegesCreateSapQuery("TestAdmin", "foobar", false));
+        assert (testPrivilegesCreateSapQuery("TestDataAnalyst", "foobar", false));
         assert (testPrivilegesCreateSapQuery("TestViewer", "foobar", true));
 
         //IArtDbContext.createConfig()
         assert (testPrivilegesCreateConfig("TestAdmin", "foobar", false));
-        assert (testPrivilegesCreateConfig("TestDataAnalyst", "foobar", false));
+        assert (testPrivilegesCreateConfig("TestDataAnalyst", "foobar", true));
         assert (testPrivilegesCreateConfig("TestViewer", "foobar", false));
 
         //IArtDbContext.createPattern()
         assert (testPrivilegesCreatePattern("TestAdmin", "foobar", false));
-        assert (testPrivilegesCreatePattern("TestDataAnalyst", "foobar", false));
+        assert (testPrivilegesCreatePattern("TestDataAnalyst", "foobar", true));
         assert (testPrivilegesCreatePattern("TestViewer", "foobar", false));
 
         //IArtDbContext.createWhitelist()
         assert (testPrivilegesCreateWhitelist("TestAdmin", "foobar", false));
-        assert (testPrivilegesCreateWhitelist("TestDataAnalyst", "foobar", false));
+        assert (testPrivilegesCreateWhitelist("TestDataAnalyst", "foobar", true));
         assert (testPrivilegesCreateWhitelist("TestViewer", "foobar", false));
 
         //IArtDbContext.createSapConfig()
-        assert (testPrivilegesGetSapQueries("TestAdmin", "foobar", true));
+        assert (testPrivilegesGetSapQueries("TestAdmin", "foobar", false));
         assert (testPrivilegesGetSapQueries("TestDataAnalyst", "foobar", true));
-        assert (testPrivilegesGetSapQueries("TestViewer", "foobar", true));
+        assert (testPrivilegesGetSapQueries("TestViewer", "foobar", false));
 
         // ============================================
         //                   R E A D
         // ============================================
 
         //IArtDbContext.getSapQueries()
-        assert (testPrivilegesCreateSapQuery("TestAdmin", "foobar", true));
-        assert (testPrivilegesCreateSapQuery("TestDataAnalyst", "foobar", true));
+        assert (testPrivilegesCreateSapQuery("TestAdmin", "foobar", false));
+        assert (testPrivilegesCreateSapQuery("TestDataAnalyst", "foobar", false));
         assert (testPrivilegesCreateSapQuery("TestViewer", "foobar", true));
 
         //IArtDbContext.getConfigs()
-        assert (testPrivilegesGetConfigs("TestAdmin", "foobar", true));
+        assert (testPrivilegesGetConfigs("TestAdmin", "foobar", false));
         assert (testPrivilegesGetConfigs("TestDataAnalyst", "foobar", true));
         assert (testPrivilegesGetConfigs("TestViewer", "foobar", true));
 
         //IArtDbContext.getPatterns()
-        assert (testPrivilegesGetPatterns("TestAdmin", "foobar", true));
+        assert (testPrivilegesGetPatterns("TestAdmin", "foobar", false));
         assert (testPrivilegesGetPatterns("TestDataAnalyst", "foobar", true));
         assert (testPrivilegesGetPatterns("TestViewer", "foobar", true));
 
         //IArtDbContext.getWhitelists()
-        assert (testPrivilegesGetWhitelists("TestAdmin", "foobar", true));
+        assert (testPrivilegesGetWhitelists("TestAdmin", "foobar", false));
         assert (testPrivilegesGetWhitelists("TestDataAnalyst", "foobar", true));
         assert (testPrivilegesGetWhitelists("TestViewer", "foobar", true));
 
         //IArtDbContext.getSapConfigs()
-        assert (testPrivilegesGetSapConfigs("TestAdmin", "foobar", true));
+        assert (testPrivilegesGetSapConfigs("TestAdmin", "foobar", false));
         assert (testPrivilegesGetSapConfigs("TestDataAnalyst", "foobar", true));
         assert (testPrivilegesGetSapConfigs("TestViewer", "foobar", true));
 
         // IArtDbContext.getDatabaseUsers()
         assert (testPrivilegesGetDatabaseUsers("TestAdmin", "foobar", true));
-        assert (testPrivilegesGetDatabaseUsers("TestDataAnalyst", "foobar", true));
-        assert (testPrivilegesGetDatabaseUsers("TestViewer", "foobar", true));
+        assert (testPrivilegesGetDatabaseUsers("TestDataAnalyst", "foobar", false));
+        assert (testPrivilegesGetDatabaseUsers("TestViewer", "foobar", false));
 
         // ============================================
         //               F I L T E R S
         // ============================================
 
         //IArtDbContext.getFilteredPatterns()
-        assert (testPrivilegesGetFilteredPatterns("TestAdmin", "foobar", true));
+        assert (testPrivilegesGetFilteredPatterns("TestAdmin", "foobar", false));
         assert (testPrivilegesGetFilteredPatterns("TestDataAnalyst", "foobar", true));
         assert (testPrivilegesGetFilteredPatterns("TestViewer", "foobar", true));
 
         //IArtDbContext.getFilteredWhitelists()
-        assert (testPrivilagesGetFilteredWhitelists("TestAdmin", "foobar", true));
+        assert (testPrivilagesGetFilteredWhitelists("TestAdmin", "foobar", false));
         assert (testPrivilagesGetFilteredWhitelists("TestDataAnalyst", "foobar", true));
         assert (testPrivilagesGetFilteredWhitelists("TestViewer", "foobar", true));
 
         //IArtDbContext.getFilteredSapConfigs()
-        assert (testPrivilegesGetFilteredSapConfigs("TestAdmin", "foobar", true));
+        assert (testPrivilegesGetFilteredSapConfigs("TestAdmin", "foobar", false));
         assert (testPrivilegesGetFilteredSapConfigs("TestDataAnalyst", "foobar", true));
         assert (testPrivilegesGetFilteredSapConfigs("TestViewer", "foobar", true));
 
         //IArtDbContext.getFilteredConfigs()
-        assert (testPrivilegesGetFilteredConfigs("TestAdmin", "foobar", true));
+        assert (testPrivilegesGetFilteredConfigs("TestAdmin", "foobar", false));
         assert (testPrivilegesGetFilteredConfigs("TestDataAnalyst", "foobar", true));
         assert (testPrivilegesGetFilteredConfigs("TestViewer", "foobar", true));
 
         //IArtDbContext.getFilteredCriticalAccessQueries()
-        assert (testPrivilegesGetFilteredCriticalAccessQueries("TestAdmin", "foobar", true));
+        assert (testPrivilegesGetFilteredCriticalAccessQueries("TestAdmin", "foobar", false));
         assert (testPrivilegesGetFilteredCriticalAccessQueries("TestDataAnalyst", "foobar", true));
         assert (testPrivilegesGetFilteredCriticalAccessQueries("TestViewer", "foobar", true));
 
@@ -128,12 +128,12 @@ public class PrivilegesTest {
 
         //IArtDbContext.updateConfig()
         assert (testPrivilegesUpdateConfig("TestAdmin", "foobar", false));
-        assert (testPrivilegesUpdateConfig("TestDataAnalyst", "foobar", false));
+        assert (testPrivilegesUpdateConfig("TestDataAnalyst", "foobar", true));
         assert (testPrivilegesUpdateConfig("TestViewer", "foobar", false));
 
         //IArtDbContext.updatePattern()
         assert (testPrivilegesUpdatePattern("TestAdmin", "foobar", false));
-        assert (testPrivilegesUpdatePattern("TestDataAnalyst", "foobar", false));
+        assert (testPrivilegesUpdatePattern("TestDataAnalyst", "foobar", true));
         assert (testPrivilegesUpdatePattern("TestViewer", "foobar", false));
 
         //IArtDbContext.updateWhitelist()
@@ -218,6 +218,7 @@ public class PrivilegesTest {
         try (ArtDbContext context = new ArtDbContext(username, password)) {
 
             // test switch user
+            // TODO: set query entries no null
             context.createSapQuery(new CriticalAccessQuery());
             ret = true;
 

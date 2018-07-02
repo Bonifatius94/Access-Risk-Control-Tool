@@ -141,6 +141,31 @@ INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty
 INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (40, 'S_DEVELOP', 'ACTVT',    '01',    '02',   NULL, NULL, 10);
 
 -- ==============================
+--      use cases (active) (that are not referenced by a query)
+-- ==============================
+
+-- use case with profile condition (NONE linkage, use case 3.B from examples)
+INSERT INTO AccessPatterns (id, isArchived, createdAt, createdBy, usecaseId, description, linkage) VALUES (7, 0, '2018-06-08T15:09:15', 'test', '3.B', 'Unexpected users with Profile ''SAP_NEW''', 'None');
+INSERT INTO AccessConditions (id, type, patternId) VALUES (11, 'Profile', 7);
+INSERT INTO AccessProfileConditions (condition_id, profile) VALUES (11, 'SAP_NEW');
+
+INSERT INTO AccessPatterns (id, isArchived, createdAt, createdBy, usecaseId, description, linkage) VALUES (8, 0, '2018-06-08T15:09:15', 'test', '1.A', 'Unexpected users are authorized to copy a client (local copy wo user/profiles)', 'And');
+INSERT INTO AccessConditions (id, type, patternId) VALUES (12, 'Pattern', 8);
+INSERT INTO AccessPatternConditions (condition_id) VALUES (12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (41, 'S_TCODE',    'TCD',        'SCCL', 'SCC9', NULL, NULL, 12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (42, 'S_ADMI_FCD', 'S_ADMI_FCD', 'T000',  NULL,  NULL, NULL, 12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (43, 'S_TABU_DIS', 'ACTVT',      '02',    NULL,  NULL, NULL, 12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (44, 'S_TABU_DIS', 'DICBERCLS',  '"*"',   NULL,  NULL, NULL, 12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (45, 'S_TABU_CLI', 'CLIIDMAINT', 'X',     NULL,  NULL, NULL, 12);
+INSERT INTO AccessConditions (id, type, patternId) VALUES (13, 'Pattern',8);
+INSERT INTO AccessPatternConditions (condition_id) VALUES (13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (46,  'S_TCODE',    'TCD',      'SCCL', 'SCC9', NULL, NULL, 13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (47,  'S_DATASET',  'PROGRAM',  '"*"',   NULL,  NULL, NULL, 13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (48,  'S_DATASET',  'ACTVT',    '"*"',   NULL,  NULL, NULL, 13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (49,  'S_DATASET',  'FILENAME', '"*"',   NULL,  NULL, NULL, 13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (50,  'S_CLNT_IMP', 'ACTVT',    '60',    NULL,  NULL, NULL, 13);
+
+-- ==============================
 --         sap settings
 -- ==============================
 

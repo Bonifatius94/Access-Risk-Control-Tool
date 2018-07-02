@@ -32,15 +32,15 @@ public class FiltersTest {
 
             // test wildcard filter: usecase id
             List<AccessPattern> patterns = context.getFilteredPatterns(true, "1.A", null, ZonedDateTime.now(), 10);
-            ret = patterns.size() == 2 && patterns.stream().map(x -> x.getId()).collect(Collectors.toList()).containsAll(Arrays.asList(2, 5));
+            ret = patterns.size() == 3 && patterns.stream().map(x -> x.getId()).collect(Collectors.toList()).containsAll(Arrays.asList(2, 5, 8));
 
             // test wildcard filter: description
             patterns = context.getFilteredPatterns(false, "copy a client", null, ZonedDateTime.now(), 10);
-            ret = ret && patterns.size() == 1 && patterns.stream().anyMatch(x -> x.getId().equals(2));
+            ret = ret && patterns.size() == 2 && patterns.stream().map(x -> x.getId()).collect(Collectors.toList()).containsAll(Arrays.asList(2, 8));
 
             // test wildcard filter: auth object
             patterns = context.getFilteredPatterns(false, "S_TCODE", null, ZonedDateTime.now(), 10);
-            ret = ret && patterns.size() == 1 && patterns.stream().anyMatch(x -> x.getId().equals(2));
+            ret = ret && patterns.size() == 2 && patterns.stream().map(x -> x.getId()).collect(Collectors.toList()).containsAll(Arrays.asList(2, 8));
 
             // test wildcard filter: profile
             patterns = context.getFilteredPatterns(true, "SAP_ALL", null, ZonedDateTime.now(), 10);

@@ -90,23 +90,29 @@ public class ConfigurationTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query config
-            Configuration activeConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
+            int configCount = context.getConfigs(true).size();
+            Configuration config = context.getConfigs(false).stream().filter(x -> x.getId().equals(2)).findFirst().get();
+            int configId = config.getId();
 
             // apply changes to config
-            AccessPattern patternToRemove = activeConfig.getPatterns().stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
-            activeConfig.getPatterns().remove(patternToRemove);
+            AccessPattern patternToRemove = config.getPatterns().stream().filter(x -> x.getId().equals(1)).findFirst().get();
+            config.getPatterns().remove(patternToRemove);
 
             final String newName = "a new name";
             final String newDescription = "a new description";
-            activeConfig.setName(newName);
-            activeConfig.setDescription(newDescription);
+            config.setName(newName);
+            config.setDescription(newDescription);
 
             // update configs
-            context.updateConfig(activeConfig);
+            context.updateConfig(config);
 
             // test to see if the update worked
-            Configuration testconfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
-            ret = testconfig.getPatterns().stream().noneMatch(x -> x.getId().equals(new Integer(3)));
+            Configuration updatedConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(configId)).findFirst().get();
+
+            ret = updatedConfig.getPatterns().stream().noneMatch(x -> x.getId().equals(patternToRemove.getId()))
+                && updatedConfig.getName().equals(newName)
+                && updatedConfig.getDescription().equals(newDescription)
+                && context.getConfigs(true).size() == configCount;
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -123,25 +129,29 @@ public class ConfigurationTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query config
-            Configuration archivedConfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
+            int configCount = context.getConfigs(true).size();
+            Configuration config = context.getConfigs(false).stream().filter(x -> x.getId().equals(1)).findFirst().get();
+            int configId = config.getId();
 
-            // apply changes to configs
-            AccessPattern patternToRemove = archivedConfig.getPatterns().stream().filter(x -> x.getId().equals(new Integer(6))).findFirst().get();
-            archivedConfig.getPatterns().remove(patternToRemove);
+            // apply changes to config
+            AccessPattern patternToRemove = config.getPatterns().stream().filter(x -> x.getId().equals(1)).findFirst().get();
+            config.getPatterns().remove(patternToRemove);
 
             final String newName = "a new name";
             final String newDescription = "a new description";
-            archivedConfig.setName(newName);
-            archivedConfig.setDescription(newDescription);
+            config.setName(newName);
+            config.setDescription(newDescription);
 
             // update configs
-            context.updateConfig(archivedConfig);
-            context.updateConfig(archivedConfig);
+            context.updateConfig(config);
 
             // test to see if the update worked
-            Configuration testconfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
-            ret = testconfig.getPatterns().stream().noneMatch(x -> x.getId().equals(new Integer(6)));
+            Configuration updatedConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(configId)).findFirst().get();
 
+            ret = updatedConfig.getPatterns().stream().noneMatch(x -> x.getId().equals(patternToRemove.getId()))
+                && updatedConfig.getName().equals(newName)
+                && updatedConfig.getDescription().equals(newDescription)
+                && context.getConfigs(true).size() == configCount + 1;
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -158,13 +168,15 @@ public class ConfigurationTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query config
-            Configuration activeConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
+            int configCount = context.getConfigs(true).size();
+            Configuration config = context.getConfigs(false).stream().filter(x -> x.getId().equals(2)).findFirst().get();
 
             // delete config
-            context.deleteConfig(activeConfig);
+            context.deleteConfig(config);
 
             //test to see if the config is deleted
-            ret = !context.getConfigs(false).stream().anyMatch(x -> x.equals(activeConfig));
+            ret = context.getConfigs(false).stream().noneMatch(x -> x.equals(config))
+                && context.getConfigs(true).size() == configCount - 1;
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -181,37 +193,22 @@ public class ConfigurationTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query config
-            Configuration activeConfig = context.getConfigs(false).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
-            Configuration archivedConfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
-
-            // use activeConfig in query
-            // get  sapconfiguration
-            SapConfiguration sapconfig = context.getSapConfigs(false).stream().findFirst().get();
-
-            // create the query
-            CriticalAccessQuery query = new CriticalAccessQuery();
-            query.setConfig(activeConfig);
-            query.setSapConfig(sapconfig);
-            String author = "querytest";
-            query.setCreatedBy(author);
-
-            // insert query into database
-            context.createSapQuery(query);
+            int configCount = context.getConfigs(true).size();
+            Configuration config = context.getConfigs(false).stream().filter(x -> x.getId().equals(1)).findFirst().get();
 
             // delete config
-            context.deleteConfig(activeConfig);
-            context.deleteConfig(archivedConfig);
+            context.deleteConfig(config);
 
-            //test to see if the config was deleted correct
-            Configuration testactiveconfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(1))).findFirst().get();
-            Configuration testarchivedconfig = context.getConfigs(true).stream().filter(x -> x.getId().equals(new Integer(3))).findFirst().get();
-            ret = testactiveconfig.getPatterns().stream().noneMatch(x -> x.equals(activeConfig));
-            ret = ret == testactiveconfig.getPatterns().stream().noneMatch(x -> x.equals(archivedConfig));
+            //test to see if the config is deleted
+            ret = context.getConfigs(false).stream().noneMatch(x -> x.equals(config))
+                && context.getConfigs(true).size() == configCount;
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
         assert (ret);
+
     }
+
 }
