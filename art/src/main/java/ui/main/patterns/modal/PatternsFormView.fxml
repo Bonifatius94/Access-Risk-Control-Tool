@@ -76,7 +76,7 @@
                             <Tooltip text="%deleteCondition"/>
                         </tooltip>
                     </JFXButton>
-                    <Label fx:id="atLeastOneCondWarning" text="%atLeastOneCondWarning" visible="false"/>
+                    <Label fx:id="atLeastTwoCondsWarning" text="%atLeastTwoCondsWarning" visible="false"/>
                 </HBox>
                 <Separator/>
                 <Label text="%conditionPropertiesTitle" style="-fx-font-size: 150%; -fx-padding: 10 0 10 0" />
