@@ -97,7 +97,9 @@ public class SapSettingsController implements IUpdateTable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     SapConfiguration sapConfiguration = row.getItem();
-                    if (!sapConfiguration.isArchived()) {
+                    if (sapConfiguration.isArchived()) {
+                        viewSapConfigDetails(sapConfiguration);
+                    } else {
                         editConfig(sapConfiguration);
                     }
                 }
@@ -196,7 +198,7 @@ public class SapSettingsController implements IUpdateTable {
 
         try {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapsettings/modal/SapSettingsFormView.fxml", "details");
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapsettings/modal/SapSettingsFormView.fxml", "detailSapSettingsTitle");
 
             SapSettingsFormController sapEdit = loader.getController();
             sapEdit.giveSelectedSapConfig(sapConfiguration);
@@ -271,16 +273,6 @@ public class SapSettingsController implements IUpdateTable {
 
     }
 
-
-    /**
-     * Opens the edit dialog with the currently selected SapConfiguration.
-     */
-    public void editAction() {
-        if (sapConnectionTable.getSelectionModel().getSelectedItem() != null) {
-            editConfig(sapConnectionTable.getSelectionModel().getSelectedItem());
-        }
-    }
-
     /**
      * Deletes the currently selected SapConfigurations.
      */
@@ -298,6 +290,12 @@ public class SapSettingsController implements IUpdateTable {
                 for (SapConfiguration config : sapConnectionTable.getSelectionModel().getSelectedItems()) {
                     database.deleteSapConfig(config);
                 }
+
+                if (sapConnectionTable.getSelectionModel().getSelectedItems().stream().anyMatch(x -> x.isArchived())) {
+                    customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("alreadyArchivedTitle"), bundle.getString("alreadyArchivedMessage"));
+                    customAlert.showAndWait();
+                }
+
                 updateTable();
             }
         }

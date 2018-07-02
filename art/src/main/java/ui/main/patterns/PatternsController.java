@@ -11,6 +11,7 @@ import extensions.ResourceBundleHelper;
 import io.msoffice.excel.AccessPatternImportHelper;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -124,9 +125,11 @@ public class PatternsController implements IUpdateTable {
             TableRow<AccessPattern> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                    AccessPattern pattern = row.getItem();
-                    if (!pattern.isArchived()) {
-                        openAccessPatternForm(pattern);
+                    AccessPattern accessPattern = row.getItem();
+                    if (accessPattern.isArchived()) {
+                        viewAccessPatternDetails(accessPattern);
+                    } else {
+                        openAccessPatternForm(accessPattern);
                     }
                 }
             });
@@ -271,15 +274,6 @@ public class PatternsController implements IUpdateTable {
     }
 
     /**
-     * Opens the edit dialog with the selected item.
-     */
-    public void editAction() {
-        if (patternsTable.getSelectionModel().getSelectedItems() != null && patternsTable.getSelectionModel().getSelectedItems().size() != 0) {
-            openAccessPatternForm(patternsTable.getSelectionModel().getSelectedItem());
-        }
-    }
-
-    /**
      * Deletes the item from the table.
      */
     public void deleteAction() throws Exception {
@@ -297,6 +291,12 @@ public class PatternsController implements IUpdateTable {
                 for (AccessPattern pattern : patternsTable.getSelectionModel().getSelectedItems()) {
                     AppComponents.getInstance().getDbContext().deletePattern(pattern);
                 }
+
+                if (patternsTable.getSelectionModel().getSelectedItems().stream().anyMatch(x -> x.isArchived())) {
+                    customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("alreadyArchivedTitle"), bundle.getString("alreadyArchivedMessage"));
+                    customAlert.showAndWait();
+                }
+
                 updateTable();
             }
         }
@@ -314,16 +314,21 @@ public class PatternsController implements IUpdateTable {
 
         if (selectedFile != null) {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternImportView.fxml", "importPatterns");
-
             // import patterns with the AccessPatternImportHelper
-            AccessPatternImportHelper importHelper = new AccessPatternImportHelper();
-            List<AccessPattern> importedPatterns = importHelper.importAccessPatterns(selectedFile.getAbsolutePath());
+            try {
+                List<AccessPattern> importedPatterns = new AccessPatternImportHelper().importAccessPatterns(selectedFile.getAbsolutePath());
 
-            // give the dialog the controller and the patterns
-            PatternImportController importController = loader.getController();
-            importController.giveImportedPatterns(importedPatterns);
-            importController.setPatternsController(this);
+                // open a modal import window
+                FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternImportView.fxml", "importPatterns");
+
+                // give the dialog the controller and the patterns
+                PatternImportController importController = loader.getController();
+                importController.giveImportedPatterns(importedPatterns);
+                importController.setPatternsController(this);
+            } catch (Exception e) {
+                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"), bundle.getString("wrongFileMessage"));
+                alert.showAndWait();
+            }
         }
     }
 

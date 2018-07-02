@@ -89,7 +89,9 @@ public class WhitelistsController implements IUpdateTable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Whitelist whitelist = row.getItem();
-                    if (!whitelist.isArchived()) {
+                    if (whitelist.isArchived()) {
+                        viewWhitelistDetails(whitelist);
+                    } else {
                         editDialogWhitelist(whitelist);
                     }
                 }
@@ -152,10 +154,6 @@ public class WhitelistsController implements IUpdateTable {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-            } else {
-                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("alreadyArchived"), "", "Ok", "Ok");
-                alert.showAndWait();
             }
             return whitelist;
         }));
@@ -236,7 +234,7 @@ public class WhitelistsController implements IUpdateTable {
 
         try {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "details", 900, 650);
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "whitelistDetails", 900, 650);
 
             WhitelistFormController editDialogController = loader.getController();
             editDialogController.giveSelectedWhitelist(whitelist);
@@ -256,25 +254,24 @@ public class WhitelistsController implements IUpdateTable {
     public void deleteWhitelist() throws Exception {
         if (whitelistTable.getSelectionModel().getSelectedItems() != null && whitelistTable.getSelectionModel().getSelectedItems().size() != 0) {
             CustomAlert customAlert;
-            if (whitelistTable.getSelectionModel().getSelectedItem().isArchived()) {
-                customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("alreadyArchived"), "", "Ok", "Ok");
-                customAlert.showAndWait();
+            if (whitelistTable.getSelectionModel().getSelectedItems().size() == 1) {
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                    bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
             } else {
-                if (whitelistTable.getSelectionModel().getSelectedItems().size() == 1) {
-                    customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
-                        bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
-                } else {
-                    customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteMultipleConfirmTitle"),
-                        bundle.getString("deleteMultipleConfirmMessage"), "Ok", "Cancel");
-                }
+                customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteMultipleConfirmTitle"),
+                    bundle.getString("deleteMultipleConfirmMessage"), "Ok", "Cancel");
+            }
 
-                if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
-                    // deletes whitelists from DB
-                    for (Whitelist whitelist : whitelistTable.getSelectionModel().getSelectedItems()) {
-                        database.deleteWhitelist(whitelist);
-                    }
-                    updateTable();
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                // deletes whitelists from DB
+                for (Whitelist whitelist : whitelistTable.getSelectionModel().getSelectedItems()) {
+                    database.deleteWhitelist(whitelist);
                 }
+                if (whitelistTable.getSelectionModel().getSelectedItems().stream().anyMatch(x -> x.isArchived())) {
+                    customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("alreadyArchivedTitle"), bundle.getString("alreadyArchivedMessage"));
+                    customAlert.showAndWait();
+                }
+                updateTable();
             }
         }
     }
@@ -304,19 +301,12 @@ public class WhitelistsController implements IUpdateTable {
         fileChooser.getExtensionFilters().add(extensionFilter);
         File file = fileChooser.showOpenDialog(App.primaryStage);
         if (file != null) {
-            String path = file.getPath();
             try {
-                WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
-                Whitelist importedWhitelist = whitelistImportHelper.importWhitelist(path);
+                Whitelist importedWhitelist = new WhitelistImportHelper().importWhitelist(file.getPath());
                 startImportDialog(importedWhitelist);
             } catch (Exception e) {
-                if (e.toString().contains("NullPointerException")) {
-                    CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileType"), bundle.getString("selectFileCarefully"), "Ok", "Ok");
-                    alert.showAndWait();
-                } else {
-                    e.printStackTrace();
-                }
-                //if()
+                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"), bundle.getString("wrongFileMessage"));
+                alert.showAndWait();
             }
         }
     }

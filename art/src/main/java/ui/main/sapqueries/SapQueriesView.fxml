@@ -50,11 +50,6 @@
                 <MaterialDesignIconView glyphName="PLUS"/>
             </graphic>
         </JFXButton>
-        <JFXButton text="%details" onAction="#editAction" prefWidth="130">
-            <graphic>
-                <MaterialDesignIconView glyphName="OPEN_IN_NEW"/>
-            </graphic>
-        </JFXButton>
         <JFXButton text="%archive" onAction="#archiveAction" prefWidth="130">
             <graphic>
                 <MaterialDesignIconView glyphName="ARCHIVE"/>

@@ -30,7 +30,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
@@ -41,6 +43,7 @@ import javafx.scene.layout.VBox;
 
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.CustomAlert;
 import ui.custom.controls.PTableColumn;
 import ui.main.patterns.PatternsController;
 
@@ -336,8 +339,28 @@ public class PatternsFormController {
      *
      * @param event the given ActionEvent
      */
-    public void close(ActionEvent event) {
+    private void close(ActionEvent event) throws Exception {
         (((Button) event.getSource()).getScene().getWindow()).hide();
+
+        // refresh the patternsTable in the parentController
+        if (parentController != null) {
+            parentController.updateTable();
+        }
+    }
+
+    /**
+     * Shows a dialog to confirm to discard unsaved changes.
+     */
+    public void confirmClose(ActionEvent event) throws Exception {
+        if (saveButton.isVisible()) {
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"),
+                bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                (((Button) event.getSource()).getScene().getWindow()).hide();
+            }
+        } else {
+            close(event);
+        }
     }
 
     /**
@@ -452,8 +475,7 @@ public class PatternsFormController {
                             AccessCondition accessCondition = tableViewWithAccessCondition.getAccessCondition();
                             AccessPatternCondition patternCondition = tableViewWithAccessCondition.getAccessCondition().getPatternCondition();
 
-                            List<AccessPatternConditionProperty> properties = new ArrayList<>();
-                            properties.addAll(items);
+                            List<AccessPatternConditionProperty> properties = new ArrayList<>(items);
 
                             patternCondition.setProperties(properties);
                             accessCondition.setPatternCondition(patternCondition);
@@ -491,8 +513,6 @@ public class PatternsFormController {
                 AppComponents.getInstance().getDbContext().updatePattern(accessPattern);
             }
 
-            // refresh the patternsTable in the parentController
-            parentController.updateTable();
             close(event);
         }
     }
@@ -638,10 +658,10 @@ public class PatternsFormController {
             // bind copyPropertyButton
             this.copyPropertyButton.disableProperty().bind(
                 Bindings.or(Bindings.isNull(selectedTable.getSelectionModel().selectedItemProperty()),
-                Bindings.or(Bindings.size(selectedTable.getItems()).isEqualTo(maxEntries),
-                    Bindings.or(Bindings.isEmpty(authObjectInput.textProperty()),
-                        Bindings.or(Bindings.isEmpty(authFieldInput.textProperty()),
-                            Bindings.isEmpty(authFieldValue1Input.textProperty()))))));
+                    Bindings.or(Bindings.size(selectedTable.getItems()).isEqualTo(maxEntries),
+                        Bindings.or(Bindings.isEmpty(authObjectInput.textProperty()),
+                            Bindings.or(Bindings.isEmpty(authFieldInput.textProperty()),
+                                Bindings.isEmpty(authFieldValue1Input.textProperty()))))));
 
             // bind applyPropertyButton
             this.applyPopertyChangesButton.disableProperty().bind(

@@ -229,15 +229,6 @@ public class SapQueriesController implements IUpdateTable {
     }
 
     /**
-     * Opens the edit dialog with the selected item.
-     */
-    public void editAction() {
-        if (queriesTable.getSelectionModel().getSelectedItem() != null) {
-            openQuery(queriesTable.getSelectionModel().getSelectedItem());
-        }
-    }
-
-    /**
      * Archives all selected items.
      */
     public void archiveAction() throws Exception {
@@ -256,8 +247,9 @@ public class SapQueriesController implements IUpdateTable {
                 for (CriticalAccessQuery query : queriesTable.getSelectionModel().getSelectedItems()) {
                     archiveQuery(query);
                 }
+
+                updateTable();
             }
-            updateTable();
         }
     }
 

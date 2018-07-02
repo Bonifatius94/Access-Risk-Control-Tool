@@ -54,11 +54,6 @@
                 <MaterialDesignIconView glyphName="PLUS"/>
             </graphic>
         </JFXButton>
-        <JFXButton prefWidth="130" text="%edit" onAction="#editAction">
-            <graphic>
-                <MaterialDesignIconView glyphName="PENCIL"/>
-            </graphic>
-        </JFXButton>
         <JFXButton prefWidth="130" text="%delete" onAction="#deleteAction" styleClass="warning-button">
             <graphic>
                 <MaterialDesignIconView glyphName="DELETE"/>

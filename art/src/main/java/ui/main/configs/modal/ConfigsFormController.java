@@ -33,6 +33,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -247,9 +248,7 @@ public class ConfigsFormController {
     private boolean validateBeforeSave() {
         return nameInput.validate()
             && descriptionInput.validate()
-            && patternsTable.getItems() != null
-            && patternsTable.getItems().size() != 0
-            && whitelistChooser.getValue() != null;
+            && patternsTable.getItems() != null;
     }
 
     /**
@@ -339,8 +338,7 @@ public class ConfigsFormController {
         if (file != null) {
             String path = file.getPath();
             try {
-                WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
-                Whitelist importedWhitelist = whitelistImportHelper.importWhitelist(path);
+                Whitelist importedWhitelist = new WhitelistImportHelper().importWhitelist(file.getPath());
 
                 FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "importWhitelist", 900, 650);
 
@@ -348,7 +346,8 @@ public class ConfigsFormController {
                 editDialogController.giveSelectedWhitelist(importedWhitelist);
                 editDialogController.setConfigsFormController(this);
             } catch (Exception e) {
-                e.printStackTrace();
+                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"), bundle.getString("wrongFileMessage"));
+                alert.showAndWait();
             }
         }
     }
@@ -366,17 +365,21 @@ public class ConfigsFormController {
 
         if (selectedFile != null) {
 
-            // create a new FXML loader with the SapSettingsEditDialogController
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternImportView.fxml", "importPatterns");
-
             // import patterns with the AccessPatternImportHelper
-            AccessPatternImportHelper importHelper = new AccessPatternImportHelper();
-            List<AccessPattern> importedPatterns = importHelper.importAccessPatterns(selectedFile.getAbsolutePath());
+            try {
+                List<AccessPattern> importedPatterns = new AccessPatternImportHelper().importAccessPatterns(selectedFile.getAbsolutePath());
 
-            // give the dialog the controller and the patterns
-            PatternImportController importController = loader.getController();
-            importController.giveImportedPatterns(importedPatterns);
-            importController.setConfigsFormController(this);
+                // open a modal import window
+                FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternImportView.fxml", "importPatterns");
+
+                // give the dialog the controller and the patterns
+                PatternImportController importController = loader.getController();
+                importController.giveImportedPatterns(importedPatterns);
+                importController.setConfigsFormController(this);
+            } catch (Exception e) {
+                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"), bundle.getString("wrongFileMessage"));
+                alert.showAndWait();
+            }
         }
     }
 
@@ -387,34 +390,41 @@ public class ConfigsFormController {
 
         if (validateBeforeSave()) {
 
-            this.configuration.setName(this.nameInput.getText());
-            this.configuration.setDescription(this.descriptionInput.getText());
-
-            // save all new (imported) patterns to the database
-            for (AccessPattern pattern : patternsTable.getItems()) {
-                if (pattern.getId() == null) {
-                    AppComponents.getInstance().getDbContext().createPattern(pattern);
-                }
-            }
-
-            // check if the whitelist was imported so it has to be created first
-            if (whitelistChooser.getValue().getId() == null) {
-                AppComponents.getInstance().getDbContext().createWhitelist(whitelistChooser.getValue());
-            }
-
-            this.configuration.setPatterns(patternsTable.getItems());
-            this.configuration.setWhitelist(whitelistChooser.getValue());
-
-            // new config, id is null
-            if (configuration.getId() == null) {
-                AppComponents.getInstance().getDbContext().createConfig(configuration);
+            if (patternsTable.getItems().size() == 0) {
+                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("patternsEmptyTitle"), bundle.getString("patternsEmptyMessage"));
+                alert.showAndWait();
+            } else if (whitelistChooser.getValue() == null) {
+                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("noWhitelistTitle"), bundle.getString("noWhitelistMessage"));
+                alert.showAndWait();
             } else {
-                AppComponents.getInstance().getDbContext().updateConfig(configuration);
+                this.configuration.setName(this.nameInput.getText());
+                this.configuration.setDescription(this.descriptionInput.getText());
+
+                // save all new (imported) patterns to the database
+                for (AccessPattern pattern : patternsTable.getItems()) {
+                    if (pattern.getId() == null) {
+                        AppComponents.getInstance().getDbContext().createPattern(pattern);
+                    }
+                }
+
+                // check if the whitelist was imported so it has to be created first
+                if (whitelistChooser.getValue().getId() == null) {
+                    AppComponents.getInstance().getDbContext().createWhitelist(whitelistChooser.getValue());
+                }
+
+                this.configuration.setPatterns(patternsTable.getItems());
+                this.configuration.setWhitelist(whitelistChooser.getValue());
+
+                // new config, id is null
+                if (configuration.getId() == null) {
+                    AppComponents.getInstance().getDbContext().createConfig(configuration);
+                } else {
+                    AppComponents.getInstance().getDbContext().updateConfig(configuration);
+                }
+
+                close(event);
             }
 
-            // refresh the configsTable in the parentController
-            parentController.updateTable();
-            close(event);
         }
     }
 
@@ -423,8 +433,24 @@ public class ConfigsFormController {
      *
      * @param event the given ActionEvent
      */
-    public void close(ActionEvent event) {
+    private void close(ActionEvent event) throws Exception {
         (((Button) event.getSource()).getScene().getWindow()).hide();
+
+        // refresh the configsTable in the parentController
+        if (parentController != null) {
+            parentController.updateTable();
+        }
+    }
+
+    /**
+     * Shows a dialog to confirm to discard unsaved changes.
+     */
+    public void confirmClose(ActionEvent event) throws Exception {
+        CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"),
+            bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
+        if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+            close(event);
+        }
     }
 
     /**
@@ -488,6 +514,7 @@ public class ConfigsFormController {
 
     /**
      * Adds the given patterns to the table, taking into account that usecaseId can't be duplicate.
+     *
      * @param patterns the patterns to add
      */
     public void addPatterns(List<AccessPattern> patterns) {
@@ -507,7 +534,7 @@ public class ConfigsFormController {
 
         // show alerts if difference is greater than 0
         if (diff == 1) {
-            CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("notAllImportedTitle"),  bundle.getString("idDuplicate"));
+            CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("notAllImportedTitle"), bundle.getString("idDuplicate"));
             alert.showAndWait();
         } else if (diff > 1) {
             CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("notAllImportedTitle"), diff + " " + bundle.getString("idDuplicates"));
