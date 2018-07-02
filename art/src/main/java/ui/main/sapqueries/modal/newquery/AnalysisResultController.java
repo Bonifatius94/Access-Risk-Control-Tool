@@ -18,7 +18,7 @@ import io.msoffice.ReportExportType;
 import io.msoffice.excel.AccessPatternExportHelper;
 import io.msoffice.excel.WhitelistExportHelper;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
