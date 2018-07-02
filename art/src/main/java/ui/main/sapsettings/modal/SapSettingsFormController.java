@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 
+import javafx.scene.control.ButtonBar;
 import sap.ISapConnector;
 import sap.SapConnector;
 
@@ -247,7 +248,19 @@ public class SapSettingsFormController {
      * @param event the given ActionEvent
      */
     public void close(ActionEvent event) throws Exception {
-        parentController.updateTable();
-        (((Button) event.getSource()).getScene().getWindow()).hide();
+        if (saveButton.isVisible()) {
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"),
+                bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                (((Button) event.getSource()).getScene().getWindow()).hide();
+            }
+        } else {
+            (((Button) event.getSource()).getScene().getWindow()).hide();
+        }
+
+        // refresh the sapSettingsTable in the parentController
+        if (parentController != null) {
+            parentController.updateTable();
+        }
     }
 }

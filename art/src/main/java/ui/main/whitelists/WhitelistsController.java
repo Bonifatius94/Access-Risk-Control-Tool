@@ -89,7 +89,9 @@ public class WhitelistsController implements IUpdateTable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Whitelist whitelist = row.getItem();
-                    if (!whitelist.isArchived()) {
+                    if (whitelist.isArchived()) {
+                        viewWhitelistDetails(whitelist);
+                    } else {
                         editDialogWhitelist(whitelist);
                     }
                 }
@@ -232,7 +234,7 @@ public class WhitelistsController implements IUpdateTable {
 
         try {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "details", 900, 650);
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "whitelistDetails", 900, 650);
 
             WhitelistFormController editDialogController = loader.getController();
             editDialogController.giveSelectedWhitelist(whitelist);

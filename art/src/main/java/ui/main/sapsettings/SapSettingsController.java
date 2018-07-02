@@ -97,7 +97,9 @@ public class SapSettingsController implements IUpdateTable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     SapConfiguration sapConfiguration = row.getItem();
-                    if (!sapConfiguration.isArchived()) {
+                    if (sapConfiguration.isArchived()) {
+                        viewSapConfigDetails(sapConfiguration);
+                    } else {
                         editConfig(sapConfiguration);
                     }
                 }
@@ -196,7 +198,7 @@ public class SapSettingsController implements IUpdateTable {
 
         try {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapsettings/modal/SapSettingsFormView.fxml", "details");
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapsettings/modal/SapSettingsFormView.fxml", "detailSapSettingsTitle");
 
             SapSettingsFormController sapEdit = loader.getController();
             sapEdit.giveSelectedSapConfig(sapConfiguration);

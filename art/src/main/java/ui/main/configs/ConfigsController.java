@@ -117,7 +117,9 @@ public class ConfigsController implements IUpdateTable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Configuration configuration = row.getItem();
-                    if (!configuration.isArchived()) {
+                    if (configuration.isArchived()) {
+                        viewConfigDetails(configuration);
+                    } else {
                         openConfigurationForm(configuration);
                     }
                 }

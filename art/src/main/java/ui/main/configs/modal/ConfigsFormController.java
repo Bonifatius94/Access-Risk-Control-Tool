@@ -33,6 +33,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -426,9 +427,16 @@ public class ConfigsFormController {
      * @param event the given ActionEvent
      */
     public void close(ActionEvent event) throws Exception {
+        CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"),
+            bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
+        if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+            (((Button) event.getSource()).getScene().getWindow()).hide();
+        }
+
         // refresh the configsTable in the parentController
-        parentController.updateTable();
-        (((Button) event.getSource()).getScene().getWindow()).hide();
+        if (parentController != null) {
+            parentController.updateTable();
+        }
     }
 
     /**
@@ -492,6 +500,7 @@ public class ConfigsFormController {
 
     /**
      * Adds the given patterns to the table, taking into account that usecaseId can't be duplicate.
+     *
      * @param patterns the patterns to add
      */
     public void addPatterns(List<AccessPattern> patterns) {
@@ -511,7 +520,7 @@ public class ConfigsFormController {
 
         // show alerts if difference is greater than 0
         if (diff == 1) {
-            CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("notAllImportedTitle"),  bundle.getString("idDuplicate"));
+            CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("notAllImportedTitle"), bundle.getString("idDuplicate"));
             alert.showAndWait();
         } else if (diff > 1) {
             CustomAlert alert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("notAllImportedTitle"), diff + " " + bundle.getString("idDuplicates"));

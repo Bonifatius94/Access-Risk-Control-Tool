@@ -125,9 +125,11 @@ public class PatternsController implements IUpdateTable {
             TableRow<AccessPattern> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                    AccessPattern pattern = row.getItem();
-                    if (!pattern.isArchived()) {
-                        openAccessPatternForm(pattern);
+                    AccessPattern accessPattern = row.getItem();
+                    if (accessPattern.isArchived()) {
+                        viewAccessPatternDetails(accessPattern);
+                    } else {
+                        openAccessPatternForm(accessPattern);
                     }
                 }
             });
