@@ -87,7 +87,6 @@ public class SapSettingsFormController {
             }
 
             close(event);
-            parentController.updateTable();
         }
     }
 
@@ -247,7 +246,8 @@ public class SapSettingsFormController {
      *
      * @param event the given ActionEvent
      */
-    public void close(ActionEvent event) {
+    public void close(ActionEvent event) throws Exception {
+        parentController.updateTable();
         (((Button) event.getSource()).getScene().getWindow()).hide();
     }
 }

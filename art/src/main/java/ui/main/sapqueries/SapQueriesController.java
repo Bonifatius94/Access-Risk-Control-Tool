@@ -247,8 +247,9 @@ public class SapQueriesController implements IUpdateTable {
                 for (CriticalAccessQuery query : queriesTable.getSelectionModel().getSelectedItems()) {
                     archiveQuery(query);
                 }
+
+                updateTable();
             }
-            updateTable();
         }
     }
 

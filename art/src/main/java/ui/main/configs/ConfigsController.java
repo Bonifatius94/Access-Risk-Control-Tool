@@ -214,6 +214,11 @@ public class ConfigsController implements IUpdateTable {
                     AppComponents.getInstance().getDbContext().deleteConfig(config);
                 }
 
+                if (configsTable.getSelectionModel().getSelectedItems().stream().anyMatch(x -> x.isArchived())) {
+                    customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("alreadyArchivedTitle"), bundle.getString("alreadyArchivedMessage"));
+                    customAlert.showAndWait();
+                }
+
                 updateTable();
             }
         }

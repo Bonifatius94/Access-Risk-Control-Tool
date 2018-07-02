@@ -288,6 +288,12 @@ public class SapSettingsController implements IUpdateTable {
                 for (SapConfiguration config : sapConnectionTable.getSelectionModel().getSelectedItems()) {
                     database.deleteSapConfig(config);
                 }
+
+                if (sapConnectionTable.getSelectionModel().getSelectedItems().stream().anyMatch(x -> x.isArchived())) {
+                    customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("alreadyArchivedTitle"), bundle.getString("alreadyArchivedMessage"));
+                    customAlert.showAndWait();
+                }
+
                 updateTable();
             }
         }

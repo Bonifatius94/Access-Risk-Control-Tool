@@ -336,7 +336,9 @@ public class PatternsFormController {
      *
      * @param event the given ActionEvent
      */
-    public void close(ActionEvent event) {
+    public void close(ActionEvent event) throws Exception {
+        // refresh the patternsTable in the parentController
+        parentController.updateTable();
         (((Button) event.getSource()).getScene().getWindow()).hide();
     }
 
@@ -452,8 +454,7 @@ public class PatternsFormController {
                             AccessCondition accessCondition = tableViewWithAccessCondition.getAccessCondition();
                             AccessPatternCondition patternCondition = tableViewWithAccessCondition.getAccessCondition().getPatternCondition();
 
-                            List<AccessPatternConditionProperty> properties = new ArrayList<>();
-                            properties.addAll(items);
+                            List<AccessPatternConditionProperty> properties = new ArrayList<>(items);
 
                             patternCondition.setProperties(properties);
                             accessCondition.setPatternCondition(patternCondition);
@@ -491,8 +492,6 @@ public class PatternsFormController {
                 AppComponents.getInstance().getDbContext().updatePattern(accessPattern);
             }
 
-            // refresh the patternsTable in the parentController
-            parentController.updateTable();
             close(event);
         }
     }

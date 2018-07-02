@@ -339,8 +339,7 @@ public class ConfigsFormController {
         if (file != null) {
             String path = file.getPath();
             try {
-                WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
-                Whitelist importedWhitelist = whitelistImportHelper.importWhitelist(path);
+                Whitelist importedWhitelist = new WhitelistImportHelper().importWhitelist(file.getPath());
 
                 FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "importWhitelist", 900, 650);
 
@@ -348,7 +347,8 @@ public class ConfigsFormController {
                 editDialogController.giveSelectedWhitelist(importedWhitelist);
                 editDialogController.setConfigsFormController(this);
             } catch (Exception e) {
-                e.printStackTrace();
+                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"), bundle.getString("wrongFileMessage"));
+                alert.showAndWait();
             }
         }
     }
@@ -366,17 +366,21 @@ public class ConfigsFormController {
 
         if (selectedFile != null) {
 
-            // create a new FXML loader with the SapSettingsEditDialogController
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternImportView.fxml", "importPatterns");
-
             // import patterns with the AccessPatternImportHelper
-            AccessPatternImportHelper importHelper = new AccessPatternImportHelper();
-            List<AccessPattern> importedPatterns = importHelper.importAccessPatterns(selectedFile.getAbsolutePath());
+            try {
+                List<AccessPattern> importedPatterns = new AccessPatternImportHelper().importAccessPatterns(selectedFile.getAbsolutePath());
 
-            // give the dialog the controller and the patterns
-            PatternImportController importController = loader.getController();
-            importController.giveImportedPatterns(importedPatterns);
-            importController.setConfigsFormController(this);
+                // open a modal import window
+                FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternImportView.fxml", "importPatterns");
+
+                // give the dialog the controller and the patterns
+                PatternImportController importController = loader.getController();
+                importController.giveImportedPatterns(importedPatterns);
+                importController.setConfigsFormController(this);
+            } catch (Exception e) {
+                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"), bundle.getString("wrongFileMessage"));
+                alert.showAndWait();
+            }
         }
     }
 
@@ -412,8 +416,6 @@ public class ConfigsFormController {
                 AppComponents.getInstance().getDbContext().updateConfig(configuration);
             }
 
-            // refresh the configsTable in the parentController
-            parentController.updateTable();
             close(event);
         }
     }
@@ -423,7 +425,9 @@ public class ConfigsFormController {
      *
      * @param event the given ActionEvent
      */
-    public void close(ActionEvent event) {
+    public void close(ActionEvent event) throws Exception {
+        // refresh the configsTable in the parentController
+        parentController.updateTable();
         (((Button) event.getSource()).getScene().getWindow()).hide();
     }
 
