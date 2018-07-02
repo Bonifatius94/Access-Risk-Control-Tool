@@ -141,18 +141,18 @@ public class WhitelistsController implements IUpdateTable {
 
         deleteWhitelistColumn.setCellFactory(DisableDeleteButtonCell.forTableColumn((Whitelist whitelist) -> {
 
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
-                    bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
+                bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
 
-                if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
 
-                    try {
-                        database.deleteWhitelist(whitelist);
-                        updateTable();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                try {
+                    database.deleteWhitelist(whitelist);
+                    updateTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
             } else {
                 CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("alreadyArchived"), "", "Ok", "Ok");
                 alert.showAndWait();
@@ -279,14 +279,6 @@ public class WhitelistsController implements IUpdateTable {
         }
     }
 
-    /**
-     * This function is called from a button press and starts edit.
-     */
-    public void editWhitelist() {
-        if (whitelistTable.getSelectionModel().getSelectedItem() != null) {
-            editDialogWhitelist(whitelistTable.getSelectionModel().getSelectedItem());
-        }
-    }
 
     /**
      * clones a selected Whitelist.
