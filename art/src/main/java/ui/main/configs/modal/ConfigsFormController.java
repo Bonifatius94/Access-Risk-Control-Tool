@@ -248,9 +248,7 @@ public class ConfigsFormController {
     private boolean validateBeforeSave() {
         return nameInput.validate()
             && descriptionInput.validate()
-            && patternsTable.getItems() != null
-            && patternsTable.getItems().size() != 0
-            && whitelistChooser.getValue() != null;
+            && patternsTable.getItems() != null;
     }
 
     /**
@@ -392,32 +390,41 @@ public class ConfigsFormController {
 
         if (validateBeforeSave()) {
 
-            this.configuration.setName(this.nameInput.getText());
-            this.configuration.setDescription(this.descriptionInput.getText());
-
-            // save all new (imported) patterns to the database
-            for (AccessPattern pattern : patternsTable.getItems()) {
-                if (pattern.getId() == null) {
-                    AppComponents.getInstance().getDbContext().createPattern(pattern);
-                }
-            }
-
-            // check if the whitelist was imported so it has to be created first
-            if (whitelistChooser.getValue().getId() == null) {
-                AppComponents.getInstance().getDbContext().createWhitelist(whitelistChooser.getValue());
-            }
-
-            this.configuration.setPatterns(patternsTable.getItems());
-            this.configuration.setWhitelist(whitelistChooser.getValue());
-
-            // new config, id is null
-            if (configuration.getId() == null) {
-                AppComponents.getInstance().getDbContext().createConfig(configuration);
+            if (patternsTable.getItems().size() == 0) {
+                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("patternsEmptyTitle"), bundle.getString("patternsEmptyMessage"));
+                alert.showAndWait();
+            } else if (whitelistChooser.getValue() == null) {
+                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("noWhitelistTitle"), bundle.getString("noWhitelistMessage"));
+                alert.showAndWait();
             } else {
-                AppComponents.getInstance().getDbContext().updateConfig(configuration);
+                this.configuration.setName(this.nameInput.getText());
+                this.configuration.setDescription(this.descriptionInput.getText());
+
+                // save all new (imported) patterns to the database
+                for (AccessPattern pattern : patternsTable.getItems()) {
+                    if (pattern.getId() == null) {
+                        AppComponents.getInstance().getDbContext().createPattern(pattern);
+                    }
+                }
+
+                // check if the whitelist was imported so it has to be created first
+                if (whitelistChooser.getValue().getId() == null) {
+                    AppComponents.getInstance().getDbContext().createWhitelist(whitelistChooser.getValue());
+                }
+
+                this.configuration.setPatterns(patternsTable.getItems());
+                this.configuration.setWhitelist(whitelistChooser.getValue());
+
+                // new config, id is null
+                if (configuration.getId() == null) {
+                    AppComponents.getInstance().getDbContext().createConfig(configuration);
+                } else {
+                    AppComponents.getInstance().getDbContext().updateConfig(configuration);
+                }
+
+                close(event);
             }
 
-            close(event);
         }
     }
 
@@ -426,16 +433,23 @@ public class ConfigsFormController {
      *
      * @param event the given ActionEvent
      */
-    public void close(ActionEvent event) throws Exception {
-        CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"),
-            bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
-        if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
-            (((Button) event.getSource()).getScene().getWindow()).hide();
-        }
+    private void close(ActionEvent event) throws Exception {
+        (((Button) event.getSource()).getScene().getWindow()).hide();
 
         // refresh the configsTable in the parentController
         if (parentController != null) {
             parentController.updateTable();
+        }
+    }
+
+    /**
+     * Shows a dialog to confirm to discard unsaved changes.
+     */
+    public void confirmClose(ActionEvent event) throws Exception {
+        CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"),
+            bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
+        if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+            close(event);
         }
     }
 

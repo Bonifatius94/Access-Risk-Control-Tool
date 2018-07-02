@@ -69,7 +69,7 @@
                     <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
                 </graphic>
             </JFXButton>
-            <JFXButton onAction="#close" prefWidth="100" text="%cancel">
+            <JFXButton onAction="#confirmClose" prefWidth="100" text="%cancel">
                 <graphic>
                     <MaterialDesignIconView glyphName="CLOSE"/>
                 </graphic>
