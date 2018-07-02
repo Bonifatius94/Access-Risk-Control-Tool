@@ -422,7 +422,7 @@ Confirm
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;
 error("The user could not be deletet.")</panel_attributes>
-    <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
+    <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
