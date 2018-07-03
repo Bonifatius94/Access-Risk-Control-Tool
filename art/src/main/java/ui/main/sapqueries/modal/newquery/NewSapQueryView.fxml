@@ -56,7 +56,7 @@
             <VBox fx:id="spinner" alignment="CENTER" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" visible="false"
                   spacing="20">
                 <JFXSpinner maxWidth="50"/>
-                <Label text="%analysisInProgress"/>
+                <Label text="%analysisInProgress" textAlignment="CENTER"/>
                 <JFXProgressBar fx:id="progressBar"/>
                 <Label fx:id="progressLabel" visible="false"/>
                 <Label fx:id="connectionLabel" />

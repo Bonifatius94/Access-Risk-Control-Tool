@@ -28,11 +28,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import sap.ISapConnector;
 import sap.SapConnector;
 
+import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.AutoCompleteComboBoxListener;
 import ui.custom.controls.CustomAlert;
@@ -271,7 +274,10 @@ public class NewSapQueryController {
 
                     parentController.updateTable();
 
-                    FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/AnalysisResultView.fxml", "analysisResultTitle");
+                    Stage stage = new Stage();
+                    FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/AnalysisResultView.fxml", "analysisResultTitle",
+                        stage, App.primaryStage, Modality.WINDOW_MODAL);
+                    stage.toFront();
 
                     AnalysisResultController resultController = loader.getController();
                     resultController.giveResultQuery(runQueryTask.getValue());
@@ -290,7 +296,7 @@ public class NewSapQueryController {
         progressLabel.visibleProperty().bind(runQueryTask.progressProperty().greaterThan(0));
         connectionLabel.visibleProperty().bind(Bindings.not(progressLabel.visibleProperty()));
         connectionLabel.managedProperty().bind(connectionLabel.visibleProperty());
-        progressLabel.textProperty().bind(runQueryTask.progressProperty().multiply(100).asString("Analyse läuft... Fortschritt %.0f%%"));
+        progressLabel.textProperty().bind(runQueryTask.progressProperty().multiply(100).asString(bundle.getString("analysisProgress") + " %.0f%%"));
 
         // start a new thread with the task
         Thread thread = new Thread(runQueryTask);
