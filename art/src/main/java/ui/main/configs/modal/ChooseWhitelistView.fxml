@@ -10,7 +10,7 @@
 <?import com.jfoenix.controls.JFXTextField?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
-              fx:controller="ui.main.configs.modal.ChooseWhitelistController" windowState="CanResize">
+              fx:controller="ui.main.configs.modal.ChooseWhitelistController" windowState="NoResize">
     <VBox spacing="20" HBox.hgrow="ALWAYS" style="-fx-padding: 20">
         <HBox spacing="40" HBox.hgrow="ALWAYS">
             <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="10">

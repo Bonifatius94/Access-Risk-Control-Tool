@@ -13,7 +13,7 @@
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
-              fx:controller="ui.main.sapqueries.modal.choosers.SapConfigChooserController" windowState="CanResize">
+              fx:controller="ui.main.sapqueries.modal.choosers.SapConfigChooserController" windowState="NoResize">
     <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
         <fx:include source="../../../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
         <TableView VBox.vgrow="ALWAYS" fx:id="sapSettingsTable">

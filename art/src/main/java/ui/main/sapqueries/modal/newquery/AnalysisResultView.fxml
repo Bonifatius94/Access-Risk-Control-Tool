@@ -15,7 +15,7 @@
 <?import com.jfoenix.controls.JFXCheckBox?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
-              fx:controller="ui.main.sapqueries.modal.newquery.AnalysisResultController">
+              fx:controller="ui.main.sapqueries.modal.newquery.AnalysisResultController" windowState="NoResize">
     <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
         <HBox spacing="10" alignment="CENTER_LEFT">
             <MaterialDesignIconView fx:id="statusIcon" size="30"/>

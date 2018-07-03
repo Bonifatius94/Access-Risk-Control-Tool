@@ -214,34 +214,6 @@ public class SapSettingsController implements IUpdateTable {
     }
 
     /**
-     * Tests the connection to the SAP system.
-     */
-    public void connectAction() {
-        if (sapConnectionTable.getSelectionModel().getSelectedItem() != null) {
-
-            SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
-
-            try {
-
-                // get exception from server
-                ISapConnector sapConnector = new SapConnector(sapConfiguration, "abs", "abs");
-                sapConnector.canPingServer();
-
-            } catch (Exception e) {
-
-                // if exception contains error code 103, connection was successful
-                if (e.getCause().toString().contains("103")) {
-                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("sapConnectTitle"), bundle.getString("sapConnectSuccessMessage"), "OK", "Cancel");
-                    customAlert.showAndWait();
-                } else {
-                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("sapConnectTitle"), bundle.getString("sapConnectFailedMessage"), "Ok", "Cancel");
-                    customAlert.showAndWait();
-                }
-            }
-        }
-    }
-
-    /**
      * Opens a new window in which a new SapConnection can be added.
      */
     public void newSapConnectionAction() {
