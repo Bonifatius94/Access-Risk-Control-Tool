@@ -16,7 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -72,6 +75,8 @@ public class NewSapQueryController {
 
     private ResourceBundle bundle;
     private SapQueriesController parentController;
+
+    public static SimpleIntegerProperty analysisRunning = new SimpleIntegerProperty(0);
 
     /**
      * Initializes the view.
@@ -257,6 +262,7 @@ public class NewSapQueryController {
                         this.updateProgress(percentage, 1);
                     });
 
+                    Platform.runLater(() -> analysisRunning.setValue(analysisRunning.getValue() + 1));
                     return connector.runAnalysis(query.getConfig());
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -281,6 +287,8 @@ public class NewSapQueryController {
 
                     AnalysisResultController resultController = loader.getController();
                     resultController.giveResultQuery(runQueryTask.getValue());
+
+                    Platform.runLater(() -> analysisRunning.setValue(analysisRunning.getValue() - 1));
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

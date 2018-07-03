@@ -4,16 +4,21 @@
 <?import javafx.scene.layout.*?>
 
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import com.jfoenix.controls.JFXSpinner?>
 <HBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="ui.main.statusbar.StatusBarController" styleClass="status-bar">
-    <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+      fx:controller="ui.main.statusbar.StatusBarController" styleClass="status-bar" alignment="CENTER">
+    <HBox alignment="CENTER_LEFT" prefWidth="350">
         <Label fx:id="loggedInUserLabel"/>
     </HBox>
-    <HBox alignment="CENTER">
-        <Label text="%copyright"/>
+    <HBox alignment="CENTER" fx:id="analysisProgressBox" spacing="10" HBox.hgrow="ALWAYS">
+        <JFXSpinner maxHeight="20" maxWidth="20"/>
+        <Label fx:id="analysisProgressLabel"/>
     </HBox>
-    <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT" spacing="20">
+    <HBox alignment="CENTER" fx:id="copyrightBox" HBox.hgrow="ALWAYS">
+        <Label text="%copyright" HBox.hgrow="ALWAYS" />
+    </HBox>
+    <HBox alignment="CENTER_RIGHT" spacing="20" prefWidth="350">
         <Label>
             <tooltip>
                 <Tooltip text="%databaseConnectionActive"/>
