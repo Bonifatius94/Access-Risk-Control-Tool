@@ -4,10 +4,13 @@ import com.jfoenix.controls.JFXButton;
 
 import data.entities.Configuration;
 
+import data.entities.CriticalAccessQuery;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import extensions.ResourceBundleHelper;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -21,6 +24,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -48,6 +52,9 @@ public class ConfigsController implements IUpdateTable {
 
     @FXML
     public TableColumn<Configuration, JFXButton> editColumn;
+
+    @FXML
+    public TableColumn<CriticalAccessQuery, ZonedDateTime> createdAtColumn;
 
     @FXML
     public FilterController filterController;
@@ -170,6 +177,16 @@ public class ConfigsController implements IUpdateTable {
             return configuration;
         }));
 
+        // overwrite the column in which the date is displayed for formatting
+        createdAtColumn.setCellFactory(col -> new TableCell<CriticalAccessQuery, ZonedDateTime>() {
+
+            @Override
+            protected void updateItem(ZonedDateTime time, boolean empty) {
+
+                // display nothing if the row is empty, otherwise the item count
+                setText((empty || time == null) ? "" : "" + time.format(DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")));
+            }
+        });
     }
 
 

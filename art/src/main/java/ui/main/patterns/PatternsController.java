@@ -5,12 +5,15 @@ import com.jfoenix.controls.JFXButton;
 import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 
+import data.entities.CriticalAccessQuery;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import extensions.ResourceBundleHelper;
 import io.msoffice.excel.AccessPatternImportHelper;
 
 import java.io.File;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -60,6 +63,9 @@ public class PatternsController implements IUpdateTable {
 
     @FXML
     public TableColumn<AccessPattern, Set<AccessCondition>> conditionTypeColumn;
+
+    @FXML
+    public TableColumn<CriticalAccessQuery, ZonedDateTime> createdAtColumn;
 
     @FXML
     public Label itemCount;
@@ -182,6 +188,16 @@ public class PatternsController implements IUpdateTable {
 
         initializeConditionTypeColumn();
 
+        // overwrite the column in which the date is displayed for formatting
+        createdAtColumn.setCellFactory(col -> new TableCell<CriticalAccessQuery, ZonedDateTime>() {
+
+            @Override
+            protected void updateItem(ZonedDateTime time, boolean empty) {
+
+                // display nothing if the row is empty, otherwise the item count
+                setText((empty || time == null) ? "" : "" + time.format(DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")));
+            }
+        });
     }
 
 

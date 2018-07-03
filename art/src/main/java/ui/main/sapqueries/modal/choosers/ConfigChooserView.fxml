@@ -22,17 +22,22 @@
                 <fx:include source="../../../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
                 <TableView VBox.vgrow="ALWAYS" fx:id="configsTable" minWidth="450" HBox.hgrow="ALWAYS">
                     <columns>
-                        <PTableColumn text="%name" percentageWidth="0.3" resizable="false" styleClass="align-left">
+                        <PTableColumn text="%name" percentageWidth="0.26" resizable="false" styleClass="align-left">
                             <cellValueFactory>
                                 <PropertyValueFactory property="name"/>
                             </cellValueFactory>
                         </PTableColumn>
-                        <PTableColumn text="%description" percentageWidth="0.6" styleClass="align-left">
+                        <PTableColumn text="%description" percentageWidth="0.46" styleClass="align-left">
                             <cellValueFactory>
                                 <PropertyValueFactory property="description"/>
                             </cellValueFactory>
                         </PTableColumn>
-                        <PTableColumn percentageWidth="0.1" styleClass="align-left" fx:id="viewDetailsColumn"/>
+                        <PTableColumn text="%createdAt" fx:id="createdAtColumn" resizable="false" percentageWidth="0.20">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="createdAt"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn percentageWidth="0.08" fx:id="viewDetailsColumn"/>
                     </columns>
                 </TableView>
             </VBox>

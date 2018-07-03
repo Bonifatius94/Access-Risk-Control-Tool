@@ -2,6 +2,8 @@ package ui.main.sapqueries.modal.choosers;
 
 import data.entities.SapConfiguration;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import javafx.collections.FXCollections;
@@ -9,6 +11,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import ui.AppComponents;
@@ -23,6 +27,9 @@ public class SapConfigChooserController {
 
     @FXML
     public FilterController filterController;
+
+    @FXML
+    private TableColumn<SapConfiguration, ZonedDateTime> creationColumn;
 
     private NewSapQueryController parentController;
 
@@ -41,6 +48,14 @@ public class SapConfigChooserController {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+        // format created at date column
+        creationColumn.setCellFactory(col -> new TableCell<SapConfiguration, ZonedDateTime>() {
+            @Override
+            protected void updateItem(ZonedDateTime item, boolean empty) {
+                setText((empty || item == null) ? "" : item.format(DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")));
             }
         });
 

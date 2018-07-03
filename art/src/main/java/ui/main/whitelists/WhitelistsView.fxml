@@ -16,34 +16,29 @@
     <TableView VBox.vgrow="ALWAYS" fx:id="whitelistTable">
 
         <columns>
-            <PTableColumn text="%whitelistName" resizable="false" percentageWidth="0.15" styleClass="align-left">
+            <PTableColumn text="%whitelistName" resizable="false" percentageWidth="0.23" styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="name"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="%description" resizable="false" percentageWidth="0.3" styleClass="align-left">
+            <PTableColumn text="%description" resizable="false" percentageWidth="0.35" styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="description"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="%numberOfEntries" resizable="false" percentageWidth="0.1" fx:id="entryCountColumn">
-                <cellValueFactory>
-                    <PropertyValueFactory property="entries"/>
-                </cellValueFactory>
-            </PTableColumn>
-            <PTableColumn text="%creationDate" fx:id="creationColumn" resizable="false" percentageWidth="0.2">
+            <PTableColumn text="%createdAt" fx:id="creationColumn" resizable="false" percentageWidth="0.20">
                 <cellValueFactory>
                     <PropertyValueFactory property="createdAt"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="%archived" resizable="false" percentageWidth="0.15">
+            <PTableColumn text="#" resizable="false" percentageWidth="0.1" fx:id="entryCountColumn">
                 <cellValueFactory>
-                    <PropertyValueFactory property="isArchived"/>
+                    <PropertyValueFactory property="entries"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.05" resizable="false" fx:id="editWhitelistColumn">
+            <PTableColumn percentageWidth="0.06" resizable="false" fx:id="editWhitelistColumn">
             </PTableColumn>
-            <PTableColumn percentageWidth="0.05" resizable="false" fx:id="deleteWhitelistColumn">
+            <PTableColumn percentageWidth="0.06" resizable="false" fx:id="deleteWhitelistColumn">
             </PTableColumn>
         </columns>
     </TableView>
