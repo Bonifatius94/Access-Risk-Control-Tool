@@ -262,7 +262,9 @@ public class NewSapQueryController {
                         this.updateProgress(percentage, 1);
                     });
 
+                    // increase the counter by one
                     Platform.runLater(() -> analysisRunning.setValue(analysisRunning.getValue() + 1));
+
                     return connector.runAnalysis(query.getConfig());
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -288,6 +290,7 @@ public class NewSapQueryController {
                     AnalysisResultController resultController = loader.getController();
                     resultController.giveResultQuery(runQueryTask.getValue());
 
+                    // decrease the counter by one
                     Platform.runLater(() -> analysisRunning.setValue(analysisRunning.getValue() - 1));
                 } catch (Exception ex) {
                     ex.printStackTrace();

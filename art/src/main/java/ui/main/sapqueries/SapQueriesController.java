@@ -159,6 +159,7 @@ public class SapQueriesController implements IUpdateTable {
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 try {
                     archiveQuery(query);
+                    updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -232,9 +233,11 @@ public class SapQueriesController implements IUpdateTable {
      * Archives all selected items.
      */
     public void archiveAction() throws Exception {
-        if (queriesTable.getSelectionModel().getSelectedItems() != null && queriesTable.getSelectionModel().getSelectedItems().size() != 0) {
+        List<CriticalAccessQuery> selectedItems = queriesTable.getSelectionModel().getSelectedItems();
+
+        if (selectedItems != null && !selectedItems.isEmpty()) {
             CustomAlert customAlert;
-            if (queriesTable.getSelectionModel().getSelectedItems().size() == 1) {
+            if (selectedItems.size() == 1) {
                 customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("archiveConfirmTitle"),
                     bundle.getString("archiveConfirmMessage"), "Ok", "Cancel");
             } else {
@@ -243,8 +246,9 @@ public class SapQueriesController implements IUpdateTable {
             }
 
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+
                 // archive all selected items
-                for (CriticalAccessQuery query : queriesTable.getSelectionModel().getSelectedItems()) {
+                for (CriticalAccessQuery query : selectedItems) {
                     archiveQuery(query);
                 }
 
@@ -269,13 +273,11 @@ public class SapQueriesController implements IUpdateTable {
         }
     }
 
-    private void archiveQuery(CriticalAccessQuery query) throws Exception {
+    private void archiveQuery(CriticalAccessQuery query) {
         if (query != null) {
 
             query.setArchived(true);
             AppComponents.getInstance().getDbContext().updateRecord(query);
-
-            updateTable();
         }
     }
 }

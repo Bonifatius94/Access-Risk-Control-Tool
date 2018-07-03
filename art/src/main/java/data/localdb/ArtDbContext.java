@@ -727,8 +727,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         String sql =
               "SELECT DISTINCT Query.* "
             + "FROM CriticalAccessQueries AS Query "
-            + "INNER JOIN CriticalAccessEntries AS Entries ON Entries.queryId = Query.id "
-            + "INNER JOIN AccessPatterns AS ViolatedPattern ON ViolatedPattern.id = Entries.violatedPatternId "
+            + "LEFT OUTER JOIN CriticalAccessEntries AS Entries ON Entries.queryId = Query.id "
+            + "LEFT OUTER JOIN AccessPatterns AS ViolatedPattern ON ViolatedPattern.id = Entries.violatedPatternId "
             + "INNER JOIN SapConfigurations AS SapConfig ON SapConfig.id = Query.sapConfigId "
             + "INNER JOIN Configurations AS Config ON Config.id = Query.configId ";
 
