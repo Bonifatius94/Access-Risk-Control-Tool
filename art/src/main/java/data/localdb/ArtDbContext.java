@@ -18,7 +18,6 @@ import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -957,7 +956,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         whitelist.adjustReferences();
 
         // check if the whitelist has already been used by a critical access query
-        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
+        boolean archive = getSapQueries(true).stream()
+            .anyMatch(x -> x.getConfig().getWhitelist() != null && whitelist.getId().equals(x.getConfig().getWhitelist().getId()));
 
         try (Session session = openSession()) {
 
@@ -1181,16 +1181,25 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 transaction = session.beginTransaction();
 
-                // remove pattern from active configs referencing it
-                pattern.getConfigurations().forEach(config -> {
+                Set<Configuration> configsToArchive =
+                    getConfigs(false).stream()
+                    .filter(x -> x.getPatterns().stream().anyMatch(y -> y.getId().equals(pattern.getId())))
+                    .collect(Collectors.toSet());
 
-                    if (!config.isArchived()) {
+                // remove pattern from active configs referencing it and archive those configs
+                for (Configuration config : configsToArchive) {
 
-                        config.getPatterns().remove(pattern);
-                        config.adjustReferences();
-                        session.update(config);
+                    Set<AccessPattern> patterns = new HashSet<>(config.getPatterns());
+                    patterns.stream().filter(x -> x.getId().equals(pattern.getId())).collect(Collectors.toList()).forEach(x -> patterns.remove(x));
+                    config.setPatterns(patterns);
+                    config.adjustReferences();
+
+                    if (archive) {
+                        archiveConfig(session, config);
                     }
-                });
+
+                    session.update(config);
+                }
 
                 if (archive) {
 
@@ -1235,7 +1244,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         whitelist.adjustReferences();
 
         // check if the whitelist has already been used by a critical access query
-        boolean archive = getSapQueries(true).stream().anyMatch(x -> x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
+        boolean archive = getSapQueries(true).stream()
+            .anyMatch(x -> x.getConfig().getWhitelist() != null && x.getConfig().getWhitelist().getId().equals(whitelist.getId()));
 
         try (Session session = openSession()) {
 
@@ -1245,12 +1255,22 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 transaction = session.beginTransaction();
 
-                // remove whitelist from active configs referencing it
-                getConfigs(false).forEach(config -> {
+                List<Configuration> configsToArchive =
+                    getConfigs(false).stream()
+                    .filter(x -> x.getWhitelist() != null && x.getWhitelist().getId().equals(whitelist.getId()))
+                    .collect(Collectors.toList());
+
+                // remove whitelist from active configs referencing it and archive those configs
+                for (Configuration config : configsToArchive) {
 
                     config.setWhitelist(null);
+
+                    if (archive) {
+                        archiveConfig(session, config);
+                    }
+
                     session.update(config);
-                });
+                }
 
                 if (archive) {
 
@@ -1358,11 +1378,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                 // parse data fields
                 String username = (String)x[0];
                 boolean isAdmin = (boolean)x[1];
-                boolean isDataAnalyst = (boolean)x[2];
+                boolean isConfigurator = (boolean)x[2];
                 boolean isViewer = (boolean)x[3];
                 boolean isFirstLogin = (boolean)x[4];
 
-                return new DbUser(username, isAdmin, isDataAnalyst, isViewer, isFirstLogin);
+                return new DbUser(username, isAdmin, isConfigurator, isViewer, isFirstLogin);
 
             }).collect(Collectors.toList());
 
@@ -1492,13 +1512,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     private void createDbUserEntry(Session session, DbUser user) {
 
         final String createDbUserSql =
-            "INSERT INTO DbUsers (USERNAME, ISADMIN, ISDATAANALYST, ISVIEWER, ISFIRSTLOGIN) "
-                + "VALUES (:username, :isAdmin, :isDataAnalyst, :isViewer, :isFirstLogin)";
+            "INSERT INTO DbUsers (USERNAME, ISADMIN, ISCONFIGURATOR, ISVIEWER, ISFIRSTLOGIN) "
+                + "VALUES (:username, :isAdmin, :isConfigurator, :isViewer, :isFirstLogin)";
 
         session.createNativeQuery(createDbUserSql)
             .setParameter("username", user.getUsername().toUpperCase())
             .setParameter("isAdmin", user.getRoles().contains(DbUserRole.Admin))
-            .setParameter("isDataAnalyst", user.getRoles().contains(DbUserRole.DataAnalyst))
+            .setParameter("isConfigurator", user.getRoles().contains(DbUserRole.Configurator))
             .setParameter("isViewer", user.getRoles().contains(DbUserRole.Viewer))
             .setParameter("isFirstLogin", user.isFirstLogin())
             .executeUpdate();
@@ -1508,12 +1528,12 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         // update DbUser entry flags
         final String updateDbUserSql =
-            "UPDATE DbUsers SET ISADMIN = :isAdmin, ISDATAANALYST = :isDataAnalyst, ISVIEWER = :isViewer WHERE USERNAME = :username";
+            "UPDATE DbUsers SET ISADMIN = :isAdmin, ISCONFIGURATOR = :isConfigurator, ISVIEWER = :isViewer WHERE USERNAME = :username";
 
         session.createNativeQuery(updateDbUserSql)
             .setParameter("username", user.getUsername().toUpperCase())
             .setParameter("isAdmin", user.getRoles().contains(DbUserRole.Admin))
-            .setParameter("isDataAnalyst", user.getRoles().contains(DbUserRole.DataAnalyst))
+            .setParameter("isConfigurator", user.getRoles().contains(DbUserRole.Configurator))
             .setParameter("isViewer", user.getRoles().contains(DbUserRole.Viewer))
             .executeUpdate();
     }

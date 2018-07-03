@@ -1,9 +1,11 @@
 package ui.main.sapqueries.modal.details;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 
 import data.entities.CriticalAccessQuery;
 
+import data.entities.DbUserRole;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
@@ -63,7 +65,6 @@ public class SapQueryDetailController {
 
     @FXML
     public void initialize() {
-
     }
 
     /**

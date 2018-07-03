@@ -16,7 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -28,11 +31,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import sap.ISapConnector;
 import sap.SapConnector;
 
+import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.AutoCompleteComboBoxListener;
 import ui.custom.controls.CustomAlert;
@@ -69,6 +75,8 @@ public class NewSapQueryController {
 
     private ResourceBundle bundle;
     private SapQueriesController parentController;
+
+    public static SimpleIntegerProperty analysisRunning = new SimpleIntegerProperty(0);
 
     /**
      * Initializes the view.
@@ -254,6 +262,7 @@ public class NewSapQueryController {
                         this.updateProgress(percentage, 1);
                     });
 
+                    Platform.runLater(() -> analysisRunning.setValue(analysisRunning.getValue() + 1));
                     return connector.runAnalysis(query.getConfig());
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -271,10 +280,15 @@ public class NewSapQueryController {
 
                     parentController.updateTable();
 
-                    FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/AnalysisResultView.fxml", "analysisResultTitle");
+                    Stage stage = new Stage();
+                    FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/AnalysisResultView.fxml", "analysisResultTitle",
+                        stage, App.primaryStage, Modality.WINDOW_MODAL);
+                    stage.toFront();
 
                     AnalysisResultController resultController = loader.getController();
                     resultController.giveResultQuery(runQueryTask.getValue());
+
+                    Platform.runLater(() -> analysisRunning.setValue(analysisRunning.getValue() - 1));
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -290,7 +304,7 @@ public class NewSapQueryController {
         progressLabel.visibleProperty().bind(runQueryTask.progressProperty().greaterThan(0));
         connectionLabel.visibleProperty().bind(Bindings.not(progressLabel.visibleProperty()));
         connectionLabel.managedProperty().bind(connectionLabel.visibleProperty());
-        progressLabel.textProperty().bind(runQueryTask.progressProperty().multiply(100).asString("Analyse läuft... Fortschritt %.0f%%"));
+        progressLabel.textProperty().bind(runQueryTask.progressProperty().multiply(100).asString(bundle.getString("analysisProgress") + " %.0f%%"));
 
         // start a new thread with the task
         Thread thread = new Thread(runQueryTask);
@@ -317,7 +331,7 @@ public class NewSapQueryController {
     public void setSapConfig(SapConfiguration sapConfig) {
 
         if (sapConfig != null) {
-            this.sapSettingsChooser.getItems().add(sapConfig);
+            this.sapSettingsChooser.setValue(sapConfig);
         }
     }
 

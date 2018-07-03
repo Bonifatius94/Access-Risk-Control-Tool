@@ -267,8 +267,8 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         // TODO: why always 5 iterations?
         for (int i = 0; i < 5; i++) {
 
-            System.out.println("y " + y);
-            System.out.println("result " + result);
+            // System.out.println("y " + y);
+            // System.out.println("result " + result);
 
             g2d.drawString(" " + result, x, y);
             y = y - yadd;

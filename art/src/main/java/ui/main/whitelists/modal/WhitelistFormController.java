@@ -231,6 +231,7 @@ public class WhitelistFormController {
     @FXML
     private void saveEditWhitelist() throws Exception {
         if (checkNameAndDescription()) {
+
             if (!whitelistEditTable.getItems().isEmpty()) {
                 whitelist.getEntries().addAll(whitelistEditTable.getItems().stream().filter(x -> x.getUsecaseId() != null).collect(Collectors.toList()));
                 whitelist.setName(tfWhitelistName.getText());
@@ -238,6 +239,7 @@ public class WhitelistFormController {
 
                 // dialog was called from WhitelistsView
                 if (whitelistsController != null) {
+
                     if (whitelist.getId() == null) {
                         whitelistDatabase.createWhitelist(whitelist);
                         whitelistsController.updateTable();
@@ -251,7 +253,7 @@ public class WhitelistFormController {
 
                 ((Stage) whitelistEditTable.getScene().getWindow()).close();
             } else {
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("whitelistEmptyAlertTitle"), bundle.getString("whitelistEmptyAlertMessage"), "Ok", "Ok");
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("whitelistEmptyAlertTitle"), bundle.getString("whitelistEmptyAlertMessage"));
                 customAlert.showAndWait();
             }
         }
@@ -262,11 +264,21 @@ public class WhitelistFormController {
      */
     @FXML
     private void cancelEditWhitelist() {
-        if (!whitelist.equals(whitelistOld)) {
-            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"), bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
+
+        // check if dialog is in edit mode
+        if (applyButton.isVisible()) {
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"),
+                bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 ((Stage) whitelistEditTable.getScene().getWindow()).close();
+                try {
+                    whitelistsController.updateTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+        } else {
+            ((Stage) whitelistEditTable.getScene().getWindow()).close();
         }
     }
 
@@ -332,6 +344,7 @@ public class WhitelistFormController {
             addButton.setVisible(false);
             applyButton.setVisible(false);
             copyButton.setVisible(false);
+            deleteWhitelistEntryColumn.setVisible(false);
         } else {
             tfWhitelistName.setEditable(true);
             tfDescription.setEditable(true);
@@ -341,6 +354,7 @@ public class WhitelistFormController {
             addButton.setVisible(true);
             applyButton.setVisible(true);
             copyButton.setVisible(true);
+            deleteWhitelistEntryColumn.setVisible(true);
         }
     }
 }

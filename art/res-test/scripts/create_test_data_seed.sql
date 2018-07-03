@@ -8,16 +8,16 @@
 -- ==============================
 
 CREATE USER TestAdmin PASSWORD 'foobar' ADMIN;
-INSERT INTO DbUsers (USERNAME, ISADMIN, ISDATAANALYST, ISVIEWER, ISFIRSTLOGIN) VALUES ('TESTADMIN', 1, 0, 0, 0);
+INSERT INTO DbUsers (USERNAME, ISADMIN, ISCONFIGURATOR, ISVIEWER, ISFIRSTLOGIN) VALUES ('TESTADMIN', 1, 0, 0, 0);
 
-CREATE USER TestDataAnalyst PASSWORD 'foobar';
-INSERT INTO DbUsers (USERNAME, ISADMIN, ISDATAANALYST, ISVIEWER, ISFIRSTLOGIN) VALUES ('TESTDATAANALYST', 0, 1, 0, 0);
+CREATE USER TestConfigurator PASSWORD 'foobar';
+INSERT INTO DbUsers (USERNAME, ISADMIN, ISCONFIGURATOR, ISVIEWER, ISFIRSTLOGIN) VALUES ('TESTCONFIGURATOR', 0, 1, 0, 0);
 
 CREATE USER TestViewer PASSWORD 'foobar';
-INSERT INTO DbUsers (USERNAME, ISADMIN, ISDATAANALYST, ISVIEWER, ISFIRSTLOGIN) VALUES ('TESTVIEWER', 0, 0, 1, 0);
+INSERT INTO DbUsers (USERNAME, ISADMIN, ISCONFIGURATOR, ISVIEWER, ISFIRSTLOGIN) VALUES ('TESTVIEWER', 0, 0, 1, 0);
 
 GRANT Admin TO TestAdmin;
-GRANT DataAnalyst TO TestDataAnalyst;
+GRANT Configurator TO TestConfigurator;
 GRANT Viewer TO TestViewer;
 
 -- ==============================
@@ -141,6 +141,31 @@ INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty
 INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (40, 'S_DEVELOP', 'ACTVT',    '01',    '02',   NULL, NULL, 10);
 
 -- ==============================
+--      use cases (active) (that are not referenced by a query)
+-- ==============================
+
+-- use case with profile condition (NONE linkage, use case 3.B from examples)
+INSERT INTO AccessPatterns (id, isArchived, createdAt, createdBy, usecaseId, description, linkage) VALUES (7, 0, '2018-06-08T15:09:15', 'test', '3.B', 'Unexpected users with Profile ''SAP_NEW''', 'None');
+INSERT INTO AccessConditions (id, type, patternId) VALUES (11, 'Profile', 7);
+INSERT INTO AccessProfileConditions (condition_id, profile) VALUES (11, 'SAP_NEW');
+
+INSERT INTO AccessPatterns (id, isArchived, createdAt, createdBy, usecaseId, description, linkage) VALUES (8, 0, '2018-06-08T15:09:15', 'test', '1.A', 'Unexpected users are authorized to copy a client (local copy wo user/profiles)', 'And');
+INSERT INTO AccessConditions (id, type, patternId) VALUES (12, 'Pattern', 8);
+INSERT INTO AccessPatternConditions (condition_id) VALUES (12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (41, 'S_TCODE',    'TCD',        'SCCL', 'SCC9', NULL, NULL, 12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (42, 'S_ADMI_FCD', 'S_ADMI_FCD', 'T000',  NULL,  NULL, NULL, 12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (43, 'S_TABU_DIS', 'ACTVT',      '02',    NULL,  NULL, NULL, 12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (44, 'S_TABU_DIS', 'DICBERCLS',  '"*"',   NULL,  NULL, NULL, 12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (45, 'S_TABU_CLI', 'CLIIDMAINT', 'X',     NULL,  NULL, NULL, 12);
+INSERT INTO AccessConditions (id, type, patternId) VALUES (13, 'Pattern',8);
+INSERT INTO AccessPatternConditions (condition_id) VALUES (13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (46,  'S_TCODE',    'TCD',      'SCCL', 'SCC9', NULL, NULL, 13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (47,  'S_DATASET',  'PROGRAM',  '"*"',   NULL,  NULL, NULL, 13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (48,  'S_DATASET',  'ACTVT',    '"*"',   NULL,  NULL, NULL, 13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (49,  'S_DATASET',  'FILENAME', '"*"',   NULL,  NULL, NULL, 13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (50,  'S_CLNT_IMP', 'ACTVT',    '60',    NULL,  NULL, NULL, 13);
+
+-- ==============================
 --         sap settings
 -- ==============================
 
@@ -149,6 +174,9 @@ INSERT INTO SapConfigurations (ID, DESCRIPTION, CLIENT, CREATEDAT, CREATEDBY, IS
 
 -- archived config
 INSERT INTO SapConfigurations (ID, DESCRIPTION, CLIENT, CREATEDAT, CREATEDBY, ISARCHIVED, LANGUAGE, POOLCAPACITY, SERVERDESTINATION, SYSNR) VALUES (2, 'a description', '001', '2018-06-08T15:09:15', 'test', 1, 'EN', '0', 'ec2-54-209-137-85.compute-1.amazonaws.com', '00');
+
+-- active config (that is not referenced by a query)
+INSERT INTO SapConfigurations (ID, DESCRIPTION, CLIENT, CREATEDAT, CREATEDBY, ISARCHIVED, LANGUAGE, POOLCAPACITY, SERVERDESTINATION, SYSNR) VALUES (3, 'a description', '001', '2018-06-08T15:09:15', 'test', 0, 'EN', '0', 'ec2-54-209-137-85.compute-1.amazonaws.com', '00');
 
 -- ==============================
 --        configurations
@@ -159,12 +187,12 @@ INSERT INTO Configurations (ID, CREATEDAT, CREATEDBY, DESCRIPTION, ISARCHIVED, N
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (1, 1);
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (1, 3);
 
-INSERT INTO Configurations (ID, CREATEDAT, CREATEDBY, DESCRIPTION, ISARCHIVED, NAME, WHITELISTID) VALUES (2, '2018-06-08T15:09:15', 'test', 'a test description', 0, 'foo config 2', 2);
+INSERT INTO Configurations (ID, CREATEDAT, CREATEDBY, DESCRIPTION, ISARCHIVED, NAME, WHITELISTID) VALUES (2, '2018-06-08T15:09:15', 'test', 'a test description', 0, 'foo config 2', 1);
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (2, 1);
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (2, 2);
 
 -- archived configs
-INSERT INTO Configurations (ID, CREATEDAT, CREATEDBY, DESCRIPTION, ISARCHIVED, NAME, WHITELISTID) VALUES (3, '2018-06-08T15:09:15', 'test', 'a test description', 1, 'foo config 1', 1);
+INSERT INTO Configurations (ID, CREATEDAT, CREATEDBY, DESCRIPTION, ISARCHIVED, NAME, WHITELISTID) VALUES (3, '2018-06-08T15:09:15', 'test', 'a test description', 1, 'foo config 1', 2);
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (3, 4);
 INSERT INTO nm_Configuration_AccessPattern (CONFIGID, ACCESSPATTERNID) VALUES (3, 6);
 
@@ -192,6 +220,6 @@ VALUES (5, 'foobar;', 6, 2);
 
 -- ==============================
 -- authors: Marco Tröster,
---          Joshua SChreibeis
--- last modified: 12.06.2018
+--          Joshua Schreibeis
+-- last modified: 02.07.2018
 -- ==============================

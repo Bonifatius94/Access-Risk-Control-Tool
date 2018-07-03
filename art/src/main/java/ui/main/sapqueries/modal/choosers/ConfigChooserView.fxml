@@ -15,24 +15,29 @@
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.main.sapqueries.modal.choosers.ConfigChooserController"
-              prefHeight="400.0" prefWidth="600.0">
+              windowState="NoResize">
     <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
         <HBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" spacing="30">
             <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" spacing="10">
                 <fx:include source="../../../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
                 <TableView VBox.vgrow="ALWAYS" fx:id="configsTable" minWidth="450" HBox.hgrow="ALWAYS">
                     <columns>
-                        <PTableColumn text="%name" percentageWidth="0.3" resizable="false" styleClass="align-left">
+                        <PTableColumn text="%name" percentageWidth="0.26" resizable="false" styleClass="align-left">
                             <cellValueFactory>
                                 <PropertyValueFactory property="name"/>
                             </cellValueFactory>
                         </PTableColumn>
-                        <PTableColumn text="%description" percentageWidth="0.6" styleClass="align-left">
+                        <PTableColumn text="%description" percentageWidth="0.46" styleClass="align-left">
                             <cellValueFactory>
                                 <PropertyValueFactory property="description"/>
                             </cellValueFactory>
                         </PTableColumn>
-                        <PTableColumn percentageWidth="0.1" styleClass="align-left" fx:id="viewDetailsColumn"/>
+                        <PTableColumn text="%createdAt" fx:id="createdAtColumn" resizable="false" percentageWidth="0.20">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="createdAt"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn percentageWidth="0.08" fx:id="viewDetailsColumn"/>
                     </columns>
                 </TableView>
             </VBox>

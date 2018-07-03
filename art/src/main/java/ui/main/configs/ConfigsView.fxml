@@ -13,19 +13,24 @@
     <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
     <TableView VBox.vgrow="ALWAYS" fx:id="configsTable">
         <columns>
-            <PTableColumn text="Name" percentageWidth="0.35" resizable="false" >
+            <PTableColumn text="Name" percentageWidth="0.35" resizable="false" styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="name"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="Description" percentageWidth="0.48" styleClass="align-left">
+            <PTableColumn text="Description" percentageWidth="0.35" styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="description"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.07" fx:id="editColumn" resizable="false" sortable="false">
+            <PTableColumn text="%createdAt" percentageWidth="0.18" fx:id="createdAtColumn">
+                <cellValueFactory>
+                    <PropertyValueFactory property="createdAt"/>
+                </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" fx:id="deleteColumn" resizable="false" sortable="false">
+            <PTableColumn percentageWidth="0.06" fx:id="editColumn" resizable="false" sortable="false">
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.06" fx:id="deleteColumn" resizable="false" sortable="false">
             </PTableColumn>
         </columns>
     </TableView>
@@ -41,11 +46,6 @@
         <JFXButton text="%newEntry" onAction="#addAction" prefWidth="130">
             <graphic>
                 <MaterialDesignIconView glyphName="PLUS"/>
-            </graphic>
-        </JFXButton>
-        <JFXButton text="%edit" onAction="#editAction" prefWidth="130">
-            <graphic>
-                <MaterialDesignIconView glyphName="PENCIL"/>
             </graphic>
         </JFXButton>
         <JFXButton text="%delete" onAction="#deleteAction" prefWidth="130" styleClass="warning-button">

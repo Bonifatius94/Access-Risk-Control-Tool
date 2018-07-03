@@ -35,8 +35,9 @@ import sap.SapConnector;
 
 import ui.AppComponents;
 import ui.IUpdateTable;
-import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
+import ui.custom.controls.DisableDeleteButtonCell;
+import ui.custom.controls.DisableEditButtonCell;
 import ui.custom.controls.filter.FilterController;
 import ui.main.sapsettings.modal.SapSettingsFormController;
 
@@ -96,7 +97,11 @@ public class SapSettingsController implements IUpdateTable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     SapConfiguration sapConfiguration = row.getItem();
-                    editConfig(sapConfiguration);
+                    if (sapConfiguration.isArchived()) {
+                        viewSapConfigDetails(sapConfiguration);
+                    } else {
+                        editConfig(sapConfiguration);
+                    }
                 }
             });
             return row;
@@ -128,7 +133,7 @@ public class SapSettingsController implements IUpdateTable {
      */
     private void initializeTableColumn() {
         // Add the delete column
-        deleteConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (SapConfiguration sapConfiguration) -> {
+        deleteConfigColumn.setCellFactory(DisableDeleteButtonCell.forTableColumn((SapConfiguration sapConfiguration) -> {
 
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
                 bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
@@ -145,8 +150,12 @@ public class SapSettingsController implements IUpdateTable {
         }));
 
         // Add the edit column
-        editConfigColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (SapConfiguration sapConfiguration) -> {
-            editConfig(sapConfiguration);
+        editConfigColumn.setCellFactory(DisableEditButtonCell.forTableColumn((SapConfiguration sapConfiguration) -> {
+            if (sapConfiguration.isArchived()) {
+                viewSapConfigDetails(sapConfiguration);
+            } else {
+                editConfig(sapConfiguration);
+            }
             return sapConfiguration;
         }));
 
@@ -181,30 +190,26 @@ public class SapSettingsController implements IUpdateTable {
     }
 
     /**
-     * Tests the connection to the SAP system.
+     * Opens a new window in which an SapConfiguration details are shown.
+     *
+     * @param sapConfiguration the SapConfiguration to edit.
      */
-    public void connectAction() {
-        if (sapConnectionTable.getSelectionModel().getSelectedItem() != null) {
+    private void viewSapConfigDetails(SapConfiguration sapConfiguration) {
 
-            SapConfiguration sapConfiguration = sapConnectionTable.getSelectionModel().getSelectedItem();
+        try {
 
-            try {
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapsettings/modal/SapSettingsFormView.fxml", "detailSapSettingsTitle");
 
-                // get exception from server
-                ISapConnector sapConnector = new SapConnector(sapConfiguration, "abs", "abs");
-                sapConnector.canPingServer();
+            SapSettingsFormController sapEdit = loader.getController();
+            sapEdit.giveSelectedSapConfig(sapConfiguration);
+            sapEdit.setParentController(this);
 
-            } catch (Exception e) {
+            // don't allow editing
+            sapEdit.setEditable(false);
 
-                // if exception contains error code 103, connection was successful
-                if (e.getCause().toString().contains("103")) {
-                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("sapConnectTitle"), bundle.getString("sapConnectSuccessMessage"), "OK", "Cancel");
-                    customAlert.showAndWait();
-                } else {
-                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("sapConnectTitle"), bundle.getString("sapConnectFailedMessage"), "Ok", "Cancel");
-                    customAlert.showAndWait();
-                }
-            }
+        } catch (Exception e) {
+
+            e.printStackTrace();
         }
     }
 
@@ -240,16 +245,6 @@ public class SapSettingsController implements IUpdateTable {
 
     }
 
-
-    /**
-     * Opens the edit dialog with the currently selected SapConfiguration.
-     */
-    public void editAction() {
-        if (sapConnectionTable.getSelectionModel().getSelectedItem() != null) {
-            editConfig(sapConnectionTable.getSelectionModel().getSelectedItem());
-        }
-    }
-
     /**
      * Deletes the currently selected SapConfigurations.
      */
@@ -267,6 +262,12 @@ public class SapSettingsController implements IUpdateTable {
                 for (SapConfiguration config : sapConnectionTable.getSelectionModel().getSelectedItems()) {
                     database.deleteSapConfig(config);
                 }
+
+                if (sapConnectionTable.getSelectionModel().getSelectedItems().stream().anyMatch(x -> x.isArchived())) {
+                    customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("alreadyArchivedTitle"), bundle.getString("alreadyArchivedMessage"));
+                    customAlert.showAndWait();
+                }
+
                 updateTable();
             }
         }

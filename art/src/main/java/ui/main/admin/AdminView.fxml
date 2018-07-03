@@ -83,7 +83,7 @@
                 </JFXCheckBox>
                 <JFXCheckBox fx:id="viewerCheckbox" onAction="#viewerSelected" text="%viewer">
                 </JFXCheckBox>
-                <JFXCheckBox fx:id="dataAnalystCheckbox" onAction="#dataAnalystSelected" text="%dataAnalyst">
+                <JFXCheckBox fx:id="configuratorCheckbox" onAction="#configuratorSelected" text="%configurator">
                 </JFXCheckBox>
             </VBox>
             <Separator/>

@@ -19,24 +19,29 @@
                     <PropertyValueFactory property="conditions"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="%useCaseID" percentageWidth="0.17">
+            <PTableColumn text="%useCaseID" percentageWidth="0.15">
                 <cellValueFactory>
                     <PropertyValueFactory property="usecaseId"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="%description" percentageWidth="0.51" styleClass="align-left">
+            <PTableColumn text="%description" percentageWidth="0.39" styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="description"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="#" fx:id="conditionCountColumn" percentageWidth="0.1" resizable="false">
+            <PTableColumn text="%createdAt" percentageWidth="0.2" fx:id="createdAtColumn">
+                <cellValueFactory>
+                    <PropertyValueFactory property="createdAt"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="#" fx:id="conditionCountColumn" percentageWidth="0.08" resizable="false">
                 <cellValueFactory>
                     <PropertyValueFactory property="conditions"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.07" fx:id="editColumn" resizable="false" sortable="false">
+            <PTableColumn percentageWidth="0.06" fx:id="editColumn" resizable="false" sortable="false">
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" fx:id="deleteColumn" resizable="false" sortable="false">
+            <PTableColumn percentageWidth="0.06" fx:id="deleteColumn" resizable="false" sortable="false">
             </PTableColumn>
         </columns>
     </TableView>
@@ -57,11 +62,6 @@
         <JFXButton text="%newEntry" onAction="#addAction" prefWidth="130">
             <graphic>
                 <MaterialDesignIconView glyphName="PLUS"/>
-            </graphic>
-        </JFXButton>
-        <JFXButton text="%edit" onAction="#editAction" prefWidth="130">
-            <graphic>
-                <MaterialDesignIconView glyphName="PENCIL"/>
             </graphic>
         </JFXButton>
         <JFXButton text="%delete" onAction="#deleteAction" prefWidth="130" styleClass="warning-button">

@@ -3,7 +3,7 @@ package data.entities;
 public enum DbUserRole {
 
     // define the three user roles
-    Admin, DataAnalyst, Viewer;
+    Admin, Configurator, Viewer;
 
     /**
      * This is an implementation of toString for enum synchronization with local database roles.
@@ -15,7 +15,7 @@ public enum DbUserRole {
 
         switch (this) {
             case Admin: return "Admin";
-            case DataAnalyst: return "DataAnalyst";
+            case Configurator: return "Configurator";
             case Viewer: return "Viewer";
             default: throw new IllegalArgumentException("Unknown user role");
         }
@@ -31,7 +31,7 @@ public enum DbUserRole {
 
         switch (value.toUpperCase()) {
             case "ADMIN": return Admin;
-            case "DATAANALYST": return DataAnalyst;
+            case "CONFIGURATOR": return Configurator;
             case "VIEWER": return Viewer;
             default: throw new IllegalArgumentException("Unknown user role");
         }

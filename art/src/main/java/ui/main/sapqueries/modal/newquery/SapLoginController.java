@@ -58,10 +58,11 @@ public class SapLoginController {
             try {
                 SapConnector connector = new SapConnector(configuration, usernameInput.getText(), passwordInput.getText());
 
-                if (connector.canPingServer()) {
+                try {
+                    connector.canPingServer();
                     close(event);
                     parentController.runAnalysis(usernameInput.getText(), passwordInput.getText());
-                } else {
+                } catch (Exception e) {
                     errorLabel.setVisible(true);
                 }
 

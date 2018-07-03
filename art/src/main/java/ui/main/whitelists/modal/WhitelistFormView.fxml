@@ -43,14 +43,14 @@
                 <Label text="%whitelistEntries" style="-fx-font-size: 1.5em"/>
                 <TableView fx:id="whitelistEditTable" minWidth="550">
                     <columns>
-                        <PTableColumn percentageWidth="0.42" text="%useCaseId" fx:id="usecaseId">
-                            <cellValueFactory>
-                                <PropertyValueFactory property="usecaseId"/>
-                            </cellValueFactory>
-                        </PTableColumn>
                         <PTableColumn percentageWidth="0.42" text="%username" fx:id="userName">
                             <cellValueFactory>
                                 <PropertyValueFactory property="username"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn percentageWidth="0.42" text="%useCaseId" fx:id="usecaseId">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="usecaseId"/>
                             </cellValueFactory>
                         </PTableColumn>
                         <PTableColumn percentageWidth="0.16" resizable="false" fx:id="deleteWhitelistEntryColumn">
@@ -97,7 +97,8 @@
                                     <Tooltip text="%copyEntry"/>
                                 </tooltip>
                             </JFXButton>
-                            <JFXButton fx:id="applyButton" styleClass="round-button" onAction="#applyChanges" prefWidth="30"
+                            <JFXButton fx:id="applyButton" styleClass="round-button" onAction="#applyChanges"
+                                       prefWidth="30"
                                        prefHeight="30">
                                 <graphic>
                                     <MaterialDesignIconView glyphName="CHECK"/>

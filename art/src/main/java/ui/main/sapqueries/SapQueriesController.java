@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXButton;
 import data.entities.Configuration;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
+import data.entities.DbUserRole;
 import data.entities.SapConfiguration;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
@@ -36,6 +37,8 @@ import ui.AppComponents;
 import ui.IUpdateTable;
 import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
+import ui.custom.controls.DisableArchiveButtonCell;
+import ui.custom.controls.DisableDeleteButtonCell;
 import ui.custom.controls.SapQueryStatusCellFactory;
 import ui.custom.controls.filter.FilterController;
 import ui.main.sapqueries.modal.details.SapQueryDetailController;
@@ -70,7 +73,6 @@ public class SapQueriesController implements IUpdateTable {
     @FXML
     public FilterController filterController;
 
-
     private ResourceBundle bundle;
     private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
 
@@ -78,7 +80,7 @@ public class SapQueriesController implements IUpdateTable {
      * Initializes the controller.
      */
     @FXML
-    public void initialize() throws Exception {
+    public void initialize() {
 
         // load the ResourceBundle
         bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
@@ -149,7 +151,7 @@ public class SapQueriesController implements IUpdateTable {
      */
     private void initializeTableColumns() {
         // Add the delete column
-        archiveColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.ARCHIVE, bundle.getString("archive"), (CriticalAccessQuery query) -> {
+        archiveColumn.setCellFactory(DisableArchiveButtonCell.forTableColumn((CriticalAccessQuery query) -> {
 
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("archiveConfirmTitle"),
                 bundle.getString("archiveConfirmMessage"), "Ok", "Cancel");
@@ -215,7 +217,7 @@ public class SapQueriesController implements IUpdateTable {
     private void openQuery(CriticalAccessQuery query) {
         try {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/details/SapQueryDetailView.fxml","queryDetails");
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/details/SapQueryDetailView.fxml", "queryDetails");
 
             // give the dialog the query
             SapQueryDetailController queryDetail = loader.getController();
@@ -223,15 +225,6 @@ public class SapQueriesController implements IUpdateTable {
             queryDetail.setParentController(this);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * Opens the edit dialog with the selected item.
-     */
-    public void editAction() {
-        if (queriesTable.getSelectionModel().getSelectedItem() != null) {
-            openQuery(queriesTable.getSelectionModel().getSelectedItem());
         }
     }
 
@@ -254,8 +247,9 @@ public class SapQueriesController implements IUpdateTable {
                 for (CriticalAccessQuery query : queriesTable.getSelectionModel().getSelectedItems()) {
                     archiveQuery(query);
                 }
+
+                updateTable();
             }
-            updateTable();
         }
     }
 
@@ -265,7 +259,7 @@ public class SapQueriesController implements IUpdateTable {
     public void addAction() {
         try {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/NewSapQueryView.fxml","newAnalysis");
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/NewSapQueryView.fxml", "newAnalysis");
 
             // give the dialog the query
             NewSapQueryController newQuery = loader.getController();

@@ -4,10 +4,13 @@ import com.jfoenix.controls.JFXButton;
 
 import data.entities.Configuration;
 
+import data.entities.CriticalAccessQuery;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import extensions.ResourceBundleHelper;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -21,16 +24,19 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 import ui.AppComponents;
 import ui.IUpdateTable;
-import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
+import ui.custom.controls.DisableDeleteButtonCell;
+import ui.custom.controls.DisableEditButtonCell;
 import ui.custom.controls.filter.FilterController;
 import ui.main.configs.modal.ConfigsFormController;
+import ui.main.sapqueries.modal.details.ConfigDetailsController;
 
 
 public class ConfigsController implements IUpdateTable {
@@ -46,6 +52,9 @@ public class ConfigsController implements IUpdateTable {
 
     @FXML
     public TableColumn<Configuration, JFXButton> editColumn;
+
+    @FXML
+    public TableColumn<CriticalAccessQuery, ZonedDateTime> createdAtColumn;
 
     @FXML
     public FilterController filterController;
@@ -115,7 +124,11 @@ public class ConfigsController implements IUpdateTable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Configuration configuration = row.getItem();
-                    openConfigurationForm(configuration);
+                    if (configuration.isArchived()) {
+                        viewConfigDetails(configuration);
+                    } else {
+                        openConfigurationForm(configuration);
+                    }
                 }
             });
             return row;
@@ -138,7 +151,7 @@ public class ConfigsController implements IUpdateTable {
     private void initializeTableColumns() {
 
         // Add the delete column
-        deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (Configuration configuration) -> {
+        deleteColumn.setCellFactory(DisableDeleteButtonCell.forTableColumn((Configuration configuration) -> {
 
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
                 bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
@@ -155,11 +168,25 @@ public class ConfigsController implements IUpdateTable {
         }));
 
         // Add the edit column
-        editColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (Configuration configuration) -> {
-            openConfigurationForm(configuration);
+        editColumn.setCellFactory(DisableEditButtonCell.forTableColumn((Configuration configuration) -> {
+            if (configuration.isArchived()) {
+                viewConfigDetails(configuration);
+            } else {
+                openConfigurationForm(configuration);
+            }
             return configuration;
         }));
 
+        // overwrite the column in which the date is displayed for formatting
+        createdAtColumn.setCellFactory(col -> new TableCell<CriticalAccessQuery, ZonedDateTime>() {
+
+            @Override
+            protected void updateItem(ZonedDateTime time, boolean empty) {
+
+                // display nothing if the row is empty, otherwise the item count
+                setText((empty || time == null) ? "" : "" + time.format(DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")));
+            }
+        });
     }
 
 
@@ -187,15 +214,6 @@ public class ConfigsController implements IUpdateTable {
     }
 
     /**
-     * Opens the edit dialog with the selected item.
-     */
-    public void editAction() {
-        if (configsTable.getSelectionModel().getSelectedItems() != null && configsTable.getSelectionModel().getSelectedItems().size() != 0) {
-            openConfigurationForm(configsTable.getSelectionModel().getSelectedItem());
-        }
-    }
-
-    /**
      * Deletes the item from the table.
      */
     public void deleteAction() throws Exception {
@@ -213,6 +231,11 @@ public class ConfigsController implements IUpdateTable {
                 // remove all selected items
                 for (Configuration config : configsTable.getSelectionModel().getSelectedItems()) {
                     AppComponents.getInstance().getDbContext().deleteConfig(config);
+                }
+
+                if (configsTable.getSelectionModel().getSelectedItems().stream().anyMatch(x -> x.isArchived())) {
+                    customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("alreadyArchivedTitle"), bundle.getString("alreadyArchivedMessage"));
+                    customAlert.showAndWait();
                 }
 
                 updateTable();
@@ -239,12 +262,29 @@ public class ConfigsController implements IUpdateTable {
             FXMLLoader loader;
 
             loader = AppComponents.getInstance()
-                .showScene("ui/main/configs/modal/ConfigsFormView.fxml", configuration == null ? "newConfigTitle" : "editConfigTitle", 800, 800);
+                .showScene("ui/main/configs/modal/ConfigsFormView.fxml", configuration == null ? "newConfigTitle" : "editConfigTitle");
 
             // give the dialog the sapConfiguration
             ConfigsFormController configForm = loader.getController();
             configForm.giveSelectedConfiguration(configuration);
             configForm.setParentController(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Opens the config details in a modal window.
+     * @param configuration the configuration which details should be shown
+     */
+    private void viewConfigDetails(Configuration configuration) {
+        try {
+
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/details/ConfigDetailsView.fxml","configDetails", 1050, 650);
+
+            // give the dialog the sapConfiguration
+            ConfigDetailsController configDetails = loader.getController();
+            configDetails.giveConfiguration(configuration);
         } catch (Exception e) {
             e.printStackTrace();
         }

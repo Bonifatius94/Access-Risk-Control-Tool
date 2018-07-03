@@ -18,6 +18,7 @@ import io.msoffice.ReportExportType;
 import io.msoffice.excel.AccessPatternExportHelper;
 import io.msoffice.excel.WhitelistExportHelper;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -146,7 +147,7 @@ public class AnalysisResultController {
     /**
      * Exports the query results with the given format / language.
      */
-    public void exportResults() throws Exception {
+    public void exportQuery() throws Exception {
 
         ReportExportType exportType = exportFormatChooser.getSelectionModel().getSelectedItem();
         Locale exportLanguage = exportLanguageChooser.getSelectionModel().getSelectedItem();
@@ -174,55 +175,75 @@ public class AnalysisResultController {
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter(description, extension);
         fileChooser.getExtensionFilters().add(extensionFilter);
-        // TODO: check if the parent stage is correct
         File file = fileChooser.showSaveDialog(App.primaryStage);
 
         if (file != null) {
 
-            // export the query results to the chosen output file
-            new ExportHelper().exportDocument(resultQuery, file, exportType, exportLanguage);
+            // export results
+            exportAndOpenResults(file, exportType, exportLanguage);
+
+            if (includePatternsCheckbox.isSelected()) {
+                exportPatterns(file);
+            }
+            if (includeWhitelistCheckbox.isSelected()) {
+                exportWhitelist(file);
+            }
+        }
+    }
+
+    /**
+     * Exports the query results with the given format / language.
+     */
+    public void exportAndOpenResults(File file, ReportExportType exportType, Locale exportLanguage) throws Exception {
+
+        // export the query results to the chosen output file
+        new ExportHelper().exportDocument(resultQuery, file, exportType, exportLanguage);
+
+        // open exported file with a suitable program
+        if (file.exists() && Desktop.isDesktopSupported()) {
+            Desktop.getDesktop().open(file);
         }
     }
 
     /**
      * Exports the whitelist used for the analysis.
      */
-    public void exportWhitelist() throws Exception {
+    public void exportWhitelist(File file) throws Exception {
 
-        FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Excel files (*.xlsx)", "*.xlsx");
-        fileChooser.getExtensionFilters().add(extensionFilter);
-        // TODO: check if the parent stage is correct
-        File file = fileChooser.showSaveDialog(App.primaryStage);
+        String path = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + " - whitelist.xlsx";
 
-        if (file != null) {
+        // export the whitelist to the chosen output file
+        new WhitelistExportHelper().exportWhitelist(path, resultQuery.getConfig().getWhitelist());
 
-            // export the whitelist to the chosen output file
-            new WhitelistExportHelper().exportWhitelist(file.getAbsolutePath(), resultQuery.getConfig().getWhitelist());
+        // open exported file with a suitable program
+        /*
+        if (file.exists() && Desktop.isDesktopSupported()) {
+            Desktop.getDesktop().open(file);
         }
+        */
     }
 
     /**
      * Exports the access patterns used for the analysis.
      */
-    public void exportPatterns() throws Exception {
+    public void exportPatterns(File file) throws Exception {
 
-        FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Excel files (*.xlsx)", "*.xlsx");
-        fileChooser.getExtensionFilters().add(extensionFilter);
-        // TODO: check if the parent stage is correct
-        File file = fileChooser.showSaveDialog(App.primaryStage);
+        String path = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + " - patterns.xlsx";
 
-        if (file != null) {
-
-            // order patterns by usecase id
-            List<AccessPattern> patterns =
-                resultQuery.getConfig().getPatterns().stream()
+        // order patterns by usecase id
+        List<AccessPattern> patterns =
+            resultQuery.getConfig().getPatterns().stream()
                 .sorted(Comparator.comparing(AccessPattern::getUsecaseId)).collect(Collectors.toList());
 
-            // export the patterns to the chosen output file
-            new AccessPatternExportHelper().exportAccessPatterns(file.getAbsolutePath(), patterns);
+        // export the patterns to the chosen output file
+        new AccessPatternExportHelper().exportAccessPatterns(path, patterns);
+
+        // open exported file with a suitable program
+        /*
+        if (file.exists() && Desktop.isDesktopSupported()) {
+            Desktop.getDesktop().open(file);
         }
+        */
     }
 
     /**
@@ -256,7 +277,7 @@ public class AnalysisResultController {
     public void viewAccessPatternDetails(AccessPattern accessPattern) {
         try {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternsFormView.fxml", "patternDetails", 1200, 750);
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternsFormView.fxml", "patternDetails", 1200, 700);
 
             // give the dialog the sapConfiguration
             PatternsFormController patternView = loader.getController();

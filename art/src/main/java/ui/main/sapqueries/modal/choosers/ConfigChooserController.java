@@ -7,10 +7,13 @@ import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 import data.entities.Configuration;
 
+import data.entities.CriticalAccessQuery;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import extensions.ResourceBundleHelper;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -61,6 +64,9 @@ public class ConfigChooserController {
 
     @FXML
     public TableColumn<Configuration, JFXButton> viewDetailsColumn;
+
+    @FXML
+    public TableColumn<CriticalAccessQuery, ZonedDateTime> createdAtColumn;
 
     @FXML
     public FilterController filterController;
@@ -125,6 +131,17 @@ public class ConfigChooserController {
 
         // sets the icon of the condition to pattern or profile
         conditionTypeColumn.setCellFactory(new ConditionTypeCellFactory());
+
+        // overwrite the column in which the date is displayed for formatting
+        createdAtColumn.setCellFactory(col -> new TableCell<CriticalAccessQuery, ZonedDateTime>() {
+
+            @Override
+            protected void updateItem(ZonedDateTime time, boolean empty) {
+
+                // display nothing if the row is empty, otherwise the item count
+                setText((empty || time == null) ? "" : "" + time.format(DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")));
+            }
+        });
     }
 
     /**

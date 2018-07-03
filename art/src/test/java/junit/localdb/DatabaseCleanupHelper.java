@@ -17,7 +17,7 @@ public class DatabaseCleanupHelper {
         System.out.println(" done");
     }
 
-    private void deleteDatabase() throws Exception {
+    private void deleteDatabase() {
 
         String databasePath = "art.h2.mv.db";
 

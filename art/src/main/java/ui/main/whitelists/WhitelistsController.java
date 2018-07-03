@@ -35,8 +35,9 @@ import javafx.stage.FileChooser;
 import ui.App;
 import ui.AppComponents;
 import ui.IUpdateTable;
-import ui.custom.controls.ButtonCell;
 import ui.custom.controls.CustomAlert;
+import ui.custom.controls.DisableDeleteButtonCell;
+import ui.custom.controls.DisableEditButtonCell;
 import ui.custom.controls.PTableColumn;
 import ui.custom.controls.filter.FilterController;
 import ui.main.whitelists.modal.WhitelistFormController;
@@ -88,7 +89,11 @@ public class WhitelistsController implements IUpdateTable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Whitelist whitelist = row.getItem();
-                    editDialogWhitelist(whitelist);
+                    if (whitelist.isArchived()) {
+                        viewWhitelistDetails(whitelist);
+                    } else {
+                        editDialogWhitelist(whitelist);
+                    }
                 }
             });
             return row;
@@ -136,12 +141,13 @@ public class WhitelistsController implements IUpdateTable {
      */
     private void initializeColumns() {
 
-        deleteWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, bundle.getString("delete"), (Whitelist whitelist) -> {
+        deleteWhitelistColumn.setCellFactory(DisableDeleteButtonCell.forTableColumn((Whitelist whitelist) -> {
 
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("deleteConfirmTitle"),
                 bundle.getString("deleteConfirmMessage"), "Ok", "Cancel");
 
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+
                 try {
                     database.deleteWhitelist(whitelist);
                     updateTable();
@@ -154,8 +160,12 @@ public class WhitelistsController implements IUpdateTable {
         deleteWhitelistColumn.setSortable(false);
 
         // Add the edit column
-        editWhitelistColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.PENCIL, bundle.getString("edit"), (Whitelist whitelist) -> {
-            editDialogWhitelist(whitelist);
+        editWhitelistColumn.setCellFactory(DisableEditButtonCell.forTableColumn((Whitelist whitelist) -> {
+            if (whitelist.isArchived()) {
+                viewWhitelistDetails(whitelist);
+            } else {
+                editDialogWhitelist(whitelist);
+            }
             return whitelist;
         }));
         editWhitelistColumn.setSortable(false);
@@ -216,6 +226,29 @@ public class WhitelistsController implements IUpdateTable {
     }
 
     /**
+     * This functions starts Whitelist detail view and Controller.
+     *
+     * @param whitelist is a Whitelist needed for Whitelist Detail dialog.
+     */
+    private void viewWhitelistDetails(Whitelist whitelist) {
+
+        try {
+
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "whitelistDetails", 900, 650);
+
+            WhitelistFormController editDialogController = loader.getController();
+            editDialogController.giveSelectedWhitelist(whitelist);
+            editDialogController.setWhitelistsController(this);
+
+            // don't allow editing
+            editDialogController.setEditable(false);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * This function deletes a selected Whitelist is called By delete Button.
      */
     public void deleteWhitelist() throws Exception {
@@ -234,19 +267,15 @@ public class WhitelistsController implements IUpdateTable {
                 for (Whitelist whitelist : whitelistTable.getSelectionModel().getSelectedItems()) {
                     database.deleteWhitelist(whitelist);
                 }
+                if (whitelistTable.getSelectionModel().getSelectedItems().stream().anyMatch(x -> x.isArchived())) {
+                    customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("alreadyArchivedTitle"), bundle.getString("alreadyArchivedMessage"));
+                    customAlert.showAndWait();
+                }
                 updateTable();
             }
         }
     }
 
-    /**
-     * This function is called from a button press and starts edit.
-     */
-    public void editWhitelist() {
-        if (whitelistTable.getSelectionModel().getSelectedItem() != null) {
-            editDialogWhitelist(whitelistTable.getSelectionModel().getSelectedItem());
-        }
-    }
 
     /**
      * clones a selected Whitelist.
@@ -255,6 +284,7 @@ public class WhitelistsController implements IUpdateTable {
         if (whitelistTable.getSelectionModel().getSelectedItems() != null && whitelistTable.getSelectionModel().getSelectedItems().size() != 0) {
             for (Whitelist whitelist : whitelistTable.getSelectionModel().getSelectedItems()) {
                 Whitelist whitelistToAdd = new Whitelist(whitelist);
+                whitelistToAdd.setArchived(false);
                 whitelistToAdd.setDescription("Clone - " + whitelist.getDescription());
                 database.createWhitelist(whitelistToAdd);
             }
@@ -271,13 +301,12 @@ public class WhitelistsController implements IUpdateTable {
         fileChooser.getExtensionFilters().add(extensionFilter);
         File file = fileChooser.showOpenDialog(App.primaryStage);
         if (file != null) {
-            String path = file.getPath();
             try {
-                WhitelistImportHelper whitelistImportHelper = new WhitelistImportHelper();
-                Whitelist importedWhitelist = whitelistImportHelper.importWhitelist(path);
+                Whitelist importedWhitelist = new WhitelistImportHelper().importWhitelist(file.getPath());
                 startImportDialog(importedWhitelist);
             } catch (Exception e) {
-                e.printStackTrace();
+                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"), bundle.getString("wrongFileMessage"));
+                alert.showAndWait();
             }
         }
     }

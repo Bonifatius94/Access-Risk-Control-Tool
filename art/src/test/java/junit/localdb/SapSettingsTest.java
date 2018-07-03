@@ -27,13 +27,13 @@ public class SapSettingsTest {
             List<SapConfiguration> configs = context.getSapConfigs(false);
 
             // check if test data was queried successfully
-            ret = configs.size() == 1;
+            ret = configs.size() == 2;
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
@@ -54,17 +54,16 @@ public class SapSettingsTest {
             List<SapConfiguration> configs = context.getSapConfigs(false);
 
             // check if config was inserted successfully
-            ret = configs.size() == 2 && configs.stream().anyMatch(x -> x.getPoolCapacity().equals(poolCapacity));
+            ret = configs.size() == 3 && configs.stream().anyMatch(x -> x.getPoolCapacity().equals(poolCapacity));
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
-    @Disabled
     public void testUpdateSapConfig() {
 
         boolean ret = false;
@@ -72,7 +71,8 @@ public class SapSettingsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query sap config
-            SapConfiguration config = context.getSapConfigs(false).stream().findFirst().get();
+            int sapConfigsCount = context.getSapConfigs(true).size();
+            SapConfiguration config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(3)).findFirst().get();
             Integer id = config.getId();
 
             // apply changes to sap config
@@ -86,19 +86,16 @@ public class SapSettingsTest {
             config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(id)).findFirst().get();
 
             // check if config was inserted successfully
-            ret = config.getLanguage().equals(newLanguage);
+            ret = config.getLanguage().equals(newLanguage) && context.getSapConfigs(true).size() == sapConfigsCount;
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        // TODO: test logic for archiving sap config on update
-
-        assert(ret);
+        assert (ret);
     }
 
     @Test
-    @Disabled
     public void testUpdateSapConfigWithArchiving() {
 
         boolean ret = false;
@@ -106,7 +103,8 @@ public class SapSettingsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query sap config
-            SapConfiguration config = context.getSapConfigs(false).stream().findFirst().get();
+            int sapConfigsCount = context.getSapConfigs(true).size();
+            SapConfiguration config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(1)).findFirst().get();
             Integer id = config.getId();
 
             // apply changes to sap config
@@ -120,15 +118,13 @@ public class SapSettingsTest {
             config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(id)).findFirst().get();
 
             // check if config was inserted successfully
-            ret = config.getLanguage().equals(newLanguage);
+            ret = config.getLanguage().equals(newLanguage) && context.getSapConfigs(true).size() == sapConfigsCount + 1;
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        // TODO: test logic for archiving sap config on update
-
-        assert(false);
+        assert (ret);
     }
 
     @Test
@@ -139,7 +135,8 @@ public class SapSettingsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query sap config
-            SapConfiguration config = context.getSapConfigs(false).stream().findFirst().get();
+            int sapConfigsCount = context.getSapConfigs(true).size();
+            SapConfiguration config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(3)).findFirst().get();
             Integer id = config.getId();
 
             // insert into database
@@ -149,17 +146,16 @@ public class SapSettingsTest {
             config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
 
             // check if config was inserted successfully
-            ret = config == null;
+            ret = config == null && context.getSapConfigs(true).size() == sapConfigsCount - 1;
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        assert(ret);
+        assert (ret);
     }
 
     @Test
-    @Disabled
     public void testDeleteSapConfigWithArchiving() {
 
         boolean ret = false;
@@ -167,23 +163,24 @@ public class SapSettingsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // query sap config
-            SapConfiguration config = context.getSapConfigs(false).stream().findFirst().get();
+            int sapConfigsCount = context.getSapConfigs(true).size();
+            SapConfiguration config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(1)).findFirst().get();
             Integer id = config.getId();
 
             // insert into database
             context.deleteSapConfig(config);
 
             // query updated data
-            config = context.getSapConfigs(false).stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
+            config = context.getSapConfigs(true).stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
 
             // check if config was inserted successfully
-            ret = config == null;
+            ret = config.isArchived() == true && context.getSapConfigs(true).size() == sapConfigsCount;
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        assert(false);
+        assert (ret);
     }
 
 }

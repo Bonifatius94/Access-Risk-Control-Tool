@@ -17,19 +17,24 @@
                 <fx:include source="../../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
                 <TableView VBox.vgrow="ALWAYS" fx:id="whitelistTable" minWidth="500">
                     <columns>
-                        <PTableColumn text="%name" percentageWidth="0.3">
+                        <PTableColumn text="%name" percentageWidth="0.3" styleClass="align-left">
                             <cellValueFactory>
                                 <PropertyValueFactory property="name"/>
                             </cellValueFactory>
                         </PTableColumn>
-                        <PTableColumn text="%description" percentageWidth="0.55">
+                        <PTableColumn text="%description" percentageWidth="0.4" styleClass="align-left">
                             <cellValueFactory>
                                 <PropertyValueFactory property="description"/>
                             </cellValueFactory>
                         </PTableColumn>
-                        <PTableColumn fx:id="entryCountColumn" text="#" resizable="false" percentageWidth="0.15">
+                        <PTableColumn text="%createdAt" fx:id="createdAtColumn" resizable="false" percentageWidth="0.20">
                             <cellValueFactory>
-                                <PropertyValueFactory property="Integer"/>
+                                <PropertyValueFactory property="createdAt"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn fx:id="entryCountColumn" text="#" resizable="false" percentageWidth="0.1">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="entries"/>
                             </cellValueFactory>
                         </PTableColumn>
                     </columns>
