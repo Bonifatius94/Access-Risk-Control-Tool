@@ -28,7 +28,8 @@ public class AnalysisGraphsController {
     @FXML
     private NumberAxis chartY;
 
-    private CriticalAccessQuery resultQuery;
+    private List<CriticalAccessQuery> relatedQueries;
+
     private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
     /**
@@ -37,17 +38,16 @@ public class AnalysisGraphsController {
      * @param query the result query
      */
     public void giveResultQuery(CriticalAccessQuery query) throws Exception {
-        resultQuery = query;
 
-        createChart(query);
+        // get the related queries
+        relatedQueries = AppComponents.getInstance().getDbContext().getRelatedSapQueries(query, false);
+
+        if (relatedQueries.size() > 1) {
+            createChart();
+        }
     }
 
-    private void createChart(CriticalAccessQuery criticalAccessQuery) throws Exception {
-
-        chartX.setAutoRanging(true);
-        chartX.setAnimated(false);
-
-        List<CriticalAccessQuery> relatedQueries = AppComponents.getInstance().getDbContext().getRelatedSapQueries(criticalAccessQuery, false);
+    private void createChart() throws Exception {
 
         // calculate maximum of entries for upper bound
         int maximum = relatedQueries.stream().map(x -> x.getEntries().size()).max(Integer::compareTo).get();
@@ -57,6 +57,9 @@ public class AnalysisGraphsController {
         chartY.setUpperBound(maximum);
         chartY.setLowerBound(0);
         chartY.setTickUnit(5);
+
+        chartX.setAutoRanging(true);
+        chartX.setAnimated(false);
 
         XYChart.Series<String, Integer> mainSeries = new XYChart.Series<>();
         mainSeries.setName(bundle.getString("numberOfViolations"));

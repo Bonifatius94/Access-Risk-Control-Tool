@@ -12,7 +12,7 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="ui.main.sapqueries.modal.results.views.AnalysisGraphsController">
-    <LineChart fx:id="queriesHistoryChart" title="Query History">
+    <LineChart fx:id="queriesHistoryChart" title="%queryHistory">
         <xAxis>
             <CategoryAxis label="%createdAt" fx:id="chartX"/>
         </xAxis>
