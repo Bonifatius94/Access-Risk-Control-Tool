@@ -393,9 +393,6 @@ public class ConfigsFormController {
             if (patternsTable.getItems().size() == 0) {
                 CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("patternsEmptyTitle"), bundle.getString("patternsEmptyMessage"));
                 alert.showAndWait();
-            } else if (whitelistChooser.getValue() == null) {
-                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("noWhitelistTitle"), bundle.getString("noWhitelistMessage"));
-                alert.showAndWait();
             } else {
                 this.configuration.setName(this.nameInput.getText());
                 this.configuration.setDescription(this.descriptionInput.getText());
@@ -408,7 +405,7 @@ public class ConfigsFormController {
                 }
 
                 // check if the whitelist was imported so it has to be created first
-                if (whitelistChooser.getValue().getId() == null) {
+                if (whitelistChooser.getValue() != null && whitelistChooser.getValue().getId() == null) {
                     AppComponents.getInstance().getDbContext().createWhitelist(whitelistChooser.getValue());
                 }
 

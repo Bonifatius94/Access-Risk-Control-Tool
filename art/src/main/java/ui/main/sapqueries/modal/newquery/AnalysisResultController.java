@@ -267,6 +267,12 @@ public class AnalysisResultController {
 
         this.resultTable.setItems(FXCollections.observableList(new ArrayList<>(query.getEntries())));
         this.resultTable.getSortOrder().add(usecaseIdColumn);
+
+        // whitelist is null, don't allow export
+        if (query.getConfig().getWhitelist() == null) {
+            includeWhitelistCheckbox.setDisable(true);
+            includeWhitelistCheckbox.setSelected(false);
+        }
     }
 
     /**

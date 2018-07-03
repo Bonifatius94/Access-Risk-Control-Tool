@@ -72,6 +72,7 @@ public class ConfigChooserController {
     public FilterController filterController;
 
     private NewSapQueryController parentController;
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
 
     /**
@@ -167,9 +168,15 @@ public class ConfigChooserController {
     private void showDetails(Configuration config) {
 
         if (config != null) {
-            // fill whitelist text fields
-            this.whitelistName.setText(config.getWhitelist().getName());
-            this.whitelistDescription.setText(config.getWhitelist().getDescription());
+
+            if (config.getWhitelist() != null) {
+                // fill whitelist text fields
+                this.whitelistName.setText(config.getWhitelist().getName());
+                this.whitelistDescription.setText(config.getWhitelist().getDescription());
+            } else {
+                this.whitelistName.setText(bundle.getString("noWhitelist"));
+                this.whitelistDescription.clear();
+            }
 
             // fill patterns table
             this.patternsTable.setItems(FXCollections.observableList(new ArrayList<>(config.getPatterns())));
