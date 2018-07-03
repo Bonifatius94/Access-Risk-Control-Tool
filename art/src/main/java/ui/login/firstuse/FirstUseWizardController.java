@@ -193,7 +193,7 @@ public class FirstUseWizardController {
         try {
 
             AppComponents.getInstance()
-                .showScene("ui/main/MainView.fxml", "art", App.primaryStage, null, null, 1050, 750);
+                .showScene("ui/main/MainView.fxml", "art", App.primaryStage, null, null, 1050, 720);
 
             close(event);
         } catch (Exception e) {

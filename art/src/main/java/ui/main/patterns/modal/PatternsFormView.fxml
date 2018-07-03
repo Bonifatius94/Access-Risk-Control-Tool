@@ -18,7 +18,7 @@
 <?import javafx.scene.control.Tab?>
 <?import com.jfoenix.controls.JFXTabPane?>
 <?import javafx.scene.control.Tooltip?>
-<CustomWindow windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
+<CustomWindow windowState="CanResize" xmlns="http://javafx.com/javafx/8.0.121"
               xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.patterns.modal.PatternsFormController">
     <VBox spacing="20" HBox.hgrow="ALWAYS" style="-fx-padding: 20">
         <VBox alignment="BASELINE_LEFT" spacing="40" HBox.hgrow="ALWAYS">
@@ -79,8 +79,8 @@
                     <Label fx:id="atLeastTwoCondsWarning" text="%atLeastTwoCondsWarning" visible="false"/>
                 </HBox>
                 <Separator/>
-                <Label text="%conditionPropertiesTitle" style="-fx-font-size: 150%; -fx-padding: 10 0 10 0" />
-                <VBox HBox.hgrow="ALWAYS" spacing="40" style="-fx-padding: 0 0 30 0">
+                <Label text="%conditionPropertiesTitle" style="-fx-font-size: 140%" />
+                <VBox HBox.hgrow="ALWAYS" spacing="40" style="-fx-padding: 0 0 20 0">
                     <JFXTextField fx:id="authObjectInput" promptText="%authObject" minWidth="150" maxWidth="400">
                         <validators>
                             <RequiredFieldValidator message="%required">

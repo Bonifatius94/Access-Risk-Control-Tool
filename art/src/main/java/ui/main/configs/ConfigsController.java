@@ -262,7 +262,7 @@ public class ConfigsController implements IUpdateTable {
             FXMLLoader loader;
 
             loader = AppComponents.getInstance()
-                .showScene("ui/main/configs/modal/ConfigsFormView.fxml", configuration == null ? "newConfigTitle" : "editConfigTitle", 800, 800);
+                .showScene("ui/main/configs/modal/ConfigsFormView.fxml", configuration == null ? "newConfigTitle" : "editConfigTitle");
 
             // give the dialog the sapConfiguration
             ConfigsFormController configForm = loader.getController();

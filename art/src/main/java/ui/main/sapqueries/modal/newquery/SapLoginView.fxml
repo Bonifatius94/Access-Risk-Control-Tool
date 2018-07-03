@@ -17,7 +17,7 @@
 <?import javafx.scene.image.Image?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
-              fx:controller="ui.main.sapqueries.modal.newquery.SapLoginController">
+              fx:controller="ui.main.sapqueries.modal.newquery.SapLoginController" windowState="NoResize">
     <!-- login credentials input -->
     <VBox HBox.hgrow="ALWAYS" style="-fx-padding: 20" spacing="20" alignment="CENTER" styleClass="login-window">
         <ImageView fitWidth="180" fitHeight="180">

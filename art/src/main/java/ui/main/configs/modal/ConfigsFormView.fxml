@@ -13,7 +13,7 @@
 <?import com.jfoenix.controls.JFXButton?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
-              fx:controller="ui.main.configs.modal.ConfigsFormController" windowState="NoResize">
+              fx:controller="ui.main.configs.modal.ConfigsFormController" windowState="CanResize">
     <VBox spacing="20" HBox.hgrow="ALWAYS" style="-fx-padding: 20">
         <VBox alignment="BASELINE_LEFT" spacing="40" HBox.hgrow="ALWAYS" style="-fx-padding: 0 0 20 0">
             <JFXTextField fx:id="nameInput" promptText="%configName" maxWidth="250">
@@ -55,7 +55,7 @@
                     </graphic>
                 </JFXButton>
             </HBox>
-            <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable">
+            <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable" maxHeight="350">
                 <columns>
                     <PTableColumn text="?" fx:id="conditionTypeColumn" percentageWidth="0.06" resizable="false">
                         <cellValueFactory>

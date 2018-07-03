@@ -15,7 +15,7 @@
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.main.sapqueries.modal.choosers.ConfigChooserController"
-              prefHeight="400.0" prefWidth="600.0">
+              windowState="CanResize">
     <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
         <HBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" spacing="30">
             <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" spacing="10">

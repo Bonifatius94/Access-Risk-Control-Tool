@@ -240,7 +240,7 @@ public class PatternsController implements IUpdateTable {
         try {
 
             FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternsFormView.fxml",
-                accessPattern == null ? "newPatternTitle" : "editPatternTitle", 1200, 750);
+                accessPattern == null ? "newPatternTitle" : "editPatternTitle", 1200, 700);
 
             // give the dialog the sapConfiguration
             PatternsFormController patternEdit = loader.getController();
@@ -259,7 +259,7 @@ public class PatternsController implements IUpdateTable {
     public void viewAccessPatternDetails(AccessPattern accessPattern) {
 
         try {
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternsFormView.fxml", "patternDetails", 1200, 750);
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternsFormView.fxml", "patternDetails", 1200, 700);
 
             // give the dialog the sapConfiguration
             PatternsFormController patternView = loader.getController();

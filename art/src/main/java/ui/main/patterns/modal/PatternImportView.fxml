@@ -13,7 +13,7 @@
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
-              fx:controller="ui.main.patterns.modal.PatternImportController" windowState="NoResize">
+              fx:controller="ui.main.patterns.modal.PatternImportController" windowState="CanResize">
     <VBox HBox.hgrow="ALWAYS" style="-fx-padding: 20" spacing="20">
         <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable" minWidth="600">
             <columns>
