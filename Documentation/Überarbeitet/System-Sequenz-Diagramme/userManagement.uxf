@@ -204,7 +204,7 @@ switch to createUserView</panel_attributes>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;
-create user(fistPassword)</panel_attributes>
+create user(firstPassword), open dialog to warn to save firstPassword</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
