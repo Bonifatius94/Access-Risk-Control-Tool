@@ -45,10 +45,12 @@ public class StatusBarController {
             e.printStackTrace();
         }
 
+        // bind analysis progress box to the analysisRunning property of NewSapQueryController
         analysisProgressBox.visibleProperty().bind(analysisRunning.greaterThan(0));
-        analysisProgressLabel.textProperty().bind(Bindings.convert(analysisRunning).concat(" " + bundle.getString("analysisRunning")));
+        analysisProgressLabel.textProperty().bind(Bindings.convert(analysisRunning).concat(" " + bundle.getString("inProgress")));
         analysisProgressBox.managedProperty().bind(analysisProgressBox.visibleProperty());
 
+        // bind the standard copyright label
         copyrightBox.visibleProperty().bind(Bindings.not(analysisProgressBox.visibleProperty()));
         copyrightBox.managedProperty().bind(copyrightBox.visibleProperty());
     }
