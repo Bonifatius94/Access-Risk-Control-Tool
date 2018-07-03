@@ -1,11 +1,9 @@
 package ui.main.sapqueries.modal.details;
 
-import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 
 import data.entities.CriticalAccessQuery;
 
-import data.entities.DbUserRole;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
@@ -17,18 +15,13 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
-import ui.App;
 import ui.AppComponents;
-import ui.custom.controls.CustomWindow;
 import ui.main.sapqueries.SapQueriesController;
-import ui.main.sapqueries.modal.newquery.AnalysisResultController;
 import ui.main.sapqueries.modal.newquery.NewSapQueryController;
+import ui.main.sapqueries.modal.results.AnalysisResultController;
 import ui.main.sapsettings.modal.SapSettingsFormController;
 
 
@@ -115,7 +108,7 @@ public class SapQueryDetailController {
      */
     public void openResultDetails() throws Exception {
 
-        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/AnalysisResultView.fxml", "analysisResultTitle");
+        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/results/AnalysisResultView.fxml", "analysisResultTitle");
 
         AnalysisResultController resultController = loader.getController();
         resultController.giveResultQuery(query);

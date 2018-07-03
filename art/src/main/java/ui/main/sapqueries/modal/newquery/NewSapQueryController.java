@@ -18,7 +18,6 @@ import java.util.ResourceBundle;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -45,6 +44,7 @@ import ui.custom.controls.CustomAlert;
 import ui.main.sapqueries.SapQueriesController;
 import ui.main.sapqueries.modal.choosers.ConfigChooserController;
 import ui.main.sapqueries.modal.choosers.SapConfigChooserController;
+import ui.main.sapqueries.modal.results.AnalysisResultController;
 
 
 public class NewSapQueryController {
@@ -283,7 +283,7 @@ public class NewSapQueryController {
                     parentController.updateTable();
 
                     Stage stage = new Stage();
-                    FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/AnalysisResultView.fxml", "analysisResultTitle",
+                    FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/results/AnalysisResultView.fxml", "analysisResultTitle",
                         stage, App.primaryStage, Modality.WINDOW_MODAL);
                     stage.toFront();
 

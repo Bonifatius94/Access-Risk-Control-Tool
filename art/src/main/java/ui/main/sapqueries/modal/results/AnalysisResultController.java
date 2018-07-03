@@ -1,11 +1,9 @@
-package ui.main.sapqueries.modal.newquery;
+package ui.main.sapqueries.modal.results;
 
-import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXComboBox;
 
 import data.entities.AccessPattern;
-import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
@@ -20,7 +18,6 @@ import io.msoffice.excel.WhitelistExportHelper;
 
 import java.awt.Desktop;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -31,22 +28,15 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
-import javafx.util.Callback;
 
 import settings.UserSettings;
 
 import ui.App;
-import ui.AppComponents;
-import ui.custom.controls.ButtonCell;
-import ui.main.patterns.modal.PatternsFormController;
+import ui.main.sapqueries.modal.results.views.AnalysisGraphsController;
+import ui.main.sapqueries.modal.results.views.AnalysisTableController;
 
 
 public class AnalysisResultController {
@@ -58,31 +48,22 @@ public class AnalysisResultController {
     private Label criticalAccessCount;
 
     @FXML
-    private TableView<CriticalAccessEntry> resultTable;
-
-    @FXML
     private JFXComboBox<ReportExportType> exportFormatChooser;
 
     @FXML
     private JFXComboBox<Locale> exportLanguageChooser;
 
     @FXML
-    public TableColumn<CriticalAccessEntry, JFXButton> viewPatternDetailsColumn;
+    private JFXCheckBox includePatternsCheckbox;
 
     @FXML
-    public TableColumn<CriticalAccessEntry, AccessPattern> conditionTypeColumn;
+    private JFXCheckBox includeWhitelistCheckbox;
 
     @FXML
-    public TableColumn<CriticalAccessEntry, AccessPattern> usecaseIdColumn;
+    private AnalysisTableController analysisTableController;
 
     @FXML
-    public TableColumn<CriticalAccessEntry, AccessPattern> descriptionColumn;
-
-    @FXML
-    public JFXCheckBox includePatternsCheckbox;
-
-    @FXML
-    public JFXCheckBox includeWhitelistCheckbox;
+    private AnalysisGraphsController analysisGraphsController;
 
 
     private CriticalAccessQuery resultQuery;
@@ -95,16 +76,6 @@ public class AnalysisResultController {
     public void initialize() {
         bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
-        // Add the detail column
-        viewPatternDetailsColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.OPEN_IN_NEW, (CriticalAccessEntry entry) -> {
-            viewAccessPatternDetails(entry.getAccessPattern());
-            return entry;
-        }));
-
-        initializeConditionTypeColumn();
-        initializeUsecaseIdColumn();
-        initializeDescriptionColumn();
-
         // init export format chooser
         exportFormatChooser.setItems(FXCollections.observableList(Arrays.asList(ReportExportType.Word, ReportExportType.Pdf, ReportExportType.Csv)));
         exportFormatChooser.getSelectionModel().select(ReportExportType.Word);
@@ -114,35 +85,6 @@ public class AnalysisResultController {
         exportLanguageChooser.getSelectionModel().select(Locale.GERMAN);
     }
 
-    /**
-     * Initializes the usecaseId Column.
-     */
-    private void initializeUsecaseIdColumn() {
-        usecaseIdColumn.setCellFactory((col -> new TableCell<CriticalAccessEntry, AccessPattern>() {
-
-            @Override
-            protected void updateItem(AccessPattern entry, boolean empty) {
-
-                // display nothing if the row is empty, otherwise the item count
-                setText((empty || entry == null) ? "" : "" + entry.getUsecaseId());
-            }
-        }));
-    }
-
-    /**
-     * Initializes the description Column.
-     */
-    private void initializeDescriptionColumn() {
-        descriptionColumn.setCellFactory((col -> new TableCell<CriticalAccessEntry, AccessPattern>() {
-
-            @Override
-            protected void updateItem(AccessPattern entry, boolean empty) {
-
-                // display nothing if the row is empty, otherwise the item count
-                setText((empty || entry == null) ? "" : "" + entry.getDescription());
-            }
-        }));
-    }
 
     /**
      * Exports the query results with the given format / language.
@@ -265,84 +207,15 @@ public class AnalysisResultController {
             statusIcon.setStyle("-fx-fill: -fx-success");
         }
 
-        this.resultTable.setItems(FXCollections.observableList(new ArrayList<>(query.getEntries())));
-        this.resultTable.getSortOrder().add(usecaseIdColumn);
-
         // whitelist is null, don't allow export
         if (query.getConfig().getWhitelist() == null) {
             includeWhitelistCheckbox.setDisable(true);
             includeWhitelistCheckbox.setSelected(false);
         }
-    }
 
-    /**
-     * Opens a modal edit dialog for the selected AccessPattern.
-     *
-     * @param accessPattern the selected AccessPattern
-     */
-    public void viewAccessPatternDetails(AccessPattern accessPattern) {
-        try {
-
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternsFormView.fxml", "patternDetails", 1200, 700);
-
-            // give the dialog the sapConfiguration
-            PatternsFormController patternView = loader.getController();
-            patternView.giveSelectedAccessPattern(accessPattern);
-            patternView.setEditable(false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Initializes the conditionType Column.
-     */
-    private void initializeConditionTypeColumn() {
-        // sets the icon of the condition to pattern or profile
-        conditionTypeColumn.setCellFactory(new Callback<TableColumn<CriticalAccessEntry, AccessPattern>, TableCell<CriticalAccessEntry, AccessPattern>>() {
-            public TableCell<CriticalAccessEntry, AccessPattern> call(TableColumn<CriticalAccessEntry, AccessPattern> param) {
-                TableCell<CriticalAccessEntry, AccessPattern> cell = new TableCell<CriticalAccessEntry, AccessPattern>() {
-                    protected void updateItem(AccessPattern item, boolean empty) {
-
-                        // display nothing if the row is empty, otherwise the item count
-                        if (empty || item == null) {
-
-                            // nothing to display
-                            setText("");
-                            setGraphic(null);
-
-                        } else {
-
-                            // add the icon
-                            MaterialDesignIconView iconView = new MaterialDesignIconView();
-                            iconView.setStyle("-fx-font-size: 1.6em");
-
-                            // wrapper label for showing a tooltip
-                            Label wrapper = new Label();
-                            wrapper.setGraphic(iconView);
-
-                            if (item.getConditions().stream().findFirst().get().getProfileCondition() == null) {
-
-                                // pattern
-                                iconView.setIcon(MaterialDesignIcon.VIEW_GRID);
-                                wrapper.setTooltip(new Tooltip(bundle.getString("patternCondition")));
-
-                            } else {
-
-                                // profile
-                                iconView.setIcon(MaterialDesignIcon.ACCOUNT_BOX_OUTLINE);
-                                wrapper.setTooltip(new Tooltip(bundle.getString("profileCondition")));
-
-                            }
-
-                            setGraphic(wrapper);
-
-                        }
-                    }
-                };
-                return cell;
-            }
-        });
+        // give the subcomponents the query
+        analysisTableController.giveResultQuery(query);
+        analysisGraphsController.giveResultQuery(query);
     }
 
     /**
