@@ -80,7 +80,7 @@ public class MainController {
         DbUser currentUser = AppComponents.getInstance().getDbContext().getCurrentUser();
 
         // get the user roles
-        boolean analyst = currentUser.getRoles().contains(DbUserRole.DataAnalyst);
+        boolean analyst = currentUser.getRoles().contains(DbUserRole.Configurator);
         boolean viewer = currentUser.getRoles().contains(DbUserRole.Viewer);
         boolean admin = currentUser.getRoles().contains(DbUserRole.Admin);
 

@@ -1,7 +1,7 @@
 
 -- create the three roles
 CREATE ROLE Admin;
-CREATE ROLE DataAnalyst;
+CREATE ROLE Configurator;
 CREATE ROLE Viewer;
 
 -- this role is just a dummy that shows if the user has already logged in or not
@@ -11,19 +11,19 @@ CREATE ROLE FirstLogin;
 GRANT ALL ON DbUsers TO Admin;
 
 -- grant privileges to data analyst role
-GRANT ALL ON CriticalAccessQueries TO DataAnalyst;
-GRANT ALL ON CriticalAccessEntries TO DataAnalyst;
-GRANT ALL ON Whitelists TO DataAnalyst;
-GRANT ALL ON WhitelistEntries TO DataAnalyst;
-GRANT ALL ON Configurations TO DataAnalyst;
-GRANT ALL ON nm_Configuration_AccessPattern TO DataAnalyst;
-GRANT ALL ON AccessPatterns TO DataAnalyst;
-GRANT ALL ON AccessConditions TO DataAnalyst;
-GRANT ALL ON AccessPatternConditions TO DataAnalyst;
-GRANT ALL ON AccessProfileConditions TO DataAnalyst;
-GRANT ALL ON AccessPatternConditionProperties TO DataAnalyst;
-GRANT ALL ON SapConfigurations TO DataAnalyst;
-GRANT ALL ON DbUsers TO DataAnalyst;
+GRANT ALL ON CriticalAccessQueries TO Configurator;
+GRANT ALL ON CriticalAccessEntries TO Configurator;
+GRANT ALL ON Whitelists TO Configurator;
+GRANT ALL ON WhitelistEntries TO Configurator;
+GRANT ALL ON Configurations TO Configurator;
+GRANT ALL ON nm_Configuration_AccessPattern TO Configurator;
+GRANT ALL ON AccessPatterns TO Configurator;
+GRANT ALL ON AccessConditions TO Configurator;
+GRANT ALL ON AccessPatternConditions TO Configurator;
+GRANT ALL ON AccessProfileConditions TO Configurator;
+GRANT ALL ON AccessPatternConditionProperties TO Configurator;
+GRANT ALL ON SapConfigurations TO Configurator;
+GRANT ALL ON DbUsers TO Configurator;
 
 -- grant privileges to viewer role
 GRANT ALL ON CriticalAccessQueries TO Viewer;

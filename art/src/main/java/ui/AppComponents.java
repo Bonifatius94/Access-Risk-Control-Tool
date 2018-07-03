@@ -167,6 +167,6 @@ public class AppComponents {
      * Returns if the string is an already defined DbUserRole.
      */
     public static boolean isUserRole(String username) {
-        return !(username.equalsIgnoreCase(DbUserRole.Viewer.toString()) || username.equalsIgnoreCase(DbUserRole.DataAnalyst.toString()) || username.equalsIgnoreCase(DbUserRole.Admin.toString()));
+        return !(username.equalsIgnoreCase(DbUserRole.Viewer.toString()) || username.equalsIgnoreCase(DbUserRole.Configurator.toString()) || username.equalsIgnoreCase(DbUserRole.Admin.toString()));
     }
 }

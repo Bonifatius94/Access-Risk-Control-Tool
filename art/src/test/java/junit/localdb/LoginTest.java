@@ -14,7 +14,7 @@ public class LoginTest {
     @Test
     public void testLogin() {
 
-        assert (testLogin("TestDataAnalyst", "foobar", true));
+        assert (testLogin("TestConfigurator", "foobar", true));
         assert (testLogin("foo", "123", false));
     }
 

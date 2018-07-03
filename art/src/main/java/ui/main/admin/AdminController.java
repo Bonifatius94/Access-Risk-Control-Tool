@@ -54,7 +54,7 @@ public class AdminController implements IUpdateTable {
     public JFXCheckBox viewerCheckbox;
 
     @FXML
-    public JFXCheckBox dataAnalystCheckbox;
+    public JFXCheckBox configuratorCheckbox;
 
     @FXML
     public PTableColumn<DbUser, JFXButton> deleteColumn;
@@ -187,7 +187,7 @@ public class AdminController implements IUpdateTable {
     private void initializeCheckboxes() {
         viewerCheckbox.setSelected(false);
         adminCheckbox.setSelected(false);
-        dataAnalystCheckbox.setSelected(false);
+        configuratorCheckbox.setSelected(false);
     }
 
     /**
@@ -248,17 +248,17 @@ public class AdminController implements IUpdateTable {
     }
 
     /**
-     * Function is called by a Checkbox event from the dataAnalyst checkbox,
-     * and adds or deletes the dataAnalyst role from the DbUserRole set(from the currently edited user).
+     * Function is called by a Checkbox event from the configurator checkbox,
+     * and adds or deletes the configurator role from the DbUserRole set(from the currently edited user).
      */
     @FXML
-    public void dataAnalystSelected() {
+    public void configuratorSelected() {
 
-        if (dataAnalystCheckbox.isSelected()) {
-            this.editDbUser.addRole(DbUserRole.DataAnalyst);
+        if (configuratorCheckbox.isSelected()) {
+            this.editDbUser.addRole(DbUserRole.Configurator);
 
-        } else if (!dataAnalystCheckbox.isSelected()) {
-            this.editDbUser.removeRole(DbUserRole.DataAnalyst);
+        } else if (!configuratorCheckbox.isSelected()) {
+            this.editDbUser.removeRole(DbUserRole.Configurator);
         }
 
     }
@@ -297,7 +297,7 @@ public class AdminController implements IUpdateTable {
             || (!newUserMode.getValue() && tfDbUserName.validate() && !usernameValidationBox.isVisible())) {
 
             // check if at least one checkbox is enabled
-            if (!adminCheckbox.isSelected() && !dataAnalystCheckbox.isSelected() && !viewerCheckbox.isSelected()) {
+            if (!adminCheckbox.isSelected() && !configuratorCheckbox.isSelected() && !viewerCheckbox.isSelected()) {
                 CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("selectRolesTitle"), bundle.getString("selectRolesMessage"));
                 customAlert.showAndWait();
             } else {
@@ -359,17 +359,17 @@ public class AdminController implements IUpdateTable {
         if (database.getCurrentUser().getUsername().equalsIgnoreCase(editDbUser.getUsername())) {
             adminCheckbox.setDisable(true);
             viewerCheckbox.setDisable(true);
-            dataAnalystCheckbox.setDisable(true);
+            configuratorCheckbox.setDisable(true);
         } else {
             adminCheckbox.setDisable(false);
             viewerCheckbox.setDisable(false);
-            dataAnalystCheckbox.setDisable(false);
+            configuratorCheckbox.setDisable(false);
         }
 
         // set the correct roles
         adminCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.Admin));
         viewerCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.Viewer));
-        dataAnalystCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.DataAnalyst));
+        configuratorCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.Configurator));
     }
 
     /**

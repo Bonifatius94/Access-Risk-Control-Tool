@@ -18,7 +18,6 @@ import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -1357,11 +1356,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                 // parse data fields
                 String username = (String)x[0];
                 boolean isAdmin = (boolean)x[1];
-                boolean isDataAnalyst = (boolean)x[2];
+                boolean isConfigurator = (boolean)x[2];
                 boolean isViewer = (boolean)x[3];
                 boolean isFirstLogin = (boolean)x[4];
 
-                return new DbUser(username, isAdmin, isDataAnalyst, isViewer, isFirstLogin);
+                return new DbUser(username, isAdmin, isConfigurator, isViewer, isFirstLogin);
 
             }).collect(Collectors.toList());
 
@@ -1491,13 +1490,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     private void createDbUserEntry(Session session, DbUser user) {
 
         final String createDbUserSql =
-            "INSERT INTO DbUsers (USERNAME, ISADMIN, ISDATAANALYST, ISVIEWER, ISFIRSTLOGIN) "
-                + "VALUES (:username, :isAdmin, :isDataAnalyst, :isViewer, :isFirstLogin)";
+            "INSERT INTO DbUsers (USERNAME, ISADMIN, ISCONFIGURATOR, ISVIEWER, ISFIRSTLOGIN) "
+                + "VALUES (:username, :isAdmin, :isConfigurator, :isViewer, :isFirstLogin)";
 
         session.createNativeQuery(createDbUserSql)
             .setParameter("username", user.getUsername().toUpperCase())
             .setParameter("isAdmin", user.getRoles().contains(DbUserRole.Admin))
-            .setParameter("isDataAnalyst", user.getRoles().contains(DbUserRole.DataAnalyst))
+            .setParameter("isConfigurator", user.getRoles().contains(DbUserRole.Configurator))
             .setParameter("isViewer", user.getRoles().contains(DbUserRole.Viewer))
             .setParameter("isFirstLogin", user.isFirstLogin())
             .executeUpdate();
@@ -1507,12 +1506,12 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         // update DbUser entry flags
         final String updateDbUserSql =
-            "UPDATE DbUsers SET ISADMIN = :isAdmin, ISDATAANALYST = :isDataAnalyst, ISVIEWER = :isViewer WHERE USERNAME = :username";
+            "UPDATE DbUsers SET ISADMIN = :isAdmin, ISCONFIGURATOR = :isConfigurator, ISVIEWER = :isViewer WHERE USERNAME = :username";
 
         session.createNativeQuery(updateDbUserSql)
             .setParameter("username", user.getUsername().toUpperCase())
             .setParameter("isAdmin", user.getRoles().contains(DbUserRole.Admin))
-            .setParameter("isDataAnalyst", user.getRoles().contains(DbUserRole.DataAnalyst))
+            .setParameter("isConfigurator", user.getRoles().contains(DbUserRole.Configurator))
             .setParameter("isViewer", user.getRoles().contains(DbUserRole.Viewer))
             .executeUpdate();
     }

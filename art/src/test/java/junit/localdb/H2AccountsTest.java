@@ -28,8 +28,8 @@ public class H2AccountsTest {
         try (ArtDbContext context = new ArtDbContext("test", "test")) {
 
             // create new database accounts
-            context.createDatabaseUser(new DbUser("FooAdmin", new HashSet<>(Arrays.asList(DbUserRole.Admin, DbUserRole.DataAnalyst))), "foobar");
-            context.createDatabaseUser(new DbUser("FooDataAnalyst", new HashSet<>(Arrays.asList(DbUserRole.Viewer, DbUserRole.DataAnalyst))), "foobar");
+            context.createDatabaseUser(new DbUser("FooAdmin", new HashSet<>(Arrays.asList(DbUserRole.Admin, DbUserRole.Configurator))), "foobar");
+            context.createDatabaseUser(new DbUser("FooConfigurator", new HashSet<>(Arrays.asList(DbUserRole.Viewer, DbUserRole.Configurator))), "foobar");
             context.createDatabaseUser(new DbUser("FooViewer", new HashSet<>(Arrays.asList(DbUserRole.Viewer))), "foobar");
 
             // query accounts
@@ -62,7 +62,7 @@ public class H2AccountsTest {
 
             // apply changes to roles
             foo.getRoles().remove(DbUserRole.Viewer);
-            foo.getRoles().add(DbUserRole.DataAnalyst);
+            foo.getRoles().add(DbUserRole.Configurator);
             foo.getRoles().add(DbUserRole.Admin);
             context.updateUserRoles(foo);
 
@@ -70,7 +70,7 @@ public class H2AccountsTest {
             users = context.getDatabaseUsers();
             Set<DbUserRole> roles = users.stream().filter(x -> x.getUsername().toUpperCase().equals(username)).findFirst().get().getRoles();
 
-            ret = roles.containsAll(Arrays.asList(DbUserRole.DataAnalyst));
+            ret = roles.containsAll(Arrays.asList(DbUserRole.Configurator));
 
         } catch (Exception ex) {
             ex.printStackTrace();
