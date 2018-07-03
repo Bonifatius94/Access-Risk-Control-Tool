@@ -331,7 +331,7 @@ public class NewSapQueryController {
     public void setSapConfig(SapConfiguration sapConfig) {
 
         if (sapConfig != null) {
-            this.sapSettingsChooser.getItems().add(sapConfig);
+            this.sapSettingsChooser.setValue(sapConfig);
         }
     }
 
