@@ -58,7 +58,7 @@
                                 <PropertyValueFactory property="conditions"/>
                             </cellValueFactory>
                         </PTableColumn>
-                        <PTableColumn text="#" fx:id="viewDetailsColumn" percentageWidth="0.07" resizable="false" />
+                        <PTableColumn fx:id="viewDetailsColumn" percentageWidth="0.07" resizable="false" />
                     </columns>
                 </TableView>
             </VBox>

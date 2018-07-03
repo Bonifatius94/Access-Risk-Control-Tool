@@ -56,6 +56,7 @@ public class ConfigDetailsController {
     public JFXTextField whitelistDescriptionField;
 
 
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
     private Configuration config;
 
     /**
@@ -124,11 +125,17 @@ public class ConfigDetailsController {
         if (config != null) {
             this.config = config;
 
-            whitelistNameField.setText(config.getWhitelist().getName());
-            whitelistDescriptionField.setText(config.getWhitelist().getDescription());
+            // check if whitelist is null
+            if (config.getWhitelist() != null) {
+                whitelistNameField.setText(config.getWhitelist().getName());
+                whitelistDescriptionField.setText(config.getWhitelist().getDescription());
+                whitelistEntries.setItems(FXCollections.observableList(new ArrayList<>(config.getWhitelist().getEntries())).sorted());
+            } else {
+                whitelistNameField.setText(bundle.getString("noWhitelist"));
+                whitelistDescriptionField.clear();
+            }
 
             patternsTable.setItems(FXCollections.observableList(new ArrayList<>(config.getPatterns())).sorted());
-            whitelistEntries.setItems(FXCollections.observableList(new ArrayList<>(config.getWhitelist().getEntries())).sorted());
         }
 
     }
