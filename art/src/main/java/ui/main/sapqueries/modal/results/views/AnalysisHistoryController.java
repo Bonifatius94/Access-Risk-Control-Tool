@@ -177,8 +177,6 @@ public class AnalysisHistoryController {
 
         }
 
-
-
         // add the main series to the chart
         queriesHistoryChart.getData().add(mainSeries);
 
@@ -455,6 +453,9 @@ public class AnalysisHistoryController {
         updateChart();
     }
 
+    /**
+     * Resets the filters and reloads the chart.
+     */
     public void resetFilters() throws Exception {
         showArchived.setSelected(false);
 
