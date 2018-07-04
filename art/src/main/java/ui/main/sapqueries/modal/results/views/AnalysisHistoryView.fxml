@@ -15,7 +15,7 @@
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="ui.main.sapqueries.modal.results.views.AnalysisHistoryController">
     <HBox HBox.hgrow="ALWAYS" spacing="20">
-        <LineChart fx:id="queriesHistoryChart" title="%queryHistory">
+        <LineChart fx:id="queriesHistoryChart" title="%queryHistory" HBox.hgrow="ALWAYS">
             <xAxis>
                 <CategoryAxis fx:id="chartX"/>
             </xAxis>
@@ -23,8 +23,8 @@
                 <NumberAxis fx:id="chartY"/>
             </yAxis>
         </LineChart>
-        <VBox spacing="30">
-            <VBox fx:id="additionalDataBox" spacing="20" alignment="CENTER_LEFT">
+        <VBox spacing="30" minWidth="200" alignment="CENTER_LEFT">
+            <VBox fx:id="additionalDataBox" spacing="20">
                 <Label text="%additionalSeries" style="-fx-font-size: 1.3em"/>
                 <VBox alignment="CENTER_LEFT" spacing="5" minWidth="100">
                     <Label text="%series0"/>

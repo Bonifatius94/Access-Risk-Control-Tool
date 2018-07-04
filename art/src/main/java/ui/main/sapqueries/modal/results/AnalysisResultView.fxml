@@ -22,7 +22,7 @@
             <MaterialDesignIconView fx:id="statusIcon" size="30"/>
             <Label fx:id="criticalAccessCount" style="-fx-font-size: 1.5em"/>
         </HBox>
-        <JFXTabPane fx:id="resultTabs">
+        <JFXTabPane fx:id="resultTabs" minWidth="1100">
             <Tab text="%table" fx:id="tableTab">
                 <fx:include source="views/AnalysisTableView.fxml" fx:id="analysisTable"/>
             </Tab>
