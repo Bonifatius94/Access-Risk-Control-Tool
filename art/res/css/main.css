@@ -241,13 +241,13 @@
 }
 
 .table-view .column-header .arrow, .table-view .column-header .sort-order-dot {
-    -fx-background-color: -fx-text;
+    -fx-background-color: -fx-alternatetext;
     -fx-padding: 4;
 }
 
 .table-view .column-header-background {
     -fx-border-width: 0 0 1 0;
-    -fx-border-color: -fx-text;
+    -fx-border-color: -fx-alternatetext;
 }
 
 .table-view .table-cell {
