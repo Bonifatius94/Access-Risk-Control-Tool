@@ -234,7 +234,7 @@ public class AnalysisResultController {
         } else {
 
             // give the data to the historyController
-            analysisHistoryController.giveData(query, relatedQueries);
+            analysisHistoryController.giveData(query);
         }
 
         // give the query to the tableController
