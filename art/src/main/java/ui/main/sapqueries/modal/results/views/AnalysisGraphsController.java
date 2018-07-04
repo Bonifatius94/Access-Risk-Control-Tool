@@ -136,9 +136,6 @@ public class AnalysisGraphsController {
 
         // add the main series to the chart
         barChart.getData().add(mainSeries);
-
-        // add the hover value display
-        // showValuesOnHover();
     }
 
     /**

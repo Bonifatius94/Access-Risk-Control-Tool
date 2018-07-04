@@ -242,13 +242,18 @@ public class AnalysisResultController {
             resultTabs.getTabs().remove(historyTab);
         } else {
 
-            // give the data to the historyController
             analysisHistoryController.giveResultQuery(query);
+        }
+
+        // don't show graphs if no entries are present
+        if (query.getEntries().isEmpty()) {
+            resultTabs.getTabs().remove(graphsTab);
+        } else {
+            graphsController.giveResultQuery(query);
         }
 
         // give the query to the tableController
         analysisTableController.giveResultQuery(query);
-        graphsController.giveResultQuery(query);
     }
 
     /**
