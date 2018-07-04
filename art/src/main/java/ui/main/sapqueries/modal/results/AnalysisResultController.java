@@ -70,7 +70,7 @@ public class AnalysisResultController {
     private AnalysisHistoryController analysisHistoryController;
 
     @FXML
-    private AnalysisGraphsController graphsController;
+    private AnalysisGraphsController analysisGraphsController;
 
     @FXML
     private JFXTabPane resultTabs;
@@ -249,7 +249,7 @@ public class AnalysisResultController {
         if (query.getEntries().isEmpty()) {
             resultTabs.getTabs().remove(graphsTab);
         } else {
-            graphsController.giveResultQuery(query);
+            analysisGraphsController.giveResultQuery(query);
         }
 
         // give the query to the tableController

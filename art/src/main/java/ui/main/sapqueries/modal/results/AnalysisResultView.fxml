@@ -27,7 +27,7 @@
                 <fx:include source="views/AnalysisTableView.fxml" fx:id="analysisTable"/>
             </Tab>
             <Tab text="%graphs" fx:id="graphsTab">
-                <fx:include source="views/AnalysisGraphsView.fxml" fx:id="graphs"/>
+                <fx:include source="views/AnalysisGraphsView.fxml" fx:id="analysisGraphs"/>
             </Tab>
             <Tab text="%history" fx:id="historyTab">
                 <fx:include source="views/AnalysisHistoryView.fxml" fx:id="analysisHistory"/>
