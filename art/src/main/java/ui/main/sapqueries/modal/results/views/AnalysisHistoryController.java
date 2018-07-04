@@ -115,6 +115,14 @@ public class AnalysisHistoryController {
 
         this.relatedQueries = relatedQueries;
 
+        // fill the allEntries Collection
+        List<AccessPattern> currentEntries = new ArrayList<>();
+        for (CriticalAccessQuery query : relatedQueries) {
+            currentEntries.addAll(query.getEntries().stream().map(x -> x.getAccessPattern()).collect(Collectors.toList()));
+        }
+
+        allEntries = FXCollections.observableList(currentEntries.stream().sorted(Comparator.comparing(AccessPattern::getUsecaseId)).distinct().collect(Collectors.toList()));
+
         // calculate maximum of entries for upper bound (round up to nearest 10)
         int maximum = relatedQueries.stream().map(x -> x.getEntries().size()).max(Integer::compareTo).get();
         int upperBound = ((maximum + 10) / 10) * 10;
@@ -177,12 +185,6 @@ public class AnalysisHistoryController {
         data0Box.setConverter(new AccessPatternStringConverter());
         data1Box.setConverter(new AccessPatternStringConverter());
         data2Box.setConverter(new AccessPatternStringConverter());
-
-        for (CriticalAccessQuery query : relatedQueries) {
-            allEntries.addAll(query.getEntries().stream().map(x -> x.getAccessPattern()).collect(Collectors.toList()));
-        }
-
-        allEntries = FXCollections.observableList(allEntries.stream().sorted(Comparator.comparing(AccessPattern::getUsecaseId)).distinct().collect(Collectors.toList()));
 
         // add the patterns to the comboboxes
         data0Box.setItems(allEntries);
