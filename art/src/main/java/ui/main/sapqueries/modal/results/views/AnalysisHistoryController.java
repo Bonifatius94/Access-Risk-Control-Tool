@@ -82,7 +82,7 @@ public class AnalysisHistoryController {
      *
      * @param query the result query
      */
-    public void giveData(CriticalAccessQuery query) throws Exception {
+    public void giveResultQuery(CriticalAccessQuery query) throws Exception {
 
         this.query = query;
 

@@ -186,10 +186,12 @@
 
 .combo-box-popup .list-view .list-cell:filled:focused {
     -fx-background-color: -fx-primary !important;
+    -fx-text-fill: -fx-text !important;
 }
 
 .combo-box-popup .list-view .list-cell:filled:hover {
     -fx-background-color: -fx-primary !important;
+    -fx-text-fill: -fx-text !important;
 }
 
 
@@ -241,7 +243,7 @@
 }
 
 .table-view .column-header .arrow, .table-view .column-header .sort-order-dot {
-    -fx-background-color: -fx-text;
+    -fx-background-color: -fx-alternatetext;
     -fx-padding: 4;
 }
 
@@ -462,7 +464,18 @@
 
 .default-color0.chart-line-symbol { -fx-background-color: derive(-fx-primary, -10%), white; }
 
+.default-color0.chart-bar { -fx-bar-fill: -fx-primary; }
+
 .current-node {
     -fx-padding: 5;
     -fx-background-color: white, white !important;
+}
+
+.bar-value {
+    -fx-text-fill: -fx-text;
+    -fx-font-size: 1.2em;
+}
+
+.warning-bar.chart-bar {
+    -fx-bar-fill: -fx-error;
 }

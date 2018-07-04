@@ -55,7 +55,7 @@
                     </graphic>
                 </JFXButton>
             </HBox>
-            <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable" maxHeight="350">
+            <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable" maxHeight="350" minWidth="800">
                 <columns>
                     <PTableColumn text="?" fx:id="conditionTypeColumn" percentageWidth="0.06" resizable="false">
                         <cellValueFactory>

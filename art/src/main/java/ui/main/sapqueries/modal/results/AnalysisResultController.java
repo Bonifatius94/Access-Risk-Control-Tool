@@ -38,6 +38,7 @@ import settings.UserSettings;
 
 import ui.App;
 import ui.AppComponents;
+import ui.main.sapqueries.modal.results.views.AnalysisGraphsController;
 import ui.main.sapqueries.modal.results.views.AnalysisHistoryController;
 import ui.main.sapqueries.modal.results.views.AnalysisTableController;
 
@@ -69,10 +70,16 @@ public class AnalysisResultController {
     private AnalysisHistoryController analysisHistoryController;
 
     @FXML
+    private AnalysisGraphsController graphsController;
+
+    @FXML
     private JFXTabPane resultTabs;
 
     @FXML
     private Tab tableTab;
+
+    @FXML
+    private Tab graphsTab;
 
     @FXML
     private Tab historyTab;
@@ -236,11 +243,12 @@ public class AnalysisResultController {
         } else {
 
             // give the data to the historyController
-            analysisHistoryController.giveData(query);
+            analysisHistoryController.giveResultQuery(query);
         }
 
         // give the query to the tableController
         analysisTableController.giveResultQuery(query);
+        graphsController.giveResultQuery(query);
     }
 
     /**
