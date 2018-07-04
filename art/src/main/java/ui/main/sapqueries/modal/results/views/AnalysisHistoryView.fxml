@@ -9,15 +9,33 @@
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
+<?import com.jfoenix.controls.JFXComboBox?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="ui.main.sapqueries.modal.results.views.AnalysisHistoryController">
-    <LineChart fx:id="queriesHistoryChart" title="%queryHistory">
-        <xAxis>
-            <CategoryAxis fx:id="chartX"/>
-        </xAxis>
-        <yAxis>
-            <NumberAxis fx:id="chartY"/>
-        </yAxis>
-    </LineChart>
+    <HBox HBox.hgrow="ALWAYS" spacing="20">
+        <LineChart fx:id="queriesHistoryChart" title="%queryHistory">
+            <xAxis>
+                <CategoryAxis fx:id="chartX"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis fx:id="chartY"/>
+            </yAxis>
+        </LineChart>
+        <VBox fx:id="additionalDataBox" spacing="20" alignment="CENTER_LEFT">
+            <Label text="%additionalSeries" style="-fx-font-size: 1.3em"/>
+            <VBox alignment="CENTER_LEFT" spacing="5" minWidth="100">
+                <Label text="%series0"/>
+                <JFXComboBox fx:id="data0Box"/>
+            </VBox>
+            <VBox alignment="CENTER_LEFT" spacing="5" minWidth="100">
+                <Label text="%series1"/>
+                <JFXComboBox fx:id="data1Box"/>
+            </VBox>
+            <VBox alignment="CENTER_LEFT" spacing="5" minWidth="100">
+                <Label text="%series2"/>
+                <JFXComboBox fx:id="data2Box"/>
+            </VBox>
+        </VBox>
+    </HBox>
 </VBox>
