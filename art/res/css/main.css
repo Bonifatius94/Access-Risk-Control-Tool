@@ -448,6 +448,14 @@
  *                                                                             *
  ******************************************************************************/
 
+.chart {
+    -fx-font-size: 15px !important;
+}
+
+.chart-legend .label {
+    -fx-padding: 0 5 0 5;
+}
+
 .chart-plot-background {
     -fx-background-color: -fx-background;
 }
@@ -473,7 +481,7 @@
 
 .bar-value {
     -fx-text-fill: -fx-text;
-    -fx-font-size: 1.2em;
+    -fx-font-size: 0.9em;
 }
 
 .warning-bar.chart-bar {

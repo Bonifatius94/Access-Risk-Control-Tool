@@ -6,6 +6,7 @@ import data.entities.CriticalAccessQuery;
 
 import extensions.ResourceBundleHelper;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -83,6 +84,8 @@ public class AnalysisGraphsController {
         chartX.setAutoRanging(true);
         chartX.setAnimated(false);
 
+        barChart.setLegendVisible(false);
+
         updateChart();
     }
 
@@ -105,6 +108,8 @@ public class AnalysisGraphsController {
                 query.getEntries().stream().map(x -> x.getAccessPattern().getUsecaseId())
                     .collect(Collectors.toMap(x -> x, x -> 1, Integer::sum));
 
+            barChart.setTitle(bundle.getString("usecaseIdViolations"));
+
         } else {
 
             // group by username
@@ -112,6 +117,7 @@ public class AnalysisGraphsController {
                 query.getEntries().stream().map(x -> x.getUsername())
                     .collect(Collectors.toMap(x -> x, x -> 1, Integer::sum));
 
+            barChart.setTitle(bundle.getString("usernameViolations"));
         }
 
         XYChart.Series<String, Integer> mainSeries = new XYChart.Series<>();
@@ -126,9 +132,10 @@ public class AnalysisGraphsController {
             all += entry.getValue();
         }
 
+        // compute average
         average = all / itemsXCount.size();
 
-        for (Map.Entry<String, Integer> entry : itemsXCount.entrySet()) {
+        for (Map.Entry<String, Integer> entry : itemsXCount.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
             XYChart.Data<String, Integer> data = createData(entry.getKey(), entry.getValue());
 
             mainSeries.getData().add(data);
