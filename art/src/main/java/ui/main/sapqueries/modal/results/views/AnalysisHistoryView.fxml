@@ -11,6 +11,8 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXCheckBox?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import com.jfoenix.controls.JFXButton?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="ui.main.sapqueries.modal.results.views.AnalysisHistoryController">
@@ -28,15 +30,45 @@
                 <Label text="%additionalSeries" style="-fx-font-size: 1.3em"/>
                 <VBox alignment="CENTER_LEFT" spacing="5" minWidth="100">
                     <Label text="%series0"/>
-                    <JFXComboBox fx:id="data0Box"/>
+                    <HBox spacing="10" alignment="BASELINE_LEFT">
+                        <JFXComboBox fx:id="data0Box"/>
+                        <JFXButton styleClass="round-button" onAction="#resetData0Box" minHeight="30">
+                            <graphic>
+                                <MaterialDesignIconView glyphName="CLOSE" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%reset"/>
+                            </tooltip>
+                        </JFXButton>
+                    </HBox>
                 </VBox>
                 <VBox alignment="CENTER_LEFT" spacing="5" minWidth="100">
                     <Label text="%series1"/>
-                    <JFXComboBox fx:id="data1Box"/>
+                    <HBox spacing="10" alignment="BASELINE_LEFT">
+                        <JFXComboBox fx:id="data1Box"/>
+                        <JFXButton styleClass="round-button" onAction="#resetData1Box" minHeight="30">
+                            <graphic>
+                                <MaterialDesignIconView glyphName="CLOSE" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%reset"/>
+                            </tooltip>
+                        </JFXButton>
+                    </HBox>
                 </VBox>
                 <VBox alignment="CENTER_LEFT" spacing="5" minWidth="100">
                     <Label text="%series2"/>
-                    <JFXComboBox fx:id="data2Box"/>
+                    <HBox spacing="10" alignment="BASELINE_LEFT">
+                        <JFXComboBox fx:id="data2Box"/>
+                        <JFXButton styleClass="round-button" onAction="#resetData2Box" minHeight="30">
+                            <graphic>
+                                <MaterialDesignIconView glyphName="CLOSE" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%reset"/>
+                            </tooltip>
+                        </JFXButton>
+                    </HBox>
                 </VBox>
             </VBox>
             <JFXCheckBox fx:id="showArchived" onAction="#toggleArchivedDisplay" text="%showArchived"/>

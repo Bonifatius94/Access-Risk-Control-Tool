@@ -313,4 +313,25 @@ public class AnalysisHistoryController {
     public void toggleArchivedDisplay() throws Exception {
         updateChart(showArchived.isSelected());
     }
+
+    public void resetData0Box() {
+        data0Box.setValue(null);
+
+        // remove old data
+        queriesHistoryChart.getData().remove(additionalSeries0);
+    }
+
+    public void resetData1Box() {
+        data1Box.setValue(null);
+
+        // remove old data
+        queriesHistoryChart.getData().remove(additionalSeries1);
+    }
+
+    public void resetData2Box() {
+        data2Box.setValue(null);
+
+        // remove old data
+        queriesHistoryChart.getData().remove(additionalSeries2);
+    }
 }
