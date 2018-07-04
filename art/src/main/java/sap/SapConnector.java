@@ -21,6 +21,7 @@ import extensions.progess.ProgressableBase;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -218,14 +219,12 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
 
         } else if (condition.getType() == AccessConditionType.Pattern) {
 
-            for (AccessPatternConditionProperty property : condition.getPatternCondition().getProperties()) {
+            for (AccessPatternConditionProperty property : condition.getPatternCondition().getProperties()
+                .stream().sorted(Comparator.comparing(AccessPatternConditionProperty::getAuthObject)).collect(Collectors.toList())) {
 
                 inputTable.appendRow();
                 inputTable.setValue("OBJCT", property.getAuthObject());
                 inputTable.setValue("FIELD", property.getAuthObjectProperty());
-
-                // TODO: how to handle empty strings? (this piece of code would not treat them like null -> wrong results?)
-                // => suggestion: if (property.getValue1() != null && !property.getValue1().isEmpty())
 
                 if (property.getValue1() != null) {
                     inputTable.setValue("VAL1", property.getValue1());
