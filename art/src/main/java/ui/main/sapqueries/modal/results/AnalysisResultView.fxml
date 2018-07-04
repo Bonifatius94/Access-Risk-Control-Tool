@@ -20,18 +20,18 @@
     <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
         <HBox spacing="10" alignment="CENTER_LEFT">
             <MaterialDesignIconView fx:id="statusIcon" size="30"/>
-            <Label fx:id="criticalAccessCount" style="-fx-font-size: 1.6em"/>
+            <Label fx:id="criticalAccessCount" style="-fx-font-size: 1.5em"/>
         </HBox>
-        <JFXTabPane>
-            <Tab text="%table">
+        <JFXTabPane fx:id="resultTabs">
+            <Tab text="%table" fx:id="tableTab">
                 <fx:include source="views/AnalysisTableView.fxml" fx:id="analysisTable"/>
             </Tab>
-            <Tab text="%graphs">
-                <fx:include source="views/AnalysisGraphsView.fxml" fx:id="analysisGraphs"/>
+            <Tab text="%history" fx:id="historyTab">
+                <fx:include source="views/AnalysisHistoryView.fxml" fx:id="analysisHistory"/>
             </Tab>
         </JFXTabPane>
         <Separator/>
-        <VBox HBox.hgrow="ALWAYS" spacing="20">
+        <VBox HBox.hgrow="ALWAYS" spacing="10">
             <Label text="%exportTitle" style="-fx-font-size: 1.3em"/>
             <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" spacing="20">
                 <VBox alignment="CENTER_LEFT" spacing="5" minWidth="100">
@@ -55,7 +55,7 @@
             </HBox>
         </VBox>
         <Separator />
-        <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" spacing="20">
+        <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
             <JFXButton text="%close" onAction="#close">
                 <graphic>
                     <MaterialDesignIconView glyphName="CLOSE"/>

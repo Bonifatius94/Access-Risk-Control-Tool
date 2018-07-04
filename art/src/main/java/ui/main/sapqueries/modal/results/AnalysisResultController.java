@@ -3,6 +3,7 @@ package ui.main.sapqueries.modal.results;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXComboBox;
 
+import com.jfoenix.controls.JFXTabPane;
 import data.entities.AccessPattern;
 import data.entities.CriticalAccessQuery;
 
@@ -30,12 +31,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
 import javafx.stage.FileChooser;
 
 import settings.UserSettings;
 
 import ui.App;
-import ui.main.sapqueries.modal.results.views.AnalysisGraphsController;
+import ui.AppComponents;
+import ui.main.sapqueries.modal.results.views.AnalysisHistoryController;
 import ui.main.sapqueries.modal.results.views.AnalysisTableController;
 
 
@@ -63,7 +66,16 @@ public class AnalysisResultController {
     private AnalysisTableController analysisTableController;
 
     @FXML
-    private AnalysisGraphsController analysisGraphsController;
+    private AnalysisHistoryController analysisHistoryController;
+
+    @FXML
+    private JFXTabPane resultTabs;
+
+    @FXML
+    private Tab tableTab;
+
+    @FXML
+    private Tab historyTab;
 
 
     private CriticalAccessQuery resultQuery;
@@ -213,9 +225,20 @@ public class AnalysisResultController {
             includeWhitelistCheckbox.setSelected(false);
         }
 
-        // give the subcomponents the query
+        // get the related queries
+        List<CriticalAccessQuery> relatedQueries = AppComponents.getInstance().getDbContext().getRelatedSapQueries(query, false);
+
+        // not enough entries for a history
+        if (relatedQueries.size() < 2) {
+            resultTabs.getTabs().remove(historyTab);
+        } else {
+
+            // give the data to the historyController
+            analysisHistoryController.giveData(query, relatedQueries);
+        }
+
+        // give the query to the tableController
         analysisTableController.giveResultQuery(query);
-        analysisGraphsController.giveResultQuery(query);
     }
 
     /**
