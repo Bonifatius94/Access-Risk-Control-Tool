@@ -1010,11 +1010,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         // get critical access queries referencing a config that references the original pattern
         Set<CriticalAccessQuery> queries =
             getSapQueries(true).stream()
-                .filter(x -> x.getConfig().getWhitelist().getId().equals(originalId))
+                .filter(x -> x.getConfig().getWhitelist() != null && x.getConfig().getWhitelist().getId().equals(originalId))
                 .collect(Collectors.toSet());
 
         // copy configs where the original whitelist is referenced
-        getConfigs(true).stream().filter(x -> x.getWhitelist().getId().equals(originalId)).forEach(originalConfig -> {
+        getConfigs(true).stream().filter(x -> x.getWhitelist() != null && x.getWhitelist().getId().equals(originalId)).forEach(originalConfig -> {
 
             if (originalConfig.isArchived()) {
 
