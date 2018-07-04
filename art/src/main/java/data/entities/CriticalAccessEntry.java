@@ -1,5 +1,7 @@
 package data.entities;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,7 +26,7 @@ public class CriticalAccessEntry {
     /**
      * This constructor creates a new instance with the given data.
      *
-     * @param pattern the pattern of the new instance
+     * @param pattern  the pattern of the new instance
      * @param username the username of the new instance
      */
     public CriticalAccessEntry(AccessPattern pattern, String username) {
@@ -97,4 +99,22 @@ public class CriticalAccessEntry {
         return "ViolatedUseCaseID: " + accessPattern.getUsecaseId() + ", Username: " + username;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CriticalAccessEntry that = (CriticalAccessEntry) o;
+        return Objects.equals(accessPattern.getUsecaseId(), that.accessPattern.getUsecaseId())
+            && Objects.equals(username, that.username);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(accessPattern, username);
+    }
 }

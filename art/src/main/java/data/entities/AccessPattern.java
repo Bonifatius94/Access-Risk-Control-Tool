@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -290,4 +291,23 @@ public class AccessPattern implements IReferenceAware, IDataEntity {
         return builder.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AccessPattern pattern = (AccessPattern) o;
+        return Objects.equals(usecaseId, pattern.usecaseId)
+            && Objects.equals(description, pattern.description)
+            && Objects.equals(createdAt, pattern.createdAt);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(usecaseId, description, createdAt);
+    }
 }

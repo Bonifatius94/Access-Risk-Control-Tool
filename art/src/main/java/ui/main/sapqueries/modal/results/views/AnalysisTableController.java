@@ -62,6 +62,8 @@ public class AnalysisTableController {
             return entry;
         }));
 
+        resultTable.setPlaceholder(new Label(bundle.getString("noEntries")));
+
         initializeConditionTypeColumn();
         initializeUsecaseIdColumn();
         initializeDescriptionColumn();
