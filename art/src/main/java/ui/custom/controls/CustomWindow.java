@@ -153,7 +153,7 @@ public class CustomWindow extends VBox {
 
         // init label for headline
         lblHeadline = new Label();
-        lblHeadline.getStyleClass().addAll("windowLabel");
+        lblHeadline.getStyleClass().addAll("window-label");
         lblHeadline.setPadding(new Insets(2, 0, 0, 4));
 
         // init region filler to render headline bound to the left and buttons bound to the right
@@ -163,21 +163,21 @@ public class CustomWindow extends VBox {
         // init minimize button
         btnMinimize = new JFXButton(null, new MaterialDesignIconView(MaterialDesignIcon.WINDOW_MINIMIZE));
         btnMinimize.setMnemonicParsing(false);
-        btnMinimize.getStyleClass().addAll("windowButton");
+        btnMinimize.getStyleClass().addAll("window-button");
         btnMinimize.setPrefWidth(20);
         btnMinimize.setFocusTraversable(false);
 
         // init maximize button
         btnMaximize = new JFXButton(null, new MaterialDesignIconView(MaterialDesignIcon.WINDOW_MAXIMIZE));
         btnMaximize.setMnemonicParsing(false);
-        btnMaximize.getStyleClass().addAll("windowButton");
+        btnMaximize.getStyleClass().addAll("window-button");
         btnMaximize.setPrefWidth(20);
         btnMaximize.setFocusTraversable(false);
 
         // init close button
         btnClose = new JFXButton(null, new MaterialDesignIconView(MaterialDesignIcon.CLOSE));
         btnClose.setMnemonicParsing(false);
-        btnClose.getStyleClass().addAll("windowButton", "closeWindowButton");
+        btnClose.getStyleClass().addAll("window-button", "close-window-button");
         btnClose.setPrefWidth(20);
         btnClose.setFocusTraversable(false);
 

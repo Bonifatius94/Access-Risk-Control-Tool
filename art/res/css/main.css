@@ -9,6 +9,19 @@
     -fx-font-smoothing-type: gray;
     -fx-background-color: -fx-background;
     -fx-border-color: derive(-fx-background, -30%);
+
+    -jfx-rippler-fill: -fx-alternatetext;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Material Icons                                                              *
+ *                                                                             *
+ ******************************************************************************/
+
+.glyph-icon {
+    -fx-font-family: "Material Design Icons";
+    -fx-fill: -fx-alternatetext;
 }
 
 /*******************************************************************************
@@ -25,16 +38,24 @@
     -jfx-button-type: RAISED;
 }
 
+.jfx-button .glyph-icon {
+    -fx-fill: -fx-text;
+}
+
 .jfx-button:hover, .jfx-button:focused  {
     -fx-background-color: -fx-primary-lighter;
 }
 
 /* Close App Button extra styling */
-.windowButton {
+.window-button {
     -fx-background-color: -fx-background;
-    -fx-text-fill: white;
+    -fx-text-fill: -fx-alternatetext;
     -jfx-disable-visual-focus: true;
     -jfx-button-type: FLAT;
+}
+
+.window-button .glyph-icon {
+    -fx-fill: -fx-alternatetext;
 }
 
 .warning-button {
@@ -53,7 +74,7 @@
     -fx-background-color: derive(-fx-error, 30%);
 }
 
-.closeWindowButton:hover, .closeWindowButton:focused {
+.close-window-button:hover, .close-window-button:focused {
     -fx-background-color: -fx-error;
 }
 
@@ -68,10 +89,9 @@
     -jfx-focus-color: -fx-primary !important;
     -jfx-unfocus-color: -fx-light !important;
     -fx-prompt-text-fill: -fx-light !important;
-    -fx-text-fill: -fx-text !important;
+    -fx-text-fill: -fx-alternatetext !important;
     -jfx-label-float: true;
 }
-
 
 /*******************************************************************************
 *                                                                              *
@@ -110,13 +130,20 @@
 }
 
 .jfx-tab-pane .tab-header-area .jfx-rippler {
-    -jfx-rippler-fill: -fx-text;
+    -jfx-rippler-fill: -fx-alternatetext;
+}
+
+.jfx-tab-pane .headers-region .label {
+    -fx-text-fill: -fx-text !important;
 }
 
 .jfx-tab-pane .tab-content-area {
     -fx-padding: 15 5 5 5;
 }
 
+.tab .tab-label {
+    -fx-text-fill: -fx-text;
+}
 
 /*******************************************************************************
  *                                                                             *
@@ -141,11 +168,11 @@
     -jfx-focus-color: -fx-primary;
     -jfx-unfocus-color: -fx-light;
     -fx-cursor: hand;
-    -fx-text-fill: -fx-text !important;
+    -fx-text-fill: -fx-alternatetext !important;
 }
 
 .jfx-combo-box .cell, .jfx-combo-box .text-field {
-    -fx-text-fill: -fx-text !important;
+    -fx-text-fill: -fx-alternatetext !important;
 }
 
 .combo-box-popup .list-view {
@@ -208,7 +235,7 @@
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: -fx-text;
+    -fx-text-fill: -fx-alternatetext;
     -fx-padding: 16 0 16 0;
     -fx-alignment: baseline-center;
 }
@@ -265,7 +292,7 @@
 .table-view .table-row-cell:selected {
     -fx-background-color: -fx-select !important;
     -fx-table-cell-border-color: -fx-primary;
-    -fx-text-fill: -fx-text;
+    -fx-text-fill: -fx-alternatetext;
 }
 
 /* remove blue border from first entry of tableView on focus */
@@ -274,7 +301,7 @@
 }
 
 .table-view .table-row-cell:selected .table-cell {
-    -fx-text-fill: -fx-text;
+    -fx-text-fill: -fx-alternatetext;
 }
 
 /* style vertical scrollbar on tableview */
@@ -350,21 +377,8 @@
 .jfx-toggle-button {
     -jfx-toggle-color: -fx-primary;
     -jfx-untoggle-color: -fx-light;
-    -fx-text-fill: -fx-text;
+    -fx-text-fill: -fx-alternatetext;
 }
-
-
-/*******************************************************************************
- *                                                                             *
- * Material Icons                                                              *
- *                                                                             *
- ******************************************************************************/
-
-.glyph-icon {
-    -fx-font-family: "Material Design Icons";
-    -fx-fill: -fx-text;
-}
-
 
 /*******************************************************************************
  *                                                                             *
@@ -372,8 +386,9 @@
  *                                                                             *
  ******************************************************************************/
 
-.windowLabel {
+.window-label {
     -fx-font-weight: bold;
+    -fx-text-fill: -fx-alternatetext;
 }
 
 
