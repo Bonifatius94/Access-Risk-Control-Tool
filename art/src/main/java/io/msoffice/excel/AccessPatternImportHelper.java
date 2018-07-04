@@ -36,7 +36,7 @@ public class AccessPatternImportHelper {
      * @throws Exception caused by file stream error or parsing error due to invalid data formats
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public List<AccessPattern> importAuthorizationPattern(String filePath) throws Exception {
+    public List<AccessPattern> importAccessPatterns(String filePath) throws Exception {
 
         // open excel file
         FileInputStream excelFile = new FileInputStream(new File(filePath));
