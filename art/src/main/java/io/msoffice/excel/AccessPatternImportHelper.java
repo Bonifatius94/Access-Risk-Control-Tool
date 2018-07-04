@@ -36,7 +36,7 @@ public class AccessPatternImportHelper {
      * @throws Exception caused by file stream error or parsing error due to invalid data formats
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    public List<AccessPattern> importAccessPatterns(String filePath) throws Exception {
+    public List<AccessPattern> importAuthorizationPattern(String filePath) throws Exception {
 
         // open excel file
         FileInputStream excelFile = new FileInputStream(new File(filePath));
@@ -99,10 +99,15 @@ public class AccessPatternImportHelper {
         String patternTypeIndicator = rows.get(1).getCell(1).getStringCellValue();
 
         if (patternTypeIndicator == null || patternTypeIndicator.isEmpty()) {
+
             throw new IllegalArgumentException("Pattern type not set. Needs to be COND, AND or OR.");
+
         } else if (patternTypeIndicator.toUpperCase().equals("COND")) {
+
             pattern = getSimpleAuthPattern(rows);
+
         } else /*if (patternTypeIndicator.toUpperCase().equals("OR") || patternTypeIndicator.toUpperCase().equals("AND"))*/ {
+
             pattern = getComplexAuthPattern(rows);
         }
 
@@ -154,14 +159,19 @@ public class AccessPatternImportHelper {
             }
 
             // parse conditions
-            String condIndicator = row.getCell(2).getStringCellValue();
+            Cell condIndicatorCell = row.getCell(2);
 
-            if (!isFirstRow && (condIndicator != null && condIndicator.toUpperCase().equals("COND"))) {
+            if (condIndicatorCell != null) {
 
-                // parse pattern from rows before and add pattern to list
-                conditions.add(getCondition(tempRows, true));
-                tempRows = new ArrayList<>();
-                counter++;
+                String condIndicator = condIndicatorCell.getStringCellValue();
+
+                if (!isFirstRow && (condIndicator != null && condIndicator.toUpperCase().equals("COND"))) {
+
+                    // parse pattern from rows before and add pattern to list
+                    conditions.add(getCondition(tempRows, true));
+                    tempRows = new ArrayList<>();
+                    counter++;
+                }
             }
 
             tempRows.add(row);
@@ -203,6 +213,7 @@ public class AccessPatternImportHelper {
             List<AccessPatternConditionProperty> properties = new ArrayList<>();
 
             for (Row row : rows) {
+
                 // parse auth object and property name
                 int index = startIndex;
                 final String authorizationObject = row.getCell(index).getStringCellValue();
