@@ -314,6 +314,9 @@ public class AnalysisHistoryController {
         updateChart(showArchived.isSelected());
     }
 
+    /**
+     * Resets Data0Box.
+     */
     public void resetData0Box() {
         data0Box.setValue(null);
 
@@ -321,6 +324,9 @@ public class AnalysisHistoryController {
         queriesHistoryChart.getData().remove(additionalSeries0);
     }
 
+    /**
+     * Resets Data1Box.
+     */
     public void resetData1Box() {
         data1Box.setValue(null);
 
@@ -328,6 +334,9 @@ public class AnalysisHistoryController {
         queriesHistoryChart.getData().remove(additionalSeries1);
     }
 
+    /**
+     * Resets Data2Box.
+     */
     public void resetData2Box() {
         data2Box.setValue(null);
 
