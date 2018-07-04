@@ -114,7 +114,7 @@
 }
 
 .jfx-tab-pane .headers-region .tab {
-    -fx-pref-width: 150;
+    -fx-pref-width: 165;
 }
 
 .jfx-tab-pane .headers-region .tab:hover {
