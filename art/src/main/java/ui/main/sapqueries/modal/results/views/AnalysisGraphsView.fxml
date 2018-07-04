@@ -18,12 +18,12 @@
             <CategoryAxis fx:id="chartX"/>
         </xAxis>
         <yAxis>
-            <NumberAxis fx:id="chartY" />
+            <NumberAxis fx:id="chartY"/>
         </yAxis>
     </BarChart>
-    <VBox minWidth="150">
-        <VBox alignment="CENTER_LEFT" spacing="5" minWidth="100">
-            <Label text="%xAxis"/>
+    <VBox alignment="BOTTOM_CENTER" minWidth="150" style="-fx-padding: 0 0 10 0">
+        <VBox spacing="10">
+            <Label text="%xAxis" style="-fx-font-size: 1.1em"/>
             <JFXComboBox fx:id="chartDataChooser"/>
         </VBox>
     </VBox>

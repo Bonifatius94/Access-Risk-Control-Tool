@@ -475,8 +475,11 @@
 .default-color0.chart-bar { -fx-bar-fill: -fx-primary; }
 
 .current-node {
-    -fx-padding: 5;
-    -fx-background-color: white, white !important;
+    -fx-background-color: -fx-primary, derive(-fx-primary, -40%) !important;
+}
+
+.node-warning {
+    -fx-background-color: -fx-primary, -fx-error !important;
 }
 
 .bar-value {

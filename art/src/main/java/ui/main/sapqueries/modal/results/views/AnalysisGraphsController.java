@@ -159,6 +159,7 @@ public class AnalysisGraphsController {
         StackPane node = new StackPane();
         node.getChildren().add(group);
 
+        // color the nodes that are above the average
         if (value > average) {
             node.getStyleClass().add("warning-bar");
         }

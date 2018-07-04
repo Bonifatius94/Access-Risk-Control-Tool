@@ -75,6 +75,8 @@ public class AnalysisHistoryController {
     private XYChart.Series<String, Integer> additionalSeries1;
     private XYChart.Series<String, Integer> additionalSeries2;
 
+    private int average = 0;
+
     private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
     /**
@@ -150,6 +152,13 @@ public class AnalysisHistoryController {
         int upperBound = ((maximum + 10) / 10) * 10;
         chartY.setUpperBound(upperBound);
 
+        int all = 0;
+        for (CriticalAccessQuery query : relatedQueries) {
+            all += query.getEntries().size();
+        }
+
+        average = all / relatedQueries.size();
+
         // if there are no violations (so also no patterns), don't show the additional data selection
         if (maximum == 0) {
             additionalDataBox.setVisible(false);
@@ -201,14 +210,22 @@ public class AnalysisHistoryController {
     private void showValuesOnHover() {
         for (XYChart.Series<String, Integer> s : queriesHistoryChart.getData()) {
             for (XYChart.Data<String, Integer> d : s.getData()) {
+                Tooltip tooltip;
+
                 // style current query node differently
                 if (d.getXValue().trim().equals(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy\n    HH:mm")))
                     || d.getXValue().trim().equals(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))) {
                     d.getNode().getStyleClass().add("current-node");
-                    Tooltip.install(d.getNode(), new Tooltip("Current Query\n" + bundle.getString("violations") + ": " + d.getYValue()));
+                    tooltip = new Tooltip(bundle.getString("currentQuery") + "\n" + bundle.getString("violations") + ": " + d.getYValue());
                 } else {
-                    Tooltip.install(d.getNode(), new Tooltip(bundle.getString("violations") + ": " + d.getYValue()));
+                    tooltip = new Tooltip(bundle.getString("violations") + ": " + d.getYValue());
                 }
+
+                // color the nodes that are above the average
+                if (d.getYValue() > average) {
+                    d.getNode().getStyleClass().add("node-warning");
+                }
+                Tooltip.install(d.getNode(), tooltip);
             }
         }
     }
