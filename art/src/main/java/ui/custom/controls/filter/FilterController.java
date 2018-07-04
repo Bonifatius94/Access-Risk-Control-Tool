@@ -70,6 +70,7 @@ public class FilterController {
                 startDateProperty.setValue(startDatePicker.getValue().atStartOfDay(ZoneOffset.UTC));
             }
         });
+        startDatePicker.setEditable(false);
 
         // endDate binding
         endDatePicker.valueProperty().addListener((ol, oldValue, newValue) -> {
@@ -84,7 +85,7 @@ public class FilterController {
                 endDateProperty.setValue(endDatePicker.getValue().atStartOfDay(ZoneOffset.UTC));
             }
         });
-
+        endDatePicker.setEditable(false);
     }
 
     /**
