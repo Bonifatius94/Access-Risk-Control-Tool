@@ -151,11 +151,12 @@ public class AnalysisHistoryController {
     private void showValuesOnHover() {
         for (XYChart.Series<String, Integer> s : queriesHistoryChart.getData()) {
             for (XYChart.Data<String, Integer> d : s.getData()) {
-                Tooltip.install(d.getNode(), new Tooltip(bundle.getString("violations") + " " + d.getYValue()));
-
-                // style current query differently
+                // style current query node differently
                 if (d.getXValue().trim().equals(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy\n    HH:mm")))) {
                     d.getNode().getStyleClass().add("current-node");
+                    Tooltip.install(d.getNode(), new Tooltip("Current Query\n" + bundle.getString("violations") + " " + d.getYValue()));
+                } else {
+                    Tooltip.install(d.getNode(), new Tooltip(bundle.getString("violations") + " " + d.getYValue()));
                 }
             }
         }
@@ -176,9 +177,12 @@ public class AnalysisHistoryController {
 
         allEntries = FXCollections.observableList(allEntries.stream().sorted(Comparator.comparing(AccessPattern::getUsecaseId)).distinct().collect(Collectors.toList()));
 
+        // add the patterns to the comboboxes
         data0Box.setItems(allEntries);
         data1Box.setItems(allEntries);
         data2Box.setItems(allEntries);
+
+        // listen to combo box value changes and add the according series
 
         data0Box.valueProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -273,7 +277,7 @@ public class AnalysisHistoryController {
 
 
     /**
-     * WhitelistStringConverter for the whitelistChooser ComboBox.
+     * AccessPatternStringConverter for the ComboBoxes.
      */
     private class AccessPatternStringConverter extends StringConverter<AccessPattern> {
         private Map<String, AccessPattern> map = new HashMap<>();
