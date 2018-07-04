@@ -2,6 +2,7 @@ package ui.main.sapqueries.modal.results.views;
 
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXDatePicker;
 import data.entities.AccessPattern;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
@@ -9,10 +10,13 @@ import data.entities.CriticalAccessQuery;
 import data.entities.Whitelist;
 import extensions.ResourceBundleHelper;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -55,6 +59,12 @@ public class AnalysisHistoryController {
     private JFXComboBox<AccessPattern> data2Box;
 
     @FXML
+    private JFXDatePicker startDatePicker;
+
+    @FXML
+    private JFXDatePicker endDatePicker;
+
+    @FXML
     private JFXCheckBox showArchived;
 
     ObservableList<AccessPattern> allEntries;
@@ -81,6 +91,8 @@ public class AnalysisHistoryController {
         createChart();
 
         initializeAdditionalDataBox();
+
+        initializeDatePickers();
     }
 
     /**
@@ -97,13 +109,13 @@ public class AnalysisHistoryController {
         chartX.setAutoRanging(true);
         chartX.setAnimated(false);
 
-        updateChart(showArchived.isSelected());
+        updateChart();
     }
 
     /**
      * Updates the chart's main series.
      */
-    private void updateChart(boolean includeArchived) throws Exception {
+    private void updateChart() throws Exception {
 
         // if there was data, clear it
         if (queriesHistoryChart.getData() != null) {
@@ -113,9 +125,15 @@ public class AnalysisHistoryController {
         // get the related queries
         List<CriticalAccessQuery> relatedQueries =
             AppComponents.getInstance().getDbContext()
-            .getRelatedFilteredCriticalAccessQueries(query, includeArchived, null, null, null, null);
+            .getRelatedFilteredCriticalAccessQueries(query,
+                showArchived.isSelected(),
+                null,
+                startDatePicker.getValue() != null ? startDatePicker.getValue().atStartOfDay(ZoneOffset.UTC) : null,
+                endDatePicker.getValue() != null ? endDatePicker.getValue().atStartOfDay(ZoneOffset.UTC) : null,
+                0);
 
-        // TODO: set parameters properly
+        // sort by date
+        relatedQueries = relatedQueries.stream().sorted(Comparator.comparing(CriticalAccessQuery::getCreatedAt)).collect(Collectors.toList());
 
         this.relatedQueries = relatedQueries;
 
@@ -142,9 +160,24 @@ public class AnalysisHistoryController {
         XYChart.Series<String, Integer> mainSeries = new XYChart.Series<>();
         mainSeries.setName(bundle.getString("all"));
 
-        for (CriticalAccessQuery query : relatedQueries) {
-            mainSeries.getData().add(new XYChart.Data<>(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy\n    HH:mm")), query.getEntries().size()));
+        // test if the data to display is too much
+        if (relatedQueries.size() > 8) {
+
+            // display only date to use automatic clustering from the line chart
+            for (CriticalAccessQuery query : relatedQueries) {
+                mainSeries.getData().add(new XYChart.Data<>(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")), query.getEntries().size()));
+            }
+
+        } else {
+
+            // display date + time
+            for (CriticalAccessQuery query : relatedQueries) {
+                mainSeries.getData().add(new XYChart.Data<>(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy\n    HH:mm")), query.getEntries().size()));
+            }
+
         }
+
+
 
         // add the main series to the chart
         queriesHistoryChart.getData().add(mainSeries);
@@ -171,7 +204,8 @@ public class AnalysisHistoryController {
         for (XYChart.Series<String, Integer> s : queriesHistoryChart.getData()) {
             for (XYChart.Data<String, Integer> d : s.getData()) {
                 // style current query node differently
-                if (d.getXValue().trim().equals(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy\n    HH:mm")))) {
+                if (d.getXValue().trim().equals(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy\n    HH:mm")))
+                    || d.getXValue().trim().equals(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))) {
                     d.getNode().getStyleClass().add("current-node");
                     Tooltip.install(d.getNode(), new Tooltip("Current Query\n" + bundle.getString("violations") + ": " + d.getYValue()));
                 } else {
@@ -227,12 +261,27 @@ public class AnalysisHistoryController {
         additionalSeries0 = new XYChart.Series<>();
         additionalSeries0.setName(pattern.getUsecaseId());
 
-        // create new series for the data and add it
-        for (CriticalAccessQuery query : relatedQueries) {
+        // test if the data to display is too much
+        if (relatedQueries.size() > 8) {
 
-            int result = (int) query.getEntries().stream().map(x -> x.getAccessPattern().getUsecaseId()).filter(y -> y.equals(pattern.getUsecaseId())).count();
+            // create new series for the data and add it
+            for (CriticalAccessQuery query : relatedQueries) {
 
-            additionalSeries0.getData().add(new XYChart.Data<>(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy\n    HH:mm")), result));
+                int result = (int) query.getEntries().stream().map(x -> x.getAccessPattern().getUsecaseId()).filter(y -> y.equals(pattern.getUsecaseId())).count();
+
+                additionalSeries0.getData().add(new XYChart.Data<>(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")), result));
+            }
+
+        } else {
+
+            // display date + time
+            for (CriticalAccessQuery query : relatedQueries) {
+
+                int result = (int) query.getEntries().stream().map(x -> x.getAccessPattern().getUsecaseId()).filter(y -> y.equals(pattern.getUsecaseId())).count();
+
+                additionalSeries0.getData().add(new XYChart.Data<>(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy\n    HH:mm")), result));
+            }
+
         }
 
         queriesHistoryChart.getData().add(additionalSeries0);
@@ -252,11 +301,27 @@ public class AnalysisHistoryController {
         additionalSeries1 = new XYChart.Series<>();
         additionalSeries1.setName(pattern.getUsecaseId());
 
-        for (CriticalAccessQuery query : relatedQueries) {
+        // test if the data to display is too much
+        if (relatedQueries.size() > 8) {
 
-            int result = (int) query.getEntries().stream().map(x -> x.getAccessPattern().getUsecaseId()).filter(y -> y.equals(pattern.getUsecaseId())).count();
+            // create new series for the data and add it
+            for (CriticalAccessQuery query : relatedQueries) {
 
-            additionalSeries1.getData().add(new XYChart.Data<>(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy\n    HH:mm")), result));
+                int result = (int) query.getEntries().stream().map(x -> x.getAccessPattern().getUsecaseId()).filter(y -> y.equals(pattern.getUsecaseId())).count();
+
+                additionalSeries1.getData().add(new XYChart.Data<>(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")), result));
+            }
+
+        } else {
+
+            // display date + time
+            for (CriticalAccessQuery query : relatedQueries) {
+
+                int result = (int) query.getEntries().stream().map(x -> x.getAccessPattern().getUsecaseId()).filter(y -> y.equals(pattern.getUsecaseId())).count();
+
+                additionalSeries1.getData().add(new XYChart.Data<>(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy\n    HH:mm")), result));
+            }
+
         }
 
         queriesHistoryChart.getData().add(additionalSeries1);
@@ -276,11 +341,27 @@ public class AnalysisHistoryController {
         additionalSeries2 = new XYChart.Series<>();
         additionalSeries2.setName(pattern.getUsecaseId());
 
-        for (CriticalAccessQuery query : relatedQueries) {
+        // test if the data to display is too much
+        if (relatedQueries.size() > 8) {
 
-            int result = (int) query.getEntries().stream().map(x -> x.getAccessPattern().getUsecaseId()).filter(y -> y.equals(pattern.getUsecaseId())).count();
+            // create new series for the data and add it
+            for (CriticalAccessQuery query : relatedQueries) {
 
-            additionalSeries2.getData().add(new XYChart.Data<>(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy\n    HH:mm")), result));
+                int result = (int) query.getEntries().stream().map(x -> x.getAccessPattern().getUsecaseId()).filter(y -> y.equals(pattern.getUsecaseId())).count();
+
+                additionalSeries2.getData().add(new XYChart.Data<>(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")), result));
+            }
+
+        } else {
+
+            // display date + time
+            for (CriticalAccessQuery query : relatedQueries) {
+
+                int result = (int) query.getEntries().stream().map(x -> x.getAccessPattern().getUsecaseId()).filter(y -> y.equals(pattern.getUsecaseId())).count();
+
+                additionalSeries2.getData().add(new XYChart.Data<>(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy\n    HH:mm")), result));
+            }
+
         }
 
         queriesHistoryChart.getData().add(additionalSeries2);
@@ -314,10 +395,6 @@ public class AnalysisHistoryController {
         }
     }
 
-    public void toggleArchivedDisplay() throws Exception {
-        updateChart(showArchived.isSelected());
-    }
-
     /**
      * Resets Data0Box.
      */
@@ -346,5 +423,44 @@ public class AnalysisHistoryController {
 
         // remove old data
         queriesHistoryChart.getData().remove(additionalSeries2);
+    }
+
+    private void initializeDatePickers() {
+        // startDate binding
+        startDatePicker.valueProperty().addListener((ol, oldValue, newValue) -> {
+
+            // startDate not after endDate
+            if (endDatePicker.getValue() != null) {
+                if (newValue != null && endDatePicker.getValue().toEpochDay() < newValue.toEpochDay()) {
+                    startDatePicker.setValue(endDatePicker.getValue());
+                }
+            }
+        });
+        startDatePicker.setEditable(false);
+
+        // endDate binding
+        endDatePicker.valueProperty().addListener((ol, oldValue, newValue) -> {
+
+            // endDate not before startDate
+            if (startDatePicker.getValue() != null) {
+                if (newValue != null && startDatePicker.getValue().toEpochDay() > newValue.toEpochDay()) {
+                    endDatePicker.setValue(startDatePicker.getValue());
+                }
+            }
+        });
+        endDatePicker.setEditable(false);
+    }
+
+    public void applyFilters() throws Exception {
+        updateChart();
+    }
+
+    public void resetFilters() throws Exception {
+        showArchived.setSelected(false);
+
+        startDatePicker.setValue(null);
+        endDatePicker.setValue(null);
+
+        updateChart();
     }
 }
