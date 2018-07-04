@@ -136,7 +136,7 @@ public class AnalysisHistoryController {
         }
 
         XYChart.Series<String, Integer> mainSeries = new XYChart.Series<>();
-        mainSeries.setName(bundle.getString("violations"));
+        mainSeries.setName(bundle.getString("all"));
 
         for (CriticalAccessQuery query : relatedQueries) {
             mainSeries.getData().add(new XYChart.Data<>(query.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy\n    HH:mm")), query.getEntries().size()));

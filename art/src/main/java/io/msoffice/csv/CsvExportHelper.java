@@ -32,8 +32,8 @@ public class CsvExportHelper implements IReportExportHelper {
 
             // TODO: make csv headers customizable in settings
             String[] headers = language.equals(Locale.GERMAN)
-                ? new String[] { "Verletztes Pattern", "Kritischer Benutzer"}
-                : new String[] {"Violated Pattern", "Critical Username"};
+                ? new String[] { "Verletztes Pattern", "Kritischer Benutzer", "Beschreibung"}
+                : new String[] {"Violated Pattern", "Critical Username", "Description"};
 
             CSVFormat format = CSVFormat.DEFAULT.withDelimiter(separator).withHeader(headers);
 
@@ -42,7 +42,7 @@ public class CsvExportHelper implements IReportExportHelper {
 
                 // write critical access entries to file
                 for (CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
-                    csvPrinter.printRecord(criticalAccessEntry.getAccessPattern().getUsecaseId(), criticalAccessEntry.getUsername());
+                    csvPrinter.printRecord(criticalAccessEntry.getAccessPattern().getUsecaseId(), criticalAccessEntry.getUsername(), criticalAccessEntry.getAccessPattern().getDescription());
                 }
 
                 // make sure the output stream gets flushed, so everything is written to the output file

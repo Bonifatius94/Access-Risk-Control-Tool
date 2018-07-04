@@ -993,12 +993,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         // get the id of the original whitelist
         Integer originalId = whitelist.getId();
+
         Whitelist original = getWhitelists(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
 
         // create copy of original and insert it
         Whitelist archived = new Whitelist(original);
         archived.setArchived(true);
-        archived.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
+        archived.initCreationFlags(original.getCreatedAt(), original.getCreatedBy());
         session.save(archived);
 
         // get critical access queries referencing a config that references the original pattern

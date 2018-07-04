@@ -448,6 +448,6 @@
 .default-color0.chart-line-symbol { -fx-background-color: derive(-fx-primary, -10%), white; }
 
 .current-node {
-    -fx-padding: 8;
+    -fx-padding: 5;
     -fx-background-color: white, white !important;
 }
