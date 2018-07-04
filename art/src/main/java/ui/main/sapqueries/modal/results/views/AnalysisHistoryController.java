@@ -111,7 +111,11 @@ public class AnalysisHistoryController {
         }
 
         // get the related queries
-        List<CriticalAccessQuery> relatedQueries = AppComponents.getInstance().getDbContext().getRelatedSapQueries(query, includeArchived);
+        List<CriticalAccessQuery> relatedQueries =
+            AppComponents.getInstance().getDbContext()
+            .getRelatedFilteredCriticalAccessQueries(query, includeArchived, null, null, null, null);
+
+        // TODO: set parameters properly
 
         this.relatedQueries = relatedQueries;
 

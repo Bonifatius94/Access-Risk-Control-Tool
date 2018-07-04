@@ -72,16 +72,6 @@ public interface IArtDbContext {
     List<CriticalAccessQuery> getSapQueries(boolean includeArchived) throws Exception;
 
     /**
-     * This method selects all already executed sap queries from the local database.
-     *
-     * @param query the query to be related to
-     * @param includeArchived determines whether archived records are also loaded
-     * @return a list of already executed sap queries
-     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
-     */
-    List<CriticalAccessQuery> getRelatedSapQueries(CriticalAccessQuery query, boolean includeArchived) throws Exception;
-
-    /**
      * This method selects all configurations from the local database that are not archived with history flag.
      *
      * @param includeArchived determines whether archived records are also loaded
@@ -188,6 +178,21 @@ public interface IArtDbContext {
      * @return a list of whitelist matching the given filter options
      */
     List<CriticalAccessQuery> getFilteredCriticalAccessQueries(boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception;
+
+    /**
+     * This method selects all already executed sap queries from the local database. The filters are applied as in the getFilteredCriticalAccessQueries() method.
+     *
+     * @param query the query to be related to
+     * @param includeArchived determines whether archived records are also loaded
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of already executed sap queries
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    public List<CriticalAccessQuery> getRelatedFilteredCriticalAccessQueries(
+        CriticalAccessQuery query, boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception;
 
     // ============================================
     //                 U P D A T E

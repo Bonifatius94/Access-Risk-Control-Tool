@@ -226,7 +226,11 @@ public class AnalysisResultController {
         }
 
         // get the related queries
-        List<CriticalAccessQuery> relatedQueries = AppComponents.getInstance().getDbContext().getRelatedSapQueries(query, false);
+        List<CriticalAccessQuery> relatedQueries =
+            AppComponents.getInstance().getDbContext()
+                .getRelatedFilteredCriticalAccessQueries(query, false, null, null, null, null);
+
+        // TODO: set parameters properly
 
         // not enough entries for a history
         if (relatedQueries.size() < 2) {
