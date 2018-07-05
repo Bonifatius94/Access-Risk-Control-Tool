@@ -50,7 +50,7 @@
                     <JFXCheckBox fx:id="includeWhitelistCheckbox" text="%includeWhitelist" selected="true"/>
                 </HBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <JFXButton onAction="#exportQuery" text="%exportResults">
+                <JFXButton onAction="#exportQuery" text="%exportResults" minWidth="160">
                     <graphic>
                         <MaterialDesignIconView glyphName="EXPORT"/>
                     </graphic>

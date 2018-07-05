@@ -45,7 +45,7 @@
                 </VBox>
                 <Separator/>
                 <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT">
-                    <JFXButton fx:id="runAnalysisButton" text="%runAnalysis" onAction="#openLoginDialog">
+                    <JFXButton fx:id="runAnalysisButton" text="%runAnalysis" onAction="#openLoginDialog" minWidth="160">
                         <graphic>
                             <MaterialDesignIconView glyphName="PLAY"/>
                         </graphic>

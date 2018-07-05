@@ -36,6 +36,7 @@
     -fx-cursor: hand;
     -jfx-disable-visual-focus: false;
     -jfx-button-type: RAISED;
+    -fx-pref-width: 140;
 }
 
 .jfx-button .glyph-icon {
@@ -52,6 +53,7 @@
     -fx-text-fill: -fx-alternatetext;
     -jfx-disable-visual-focus: true;
     -jfx-button-type: FLAT;
+    -fx-pref-width: 30;
 }
 
 .window-button .glyph-icon {
@@ -64,6 +66,7 @@
 
 .round-button {
     -fx-background-radius: 100%;
+    -fx-pref-width: 30;
 }
 
 .round-button .glyph-icon {
@@ -76,6 +79,10 @@
 
 .close-window-button:hover, .close-window-button:focused {
     -fx-background-color: -fx-error;
+}
+
+.action-button-table-cell .jfx-button {
+    -fx-pref-width: 30;
 }
 
 
