@@ -7,21 +7,25 @@ import data.entities.DbUser;
 import data.entities.DbUserRole;
 import data.entities.Whitelist;
 
+import extensions.ResourceBundleHelper;
 import io.msoffice.excel.AccessPatternImportHelper;
 import io.msoffice.excel.WhitelistImportHelper;
 
 import java.io.File;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Tab;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
 import ui.AppComponents;
+import ui.custom.controls.CustomAlert;
 import ui.main.admin.AdminController;
 import ui.main.configs.ConfigsController;
 import ui.main.patterns.PatternsController;
@@ -73,6 +77,8 @@ public class MainController {
     @FXML
     private Tab usersTab;
 
+
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
     /**
      * Initializes the controller.
@@ -192,7 +198,8 @@ public class MainController {
             @Override
             public void handle(DragEvent event) {
                 if (event.getGestureSource() != mainTabs
-                    && event.getDragboard().hasFiles()) {
+                    && event.getDragboard().hasFiles()
+                    && event.getDragboard().getFiles().get(0).getAbsolutePath().endsWith(".xlsx")) {
                     /* allow for both copying and moving, whatever user chooses */
                     event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
                 }
@@ -216,11 +223,16 @@ public class MainController {
 
                             // if importWhitelist throws an error, try importPatterns
                             importWhitelist(file);
+                            success = true;
                         } catch (Exception e) {
                             try {
                                 importPatterns(file);
+                                success = true;
                             } catch (Exception ex) {
-                                ex.printStackTrace();
+
+                                new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"),
+                                    bundle.getString("wrongFileMessage")).showAndWait();
+
                             }
                         }
                     }
