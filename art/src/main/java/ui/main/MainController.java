@@ -1,17 +1,36 @@
 package ui.main;
 
 import com.jfoenix.controls.JFXTabPane;
+
+import data.entities.AccessPattern;
 import data.entities.DbUser;
 import data.entities.DbUserRole;
+import data.entities.Whitelist;
+
+import io.msoffice.excel.AccessPatternImportHelper;
+import io.msoffice.excel.WhitelistImportHelper;
+
+import java.io.File;
+import java.util.List;
+
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Tab;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+
 import ui.AppComponents;
 import ui.main.admin.AdminController;
 import ui.main.configs.ConfigsController;
 import ui.main.patterns.PatternsController;
+import ui.main.patterns.modal.PatternImportController;
 import ui.main.sapqueries.SapQueriesController;
 import ui.main.sapsettings.SapSettingsController;
 import ui.main.whitelists.WhitelistsController;
+import ui.main.whitelists.modal.WhitelistFormController;
+
 
 public class MainController {
 
@@ -66,6 +85,8 @@ public class MainController {
         initTableUpdates();
 
         updateAllTables();
+
+        initializeDragAndDrop();
     }
 
     /**
@@ -160,5 +181,88 @@ public class MainController {
                 e.printStackTrace();
             }
         }));
+    }
+
+    /**
+     * Initializes the drag and drop functionality for the MainTabs.
+     */
+    private void initializeDragAndDrop() {
+        mainTabs.setOnDragOver(new EventHandler<DragEvent>() {
+
+            @Override
+            public void handle(DragEvent event) {
+                if (event.getGestureSource() != mainTabs
+                    && event.getDragboard().hasFiles()) {
+                    /* allow for both copying and moving, whatever user chooses */
+                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                }
+                event.consume();
+            }
+        });
+
+        // on drag drop, start the import dialogs
+        mainTabs.setOnDragDropped(new EventHandler<DragEvent>() {
+
+            @Override
+            public void handle(DragEvent event) {
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+                if (db.hasFiles()) {
+                    File file = db.getFiles().get(0);
+
+                    // file is a file that can be imported
+                    if (file.getAbsolutePath().endsWith(".xlsx")) {
+                        try {
+
+                            // if importWhitelist throws an error, try importPatterns
+                            importWhitelist(file);
+                        } catch (Exception e) {
+                            try {
+                                importPatterns(file);
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                }
+                /* let the source know whether the string was successfully
+                 * transferred and used */
+                event.setDropCompleted(success);
+
+                event.consume();
+            }
+        });
+    }
+
+    /**
+     * Import a whitelist from the given file.
+     */
+    private void importWhitelist(File file) throws Exception {
+        Whitelist importedWhitelist = new WhitelistImportHelper().importWhitelist(file.getPath());
+
+        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "importWhitelist", 900, 650);
+
+        WhitelistFormController editDialogController = loader.getController();
+        editDialogController.giveSelectedWhitelist(importedWhitelist);
+        editDialogController.setWhitelistsController(whitelistsController);
+
+        mainTabs.getSelectionModel().select(whitelistsTab);
+    }
+
+    /**
+     * Imports patterns from the given file.
+     */
+    private void importPatterns(File file) throws Exception {
+        List<AccessPattern> importedPatterns = new AccessPatternImportHelper().importAccessPatterns(file.getAbsolutePath());
+
+        // open a modal import window
+        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternImportView.fxml", "importPatterns");
+
+        // give the dialog the controller and the patterns
+        PatternImportController importController = loader.getController();
+        importController.giveImportedPatterns(importedPatterns);
+        importController.setPatternsController(patternsController);
+
+        mainTabs.getSelectionModel().select(patternsTab);
     }
 }
