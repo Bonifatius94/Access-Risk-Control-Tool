@@ -60,16 +60,16 @@ public class WordExportTest {
             query.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), "TESTUSER");
 
             // export data as docx format
-            new WordExportHelper().exportDocument(query, new File("out_de.docx"), Locale.GERMAN);
+            new WordExportHelper().exportDocument(query, new File("out_de.docx"), Locale.GERMAN, null);
 
             // export data as docx format
-            new WordExportHelper().exportDocument(query, new File("out_en.docx"), Locale.ENGLISH);
+            new WordExportHelper().exportDocument(query, new File("out_en.docx"), Locale.ENGLISH, null);
 
             // export data as pdf format
-            new PdfExportHelper().exportDocument(query, new File("out_de.pdf"), Locale.GERMAN);
+            new PdfExportHelper().exportDocument(query, new File("out_de.pdf"), Locale.GERMAN, null);
 
             // export data as pdf format
-            new PdfExportHelper().exportDocument(query, new File("out_en.pdf"), Locale.ENGLISH);
+            new PdfExportHelper().exportDocument(query, new File("out_en.pdf"), Locale.ENGLISH, null);
 
             // if no exception occurred, the test was successful
             ret = true;

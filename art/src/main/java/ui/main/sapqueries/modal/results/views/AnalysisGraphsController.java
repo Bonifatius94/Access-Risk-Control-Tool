@@ -6,9 +6,10 @@ import data.entities.CriticalAccessQuery;
 
 import extensions.ResourceBundleHelper;
 
-import java.io.File;
-import java.io.IOException;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -27,8 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
-
-import javax.imageio.ImageIO;
+import settings.UserSettingsHelper;
 
 public class AnalysisGraphsController {
 
@@ -46,8 +46,6 @@ public class AnalysisGraphsController {
 
     private CriticalAccessQuery query;
     private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
-    private int average = 0;
-
 
     /**
      * Gives the controller the result query.
@@ -141,10 +139,10 @@ public class AnalysisGraphsController {
         }
 
         // compute average
-        average = all / itemsXCount.size();
+        int average = all / itemsXCount.size();
 
         for (Map.Entry<String, Integer> entry : itemsXCount.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
-            XYChart.Data<String, Integer> data = createData(entry.getKey(), entry.getValue());
+            XYChart.Data<String, Integer> data = createData(entry.getKey(), entry.getValue(), average);
 
             mainSeries.getData().add(data);
         }
@@ -156,7 +154,7 @@ public class AnalysisGraphsController {
     /**
      * Creates the data and adds a label with the value.
      */
-    private XYChart.Data<String, Integer> createData(String key, int value) {
+    private XYChart.Data<String, Integer> createData(String key, int value, int average) {
 
         Label label = new Label("" + value);
         label.getStyleClass().add("bar-value");
@@ -178,32 +176,42 @@ public class AnalysisGraphsController {
         return data;
     }
 
-    private void convertGraphToPng(BarChart chart, String name) {
-
+    /**
+     * Makes a snapshot of the given chart and return a BufferedImage of it.
+     */
+    private BufferedImage graphToBufferedImage(BarChart chart) throws Exception {
         Scene scene = new Scene(new AnchorPane(chart));
+
+        // add styles to the scene
+        scene.getRoot().setStyle(new UserSettingsHelper().loadUserSettings().getDarkThemeCss());
+        scene.getStylesheets().add("css/bar-export.css");
+
+        // add main-root to the root so tooltip styling is not affected
+        scene.getRoot().getStyleClass().add("main-root");
 
         WritableImage image = scene.snapshot(null);
 
-        File file = new File(name);
-
-        try {
-            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return SwingFXUtils.fromFXImage(image, null);
     }
 
     /**
      * Exports the graphs.
      */
-    public void exportGraphs() {
+    public List<BufferedImage> getExportedGraphs() throws Exception {
 
-        exportUsecaseGraph();
+        List<BufferedImage> images = new ArrayList<>();
 
-        exportUsernameGraph();
+        images.add(exportUsecaseGraph());
+        images.add(exportUsernameGraph());
+
+        return images;
     }
 
-    private void exportUsecaseGraph() {
+    /**
+     * Exports the UsecaseGraph as a BufferedImage.
+     */
+    @SuppressWarnings("all")
+    private BufferedImage exportUsecaseGraph() throws Exception {
 
         // y axis properties
         NumberAxis numberAxis = new NumberAxis();
@@ -230,7 +238,6 @@ public class AnalysisGraphsController {
 
         chart.setTitle(bundle.getString("usecaseIdViolations"));
 
-
         XYChart.Series<String, Integer> mainSeries = new XYChart.Series<>();
 
         // calculate maximum of entries for upper bound (round up to nearest 10)
@@ -244,10 +251,10 @@ public class AnalysisGraphsController {
         }
 
         // compute average
-        average = all / itemsXCount.size();
+        int average = all / itemsXCount.size();
 
         for (Map.Entry<String, Integer> entry : itemsXCount.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
-            XYChart.Data<String, Integer> data = createData(entry.getKey(), entry.getValue());
+            XYChart.Data<String, Integer> data = createData(entry.getKey(), entry.getValue(), average);
 
             mainSeries.getData().add(data);
         }
@@ -255,10 +262,17 @@ public class AnalysisGraphsController {
         // add the main series to the chart
         chart.getData().add(mainSeries);
 
-        convertGraphToPng(chart, "usecases.png");
+        // cap max chart size
+        chart.setMaxWidth(800);
+
+        return graphToBufferedImage(chart);
     }
 
-    private void exportUsernameGraph() {
+    /**
+     * Exports the UsernameGraph as a BufferedImage.
+     */
+    @SuppressWarnings("all")
+    private BufferedImage exportUsernameGraph() throws Exception {
 
         // y axis properties
         NumberAxis numberAxis = new NumberAxis();
@@ -272,7 +286,7 @@ public class AnalysisGraphsController {
         categoryAxis.setAutoRanging(true);
         categoryAxis.setAnimated(false);
 
-        BarChart<String, Integer> chart = new BarChart(categoryAxis, numberAxis);
+        BarChart<Integer, String> chart = new BarChart(numberAxis, categoryAxis);
 
         chart.setLegendVisible(false);
 
@@ -295,13 +309,13 @@ public class AnalysisGraphsController {
             all += entry.getValue();
         }
 
-        XYChart.Series<String, Integer> mainSeries = new XYChart.Series<>();
+        XYChart.Series<Integer, String> mainSeries = new XYChart.Series<>();
 
         // compute average
-        average = all / itemsXCount.size();
+        int average = all / itemsXCount.size();
 
         for (Map.Entry<String, Integer> entry : itemsXCount.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
-            XYChart.Data<String, Integer> data = createData(entry.getKey(), entry.getValue());
+            XYChart.Data<Integer, String> data = createDataInverted(entry.getKey(), entry.getValue(), average);
 
             mainSeries.getData().add(data);
         }
@@ -309,6 +323,35 @@ public class AnalysisGraphsController {
         // add the main series to the chart
         chart.getData().add(mainSeries);
 
-        convertGraphToPng(chart, "usernames.png");
+        // cap max chart size
+        chart.setPrefHeight(itemsXCount.size() * 40);
+        chart.setMaxHeight(1000);
+
+        return graphToBufferedImage(chart);
+    }
+
+    /**
+     * Creates the data and adds a label with the value.
+     */
+    private XYChart.Data<Integer, String> createDataInverted(String key, int value, int average) {
+
+        Label label = new Label("" + value);
+        label.getStyleClass().add("bar-value");
+        Group group = new Group(label);
+        StackPane.setAlignment(group, Pos.CENTER_RIGHT);
+        StackPane.setMargin(group, new Insets(0, 5, 0, 0));
+
+        StackPane node = new StackPane();
+        node.getChildren().add(group);
+
+        // color the nodes that are above the average
+        if (value > average) {
+            node.getStyleClass().add("warning-bar");
+        }
+
+        XYChart.Data<Integer, String> data = new XYChart.Data<>(value, key);
+        data.setNode(node);
+
+        return data;
     }
 }

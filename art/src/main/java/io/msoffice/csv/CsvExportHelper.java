@@ -5,8 +5,10 @@ import data.entities.CriticalAccessQuery;
 
 import io.msoffice.IReportExportHelper;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.csv.CSVFormat;
@@ -23,7 +25,7 @@ public class CsvExportHelper implements IReportExportHelper {
      * @throws Exception caused by incompatible file type or failed write process and other I/O exceptions
      */
     @Override
-    public void exportDocument(CriticalAccessQuery criticalAccessQuery, File file, Locale language) throws Exception {
+    public void exportDocument(CriticalAccessQuery criticalAccessQuery, File file, Locale language, List<BufferedImage> chartImages) throws Exception {
 
         try (FileWriter csvWriter = new FileWriter(file)) {
 

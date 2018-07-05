@@ -4,9 +4,11 @@ import data.entities.CriticalAccessQuery;
 
 import io.msoffice.ReportExportType;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.poi.xwpf.converter.pdf.PdfConverter;
@@ -25,10 +27,10 @@ public class WordExportHelper extends ReportExportHelperBase {
      * @throws Exception caused by incompatible file type or failed write process and other I/O exceptions
      */
     @Override
-    public void exportDocument(CriticalAccessQuery query, File file, Locale language) throws Exception {
+    public void exportDocument(CriticalAccessQuery query, File file, Locale language, List<BufferedImage> chartImages) throws Exception {
 
         // init word document with template from resources
-        try (XWPFDocument document = prepareDocument(query, language)) {
+        try (XWPFDocument document = prepareDocument(query, language, chartImages)) {
 
             // write results to file
             try (FileOutputStream out = new FileOutputStream(file)) {

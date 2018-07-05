@@ -1,0 +1,41 @@
+/*******************************************************************************
+ *                                                                             *
+ * Chart Export Special Styling                                                *
+ *                                                                             *
+ ******************************************************************************/
+
+* {
+    -fx-text: ladder(-fx-primary, white 0%, white 65%, black 66%, black 100%);
+    -fx-error: #c82d49;
+}
+
+.chart {
+    -fx-font-size: 15px !important;
+}
+
+.chart-legend .label {
+    -fx-padding: 0 5 0 5;
+}
+
+.default-color0.chart-series-line { -fx-stroke: -fx-primary; }
+
+.default-color0.chart-line-symbol { -fx-background-color: derive(-fx-primary, -10%), white; }
+
+.default-color0.chart-bar { -fx-bar-fill: -fx-primary; }
+
+.current-node {
+    -fx-background-color: -fx-primary, derive(-fx-primary, -40%) !important;
+}
+
+.node-warning {
+    -fx-background-color: -fx-primary, -fx-error !important;
+}
+
+.bar-value {
+    -fx-text-fill: -fx-text;
+    -fx-font-size: 0.9em;
+}
+
+.warning-bar.chart-bar {
+    -fx-bar-fill: -fx-error;
+}

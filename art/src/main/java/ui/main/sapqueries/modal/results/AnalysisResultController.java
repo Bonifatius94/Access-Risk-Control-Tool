@@ -18,6 +18,7 @@ import io.msoffice.excel.AccessPatternExportHelper;
 import io.msoffice.excel.WhitelistExportHelper;
 
 import java.awt.Desktop;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -32,8 +33,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
-import javafx.stage.FileChooser;
 
+import javafx.stage.FileChooser;
 import settings.UserSettings;
 
 import ui.App;
@@ -110,9 +111,8 @@ public class AnalysisResultController {
      */
     public void exportQuery() throws Exception {
 
-        analysisGraphsController.exportGraphs();
+        List<BufferedImage> chartImages = analysisGraphsController.getExportedGraphs();
 
-        /*
         ReportExportType exportType = exportFormatChooser.getSelectionModel().getSelectedItem();
         Locale exportLanguage = exportLanguageChooser.getSelectionModel().getSelectedItem();
 
@@ -144,7 +144,7 @@ public class AnalysisResultController {
         if (file != null) {
 
             // export results
-            exportAndOpenResults(file, exportType, exportLanguage);
+            exportAndOpenResults(file, exportType, exportLanguage, chartImages);
 
             if (includePatternsCheckbox.isSelected()) {
                 exportPatterns(file);
@@ -152,16 +152,16 @@ public class AnalysisResultController {
             if (includeWhitelistCheckbox.isSelected()) {
                 exportWhitelist(file);
             }
-        } */
+        }
     }
 
     /**
      * Exports the query results with the given format / language.
      */
-    public void exportAndOpenResults(File file, ReportExportType exportType, Locale exportLanguage) throws Exception {
+    public void exportAndOpenResults(File file, ReportExportType exportType, Locale exportLanguage, List<BufferedImage> chartImages) throws Exception {
 
         // export the query results to the chosen output file
-        new ExportHelper().exportDocument(resultQuery, file, exportType, exportLanguage);
+        new ExportHelper().exportDocument(resultQuery, file, exportType, exportLanguage, chartImages);
 
         // open exported file with a suitable program
         if (file.exists() && Desktop.isDesktopSupported()) {

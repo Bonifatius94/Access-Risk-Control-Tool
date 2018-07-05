@@ -6,7 +6,10 @@ import io.msoffice.csv.CsvExportHelper;
 import io.msoffice.word.PdfExportHelper;
 import io.msoffice.word.WordExportHelper;
 
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.util.List;
 import java.util.Locale;
 
 public class ExportHelper {
@@ -20,10 +23,10 @@ public class ExportHelper {
      * @param language is the language of the export format
      * @throws Exception caused by incompatible file type or failed write process and other I/O exceptions
      */
-    public void exportDocument(CriticalAccessQuery query, File file, ReportExportType type, Locale language) throws Exception {
+    public void exportDocument(CriticalAccessQuery query, File file, ReportExportType type, Locale language, List<BufferedImage> chartImages) throws Exception {
 
         // get export helper and export the document accordingly
-        getExportHelper(type).exportDocument(query, file, language);
+        getExportHelper(type).exportDocument(query, file, language, chartImages);
     }
 
     private IReportExportHelper getExportHelper(ReportExportType type) {
