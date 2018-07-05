@@ -6,21 +6,29 @@ import data.entities.CriticalAccessQuery;
 
 import extensions.ResourceBundleHelper;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+
+import javax.imageio.ImageIO;
 
 public class AnalysisGraphsController {
 
@@ -164,10 +172,143 @@ public class AnalysisGraphsController {
             node.getStyleClass().add("warning-bar");
         }
 
-        XYChart.Data<String, Integer> data =  new XYChart.Data<>(key, value);
+        XYChart.Data<String, Integer> data = new XYChart.Data<>(key, value);
         data.setNode(node);
 
         return data;
     }
 
+    private void convertGraphToPng(BarChart chart, String name) {
+
+        Scene scene = new Scene(new AnchorPane(chart));
+
+        WritableImage image = scene.snapshot(null);
+
+        File file = new File(name);
+
+        try {
+            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Exports the graphs.
+     */
+    public void exportGraphs() {
+
+        exportUsecaseGraph();
+
+        exportUsernameGraph();
+    }
+
+    private void exportUsecaseGraph() {
+
+        // y axis properties
+        NumberAxis numberAxis = new NumberAxis();
+        numberAxis.setAutoRanging(false);
+        numberAxis.setLowerBound(0);
+        numberAxis.setTickUnit(5);
+        numberAxis.setAnimated(false);
+
+        // x axis properties
+        CategoryAxis categoryAxis = new CategoryAxis();
+        categoryAxis.setAutoRanging(true);
+        categoryAxis.setAnimated(false);
+
+        BarChart<String, Integer> chart = new BarChart(categoryAxis, numberAxis);
+
+        chart.setLegendVisible(false);
+
+        Map<String, Integer> itemsXCount;
+
+        // group by usecase id
+        itemsXCount =
+            query.getEntries().stream().map(x -> x.getAccessPattern().getUsecaseId())
+                .collect(Collectors.toMap(x -> x, x -> 1, Integer::sum));
+
+        chart.setTitle(bundle.getString("usecaseIdViolations"));
+
+
+        XYChart.Series<String, Integer> mainSeries = new XYChart.Series<>();
+
+        // calculate maximum of entries for upper bound (round up to nearest 10)
+        int maximum = itemsXCount.values().stream().max(Integer::compareTo).get();
+        int upperBound = ((maximum + 10) / 10) * 10;
+        numberAxis.setUpperBound(upperBound);
+
+        int all = 0;
+        for (Map.Entry<String, Integer> entry : itemsXCount.entrySet()) {
+            all += entry.getValue();
+        }
+
+        // compute average
+        average = all / itemsXCount.size();
+
+        for (Map.Entry<String, Integer> entry : itemsXCount.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
+            XYChart.Data<String, Integer> data = createData(entry.getKey(), entry.getValue());
+
+            mainSeries.getData().add(data);
+        }
+
+        // add the main series to the chart
+        chart.getData().add(mainSeries);
+
+        convertGraphToPng(chart, "usecases.png");
+    }
+
+    private void exportUsernameGraph() {
+
+        // y axis properties
+        NumberAxis numberAxis = new NumberAxis();
+        numberAxis.setAutoRanging(false);
+        numberAxis.setLowerBound(0);
+        numberAxis.setTickUnit(5);
+        numberAxis.setAnimated(false);
+
+        // x axis properties
+        CategoryAxis categoryAxis = new CategoryAxis();
+        categoryAxis.setAutoRanging(true);
+        categoryAxis.setAnimated(false);
+
+        BarChart<String, Integer> chart = new BarChart(categoryAxis, numberAxis);
+
+        chart.setLegendVisible(false);
+
+        Map<String, Integer> itemsXCount;
+
+        // group by username
+        itemsXCount =
+            query.getEntries().stream().map(x -> x.getUsername())
+                .collect(Collectors.toMap(x -> x, x -> 1, Integer::sum));
+
+        chart.setTitle(bundle.getString("usernameViolations"));
+
+        // calculate maximum of entries for upper bound (round up to nearest 10)
+        int maximum = itemsXCount.values().stream().max(Integer::compareTo).get();
+        int upperBound = ((maximum + 10) / 10) * 10;
+        numberAxis.setUpperBound(upperBound);
+
+        int all = 0;
+        for (Map.Entry<String, Integer> entry : itemsXCount.entrySet()) {
+            all += entry.getValue();
+        }
+
+        XYChart.Series<String, Integer> mainSeries = new XYChart.Series<>();
+
+        // compute average
+        average = all / itemsXCount.size();
+
+        for (Map.Entry<String, Integer> entry : itemsXCount.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
+            XYChart.Data<String, Integer> data = createData(entry.getKey(), entry.getValue());
+
+            mainSeries.getData().add(data);
+        }
+
+        // add the main series to the chart
+        chart.getData().add(mainSeries);
+
+        convertGraphToPng(chart, "usernames.png");
+    }
 }

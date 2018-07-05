@@ -110,6 +110,9 @@ public class AnalysisResultController {
      */
     public void exportQuery() throws Exception {
 
+        analysisGraphsController.exportGraphs();
+
+        /*
         ReportExportType exportType = exportFormatChooser.getSelectionModel().getSelectedItem();
         Locale exportLanguage = exportLanguageChooser.getSelectionModel().getSelectedItem();
 
@@ -149,7 +152,7 @@ public class AnalysisResultController {
             if (includeWhitelistCheckbox.isSelected()) {
                 exportWhitelist(file);
             }
-        }
+        } */
     }
 
     /**
