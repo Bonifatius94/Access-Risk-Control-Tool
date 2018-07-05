@@ -47,6 +47,11 @@ public class WhitelistImportHelper {
                 continue;
             }
 
+            // throw an Exception if the whitelist is not correctly formatted
+            if (row.getCell(0).getStringCellValue().isEmpty() && row.getCell(1).getStringCellValue().isEmpty()) {
+                throw new Exception("Whitelist not correctly formatted!");
+            }
+
             // get value from columns A and B as string
             String userId = row.getCell(0).getStringCellValue();
             String userName = row.getCell(1).getStringCellValue();

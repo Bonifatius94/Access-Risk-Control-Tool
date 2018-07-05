@@ -230,9 +230,9 @@ public class MainController {
                                 success = true;
                             } catch (Exception ex) {
 
+                                // show wrong format exception
                                 new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"),
                                     bundle.getString("wrongFileMessage")).showAndWait();
-
                             }
                         }
                     }
