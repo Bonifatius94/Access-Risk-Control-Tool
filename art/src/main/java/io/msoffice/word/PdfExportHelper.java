@@ -2,12 +2,9 @@ package io.msoffice.word;
 
 import data.entities.CriticalAccessQuery;
 
-import io.msoffice.ReportExportType;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 

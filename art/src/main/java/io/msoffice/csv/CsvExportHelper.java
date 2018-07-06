@@ -22,6 +22,7 @@ public class CsvExportHelper implements IReportExportHelper {
      * @param criticalAccessQuery is the result of an anlysis
      * @param file is the File, where the critical entries are written in
      * @param language is the language of the export format
+     * @param chartImages are the chart graphics displayed (only Word / PDF format)
      * @throws Exception caused by incompatible file type or failed write process and other I/O exceptions
      */
     @Override
