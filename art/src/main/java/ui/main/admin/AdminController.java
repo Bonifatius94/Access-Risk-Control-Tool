@@ -457,7 +457,9 @@ public class AdminController implements IUpdateTable {
 
         // reset all inputs
         tfDbUserName.setText("");
+        tfDbUserName.resetValidation();
         tfDbUserPassword.setText("");
+        tfDbUserPassword.resetValidation();
         initializeCheckboxes();
 
         updateTable();
