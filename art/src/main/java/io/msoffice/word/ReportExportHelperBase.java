@@ -49,6 +49,7 @@ import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBookmark;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRow;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl;
 
 import settings.UserSettingsHelper;
 
@@ -138,17 +139,58 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         // prepare the critical access entries (sorting by usecase id, then by critical username)
         List<CriticalAccessEntry> sortedEntries =
             query.getEntries().stream()
-                .sorted(
-                    Comparator.comparing((CriticalAccessEntry x) -> x.getAccessPattern().getUsecaseId())
-                        .thenComparing(CriticalAccessEntry::getUsername)
-                )
-                .collect(Collectors.toList());
+            .sorted(
+                Comparator.comparing((CriticalAccessEntry x) -> x.getAccessPattern().getUsecaseId())
+                .thenComparing(CriticalAccessEntry::getUsername)
+            )
+            .collect(Collectors.toList());
+
+        XWPFTable originalTable = document.getTables().get(2);
+        boolean isTablePageBreakRequired = sortedEntries.size() > 21;
+
+        // manage the page break manually because the pdf export does not support the table page break feature from MS Word
+        if (isTablePageBreakRequired) {
+
+            // retrieve the remaining entries (without entries from first page)
+            List<CriticalAccessEntry> remainingEntries = new ArrayList<>(sortedEntries.subList(21, sortedEntries.size()));
+
+            while (remainingEntries.size() > 0) {
+
+                // start a new page and clone the table there
+                XWPFTable clone = cloneTableAndWriteItToNewPage(document, originalTable);
+
+                // retrieve the remaining entries and write them to the cloned table
+                int itemsCount = remainingEntries.size() > 48 ? 48 : remainingEntries.size();
+                List<CriticalAccessEntry> entriesToWrite = new ArrayList<>(remainingEntries.subList(0, itemsCount));
+                writeEntriesToTable(clone, entriesToWrite);
+                remainingEntries.removeAll(entriesToWrite);
+            }
+        }
+
+        // write all entries to the table on the first page
+        writeEntriesToTable(originalTable, isTablePageBreakRequired ? sortedEntries.subList(0, 21) : sortedEntries);
+    }
+
+    private XWPFTable cloneTableAndWriteItToNewPage(XWPFDocument document, XWPFTable table) {
+
+        // insert page break into document
+        document.createParagraph().setPageBreak(true);
+
+        // clone the existing table
+        CTTbl tbl = document.getDocument().getBody().insertNewTbl(document.getTables().size());
+        tbl.set(table.getCTTbl());
+        XWPFTable clone = new XWPFTable(tbl, document);
+
+        return clone;
+    }
+
+    private void writeEntriesToTable(XWPFTable table, List<CriticalAccessEntry> entries) {
+
+        final int dataTemplateRowIndex = 2;
+        XWPFTableRow dataTemplateRow = table.getRow(dataTemplateRowIndex);
 
         // write critical access entries
-        XWPFTable table = document.getTables().get(2);
-        XWPFTableRow dataTemplateRow = table.getRow(2);
-
-        for (CriticalAccessEntry entry : sortedEntries) {
+        for (CriticalAccessEntry entry : entries) {
 
             // clone empty data template row
             CTRow ctRow = CTRow.Factory.newInstance();
@@ -163,8 +205,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
             table.addRow(dataRow);
         }
 
-        // remove empty data template row
-        table.removeRow(2);
+        table.removeRow(dataTemplateRowIndex);
     }
 
     private void writeChartsToDocument(XWPFDocument document, CriticalAccessQuery query, Locale language) throws Exception {
