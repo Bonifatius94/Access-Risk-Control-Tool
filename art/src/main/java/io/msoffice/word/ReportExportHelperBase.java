@@ -405,8 +405,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         chart.getData().add(mainSeries);
 
         // cap max chart size
-        chart.setPrefHeight(itemsXCount.size() * 40);
-        chart.setMaxHeight(1000);
+        chart.setMaxHeight(1200);
         chart.setMaxWidth(1100);
 
         return chartToBufferedImage(chart);
