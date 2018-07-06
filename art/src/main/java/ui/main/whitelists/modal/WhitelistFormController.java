@@ -80,6 +80,8 @@ public class WhitelistFormController {
     private WhitelistsController whitelistsController;
     private ConfigsFormController configsFormController;
 
+    private boolean editable = true;
+
     /**
      * Automatically called by FXML loader, starts initialize Columns.
      *
@@ -306,22 +308,22 @@ public class WhitelistFormController {
      */
     private void initializeValidation() {
         tfUserName.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 tfUserName.validate();
             }
         });
         tfUsecaseId.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 tfUsecaseId.validate();
             }
         });
         tfDescription.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 tfDescription.validate();
             }
         });
         tfWhitelistName.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 tfWhitelistName.validate();
             }
         });
@@ -358,6 +360,8 @@ public class WhitelistFormController {
      * @author Franz Schulze/Merlin Albes
      */
     public void setEditable(boolean editable) {
+        this.editable = editable;
+
         if (!editable) {
             tfWhitelistName.setEditable(false);
             tfDescription.setEditable(false);

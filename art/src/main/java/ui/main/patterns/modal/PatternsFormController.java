@@ -123,6 +123,8 @@ public class PatternsFormController {
     private PatternsController parentController;
     private AccessPattern accessPattern;
 
+    private boolean editable = true;
+
     private List<TableViewWithAccessCondition> conditionTables;
     private TableView<AccessPatternConditionProperty> selectedTable;
     private List<PTableColumn<AccessPatternConditionProperty, JFXButton>> deleteColumns;
@@ -234,6 +236,9 @@ public class PatternsFormController {
 
             if (newValue.equals(bundle.getString("pattern"))) {
                 conditionBox.setDisable(false);
+
+                // automatically select the linkage
+                this.linkageInput.getSelectionModel().select(ConditionLinkage.None);
             } else if (newValue.equals(bundle.getString("profile"))) {
                 profileInput.setVisible(true);
             } else {
@@ -249,37 +254,37 @@ public class PatternsFormController {
     private void initializeValidation() {
 
         useCaseIdInput.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 useCaseIdInput.validate();
             }
         });
 
         descriptionInput.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 descriptionInput.validate();
             }
         });
 
         profileInput.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 profileInput.validate();
             }
         });
 
         authObjectInput.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 authObjectInput.validate();
             }
         });
 
         authFieldInput.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 authFieldInput.validate();
             }
         });
 
         authFieldValue1Input.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 authFieldValue1Input.validate();
             }
         });
@@ -318,7 +323,6 @@ public class PatternsFormController {
                 }
 
                 this.selectedTable = conditionTables.get(0).getTableView();
-
 
                 // preselect correct linkage
                 this.linkageInput.getSelectionModel().select(pattern.getLinkage());
@@ -766,6 +770,8 @@ public class PatternsFormController {
      */
     public void setEditable(boolean editable) {
 
+        this.editable = editable;
+
         // disable everything
         if (!editable) {
 
@@ -792,6 +798,10 @@ public class PatternsFormController {
             applyPopertyChangesButton.setVisible(false);
             addPropertyButton.setVisible(false);
             copyPropertyButton.setVisible(false);
+
+            // remove label
+            atLeastTwoCondsWarning.visibleProperty().unbind();
+            atLeastTwoCondsWarning.setVisible(false);
 
             // remove delete column
             for (PTableColumn column : deleteColumns) {
