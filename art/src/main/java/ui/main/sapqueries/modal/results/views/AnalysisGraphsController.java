@@ -26,7 +26,7 @@ import javafx.scene.layout.VBox;
 public class AnalysisGraphsController {
 
     @FXML
-    private BarChart<String, Integer> barChart;
+    private BarChart<String, Number> barChart;
 
     @FXML
     private CategoryAxis chartX;
@@ -119,7 +119,7 @@ public class AnalysisGraphsController {
             barChart.setTitle(bundle.getString("usernameViolations"));
         }
 
-        XYChart.Series<String, Integer> mainSeries = new XYChart.Series<>();
+        XYChart.Series<String, Number> mainSeries = new XYChart.Series<>();
 
         // calculate maximum of entries for upper bound (round up to nearest 10)
         int maximum = itemsXCount.values().stream().max(Integer::compareTo).get();
@@ -135,7 +135,7 @@ public class AnalysisGraphsController {
         int average = all / itemsXCount.size();
 
         for (Map.Entry<String, Integer> entry : itemsXCount.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
-            XYChart.Data<String, Integer> data = createData(entry.getKey(), entry.getValue(), average);
+            XYChart.Data<String, Number> data = createData(entry.getKey(), entry.getValue(), average);
 
             mainSeries.getData().add(data);
         }
@@ -147,7 +147,7 @@ public class AnalysisGraphsController {
     /**
      * Creates the data and adds a label with the value.
      */
-    private XYChart.Data<String, Integer> createData(String key, int value, int average) {
+    private XYChart.Data<String, Number> createData(String key, int value, int average) {
 
         Label label = new Label("" + value);
         label.getStyleClass().add("bar-value");
@@ -163,7 +163,7 @@ public class AnalysisGraphsController {
             node.getStyleClass().add("warning-bar");
         }
 
-        XYChart.Data<String, Integer> data = new XYChart.Data<>(key, value);
+        XYChart.Data<String, Number> data = new XYChart.Data<>(key, value);
         data.setNode(node);
 
         return data;
