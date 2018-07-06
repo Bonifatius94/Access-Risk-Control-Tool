@@ -147,7 +147,7 @@ public class ConfigDetailsController {
      */
     public void viewAccessPatternDetails(AccessPattern accessPattern) throws Exception {
 
-        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternsFormView.fxml", "patternDetails", 1200, 700);
+        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternsFormView.fxml", "patternDetails", 1200, 720);
 
         // give the dialog the sapConfiguration
         PatternsFormController patternView = loader.getController();
