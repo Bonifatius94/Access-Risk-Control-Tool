@@ -4,6 +4,7 @@ import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
 import data.entities.Whitelist;
 
+import extensions.Utf8Control;
 import io.msoffice.IReportExportHelper;
 
 import java.awt.image.BufferedImage;
@@ -314,7 +315,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
                 .collect(Collectors.toMap(x -> x, x -> 1, Integer::sum));
 
         // get the correct string from the chosen locale
-        ResourceBundle bundle = ResourceBundle.getBundle("lang", language);
+        ResourceBundle bundle = ResourceBundle.getBundle("lang", language, new Utf8Control());
         chart.setTitle(bundle.getString("usecaseIdViolations"));
 
         XYChart.Series<String, Number> mainSeries = new XYChart.Series<>();
@@ -376,7 +377,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
                 .collect(Collectors.toMap(x -> x, x -> 1, Integer::sum));
 
         // get the correct string from the chosen locale
-        ResourceBundle bundle = ResourceBundle.getBundle("lang", language);
+        ResourceBundle bundle = ResourceBundle.getBundle("lang", language, new Utf8Control());
         chart.setTitle(bundle.getString("usernameViolations"));
 
         // calculate maximum of entries for upper bound (round up to nearest 10)
