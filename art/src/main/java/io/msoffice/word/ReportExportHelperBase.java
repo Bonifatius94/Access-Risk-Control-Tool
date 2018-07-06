@@ -165,16 +165,13 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
 
     private void writeChartsToDocument(XWPFDocument document, CriticalAccessQuery query, Locale language) throws Exception {
 
-        if (query.getConfig().getPatterns().size() > 1) {
+        for (BufferedImage image : getExportedCharts(query, language)) {
 
-            for (BufferedImage image : getExportedCharts(query, language)) {
+            if (image != null) {
 
-                if (image != null) {
-
-                    // start a new page and insert the chart there
-                    document.createParagraph().setPageBreak(true);
-                    writeImageToDocument(document, image);
-                }
+                // start a new page and insert the chart there
+                document.createParagraph().setPageBreak(true);
+                writeImageToDocument(document, image);
             }
         }
     }
@@ -272,31 +269,17 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
     }
 
     /**
-     * Makes a snapshot of the given chart and returns a BufferedImage of it.
-     */
-    private BufferedImage chartToBufferedImage(BarChart chart) throws Exception {
-        Scene scene = new Scene(new AnchorPane(chart));
-
-        // add styles to the scene
-        scene.getRoot().setStyle(new UserSettingsHelper().loadUserSettings().getDarkThemeCss());
-        scene.getStylesheets().add("css/bar-export.css");
-
-        // add main-root to the root so tooltip styling is not affected
-        scene.getRoot().getStyleClass().add("main-root");
-
-        WritableImage image = scene.snapshot(null);
-
-        return SwingFXUtils.fromFXImage(image, null);
-    }
-
-    /**
      * Returns the charts to export as a list of BufferedImages.
      */
     public List<BufferedImage> getExportedCharts(CriticalAccessQuery query, Locale language) throws Exception {
 
         List<BufferedImage> images = new ArrayList<>();
 
-        images.add(exportUsecaseChart(query, language));
+        // only add the UsecaseChart if there is more than one usecase
+        if (query.getConfig().getPatterns().size() > 1) {
+            images.add(exportUsecaseChart(query, language));
+        }
+
         images.add(exportUsernameChart(query, language));
 
         return images;
@@ -339,7 +322,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
 
         // calculate maximum of entries for upper bound (round up to nearest 10)
         int maximum = itemsXCount.values().stream().max(Integer::compareTo).get();
-        int upperBound = ((maximum + 10) / 10) * 10;
+        int upperBound = 5 * ((maximum + 4) / 5);
         numberAxis.setUpperBound(upperBound);
 
         int all = 0;
@@ -400,7 +383,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
 
         // calculate maximum of entries for upper bound (round up to nearest 10)
         int maximum = itemsXCount.values().stream().max(Integer::compareTo).get();
-        int upperBound = ((maximum + 10) / 10) * 10;
+        int upperBound = 5 * ((maximum + 4) / 5);
         numberAxis.setUpperBound(upperBound);
 
         int all = 0;
@@ -478,5 +461,23 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         data.setNode(node);
 
         return data;
+    }
+
+    /**
+     * Makes a snapshot of the given chart and returns a BufferedImage of it.
+     */
+    private BufferedImage chartToBufferedImage(BarChart chart) throws Exception {
+        Scene scene = new Scene(new AnchorPane(chart));
+
+        // add styles to the scene
+        scene.getRoot().setStyle(new UserSettingsHelper().loadUserSettings().getDarkThemeCss());
+        scene.getStylesheets().add("css/bar-export.css");
+
+        // add main-root to the root so tooltip styling is not affected
+        scene.getRoot().getStyleClass().add("main-root");
+
+        WritableImage image = scene.snapshot(null);
+
+        return SwingFXUtils.fromFXImage(image, null);
     }
 }

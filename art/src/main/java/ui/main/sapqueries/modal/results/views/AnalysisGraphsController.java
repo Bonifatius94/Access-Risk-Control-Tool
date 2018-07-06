@@ -21,6 +21,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 public class AnalysisGraphsController {
 
@@ -32,6 +33,9 @@ public class AnalysisGraphsController {
 
     @FXML
     private NumberAxis chartY;
+
+    @FXML
+    private VBox chartDataBox;
 
     @FXML
     private JFXComboBox<String> chartDataChooser;
@@ -55,7 +59,14 @@ public class AnalysisGraphsController {
 
     private void initializeChartChoosers() {
         chartDataChooser.getItems().setAll(bundle.getString("pattern"), bundle.getString("username"));
-        chartDataChooser.getSelectionModel().select(0);
+
+        if (query.getConfig().getPatterns().size() > 1) {
+            chartDataChooser.getSelectionModel().select(0);
+        } else {
+            chartDataChooser.getSelectionModel().select(1);
+            chartDataBox.setVisible(false);
+            chartDataBox.setManaged(false);
+        }
 
         chartDataChooser.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -122,7 +133,7 @@ public class AnalysisGraphsController {
 
         // calculate maximum of entries for upper bound (round up to nearest 10)
         int maximum = itemsXCount.values().stream().max(Integer::compareTo).get();
-        int upperBound = ((maximum + 10) / 10) * 10;
+        int upperBound =  5 * ((maximum + 4) / 5);
         chartY.setUpperBound(upperBound);
 
         int all = 0;
