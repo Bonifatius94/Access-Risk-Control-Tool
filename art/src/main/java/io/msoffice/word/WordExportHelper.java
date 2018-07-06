@@ -24,14 +24,13 @@ public class WordExportHelper extends ReportExportHelperBase {
      * @param query is the result of an anlysis
      * @param file is the File, where the critical entries are written in
      * @param language is the language of the export format
-     * @param chartImages are the chart graphics displayed (only Word / PDF format)
      * @throws Exception caused by incompatible file type or failed write process and other I/O exceptions
      */
     @Override
-    public void exportDocument(CriticalAccessQuery query, File file, Locale language, List<BufferedImage> chartImages) throws Exception {
+    public void exportDocument(CriticalAccessQuery query, File file, Locale language) throws Exception {
 
         // init word document with template from resources
-        try (XWPFDocument document = prepareDocument(query, language, chartImages)) {
+        try (XWPFDocument document = prepareDocument(query, language)) {
 
             // write results to file
             try (FileOutputStream out = new FileOutputStream(file)) {

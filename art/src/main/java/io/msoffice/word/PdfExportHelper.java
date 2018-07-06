@@ -24,10 +24,10 @@ public class PdfExportHelper extends ReportExportHelperBase {
      * @throws Exception caused by incompatible file type or failed write process and other I/O exceptions
      */
     @Override
-    public void exportDocument(CriticalAccessQuery query, File file, Locale language, List<BufferedImage> chartImages) throws Exception {
+    public void exportDocument(CriticalAccessQuery query, File file, Locale language) throws Exception {
 
         // init word document with template from resources
-        try (XWPFDocument document = prepareDocument(query, language, chartImages)) {
+        try (XWPFDocument document = prepareDocument(query, language)) {
 
             // write results to file
             try (FileOutputStream out = new FileOutputStream(file)) {

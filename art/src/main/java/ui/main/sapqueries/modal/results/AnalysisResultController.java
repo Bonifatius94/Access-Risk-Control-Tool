@@ -111,7 +111,7 @@ public class AnalysisResultController {
      */
     public void exportQuery() throws Exception {
 
-        List<BufferedImage> chartImages = analysisGraphsController.getExportedGraphs();
+        List<BufferedImage> chartImages = null;
 
         ReportExportType exportType = exportFormatChooser.getSelectionModel().getSelectedItem();
         Locale exportLanguage = exportLanguageChooser.getSelectionModel().getSelectedItem();
@@ -144,7 +144,7 @@ public class AnalysisResultController {
         if (file != null) {
 
             // export results
-            exportAndOpenResults(file, exportType, exportLanguage, chartImages);
+            exportAndOpenResults(file, exportType, exportLanguage);
 
             if (includePatternsCheckbox.isSelected()) {
                 exportPatterns(file);
@@ -158,10 +158,10 @@ public class AnalysisResultController {
     /**
      * Exports the query results with the given format / language.
      */
-    public void exportAndOpenResults(File file, ReportExportType exportType, Locale exportLanguage, List<BufferedImage> chartImages) throws Exception {
+    public void exportAndOpenResults(File file, ReportExportType exportType, Locale exportLanguage) throws Exception {
 
         // export the query results to the chosen output file
-        new ExportHelper().exportDocument(resultQuery, file, exportType, exportLanguage, chartImages);
+        new ExportHelper().exportDocument(resultQuery, file, exportType, exportLanguage);
 
         // open exported file with a suitable program
         if (file.exists() && Desktop.isDesktopSupported()) {
@@ -249,7 +249,7 @@ public class AnalysisResultController {
         }
 
         // don't show graphs if no entries are present
-        if (query.getEntries().isEmpty()) {
+        if (query.getEntries().size() <= 1) {
             resultTabs.getTabs().remove(graphsTab);
         } else {
             analysisGraphsController.giveResultQuery(query);

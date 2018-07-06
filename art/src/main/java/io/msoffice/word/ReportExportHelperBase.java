@@ -13,20 +13,35 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+
+import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 
 import javax.imageio.ImageIO;
 
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
-import org.apache.poi.xwpf.usermodel.VerticalAlign;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFPicture;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
@@ -34,6 +49,8 @@ import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBookmark;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRow;
+
+import settings.UserSettingsHelper;
 
 
 public abstract class ReportExportHelperBase implements IReportExportHelper {
@@ -58,7 +75,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
     //                 METHODS
     // =========================================
 
-    protected XWPFDocument prepareDocument(CriticalAccessQuery query, Locale language, List<BufferedImage> chartImages) throws Exception {
+    protected XWPFDocument prepareDocument(CriticalAccessQuery query, Locale language) throws Exception {
 
         XWPFDocument document;
 
@@ -79,7 +96,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         writeCriticalAccessEntriesToDocument(document, query);
 
         // write the overloaded charts to the document
-        writeChartsToDocument(document, chartImages);
+        writeChartsToDocument(document, query, language);
 
         return document;
     }
@@ -89,8 +106,8 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         // format usecase ids of patterns
         final String patternsContent =
             query.getConfig().getPatterns().stream()
-            .map(x -> x.getUsecaseId()).distinct().sorted()
-            .collect(Collectors.joining(", "));
+                .map(x -> x.getUsecaseId()).distinct().sorted()
+                .collect(Collectors.joining(", "));
 
         // format whitelist name
         final Whitelist whitelist = query.getConfig().getWhitelist();
@@ -117,11 +134,11 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         // prepare the critical access entries (sorting by usecase id, then by critical username)
         List<CriticalAccessEntry> sortedEntries =
             query.getEntries().stream()
-            .sorted(
-                Comparator.comparing((CriticalAccessEntry x) -> x.getAccessPattern().getUsecaseId())
-                .thenComparing(CriticalAccessEntry::getUsername)
-            )
-            .collect(Collectors.toList());
+                .sorted(
+                    Comparator.comparing((CriticalAccessEntry x) -> x.getAccessPattern().getUsecaseId())
+                        .thenComparing(CriticalAccessEntry::getUsername)
+                )
+                .collect(Collectors.toList());
 
         // write critical access entries
         XWPFTable table = document.getTables().get(2);
@@ -146,11 +163,11 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         table.removeRow(2);
     }
 
-    private void writeChartsToDocument(XWPFDocument document, List<BufferedImage> chartImages) throws Exception {
+    private void writeChartsToDocument(XWPFDocument document, CriticalAccessQuery query, Locale language) throws Exception {
 
-        if (chartImages != null) {
+        if (query.getConfig().getPatterns().size() > 1) {
 
-            for (BufferedImage image : chartImages) {
+            for (BufferedImage image : getExportedCharts(query, language)) {
 
                 if (image != null) {
 
@@ -177,8 +194,8 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         // TODO: make the resize fill the page correctly
 
         // calculate the width / height of the image (image has 133% scaling factor, but no idea why ...)
-        int newWidth = (int)((double)image.getWidth() / ((double)4 / 3));
-        int newHeight = (int)((double)image.getHeight() / ((double)4 / 3));
+        int newWidth = (int) ((double) image.getWidth() / ((double) 4 / 3));
+        int newHeight = (int) ((double) image.getHeight() / ((double) 4 / 3));
 
         run.addPicture(imageIn, document.PICTURE_TYPE_PNG, null, Units.toEMU(newWidth), Units.toEMU(newHeight));
     }
@@ -252,5 +269,214 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         XWPFParagraph paragraph = cell.getParagraphs().get(0);
         XWPFRun run = paragraph.createRun();
         run.setText(text);
+    }
+
+    /**
+     * Makes a snapshot of the given chart and returns a BufferedImage of it.
+     */
+    private BufferedImage chartToBufferedImage(BarChart chart) throws Exception {
+        Scene scene = new Scene(new AnchorPane(chart));
+
+        // add styles to the scene
+        scene.getRoot().setStyle(new UserSettingsHelper().loadUserSettings().getDarkThemeCss());
+        scene.getStylesheets().add("css/bar-export.css");
+
+        // add main-root to the root so tooltip styling is not affected
+        scene.getRoot().getStyleClass().add("main-root");
+
+        WritableImage image = scene.snapshot(null);
+
+        return SwingFXUtils.fromFXImage(image, null);
+    }
+
+    /**
+     * Returns the charts to export as a list of BufferedImages.
+     */
+    public List<BufferedImage> getExportedCharts(CriticalAccessQuery query, Locale language) throws Exception {
+
+        List<BufferedImage> images = new ArrayList<>();
+
+        images.add(exportUsecaseChart(query, language));
+        images.add(exportUsernameChart(query, language));
+
+        return images;
+    }
+
+    /**
+     * Exports the UsecaseChart as a BufferedImage (snapshot).
+     */
+    @SuppressWarnings("all")
+    private BufferedImage exportUsecaseChart(CriticalAccessQuery query, Locale language) throws Exception {
+
+        // y axis properties
+        NumberAxis numberAxis = new NumberAxis();
+        numberAxis.setAutoRanging(false);
+        numberAxis.setLowerBound(0);
+        numberAxis.setTickUnit(5);
+        numberAxis.setAnimated(false);
+
+        // x axis properties
+        CategoryAxis categoryAxis = new CategoryAxis();
+        categoryAxis.setAutoRanging(true);
+        categoryAxis.setAnimated(false);
+
+        BarChart<String, Integer> chart = new BarChart(categoryAxis, numberAxis);
+
+        chart.setLegendVisible(false);
+
+        Map<String, Integer> itemsXCount;
+
+        // group by usecase id
+        itemsXCount =
+            query.getEntries().stream().map(x -> x.getAccessPattern().getUsecaseId())
+                .collect(Collectors.toMap(x -> x, x -> 1, Integer::sum));
+
+        // get the correct string from the chosen locale
+        ResourceBundle bundle = ResourceBundle.getBundle("lang", language);
+        chart.setTitle(bundle.getString("usecaseIdViolations"));
+
+        XYChart.Series<String, Integer> mainSeries = new XYChart.Series<>();
+
+        // calculate maximum of entries for upper bound (round up to nearest 10)
+        int maximum = itemsXCount.values().stream().max(Integer::compareTo).get();
+        int upperBound = ((maximum + 10) / 10) * 10;
+        numberAxis.setUpperBound(upperBound);
+
+        int all = 0;
+        for (Map.Entry<String, Integer> entry : itemsXCount.entrySet()) {
+            all += entry.getValue();
+        }
+
+        // compute average
+        int average = all / itemsXCount.size();
+
+        for (Map.Entry<String, Integer> entry : itemsXCount.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
+            XYChart.Data<String, Integer> data = createData(entry.getKey(), entry.getValue(), average);
+
+            mainSeries.getData().add(data);
+        }
+
+        // add the main series to the chart
+        chart.getData().add(mainSeries);
+
+        // cap max chart size
+        chart.setMaxWidth(1000);
+
+        return chartToBufferedImage(chart);
+    }
+
+    /**
+     * Exports the UsernameChart as a BufferedImage (snapshot).
+     */
+    @SuppressWarnings("all")
+    private BufferedImage exportUsernameChart(CriticalAccessQuery query, Locale language) throws Exception {
+
+        // y axis properties
+        NumberAxis numberAxis = new NumberAxis();
+        numberAxis.setAutoRanging(false);
+        numberAxis.setLowerBound(0);
+        numberAxis.setTickUnit(5);
+        numberAxis.setAnimated(false);
+
+        // x axis properties
+        CategoryAxis categoryAxis = new CategoryAxis();
+        categoryAxis.setAutoRanging(true);
+        categoryAxis.setAnimated(false);
+
+        BarChart<Integer, String> chart = new BarChart(numberAxis, categoryAxis);
+
+        chart.setLegendVisible(false);
+
+        Map<String, Integer> itemsXCount;
+
+        // group by username
+        itemsXCount =
+            query.getEntries().stream().map(x -> x.getUsername())
+                .collect(Collectors.toMap(x -> x, x -> 1, Integer::sum));
+
+        // get the correct string from the chosen locale
+        ResourceBundle bundle = ResourceBundle.getBundle("lang", language);
+        chart.setTitle(bundle.getString("usernameViolations"));
+
+        // calculate maximum of entries for upper bound (round up to nearest 10)
+        int maximum = itemsXCount.values().stream().max(Integer::compareTo).get();
+        int upperBound = ((maximum + 10) / 10) * 10;
+        numberAxis.setUpperBound(upperBound);
+
+        int all = 0;
+        for (Map.Entry<String, Integer> entry : itemsXCount.entrySet()) {
+            all += entry.getValue();
+        }
+
+        XYChart.Series<Integer, String> mainSeries = new XYChart.Series<>();
+
+        // compute average
+        int average = all / itemsXCount.size();
+
+        for (Map.Entry<String, Integer> entry : itemsXCount.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
+            XYChart.Data<Integer, String> data = createDataInverted(entry.getKey(), entry.getValue(), average);
+
+            mainSeries.getData().add(data);
+        }
+
+        // add the main series to the chart
+        chart.getData().add(mainSeries);
+
+        // cap max chart size
+        chart.setPrefHeight(itemsXCount.size() * 40);
+        chart.setMaxHeight(1000);
+        chart.setMaxWidth(1100);
+
+        return chartToBufferedImage(chart);
+    }
+
+    /**
+     * Creates the data and adds a label with the value.
+     */
+    private XYChart.Data<String, Integer> createData(String key, int value, int average) {
+
+        Label label = new Label("" + value);
+        label.getStyleClass().add("bar-value");
+        Group group = new Group(label);
+        StackPane.setAlignment(group, Pos.BOTTOM_CENTER);
+        StackPane.setMargin(group, new Insets(0, 0, 5, 0));
+
+        StackPane node = new StackPane();
+        node.getChildren().add(group);
+
+        // color the nodes that are above the average
+        if (value > average) {
+            node.getStyleClass().add("warning-bar");
+        }
+
+        XYChart.Data<String, Integer> data = new XYChart.Data<>(key, value);
+        data.setNode(node);
+
+        return data;
+    }
+
+    /**
+     * Creates the data and adds a label with the value.
+     */
+    private XYChart.Data<Integer, String> createDataInverted(String key, int value, int average) {
+
+        Label label = new Label("" + value);
+        label.getStyleClass().add("bar-value");
+        Group group = new Group(label);
+        StackPane.setAlignment(group, Pos.CENTER_RIGHT);
+        StackPane.setMargin(group, new Insets(0, 5, 0, 0));
+
+        StackPane node = new StackPane();
+        node.getChildren().add(group);
+
+        // color the nodes that are above the average
+        if (value > average) {
+            node.getStyleClass().add("warning-bar");
+        }
+
+        XYChart.Data<Integer, String> data = new XYChart.Data<>(value, key);
+        data.setNode(node);
+
+        return data;
     }
 }

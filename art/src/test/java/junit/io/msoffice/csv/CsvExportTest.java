@@ -52,10 +52,10 @@ public class CsvExportTest {
             query.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), "TESTUSER");
 
             // export data with german format
-            new CsvExportHelper().exportDocument(query, new File("out_de.csv"), Locale.GERMAN, null);
+            new CsvExportHelper().exportDocument(query, new File("out_de.csv"), Locale.GERMAN);
 
             // export data with english format
-            new CsvExportHelper().exportDocument(query, new File("out_en.csv"), Locale.ENGLISH, null);
+            new CsvExportHelper().exportDocument(query, new File("out_en.csv"), Locale.ENGLISH);
 
             // if no exception occurred, the test was successful
             ret = true;

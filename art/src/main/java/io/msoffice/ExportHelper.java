@@ -22,10 +22,10 @@ public class ExportHelper {
      * @param language is the language of the export format
      * @throws Exception caused by incompatible file type or failed write process and other I/O exceptions
      */
-    public void exportDocument(CriticalAccessQuery query, File file, ReportExportType type, Locale language, List<BufferedImage> chartImages) throws Exception {
+    public void exportDocument(CriticalAccessQuery query, File file, ReportExportType type, Locale language) throws Exception {
 
         // get export helper and export the document accordingly
-        getExportHelper(type).exportDocument(query, file, language, chartImages);
+        getExportHelper(type).exportDocument(query, file, language);
     }
 
     private IReportExportHelper getExportHelper(ReportExportType type) {
