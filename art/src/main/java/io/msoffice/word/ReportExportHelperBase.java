@@ -4,6 +4,7 @@ import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
 import data.entities.Whitelist;
 
+import extensions.Utf8Control;
 import io.msoffice.IReportExportHelper;
 
 import java.awt.image.BufferedImage;
@@ -329,7 +330,6 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
     /**
      * Exports the UsecaseChart as a BufferedImage (snapshot).
      */
-    @SuppressWarnings("all")
     private BufferedImage exportUsecaseChart(CriticalAccessQuery query, Locale language) throws Exception {
 
         // y axis properties
@@ -344,7 +344,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         categoryAxis.setAutoRanging(true);
         categoryAxis.setAnimated(false);
 
-        BarChart<String, Integer> chart = new BarChart(categoryAxis, numberAxis);
+        BarChart<String, Number> chart = new BarChart<>(categoryAxis, numberAxis);
 
         chart.setLegendVisible(false);
 
@@ -356,10 +356,10 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
                 .collect(Collectors.toMap(x -> x, x -> 1, Integer::sum));
 
         // get the correct string from the chosen locale
-        ResourceBundle bundle = ResourceBundle.getBundle("lang", language);
+        ResourceBundle bundle = ResourceBundle.getBundle("lang", language, new Utf8Control());
         chart.setTitle(bundle.getString("usecaseIdViolations"));
 
-        XYChart.Series<String, Integer> mainSeries = new XYChart.Series<>();
+        XYChart.Series<String, Number> mainSeries = new XYChart.Series<>();
 
         // calculate maximum of entries for upper bound (round up to nearest 10)
         int maximum = itemsXCount.values().stream().max(Integer::compareTo).get();
@@ -375,7 +375,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         int average = all / itemsXCount.size();
 
         for (Map.Entry<String, Integer> entry : itemsXCount.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
-            XYChart.Data<String, Integer> data = createData(entry.getKey(), entry.getValue(), average);
+            XYChart.Data<String, Number> data = createData(entry.getKey(), entry.getValue(), average);
 
             mainSeries.getData().add(data);
         }
@@ -392,7 +392,6 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
     /**
      * Exports the UsernameChart as a BufferedImage (snapshot).
      */
-    @SuppressWarnings("all")
     private BufferedImage exportUsernameChart(CriticalAccessQuery query, Locale language) throws Exception {
 
         // y axis properties
@@ -407,7 +406,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         categoryAxis.setAutoRanging(true);
         categoryAxis.setAnimated(false);
 
-        BarChart<Integer, String> chart = new BarChart(numberAxis, categoryAxis);
+        BarChart<Number, String> chart = new BarChart<>(numberAxis, categoryAxis);
 
         chart.setLegendVisible(false);
 
@@ -419,7 +418,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
                 .collect(Collectors.toMap(x -> x, x -> 1, Integer::sum));
 
         // get the correct string from the chosen locale
-        ResourceBundle bundle = ResourceBundle.getBundle("lang", language);
+        ResourceBundle bundle = ResourceBundle.getBundle("lang", language, new Utf8Control());
         chart.setTitle(bundle.getString("usernameViolations"));
 
         // calculate maximum of entries for upper bound (round up to nearest 10)
@@ -432,13 +431,13 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
             all += entry.getValue();
         }
 
-        XYChart.Series<Integer, String> mainSeries = new XYChart.Series<>();
+        XYChart.Series<Number, String> mainSeries = new XYChart.Series<>();
 
         // compute average
         int average = all / itemsXCount.size();
 
         for (Map.Entry<String, Integer> entry : itemsXCount.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
-            XYChart.Data<Integer, String> data = createDataInverted(entry.getKey(), entry.getValue(), average);
+            XYChart.Data<Number, String> data = createDataInverted(entry.getKey(), entry.getValue(), average);
 
             mainSeries.getData().add(data);
         }
@@ -447,8 +446,8 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         chart.getData().add(mainSeries);
 
         // cap max chart size
-        chart.setPrefHeight(itemsXCount.size() * 40);
-        chart.setMaxHeight(1000);
+        chart.setMinHeight(itemsXCount.size() * 40);
+        chart.setMaxHeight(1200);
         chart.setMaxWidth(1100);
 
         return chartToBufferedImage(chart);
@@ -457,7 +456,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
     /**
      * Creates the data and adds a label with the value.
      */
-    private XYChart.Data<String, Integer> createData(String key, int value, int average) {
+    private XYChart.Data<String, Number> createData(String key, int value, int average) {
 
         Label label = new Label("" + value);
         label.getStyleClass().add("bar-value");
@@ -473,7 +472,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
             node.getStyleClass().add("warning-bar");
         }
 
-        XYChart.Data<String, Integer> data = new XYChart.Data<>(key, value);
+        XYChart.Data<String, Number> data = new XYChart.Data<>(key, value);
         data.setNode(node);
 
         return data;
@@ -482,7 +481,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
     /**
      * Creates the data and adds a label with the value.
      */
-    private XYChart.Data<Integer, String> createDataInverted(String key, int value, int average) {
+    private XYChart.Data<Number, String> createDataInverted(String key, int value, int average) {
 
         Label label = new Label("" + value);
         label.getStyleClass().add("bar-value");
@@ -498,7 +497,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
             node.getStyleClass().add("warning-bar");
         }
 
-        XYChart.Data<Integer, String> data = new XYChart.Data<>(value, key);
+        XYChart.Data<Number, String> data = new XYChart.Data<>(value, key);
         data.setNode(node);
 
         return data;

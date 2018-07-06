@@ -20,6 +20,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.util.Callback;
@@ -63,6 +64,26 @@ public class AnalysisTableController {
         }));
 
         resultTable.setPlaceholder(new Label(bundle.getString("noEntries")));
+
+        initializeResultTable();
+    }
+
+    /**
+     * Initializes all important columns and the double click.
+     */
+    private void initializeResultTable() {
+
+        // catch row double click
+        resultTable.setRowFactory(tv -> {
+            TableRow<CriticalAccessEntry> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    CriticalAccessEntry entry = row.getItem();
+                    viewAccessPatternDetails(entry.getAccessPattern());
+                }
+            });
+            return row;
+        });
 
         initializeConditionTypeColumn();
         initializeUsecaseIdColumn();

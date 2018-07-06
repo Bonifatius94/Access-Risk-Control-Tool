@@ -58,7 +58,7 @@
         <HBox HBox.hgrow="ALWAYS" fx:id="conditionBox" spacing="30" alignment="CENTER">
             <JFXTabPane fx:id="conditionTabs" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"/>
             <VBox spacing="20">
-                <HBox fx:id="editConditionBox" alignment="BASELINE_LEFT" spacing="20">
+                <HBox fx:id="editConditionBox" alignment="BASELINE_LEFT" spacing="20" minHeight="30">
                     <JFXButton fx:id="addConditionButton" onAction="#addEmptyConditionTableTab" prefHeight="30" styleClass="round-button">
                         <graphic>
                             <MaterialDesignIconView glyphName="PLUS"/>
@@ -124,7 +124,7 @@
                         </JFXTextField>
                     </HBox>
                 </VBox>
-                <HBox alignment="CENTER_RIGHT" spacing="10">
+                <HBox alignment="CENTER_RIGHT" spacing="10" minHeight="30">
                     <JFXButton fx:id="addPropertyButton" onAction="#addConditionProperty" prefHeight="30" prefWidth="30" styleClass="round-button">
                         <graphic>
                             <MaterialDesignIconView glyphName="PLUS"/>
