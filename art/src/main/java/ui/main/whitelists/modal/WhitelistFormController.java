@@ -82,6 +82,8 @@ public class WhitelistFormController {
 
     /**
      * Automatically called by FXML loader, starts initialize Columns.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void initialize() {
 
@@ -116,7 +118,9 @@ public class WhitelistFormController {
     }
 
     /**
-     * Initializes delete and edit Column with Buttons.
+     * Initializes delete Column with Buttons.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     private void initializeTableColumns() {
         deleteWhitelistEntryColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (WhitelistEntry whitelistEntry) -> {
@@ -131,8 +135,10 @@ public class WhitelistFormController {
 
     /**
      * Is called if an Whitelist edit is started by the WhitelistController class.
+     * if whitelist is null
      *
      * @param whitelist the whitelist that is loaded to edit dialog.
+     * @author Franz Schulze/Merlin Albes
      */
     public void giveSelectedWhitelist(Whitelist whitelist) {
 
@@ -154,9 +160,10 @@ public class WhitelistFormController {
 
 
     /**
-     * Loads use case and username from the selected entry to the textfield.
+     * Loads use case and username from the selected entry to the textfields.
      *
      * @param whitelistEntry is the by call given whitelist entry.
+     * @author Franz Schulze/Merlin Albes
      */
     private void editWhitelistEntry(WhitelistEntry whitelistEntry) {
         if (whitelistEntry != null) {
@@ -173,6 +180,8 @@ public class WhitelistFormController {
 
     /**
      * Creates a new Whitelist Entry.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void addWhitelistEntry() {
         WhitelistEntry entry = new WhitelistEntry(tfUsecaseId.getText(), tfUserName.getText());
@@ -186,7 +195,9 @@ public class WhitelistFormController {
     }
 
     /**
-     * Creates a new Whitelist Entry.
+     * Creates a copy of a selected Whitelist entry .
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void copyWhitelistEntry() {
         if (whitelistEditTable.getSelectionModel().getSelectedItem() != null) {
@@ -203,6 +214,8 @@ public class WhitelistFormController {
 
     /**
      * Applies the changes from the detail view to the table.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     @FXML
     public void applyChanges() {
@@ -226,7 +239,9 @@ public class WhitelistFormController {
     }
 
     /**
-     * Save edited Whitelist.
+     * Save changes in edited Whitelist.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     @FXML
     private void saveEditWhitelist() throws Exception {
@@ -261,6 +276,8 @@ public class WhitelistFormController {
 
     /**
      * Cancels the edit process of a whitelist.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     @FXML
     private void cancelEditWhitelist() {
@@ -284,6 +301,8 @@ public class WhitelistFormController {
 
     /**
      * Initializes all validation of text fields.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     private void initializeValidation() {
         tfUserName.focusedProperty().addListener((o, oldVal, newVal) -> {
@@ -312,6 +331,7 @@ public class WhitelistFormController {
      * Sets the parent controller.
      *
      * @param whitelistsController the parent controller
+     * @author Franz Schulze/Merlin Albes
      */
     public void setWhitelistsController(WhitelistsController whitelistsController) {
         this.whitelistsController = whitelistsController;
@@ -326,6 +346,7 @@ public class WhitelistFormController {
      * Checks if Whitelist name and whitelist Description is empty.
      *
      * @return true if name or description is empty.
+     * @author Franz Schulze/Merlin Albes
      */
     private boolean checkNameAndDescription() {
         return tfDescription.validate() && tfWhitelistName.validate();
@@ -333,6 +354,8 @@ public class WhitelistFormController {
 
     /**
      * Sets the editable attribute of all textfields and visibility of saveButton.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void setEditable(boolean editable) {
         if (!editable) {

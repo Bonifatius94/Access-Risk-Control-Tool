@@ -69,6 +69,8 @@ public class SapSettingsController implements IUpdateTable {
 
     /**
      * Initialized the view and sets a dummy SapConfig.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     @FXML
     public void initialize() throws Exception {
@@ -114,6 +116,8 @@ public class SapSettingsController implements IUpdateTable {
 
     /**
      * updates Sap Setting Table.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void updateTable() throws Exception {
         List<SapConfiguration> sapConfigurationList = database.getFilteredSapConfigs(filterController.showArchivedProperty.getValue(),
@@ -130,6 +134,8 @@ public class SapSettingsController implements IUpdateTable {
 
     /**
      * Initializes the edit and delete table columns.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     private void initializeTableColumn() {
         // Add the delete column
@@ -172,6 +178,7 @@ public class SapSettingsController implements IUpdateTable {
      * Opens a new window in which an SapConfiguration can be edited.
      *
      * @param sapConfiguration the SapConfiguration to edit.
+     * @author Franz Schulze/Merlin Albes
      */
     private void editConfig(SapConfiguration sapConfiguration) {
 
@@ -193,6 +200,7 @@ public class SapSettingsController implements IUpdateTable {
      * Opens a new window in which an SapConfiguration details are shown.
      *
      * @param sapConfiguration the SapConfiguration to edit.
+     * @author Franz Schulze/Merlin Albes
      */
     private void viewSapConfigDetails(SapConfiguration sapConfiguration) {
 
@@ -215,6 +223,8 @@ public class SapSettingsController implements IUpdateTable {
 
     /**
      * Opens a new window in which a new SapConnection can be added.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void newSapConnectionAction() {
         try {
@@ -232,6 +242,8 @@ public class SapSettingsController implements IUpdateTable {
 
     /**
      * Clones the currently selected SapConfiguration table entries.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void cloneAction() throws Exception {
         if (sapConnectionTable.getSelectionModel().getSelectedItems() != null && sapConnectionTable.getSelectionModel().getSelectedItems().size() != 0) {
@@ -247,6 +259,8 @@ public class SapSettingsController implements IUpdateTable {
 
     /**
      * Deletes the currently selected SapConfigurations.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void deleteAction() throws Exception {
         if (sapConnectionTable.getSelectionModel().getSelectedItems() != null && sapConnectionTable.getSelectionModel().getSelectedItems().size() != 0) {
