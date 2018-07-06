@@ -148,13 +148,23 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
             .collect(Collectors.toList());
 
         XWPFTable originalTable = document.getTables().get(2);
-        boolean isTablePageBreakRequired = sortedEntries.size() > 21;
+        writeEntriesToTable(originalTable, sortedEntries);
+
+        // tried to add the table header at the new page start
+        // this did not work for pdf export unfortunately
+
+        /*// define max entries of tables
+        final int maxEntriesFirstPage = 19;
+        final int maxEntriesNextPage = 42;
+
+        XWPFTable originalTable = document.getTables().get(2);
+        boolean isTablePageBreakRequired = sortedEntries.size() > maxEntriesFirstPage;
 
         // manage the page break manually because the pdf export does not support the table page break feature from MS Word
         if (isTablePageBreakRequired) {
 
             // retrieve the remaining entries (without entries from first page)
-            List<CriticalAccessEntry> remainingEntries = new ArrayList<>(sortedEntries.subList(21, sortedEntries.size()));
+            List<CriticalAccessEntry> remainingEntries = new ArrayList<>(sortedEntries.subList(maxEntriesFirstPage, sortedEntries.size()));
 
             while (remainingEntries.size() > 0) {
 
@@ -162,7 +172,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
                 XWPFTable clone = cloneTableAndWriteItToNewPage(document, originalTable);
 
                 // retrieve the remaining entries and write them to the cloned table
-                int itemsCount = remainingEntries.size() > 48 ? 48 : remainingEntries.size();
+                int itemsCount = remainingEntries.size() > maxEntriesNextPage ? maxEntriesNextPage : remainingEntries.size();
                 List<CriticalAccessEntry> entriesToWrite = new ArrayList<>(remainingEntries.subList(0, itemsCount));
                 writeEntriesToTable(clone, entriesToWrite);
                 remainingEntries.removeAll(entriesToWrite);
@@ -170,10 +180,10 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         }
 
         // write all entries to the table on the first page
-        writeEntriesToTable(originalTable, isTablePageBreakRequired ? sortedEntries.subList(0, 21) : sortedEntries);
+        writeEntriesToTable(originalTable, isTablePageBreakRequired ? sortedEntries.subList(0, maxEntriesFirstPage) : sortedEntries);*/
     }
 
-    private XWPFTable cloneTableAndWriteItToNewPage(XWPFDocument document, XWPFTable table) {
+    /*private XWPFTable cloneTableAndWriteItToNewPage(XWPFDocument document, XWPFTable table) {
 
         // insert page break into document
         document.createParagraph().setPageBreak(true);
@@ -182,10 +192,9 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         CTTbl tbl = document.getDocument().getBody().insertNewTbl(document.getTables().size());
         tbl.set(table.getCTTbl());
         XWPFTable clone = new XWPFTable(tbl, document);
-        document.createParagraph();
 
         return clone;
-    }
+    }*/
 
     private void writeEntriesToTable(XWPFTable table, List<CriticalAccessEntry> entries) {
 
