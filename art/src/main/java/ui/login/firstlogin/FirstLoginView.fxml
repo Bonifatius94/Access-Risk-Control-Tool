@@ -63,7 +63,7 @@
         </VBox>
         <Separator/>
         <HBox alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS">
-            <JFXButton onAction="#changePasswordAndLogin" text="%changePasswordAndLogin" defaultButton="true">
+            <JFXButton onAction="#changePasswordAndLogin" text="%changePasswordAndLogin" defaultButton="true" styleClass="first-login-button">
                 <graphic>
                     <MaterialDesignIconView glyphName="LOGIN"/>
                 </graphic>

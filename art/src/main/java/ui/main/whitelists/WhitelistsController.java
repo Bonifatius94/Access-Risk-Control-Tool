@@ -74,6 +74,8 @@ public class WhitelistsController implements IUpdateTable {
 
     /**
      * this function is automatically called by FXML loader , its starts initialize.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     @FXML
     public void initialize() throws Exception {
@@ -123,6 +125,7 @@ public class WhitelistsController implements IUpdateTable {
      * Updates Whitelist Table.
      *
      * @throws Exception if a Database error occurred.
+     * @author Franz Schulze/Merlin Albes
      */
     public void updateTable() throws Exception {
         List<Whitelist> whitelists = database.getFilteredWhitelists(filterController.showArchivedProperty.getValue(), filterController.searchStringProperty.getValue(),
@@ -191,6 +194,8 @@ public class WhitelistsController implements IUpdateTable {
 
     /**
      * starts new Whitelist Dialog.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     @FXML
     public void newWhitelist() {
@@ -210,6 +215,7 @@ public class WhitelistsController implements IUpdateTable {
      * This functions starts Whitelist editView and Controller.
      *
      * @param whitelist is a Whitelist needed for Whitelist Edit dialog.
+     * @author Franz Schulze/Merlin Albes
      */
     private void editDialogWhitelist(Whitelist whitelist) {
 
@@ -229,6 +235,7 @@ public class WhitelistsController implements IUpdateTable {
      * This functions starts Whitelist detail view and Controller.
      *
      * @param whitelist is a Whitelist needed for Whitelist Detail dialog.
+     * @author Franz Schulze/Merlin Albes
      */
     private void viewWhitelistDetails(Whitelist whitelist) {
 
@@ -250,6 +257,8 @@ public class WhitelistsController implements IUpdateTable {
 
     /**
      * This function deletes a selected Whitelist is called By delete Button.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void deleteWhitelist() throws Exception {
         if (whitelistTable.getSelectionModel().getSelectedItems() != null && whitelistTable.getSelectionModel().getSelectedItems().size() != 0) {
@@ -278,7 +287,9 @@ public class WhitelistsController implements IUpdateTable {
 
 
     /**
-     * clones a selected Whitelist.
+     * clones a selected Whitelist or multible selected whitelists.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void cloneWhitelist() throws Exception {
         if (whitelistTable.getSelectionModel().getSelectedItems() != null && whitelistTable.getSelectionModel().getSelectedItems().size() != 0) {
@@ -294,6 +305,8 @@ public class WhitelistsController implements IUpdateTable {
 
     /**
      * starts Whitelist import.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void importWhitelist() {
         FileChooser fileChooser = new FileChooser();

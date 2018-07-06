@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -148,13 +149,13 @@ public class CustomWindow extends VBox {
         // init application icon
         Image img = new Image(getClass().getResourceAsStream("/icons/art_64.png"));
         ImageView icon = new ImageView(img);
-        icon.setFitWidth(20);
-        icon.setFitHeight(20);
+        icon.setFitWidth(25);
+        icon.setFitHeight(25);
 
         // init label for headline
         lblHeadline = new Label();
         lblHeadline.getStyleClass().addAll("window-label");
-        lblHeadline.setPadding(new Insets(2, 0, 0, 4));
+        lblHeadline.setPadding(new Insets(2, 0, 0, 6));
 
         // init region filler to render headline bound to the left and buttons bound to the right
         final Region regFiller = new Region();
@@ -183,6 +184,7 @@ public class CustomWindow extends VBox {
 
         // init container with horizontal orientation and apply children to it
         hbHeaderContainer = new HBox();
+        hbHeaderContainer.setAlignment(Pos.CENTER_LEFT);
         hbHeaderContainer.getChildren().addAll(icon, lblHeadline, regFiller, btnMinimize, btnMaximize, btnClose);
     }
 
