@@ -244,12 +244,11 @@ public class AnalysisResultController {
         if (relatedQueries.size() < 2) {
             resultTabs.getTabs().remove(historyTab);
         } else {
-
             analysisHistoryController.giveResultQuery(query);
         }
 
-        // don't show graphs if no entries are present
-        if (query.getEntries().size() <= 1) {
+        // don't show graphs if no entries are present or only one usecase
+        if (query.getEntries().size() <= 1 || query.getConfig().getPatterns().size() <= 1) {
             resultTabs.getTabs().remove(graphsTab);
         } else {
             analysisGraphsController.giveResultQuery(query);

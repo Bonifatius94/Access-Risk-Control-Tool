@@ -96,7 +96,11 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         writeCriticalAccessEntriesToDocument(document, query);
 
         // write the overloaded charts to the document
-        writeChartsToDocument(document, query, language);
+
+        // only add the charts if there is more than one usecase
+        if (query.getConfig().getPatterns().size() > 1) {
+            writeChartsToDocument(document, query, language);
+        }
 
         return document;
     }
@@ -275,11 +279,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
 
         List<BufferedImage> images = new ArrayList<>();
 
-        // only add the UsecaseChart if there is more than one usecase
-        if (query.getConfig().getPatterns().size() > 1) {
-            images.add(exportUsecaseChart(query, language));
-        }
-
+        images.add(exportUsecaseChart(query, language));
         images.add(exportUsernameChart(query, language));
 
         return images;

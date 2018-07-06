@@ -35,9 +35,6 @@ public class AnalysisGraphsController {
     private NumberAxis chartY;
 
     @FXML
-    private VBox chartDataBox;
-
-    @FXML
     private JFXComboBox<String> chartDataChooser;
 
     private CriticalAccessQuery query;
@@ -59,14 +56,7 @@ public class AnalysisGraphsController {
 
     private void initializeChartChoosers() {
         chartDataChooser.getItems().setAll(bundle.getString("pattern"), bundle.getString("username"));
-
-        if (query.getConfig().getPatterns().size() > 1) {
-            chartDataChooser.getSelectionModel().select(0);
-        } else {
-            chartDataChooser.getSelectionModel().select(1);
-            chartDataBox.setVisible(false);
-            chartDataBox.setManaged(false);
-        }
+        chartDataChooser.getSelectionModel().select(0);
 
         chartDataChooser.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -133,7 +123,7 @@ public class AnalysisGraphsController {
 
         // calculate maximum of entries for upper bound (round up to nearest 10)
         int maximum = itemsXCount.values().stream().max(Integer::compareTo).get();
-        int upperBound =  5 * ((maximum + 4) / 5);
+        int upperBound = 5 * ((maximum + 4) / 5);
         chartY.setUpperBound(upperBound);
 
         int all = 0;

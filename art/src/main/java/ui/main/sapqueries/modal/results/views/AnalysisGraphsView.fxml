@@ -21,7 +21,7 @@
             <NumberAxis fx:id="chartY"/>
         </yAxis>
     </BarChart>
-    <VBox alignment="BOTTOM_CENTER" minWidth="150" style="-fx-padding: 0 0 10 0" fx:id="chartDataBox">
+    <VBox alignment="BOTTOM_CENTER" minWidth="150" style="-fx-padding: 0 0 10 0">
         <VBox spacing="10">
             <Label text="%xAxis" style="-fx-font-size: 1.1em"/>
             <JFXComboBox fx:id="chartDataChooser"/>
