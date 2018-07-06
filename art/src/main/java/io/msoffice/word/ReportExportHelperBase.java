@@ -5,6 +5,7 @@ import data.entities.CriticalAccessQuery;
 import data.entities.Whitelist;
 
 import extensions.Utf8Control;
+
 import io.msoffice.IReportExportHelper;
 
 import java.awt.image.BufferedImage;
@@ -181,6 +182,7 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         CTTbl tbl = document.getDocument().getBody().insertNewTbl(document.getTables().size());
         tbl.set(table.getCTTbl());
         XWPFTable clone = new XWPFTable(tbl, document);
+        document.createParagraph();
 
         return clone;
     }
