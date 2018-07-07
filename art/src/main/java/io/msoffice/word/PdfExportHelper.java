@@ -33,7 +33,6 @@ public class PdfExportHelper extends ReportExportHelperBase {
             try (FileOutputStream out = new FileOutputStream(file)) {
 
                 // write document as pdf
-                // TODO: check if this also works on linux
                 PdfOptions options = PdfOptions.create().fontEncoding("windows-1250");
                 PdfConverter.getInstance().convert(document, out, options);
             }

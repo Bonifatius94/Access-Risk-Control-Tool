@@ -45,9 +45,8 @@ public class ArtException extends Exception {
         // all error messages
         static final HashMap<ErrorCode, String> errorMessages = new HashMap<>();
         static {
-            // TODO: outsource all message strings to a properties file for each language (multi-language support)
             errorMessages.put(ErrorCode.UnregisteredLocalDatabaseUser, "User is not registered in the local database!");
-            errorMessages.put(ErrorCode.WrongLocalDatabaseLoginCredentials, "Wrong username or password ofr local database login!");
+            errorMessages.put(ErrorCode.WrongLocalDatabaseLoginCredentials, "Wrong username or password or local database login!");
             errorMessages.put(ErrorCode.Unknown, "Unknown error!");
         }
 
@@ -83,11 +82,4 @@ public class ArtException extends Exception {
         String errorCodeMessage = (code != null) ? code.toString() : ErrorCode.Unknown.toString();
         return (customData != null) ? String.format(errorCodeMessage, customData) : errorCodeMessage;
     }
-
-    // ================================
-    //          ORIGINAL ERROR
-    // ================================
-
-    // TODO: override methods for getting call stack, etc. by returning the data from the original message
-
 }

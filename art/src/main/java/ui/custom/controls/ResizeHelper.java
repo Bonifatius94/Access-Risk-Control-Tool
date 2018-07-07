@@ -10,7 +10,6 @@ import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
-// TODO: rework this snippet (divide logic of monster methods into smaller parts, etc.)
 // snippet source: https://stackoverflow.com/questions/19455059/allow-user-to-resize-an-undecorated-stage
 
 @SuppressWarnings({"unused", "WeakerAccess"})

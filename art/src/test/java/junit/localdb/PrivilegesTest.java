@@ -28,8 +28,6 @@ public class PrivilegesTest {
     @Disabled
     public void testPrivileges() {
 
-        // TODO: Check if privileges should be as they are, since they probably aren't
-
         // ============================================
         //                 C R E A T E
         // ============================================
@@ -218,7 +216,6 @@ public class PrivilegesTest {
         try (ArtDbContext context = new ArtDbContext(username, password)) {
 
             // test switch user
-            // TODO: set query entries no null
             context.createSapQuery(new CriticalAccessQuery());
             ret = true;
 

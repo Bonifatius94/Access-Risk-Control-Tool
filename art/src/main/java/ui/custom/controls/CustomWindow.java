@@ -31,8 +31,6 @@ import javafx.stage.StageStyle;
  * dragging undecorated JavaFX window: https://stackoverflow.com/questions/18173956/how-to-drag-undecorated-window
  */
 
-// TODO: add support for a custom app icon at the left
-
 /**
  * <p>
  * This class implements a custom window header with custom JPhoenix JavaFX style.

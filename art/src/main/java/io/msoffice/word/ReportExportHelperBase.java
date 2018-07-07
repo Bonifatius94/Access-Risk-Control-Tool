@@ -245,8 +245,6 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
         paragraph.setAlignment(ParagraphAlignment.CENTER);
         XWPFRun run = paragraph.createRun();
 
-        // TODO: make the resize fill the page correctly
-
         // calculate the width / height of the image (image has 133% scaling factor, but no idea why ...)
         int newWidth = (int) ((double) image.getWidth() / ((double) 4 / 3));
         int newHeight = (int) ((double) image.getHeight() / ((double) 4 / 3));

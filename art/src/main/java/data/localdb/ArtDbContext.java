@@ -334,7 +334,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             results = query.list();
 
         } catch (Exception ex) {
-            // TODO: implement custom exception
             throw ex;
         }
 
@@ -427,7 +426,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             results = query.list();
 
         } catch (Exception ex) {
-            // TODO: implement custom exception
             throw ex;
         }
 
@@ -517,7 +515,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             results = query.list();
 
         } catch (Exception ex) {
-            // TODO: implement custom exception
             throw ex;
         }
 
@@ -601,7 +598,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             results = query.list();
 
         } catch (Exception ex) {
-            // TODO: implement custom exception
             throw ex;
         }
 
@@ -692,7 +688,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             results = query.list();
 
         } catch (Exception ex) {
-            // TODO: implement custom exception
             throw ex;
         }
 
@@ -1420,7 +1415,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 // avoid sql injection with username
                 if (user.getUsername().contains(" ")) {
-                    // TODO: implement this as custom exception
                     throw new Exception("Invalid username! No whitespaces allowed!");
                 }
 
@@ -1498,7 +1492,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                     transaction.commit();
 
                 } else {
-                    // TODO: replace this exception with a custom exception
                     throw new IllegalArgumentException("Database user does not exist.");
                 }
 
@@ -1594,7 +1587,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 // avoid sql injection with username
                 if (username.contains(" ")) {
-                    // TODO: implement this as custom exception
                     throw new Exception("Invalid username! No whitespaces allowed!");
                 }
 
@@ -1638,7 +1630,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 // avoid sql injection with username
                 if (username.contains(" ")) {
-                    // TODO: implement this as custom exception
                     throw new Exception("Invalid username! No whitespaces allowed!");
                 }
 

@@ -321,8 +321,6 @@ public class AccessPatternTest {
             ex.printStackTrace();
         }
 
-        // TODO: add another test for evaluating archiving logic on update
-
         assert(ret);
     }*/
 

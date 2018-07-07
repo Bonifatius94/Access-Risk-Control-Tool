@@ -168,8 +168,6 @@ public class CriticalAccessQuery implements IReferenceAware, IDataEntity {
 
     @Override
     public String toString() {
-
-        // TODO: implement logic
         return super.toString();
     }
 

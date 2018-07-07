@@ -553,7 +553,7 @@ public class PatternsFormController {
      *
      * @param condition the condition which items are displayed in the tableView
      */
-    @SuppressWarnings("unchecked") // TODO: remove this annotation if possible
+    @SuppressWarnings("unchecked")
     public void addConditionTableTab(AccessCondition condition) {
 
         // AuthObject Column
