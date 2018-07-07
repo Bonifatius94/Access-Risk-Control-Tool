@@ -36,6 +36,7 @@ public class FirstLoginController {
     private JFXTextField confirmPasswordInputPlain;
 
 
+    private boolean normalLogin;
     private ResourceBundle bundle;
 
     /**
@@ -60,7 +61,9 @@ public class FirstLoginController {
         Platform.runLater(() ->
             passwordInput.getScene().getWindow().setOnHiding((e -> {
                 // close the database
-                AppComponents.getInstance().getDbContext().close();
+                if (!normalLogin) {
+                    AppComponents.getInstance().getDbContext().close();
+                }
             }))
         );
 
@@ -148,6 +151,7 @@ public class FirstLoginController {
      * @param event the given ActionEvent
      */
     public void close(ActionEvent event) {
+        normalLogin = true;
         (((Button) event.getSource()).getScene().getWindow()).hide();
     }
 }

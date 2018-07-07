@@ -56,6 +56,8 @@ public class FirstUseWizardController {
     @FXML
     private HBox usernameValidationBox;
 
+    private boolean normalFirstUse;
+
     /**
      * Initializes the view with all needed bindings.
      */
@@ -87,7 +89,9 @@ public class FirstUseWizardController {
         Platform.runLater(() ->
             finishBox.getScene().getWindow().setOnHiding((e -> {
                 // close the database
-                AppComponents.getInstance().getDbContext().close();
+                if (!normalFirstUse) {
+                    AppComponents.getInstance().getDbContext().close();
+                }
             }))
         );
 
@@ -215,6 +219,7 @@ public class FirstUseWizardController {
      * @param event the given ActionEvent
      */
     public void close(ActionEvent event) {
+        normalFirstUse = true;
         (((Button) event.getSource()).getScene().getWindow()).hide();
     }
 
