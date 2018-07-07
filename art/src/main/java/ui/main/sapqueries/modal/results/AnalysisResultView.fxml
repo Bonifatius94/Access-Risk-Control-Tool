@@ -16,7 +16,7 @@
 <?import com.jfoenix.controls.JFXTabPane?>
 <CustomWindow xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"
-              fx:controller="ui.main.sapqueries.modal.results.AnalysisResultController" windowState="NoResize">
+              fx:controller="ui.main.sapqueries.modal.results.AnalysisResultController" windowState="CanMinimize">
     <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 20">
         <HBox spacing="10" alignment="CENTER_LEFT">
             <MaterialDesignIconView fx:id="statusIcon" size="30"/>
