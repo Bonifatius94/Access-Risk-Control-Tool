@@ -140,6 +140,10 @@ public class SapQueryDetailController {
             NewSapQueryController newQuery = loader.getController();
             newQuery.giveQuery(query);
             newQuery.setParentController(parentController);
+
+            newQuery.setRerun(true);
+            newQuery.setInputsDisable(true);
+            newQuery.openLoginDialog();
         } catch (Exception e) {
             e.printStackTrace();
         }
