@@ -282,7 +282,7 @@ public class WhitelistFormController {
      * @author Franz Schulze/Merlin Albes
      */
     @FXML
-    private void cancelEditWhitelist() {
+    private void cancelEditWhitelist() throws Exception {
 
         // check if dialog is in edit mode
         if (applyButton.isVisible()) {
@@ -290,11 +290,11 @@ public class WhitelistFormController {
                 bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 ((Stage) whitelistEditTable.getScene().getWindow()).close();
-                try {
+
+                if (whitelistsController != null) {
                     whitelistsController.updateTable();
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+
             }
         } else {
             ((Stage) whitelistEditTable.getScene().getWindow()).close();

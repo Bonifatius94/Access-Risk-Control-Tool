@@ -194,20 +194,29 @@ public class PatternsFormController {
 
         linkageInput.getSelectionModel().selectedItemProperty().addListener((selected, oldValue, newValue) -> {
             if (newValue == ConditionLinkage.None) {
-                conditionTabs.getTabs().clear();
-                this.conditionTables.clear();
-                if (accessPattern.getConditions().size() != 0) {
-                    addConditionTableTab(accessPattern.getConditions().stream().findFirst().get());
-                } else {
-                    addConditionTableTab(new AccessCondition());
+
+                if (oldValue != null && oldValue != ConditionLinkage.None) {
+                    conditionTabs.getTabs().clear();
+                    this.conditionTables.clear();
+                    List<AccessCondition> newConds = new ArrayList<>();
+                    newConds.add(this.accessPattern.getConditions().stream().filter(x -> x.getPatternCondition() != null).findFirst().get());
+
+                    accessPattern.setConditions(newConds);
+
+                    if (accessPattern.getConditions().size() != 0 && accessPattern.getConditions().stream().findFirst().get().getProfileCondition() == null) {
+                        addConditionTableTab(accessPattern.getConditions().stream().sorted(Comparator.comparing(AccessCondition::getId)).findFirst().get());
+                    } else {
+                        addEmptyConditionTableTab();
+                    }
                 }
+
                 this.editConditionBox.disableProperty().unbind();
                 this.editConditionBox.setDisable(true);
             } else {
                 this.editConditionBox.disableProperty().bind(this.conditionBox.disableProperty());
 
                 if (conditionTabs.getTabs().size() == 1) {
-                    addConditionTableTab(new AccessCondition());
+                    addEmptyConditionTableTab();
                 }
 
                 // don't allow less than 2 tabs
@@ -227,23 +236,41 @@ public class PatternsFormController {
                 if (oldValue.equals(bundle.getString("pattern"))) {
                     conditionBox.setDisable(true);
                 } else if (oldValue.equals(bundle.getString("profile"))) {
+                    accessPattern.getConditions().clear();
                     profileInput.setVisible(false);
                 } else {
                     profileInput.setVisible(false);
                     conditionBox.setVisible(false);
                 }
+
+                if (accessPattern.getConditions().size() != 0 && accessPattern.getConditions().stream().findFirst().get().getProfileCondition() != null) {
+                    addConditionTableTab(accessPattern.getConditions().stream().sorted(Comparator.comparing(AccessCondition::getId)).findFirst().get());
+                } else {
+                    addEmptyConditionTableTab();
+                }
             }
 
-            if (newValue.equals(bundle.getString("pattern"))) {
-                conditionBox.setDisable(false);
+            if (newValue != null) {
+                if (newValue.equals(bundle.getString("pattern"))) {
+                    conditionBox.setDisable(false);
 
-                // automatically select the linkage
-                this.linkageInput.getSelectionModel().select(ConditionLinkage.None);
-            } else if (newValue.equals(bundle.getString("profile"))) {
-                profileInput.setVisible(true);
-            } else {
-                profileInput.setVisible(true);
-                conditionBox.setVisible(true);
+                    if (oldValue != null) {
+                        conditionTabs.getTabs().clear();
+                        this.conditionTables.clear();
+                        addEmptyConditionTableTab();
+                    }
+
+                    // automatically select the linkage
+                    this.linkageInput.getSelectionModel().select(ConditionLinkage.None);
+                } else if (newValue.equals(bundle.getString("profile"))) {
+                    profileInput.setVisible(true);
+                    conditionTabs.getTabs().clear();
+                    this.conditionTables.clear();
+                    addEmptyConditionTableTab();
+                } else {
+                    profileInput.setVisible(true);
+                    conditionBox.setVisible(true);
+                }
             }
         });
     }
@@ -302,7 +329,7 @@ public class PatternsFormController {
             this.accessPattern = new AccessPattern();
 
             // add one tab for correct display
-            addConditionTableTab(new AccessCondition());
+            addEmptyConditionTableTab();
 
             // disable condition box
             this.conditionBox.setDisable(true);
@@ -330,7 +357,7 @@ public class PatternsFormController {
                 this.conditionTypeInput.getSelectionModel().select(bundle.getString("profile"));
 
                 // add one tab for correct display
-                addConditionTableTab(new AccessCondition());
+                addEmptyConditionTableTab();
 
                 // disable condition box
                 this.conditionBox.setDisable(true);
@@ -362,7 +389,7 @@ public class PatternsFormController {
             CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"),
                 bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
-                (((Button) event.getSource()).getScene().getWindow()).hide();
+                close(event);
             }
         } else {
             close(event);
@@ -401,7 +428,7 @@ public class PatternsFormController {
     }
 
     public void addEmptyConditionTableTab() {
-        this.addConditionTableTab(new AccessCondition());
+        addConditionTableTab(new AccessCondition());
     }
 
     /**
@@ -409,9 +436,15 @@ public class PatternsFormController {
      */
     public void deleteSelectedTableTab() {
 
+        TableViewWithAccessCondition temp = conditionTables.stream().filter(x -> x.getTableView() == selectedTable).findFirst().get();
+
         // remove items from AccessPattern
         this.selectedTable.getItems().clear();
-        this.conditionTables.remove(selectedTable);
+        this.conditionTables.remove(temp);
+
+        if (temp.getAccessCondition() != null) {
+            accessPattern.getConditions().remove(this.accessPattern.getConditions().stream().filter(x -> x.getId().equals(temp.getAccessCondition().getId())).findFirst().get());
+        }
 
         // remove the tab from the conditionTabs
         this.conditionTabs.getTabs().remove(this.conditionTabs.getSelectionModel().getSelectedItem());
