@@ -144,6 +144,10 @@ public class AppComponents {
         return showScene(path, title, new Stage(), App.primaryStage, Modality.WINDOW_MODAL, width, height);
     }
 
+    public FXMLLoader showScene(String path, String title, Modality modality) throws Exception {
+        return showScene(path, title, new Stage(), null, modality, 0, 0);
+    }
+
     public FXMLLoader showScene(String path, String title) throws Exception {
         return showScene(path, title, new Stage(), App.primaryStage, Modality.WINDOW_MODAL, 0, 0);
     }
@@ -167,6 +171,6 @@ public class AppComponents {
      * Returns if the string is an already defined DbUserRole.
      */
     public static boolean isUserRole(String username) {
-        return !(username.equalsIgnoreCase(DbUserRole.Viewer.toString()) || username.equalsIgnoreCase(DbUserRole.DataAnalyst.toString()) || username.equalsIgnoreCase(DbUserRole.Admin.toString()));
+        return !(username.equalsIgnoreCase(DbUserRole.Viewer.toString()) || username.equalsIgnoreCase(DbUserRole.Configurator.toString()) || username.equalsIgnoreCase(DbUserRole.Admin.toString()));
     }
 }

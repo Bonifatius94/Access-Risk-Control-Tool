@@ -18,7 +18,6 @@ import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -335,7 +334,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             results = query.list();
 
         } catch (Exception ex) {
-            // TODO: implement custom exception
             throw ex;
         }
 
@@ -428,7 +426,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             results = query.list();
 
         } catch (Exception ex) {
-            // TODO: implement custom exception
             throw ex;
         }
 
@@ -518,7 +515,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             results = query.list();
 
         } catch (Exception ex) {
-            // TODO: implement custom exception
             throw ex;
         }
 
@@ -602,7 +598,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             results = query.list();
 
         } catch (Exception ex) {
-            // TODO: implement custom exception
             throw ex;
         }
 
@@ -693,7 +688,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             results = query.list();
 
         } catch (Exception ex) {
-            // TODO: implement custom exception
             throw ex;
         }
 
@@ -706,8 +700,8 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         String sql =
               "SELECT DISTINCT Query.* "
             + "FROM CriticalAccessQueries AS Query "
-            + "INNER JOIN CriticalAccessEntries AS Entries ON Entries.queryId = Query.id "
-            + "INNER JOIN AccessPatterns AS ViolatedPattern ON ViolatedPattern.id = Entries.violatedPatternId "
+            + "LEFT OUTER JOIN CriticalAccessEntries AS Entries ON Entries.queryId = Query.id "
+            + "LEFT OUTER JOIN AccessPatterns AS ViolatedPattern ON ViolatedPattern.id = Entries.violatedPatternId "
             + "INNER JOIN SapConfigurations AS SapConfig ON SapConfig.id = Query.sapConfigId "
             + "INNER JOIN Configurations AS Config ON Config.id = Query.configId ";
 
@@ -740,6 +734,33 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
         sql += "ORDER BY Query.createdAt DESC";
 
         return sql;
+    }
+
+    /**
+     * This method selects all already executed sap queries from the local database. The filters are applied as in the getFilteredCriticalAccessQueries() method.
+     *
+     * @param query the query to be related to
+     * @param includeArchived determines whether archived records are also loaded
+     * @param wildcard        the wildcard string that is searched in several text attributes of whitelists
+     * @param start           the lower limit of the whitelist creation timestamp to be filtered
+     * @param end             the upper limit of the whitelist creation timestamp to be filtered
+     * @param limit           the limit of records returned
+     * @return a list of already executed sap queries
+     * @throws Exception caused by unauthorized access (e.g. missing privileges, wrong login credentials, etc.)
+     */
+    @Override
+    public List<CriticalAccessQuery> getRelatedFilteredCriticalAccessQueries(
+        CriticalAccessQuery query, boolean includeArchived, String wildcard, ZonedDateTime start, ZonedDateTime end, Integer limit) throws Exception {
+
+        TraceOut.enter();
+
+        List<CriticalAccessQuery> queries =
+            getFilteredCriticalAccessQueries(includeArchived, wildcard, start, end, limit).stream()
+                .filter(x -> x.getConfig().getId().equals(query.getConfig().getId()) && x.getSapConfig().getId().equals(query.getSapConfig().getId()))
+                .collect(Collectors.toList());
+
+        TraceOut.leave();
+        return queries;
     }
 
     // ============================================
@@ -972,22 +993,23 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         // get the id of the original whitelist
         Integer originalId = whitelist.getId();
+
         Whitelist original = getWhitelists(true).stream().filter(x -> x.getId().equals(originalId)).findFirst().get();
 
         // create copy of original and insert it
         Whitelist archived = new Whitelist(original);
         archived.setArchived(true);
-        archived.initCreationFlags(ZonedDateTime.now(ZoneOffset.UTC), getUsername());
+        archived.initCreationFlags(original.getCreatedAt(), original.getCreatedBy());
         session.save(archived);
 
         // get critical access queries referencing a config that references the original pattern
         Set<CriticalAccessQuery> queries =
             getSapQueries(true).stream()
-                .filter(x -> x.getConfig().getWhitelist().getId().equals(originalId))
+                .filter(x -> x.getConfig().getWhitelist() != null && x.getConfig().getWhitelist().getId().equals(originalId))
                 .collect(Collectors.toSet());
 
         // copy configs where the original whitelist is referenced
-        getConfigs(true).stream().filter(x -> x.getWhitelist().getId().equals(originalId)).forEach(originalConfig -> {
+        getConfigs(true).stream().filter(x -> x.getWhitelist() != null && x.getWhitelist().getId().equals(originalId)).forEach(originalConfig -> {
 
             if (originalConfig.isArchived()) {
 
@@ -1160,23 +1182,24 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 transaction = session.beginTransaction();
 
-                Set<Configuration> configsToArchive = new HashSet<>(pattern.getConfigurations());
+                Set<Configuration> configsToArchive =
+                    getConfigs(false).stream()
+                    .filter(x -> x.getPatterns().stream().anyMatch(y -> y.getId().equals(pattern.getId())))
+                    .collect(Collectors.toSet());
 
                 // remove pattern from active configs referencing it and archive those configs
                 for (Configuration config : configsToArchive) {
 
-                    if (!config.isArchived()) {
+                    Set<AccessPattern> patterns = new HashSet<>(config.getPatterns());
+                    patterns.stream().filter(x -> x.getId().equals(pattern.getId())).collect(Collectors.toList()).forEach(x -> patterns.remove(x));
+                    config.setPatterns(patterns);
+                    config.adjustReferences();
 
-                        Set<AccessPattern> patterns = new HashSet<>(config.getPatterns());
-                        patterns.stream().filter(x -> x.getId().equals(pattern.getId())).collect(Collectors.toList()).forEach(x -> patterns.remove(x));
-                        config.setPatterns(patterns);
-
-                        if (archive) {
-                            archiveConfig(session, config);
-                        }
-
-                        session.update(config);
+                    if (archive) {
+                        archiveConfig(session, config);
                     }
+
+                    session.update(config);
                 }
 
                 if (archive) {
@@ -1356,11 +1379,11 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                 // parse data fields
                 String username = (String)x[0];
                 boolean isAdmin = (boolean)x[1];
-                boolean isDataAnalyst = (boolean)x[2];
+                boolean isConfigurator = (boolean)x[2];
                 boolean isViewer = (boolean)x[3];
                 boolean isFirstLogin = (boolean)x[4];
 
-                return new DbUser(username, isAdmin, isDataAnalyst, isViewer, isFirstLogin);
+                return new DbUser(username, isAdmin, isConfigurator, isViewer, isFirstLogin);
 
             }).collect(Collectors.toList());
 
@@ -1392,7 +1415,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 // avoid sql injection with username
                 if (user.getUsername().contains(" ")) {
-                    // TODO: implement this as custom exception
                     throw new Exception("Invalid username! No whitespaces allowed!");
                 }
 
@@ -1470,7 +1492,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                     transaction.commit();
 
                 } else {
-                    // TODO: replace this exception with a custom exception
                     throw new IllegalArgumentException("Database user does not exist.");
                 }
 
@@ -1490,13 +1511,13 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
     private void createDbUserEntry(Session session, DbUser user) {
 
         final String createDbUserSql =
-            "INSERT INTO DbUsers (USERNAME, ISADMIN, ISDATAANALYST, ISVIEWER, ISFIRSTLOGIN) "
-                + "VALUES (:username, :isAdmin, :isDataAnalyst, :isViewer, :isFirstLogin)";
+            "INSERT INTO DbUsers (USERNAME, ISADMIN, ISCONFIGURATOR, ISVIEWER, ISFIRSTLOGIN) "
+                + "VALUES (:username, :isAdmin, :isConfigurator, :isViewer, :isFirstLogin)";
 
         session.createNativeQuery(createDbUserSql)
             .setParameter("username", user.getUsername().toUpperCase())
             .setParameter("isAdmin", user.getRoles().contains(DbUserRole.Admin))
-            .setParameter("isDataAnalyst", user.getRoles().contains(DbUserRole.DataAnalyst))
+            .setParameter("isConfigurator", user.getRoles().contains(DbUserRole.Configurator))
             .setParameter("isViewer", user.getRoles().contains(DbUserRole.Viewer))
             .setParameter("isFirstLogin", user.isFirstLogin())
             .executeUpdate();
@@ -1506,12 +1527,12 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
         // update DbUser entry flags
         final String updateDbUserSql =
-            "UPDATE DbUsers SET ISADMIN = :isAdmin, ISDATAANALYST = :isDataAnalyst, ISVIEWER = :isViewer WHERE USERNAME = :username";
+            "UPDATE DbUsers SET ISADMIN = :isAdmin, ISCONFIGURATOR = :isConfigurator, ISVIEWER = :isViewer WHERE USERNAME = :username";
 
         session.createNativeQuery(updateDbUserSql)
             .setParameter("username", user.getUsername().toUpperCase())
             .setParameter("isAdmin", user.getRoles().contains(DbUserRole.Admin))
-            .setParameter("isDataAnalyst", user.getRoles().contains(DbUserRole.DataAnalyst))
+            .setParameter("isConfigurator", user.getRoles().contains(DbUserRole.Configurator))
             .setParameter("isViewer", user.getRoles().contains(DbUserRole.Viewer))
             .executeUpdate();
     }
@@ -1566,7 +1587,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 // avoid sql injection with username
                 if (username.contains(" ")) {
-                    // TODO: implement this as custom exception
                     throw new Exception("Invalid username! No whitespaces allowed!");
                 }
 
@@ -1610,7 +1630,6 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
                 // avoid sql injection with username
                 if (username.contains(" ")) {
-                    // TODO: implement this as custom exception
                     throw new Exception("Invalid username! No whitespaces allowed!");
                 }
 

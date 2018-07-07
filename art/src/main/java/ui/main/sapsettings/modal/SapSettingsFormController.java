@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 
+import javafx.scene.control.ButtonBar;
 import sap.ISapConnector;
 import sap.SapConnector;
 
@@ -61,6 +62,8 @@ public class SapSettingsFormController {
 
     /**
      * Initializes the view.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void initialize() {
         startValidation();
@@ -68,6 +71,8 @@ public class SapSettingsFormController {
 
     /**
      * Saves the currently edited connection.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void saveConnection(ActionEvent event) throws Exception {
 
@@ -87,7 +92,6 @@ public class SapSettingsFormController {
             }
 
             close(event);
-            parentController.updateTable();
         }
     }
 
@@ -96,6 +100,7 @@ public class SapSettingsFormController {
      * Checks if the all Edit Window textfields are filled.
      *
      * @return false if any(except password and username) textfield is empty, everytime else it returns true.
+     * @author Franz Schulze/Merlin Albes
      */
     private Boolean checkTextFields() {
         return (hostServerField.validate() && sysNrField.validate() && jcoClientField.validate() && tfLanguage.validate()
@@ -105,6 +110,8 @@ public class SapSettingsFormController {
 
     /**
      * Establishes a test connection to SAP.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void connect() {
         if (checkTextFields()) {
@@ -141,6 +148,7 @@ public class SapSettingsFormController {
      * Prefills the inputs with the given SapConfig.
      *
      * @param sapConfig the given SapConfig
+     * @author Franz Schulze/Merlin Albes
      */
     public void giveSelectedSapConfig(SapConfiguration sapConfig) {
 
@@ -174,6 +182,8 @@ public class SapSettingsFormController {
 
     /**
      * starts validation of all Textfield.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     private void startValidation() {
         jcoClientField.focusedProperty().addListener((o, oldVal, newVal) -> {
@@ -188,7 +198,7 @@ public class SapSettingsFormController {
         });
         tfPoolCapacity.focusedProperty().addListener((o, oldVal, newVal) -> {
             if (!newVal) {
-                tfLanguage.validate();
+                tfPoolCapacity.validate();
             }
         });
         hostServerField.focusedProperty().addListener((o, oldVal, newVal) -> {
@@ -210,6 +220,8 @@ public class SapSettingsFormController {
 
     /**
      * Sets the editable property of the textfields and removes save and connect button.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void setEditable(boolean editable) {
         if (!editable) {
@@ -237,6 +249,7 @@ public class SapSettingsFormController {
      * Sets the parent Controller.
      *
      * @param sapSettingsController the parent Controller.
+     * @author Franz Schulze/Merlin Albes
      */
     public void setParentController(SapSettingsController sapSettingsController) {
         this.parentController = sapSettingsController;
@@ -246,8 +259,31 @@ public class SapSettingsFormController {
      * Hides the stage.
      *
      * @param event the given ActionEvent
+     * @author Franz Schulze/Merlin Albes
      */
-    public void close(ActionEvent event) {
+    private void close(ActionEvent event) throws Exception {
         (((Button) event.getSource()).getScene().getWindow()).hide();
+
+        // refresh the sapSettingsTable in the parentController
+        if (parentController != null) {
+            parentController.updateTable();
+        }
+    }
+
+    /**
+     * Shows a dialog to confirm to discard unsaved changes.
+     *
+     * @author Merlin Albes
+     */
+    public void confirmClose(ActionEvent event) throws Exception {
+        if (saveButton.isVisible()) {
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"),
+                bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                (((Button) event.getSource()).getScene().getWindow()).hide();
+            }
+        } else {
+            close(event);
+        }
     }
 }

@@ -30,7 +30,7 @@ public class DisableArchiveButtonCell<S> extends TableCell<S, JFXButton> {
     public DisableArchiveButtonCell(Function<S, S> function) {
         this.getStyleClass().add("action-button-table-cell");
 
-        MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.DELETE);
+        MaterialDesignIconView view = new MaterialDesignIconView(MaterialDesignIcon.ARCHIVE);
         this.actionButton = new JFXButton(null, view);
         this.actionButton.setMinSize(30, 30);
         this.actionButton.setTooltip(new Tooltip(bundle.getString("archive")));
@@ -45,7 +45,7 @@ public class DisableArchiveButtonCell<S> extends TableCell<S, JFXButton> {
     }
 
     public static <S> Callback<TableColumn<S, JFXButton>, TableCell<S, JFXButton>> forTableColumn(Function<S, S> function) {
-        return param -> new DisableDeleteButtonCell<>(function);
+        return param -> new DisableArchiveButtonCell<>(function);
     }
 
     @Override

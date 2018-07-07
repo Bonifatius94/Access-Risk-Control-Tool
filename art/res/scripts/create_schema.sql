@@ -314,7 +314,7 @@ CREATE TABLE DbUsers
 (
    USERNAME         VARCHAR(2147483647)     NOT NULL,
    ISADMIN          BIT                     NOT NULL,
-   ISDATAANALYST    BIT                     NOT NULL,
+   ISCONFIGURATOR    BIT                     NOT NULL,
    ISVIEWER         BIT                     NOT NULL,
    ISFIRSTLOGIN     BIT                     NOT NULL,
 

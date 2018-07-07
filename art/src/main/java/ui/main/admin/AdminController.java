@@ -54,7 +54,7 @@ public class AdminController implements IUpdateTable {
     public JFXCheckBox viewerCheckbox;
 
     @FXML
-    public JFXCheckBox dataAnalystCheckbox;
+    public JFXCheckBox configuratorCheckbox;
 
     @FXML
     public PTableColumn<DbUser, JFXButton> deleteColumn;
@@ -90,6 +90,8 @@ public class AdminController implements IUpdateTable {
 
     /**
      * is called by the FXMl and initializes all parts of the window.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void initialize() throws Exception {
 
@@ -122,6 +124,8 @@ public class AdminController implements IUpdateTable {
 
     /**
      * Initializes all bindings for the view.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     private void initializeBindings() {
 
@@ -152,6 +156,8 @@ public class AdminController implements IUpdateTable {
 
     /**
      * Initializes the validation.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     private void initializeValidation() {
 
@@ -183,15 +189,19 @@ public class AdminController implements IUpdateTable {
 
     /**
      * Initializes the checkboxes, by setting selected on false.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     private void initializeCheckboxes() {
         viewerCheckbox.setSelected(false);
         adminCheckbox.setSelected(false);
-        dataAnalystCheckbox.setSelected(false);
+        configuratorCheckbox.setSelected(false);
     }
 
     /**
      * Initializes the Columns with delete Buttons.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     private void initializeColumns() {
         deleteColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (DbUser user) -> {
@@ -222,6 +232,8 @@ public class AdminController implements IUpdateTable {
     /**
      * Function is called by a Checkbox event from the admin checkbox,
      * and adds or deletes the admin role from the DbUserRole set.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     @FXML
     public void adminSelected() {
@@ -236,6 +248,8 @@ public class AdminController implements IUpdateTable {
     /**
      * Function is called by a Checkbox event from the viewer checkbox,
      * and adds or deletes the viewer role from the DbUserRole set.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     @FXML
     public void viewerSelected() {
@@ -248,23 +262,27 @@ public class AdminController implements IUpdateTable {
     }
 
     /**
-     * Function is called by a Checkbox event from the dataAnalyst checkbox,
-     * and adds or deletes the dataAnalyst role from the DbUserRole set(from the currently edited user).
+     * Function is called by a Checkbox event from the configurator checkbox,
+     * and adds or deletes the configurator role from the DbUserRole set(from the currently edited user).
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     @FXML
-    public void dataAnalystSelected() {
+    public void configuratorSelected() {
 
-        if (dataAnalystCheckbox.isSelected()) {
-            this.editDbUser.addRole(DbUserRole.DataAnalyst);
+        if (configuratorCheckbox.isSelected()) {
+            this.editDbUser.addRole(DbUserRole.Configurator);
 
-        } else if (!dataAnalystCheckbox.isSelected()) {
-            this.editDbUser.removeRole(DbUserRole.DataAnalyst);
+        } else if (!configuratorCheckbox.isSelected()) {
+            this.editDbUser.removeRole(DbUserRole.Configurator);
         }
 
     }
 
     /**
      * Adds new User with a random initial password.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void addNewUser() throws Exception {
 
@@ -289,6 +307,8 @@ public class AdminController implements IUpdateTable {
 
     /**
      * Saves user Changes to the database and refreshes the table.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void saveUserChanges() throws Exception {
 
@@ -297,7 +317,7 @@ public class AdminController implements IUpdateTable {
             || (!newUserMode.getValue() && tfDbUserName.validate() && !usernameValidationBox.isVisible())) {
 
             // check if at least one checkbox is enabled
-            if (!adminCheckbox.isSelected() && !dataAnalystCheckbox.isSelected() && !viewerCheckbox.isSelected()) {
+            if (!adminCheckbox.isSelected() && !configuratorCheckbox.isSelected() && !viewerCheckbox.isSelected()) {
                 CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("selectRolesTitle"), bundle.getString("selectRolesMessage"));
                 customAlert.showAndWait();
             } else {
@@ -320,6 +340,8 @@ public class AdminController implements IUpdateTable {
 
     /**
      * Saves the current user to the database.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     private void saveUserToDatabase() throws Exception {
         // set the username
@@ -347,6 +369,7 @@ public class AdminController implements IUpdateTable {
      * Initializes all fields with the user data.
      *
      * @param newValue is the user , who is going to be edited
+     * @author Franz Schulze/Merlin Albes
      */
     private void editUser(DbUser newValue) throws Exception {
 
@@ -359,21 +382,23 @@ public class AdminController implements IUpdateTable {
         if (database.getCurrentUser().getUsername().equalsIgnoreCase(editDbUser.getUsername())) {
             adminCheckbox.setDisable(true);
             viewerCheckbox.setDisable(true);
-            dataAnalystCheckbox.setDisable(true);
+            configuratorCheckbox.setDisable(true);
         } else {
             adminCheckbox.setDisable(false);
             viewerCheckbox.setDisable(false);
-            dataAnalystCheckbox.setDisable(false);
+            configuratorCheckbox.setDisable(false);
         }
 
         // set the correct roles
         adminCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.Admin));
         viewerCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.Viewer));
-        dataAnalystCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.DataAnalyst));
+        configuratorCheckbox.setSelected(editDbUser.getRoles().contains(DbUserRole.Configurator));
     }
 
     /**
      * Reloads all users from the database to the table.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void updateTable() throws Exception {
         List<DbUser> items = database.getDatabaseUsers();
@@ -385,6 +410,8 @@ public class AdminController implements IUpdateTable {
 
     /**
      * Copies the current password to the clipboard.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void copyPasswordToClipboard() {
         final ClipboardContent clipboardContent = new ClipboardContent();
@@ -398,6 +425,7 @@ public class AdminController implements IUpdateTable {
      *
      * @param length the length of the password
      * @return a randomly generated password
+     * @author Franz Schulze/Merlin Albes
      */
     private String generateFirstPassword(int length) {
         final String lowercase = "abcdefghjklmnpqrstuvwxyz";
@@ -421,13 +449,17 @@ public class AdminController implements IUpdateTable {
 
     /**
      * Cancels the user creation.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void cancelUserCreation() throws Exception {
         newUserMode.setValue(false);
 
         // reset all inputs
         tfDbUserName.setText("");
+        tfDbUserName.resetValidation();
         tfDbUserPassword.setText("");
+        tfDbUserPassword.resetValidation();
         initializeCheckboxes();
 
         updateTable();

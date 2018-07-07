@@ -160,11 +160,6 @@ public class CustomAlert extends Alert {
 
             initOtherAlertTypes();
 
-        } else {
-
-            // TODO: remove this
-            System.err.println("Only use CONFIRMATION, INFORMATION and WARNING as AlertType!");
-
         }
     }
 

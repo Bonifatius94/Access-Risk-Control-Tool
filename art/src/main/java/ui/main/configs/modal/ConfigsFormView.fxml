@@ -55,7 +55,7 @@
                     </graphic>
                 </JFXButton>
             </HBox>
-            <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable">
+            <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable" maxHeight="350" minWidth="800">
                 <columns>
                     <PTableColumn text="?" fx:id="conditionTypeColumn" percentageWidth="0.06" resizable="false">
                         <cellValueFactory>
@@ -111,7 +111,7 @@
                     <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
                 </graphic>
             </JFXButton>
-            <JFXButton onAction="#close" prefWidth="120" text="%cancel">
+            <JFXButton onAction="#confirmClose" prefWidth="120" text="%cancel">
                 <graphic>
                     <MaterialDesignIconView glyphName="CLOSE"/>
                 </graphic>

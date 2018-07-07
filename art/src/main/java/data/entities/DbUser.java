@@ -25,12 +25,12 @@ public class DbUser {
      * This constructor creates a new DbUser with the given username and roles (as boolean flags).
      *
      * @param username the username of the new instance
-     * @param isAdmin a flag that indicates whether the new user is admin or not
-     * @param isDataAnalyst a flag that indicates whether the new user is data analyst or not
-     * @param isViewer a flag that indicates whether the new user is viewer or not
+     * @param isAdmin a flag that indicates whether the new user is an admin or not
+     * @param isConfigurator a flag that indicates whether the new user is a configurator or not
+     * @param isViewer a flag that indicates whether the new user is a viewer or not
      * @param isFirstLogin a flag that indicates whether the new user is logging in for the first time
      */
-    public DbUser(String username, boolean isAdmin, boolean isDataAnalyst, boolean isViewer, boolean isFirstLogin) {
+    public DbUser(String username, boolean isAdmin, boolean isConfigurator, boolean isViewer, boolean isFirstLogin) {
 
         setUsername(username);
         setFirstLogin(isFirstLogin);
@@ -39,8 +39,8 @@ public class DbUser {
             roles.add(DbUserRole.Admin);
         }
 
-        if (isDataAnalyst) {
-            roles.add(DbUserRole.DataAnalyst);
+        if (isConfigurator) {
+            roles.add(DbUserRole.Configurator);
         }
 
         if (isViewer) {

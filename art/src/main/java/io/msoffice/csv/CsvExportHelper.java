@@ -5,8 +5,10 @@ import data.entities.CriticalAccessQuery;
 
 import io.msoffice.IReportExportHelper;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.csv.CSVFormat;
@@ -18,8 +20,8 @@ public class CsvExportHelper implements IReportExportHelper {
      * This method exports a critical access query to the given file with the given export format.
      *
      * @param criticalAccessQuery is the result of an anlysis
-     * @param file is the File, where the critical entries are written in
-     * @param language is the language of the export format
+     * @param file                is the File, where the critical entries are written in
+     * @param language            is the language of the export format
      * @throws Exception caused by incompatible file type or failed write process and other I/O exceptions
      */
     @Override
@@ -30,10 +32,9 @@ public class CsvExportHelper implements IReportExportHelper {
             // prepare csv format
             char separator = language.equals(Locale.GERMAN) ? ';' : ',';
 
-            // TODO: make csv headers customizable in settings
             String[] headers = language.equals(Locale.GERMAN)
-                ? new String[] { "Verletztes Pattern", "Kritischer Benutzer"}
-                : new String[] {"Violated Pattern", "Critical Username"};
+                ? new String[] {"Verletztes Pattern", "Kritischer Benutzer", "Beschreibung", "Query Id: " + criticalAccessQuery.getId()}
+                : new String[] {"Violated Pattern", "Critical Username", "Description", "Query Id: " + criticalAccessQuery.getId()};
 
             CSVFormat format = CSVFormat.DEFAULT.withDelimiter(separator).withHeader(headers);
 
@@ -42,7 +43,7 @@ public class CsvExportHelper implements IReportExportHelper {
 
                 // write critical access entries to file
                 for (CriticalAccessEntry criticalAccessEntry : criticalAccessQuery.getEntries()) {
-                    csvPrinter.printRecord(criticalAccessEntry.getAccessPattern().getUsecaseId(), criticalAccessEntry.getUsername());
+                    csvPrinter.printRecord(criticalAccessEntry.getAccessPattern().getUsecaseId(), criticalAccessEntry.getUsername(), criticalAccessEntry.getAccessPattern().getDescription());
                 }
 
                 // make sure the output stream gets flushed, so everything is written to the output file

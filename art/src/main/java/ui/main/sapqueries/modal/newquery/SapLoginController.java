@@ -58,10 +58,11 @@ public class SapLoginController {
             try {
                 SapConnector connector = new SapConnector(configuration, usernameInput.getText(), passwordInput.getText());
 
-                if (connector.canPingServer()) {
+                try {
+                    connector.canPingServer();
                     close(event);
                     parentController.runAnalysis(usernameInput.getText(), passwordInput.getText());
-                } else {
+                } catch (Exception e) {
                     errorLabel.setVisible(true);
                 }
 
@@ -99,6 +100,7 @@ public class SapLoginController {
      * @param event the given ActionEvent
      */
     public void close(ActionEvent event) {
+        parentController.setInputsDisable(false);
         (((Button) event.getSource()).getScene().getWindow()).hide();
     }
 

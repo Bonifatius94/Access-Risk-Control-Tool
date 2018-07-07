@@ -18,13 +18,13 @@
                     <PropertyValueFactory property="entries"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="%configuration" percentageWidth="0.27" fx:id="configurationColumn"
+            <PTableColumn text="%configuration" percentageWidth="0.3" fx:id="configurationColumn"
                           styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="config"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn text="%sapSettings" percentageWidth="0.28" fx:id="sapConfigurationColumn"
+            <PTableColumn text="%sapSettings" percentageWidth="0.3" fx:id="sapConfigurationColumn"
                           styleClass="align-left">
                 <cellValueFactory>
                     <PropertyValueFactory property="sapConfig"/>
@@ -35,9 +35,9 @@
                     <PropertyValueFactory property="createdAt"/>
                 </cellValueFactory>
             </PTableColumn>
-            <PTableColumn percentageWidth="0.07" fx:id="editColumn" resizable="false" sortable="false">
+            <PTableColumn percentageWidth="0.06" fx:id="editColumn" resizable="false" sortable="false">
             </PTableColumn>
-            <PTableColumn percentageWidth="0.1" fx:id="archiveColumn" resizable="false" sortable="false">
+            <PTableColumn percentageWidth="0.06" fx:id="archiveColumn" resizable="false" sortable="false">
             </PTableColumn>
         </columns>
     </TableView>
@@ -48,11 +48,6 @@
         <JFXButton text="%newAnalysis" onAction="#addAction" prefWidth="130">
             <graphic>
                 <MaterialDesignIconView glyphName="PLUS"/>
-            </graphic>
-        </JFXButton>
-        <JFXButton text="%details" onAction="#editAction" prefWidth="130">
-            <graphic>
-                <MaterialDesignIconView glyphName="OPEN_IN_NEW"/>
             </graphic>
         </JFXButton>
         <JFXButton text="%archive" onAction="#archiveAction" prefWidth="130">

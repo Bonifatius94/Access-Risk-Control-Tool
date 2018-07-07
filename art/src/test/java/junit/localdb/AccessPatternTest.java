@@ -321,8 +321,6 @@ public class AccessPatternTest {
             ex.printStackTrace();
         }
 
-        // TODO: add another test for evaluating archiving logic on update
-
         assert(ret);
     }*/
 
@@ -390,16 +388,18 @@ public class AccessPatternTest {
             List<AccessPattern> patterns = context.getPatterns(false);
             AccessPattern profilePattern = patterns.stream().filter(x -> x.getId().equals(7)).findFirst().get();
             AccessPattern multiConditionPattern = patterns.stream().filter(x -> x.getId().equals(8)).findFirst().get();
+            AccessPattern multiConditionPattern2 = patterns.stream().filter(x -> x.getId().equals(2)).findFirst().get();
 
             // delete patterns
             context.deletePattern(profilePattern);
             context.deletePattern(multiConditionPattern);
+            context.deletePattern(multiConditionPattern2);
 
             // query patterns again
             patterns = context.getPatterns(true);
 
             // check if patterns were deleted
-            ret = patterns.size() == patternCount - 2;
+            ret = patterns.size() == patternCount - 3;
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -409,7 +409,6 @@ public class AccessPatternTest {
     }
 
     @Test
-    @Disabled
     public void deletePatternWithArchiving() {
 
         boolean ret = false;
@@ -420,7 +419,7 @@ public class AccessPatternTest {
             int patternCount = context.getPatterns(true).size();
             List<AccessPattern> patterns = context.getPatterns(false);
             AccessPattern profilePattern = patterns.stream().filter(x -> x.getId().equals(1)).findFirst().get();
-            AccessPattern multiConditionPattern = patterns.stream().filter(x -> x.getId().equals(2)).findFirst().get();
+            AccessPattern multiConditionPattern = patterns.stream().filter(x -> x.getId().equals(3)).findFirst().get();
 
             // delete patterns
             context.deletePattern(profilePattern);

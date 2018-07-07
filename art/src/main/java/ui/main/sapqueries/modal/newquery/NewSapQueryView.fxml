@@ -15,13 +15,13 @@
               xmlns:fx="http://javafx.com/fxml"
               fx:controller="ui.main.sapqueries.modal.newquery.NewSapQueryController" windowState="NoResize">
     <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-padding: 20">
-        <StackPane>
-            <VBox HBox.hgrow="ALWAYS" fx:id="inputBox" spacing="20">
+        <StackPane prefHeight="150">
+            <VBox HBox.hgrow="ALWAYS" fx:id="inputBox" spacing="20" prefHeight="100">
                 <VBox HBox.hgrow="ALWAYS" spacing="40">
                     <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="30">
                         <Label text="%configuration"/>
                         <JFXComboBox fx:id="configChooser" minWidth="450" maxWidth="900"/>
-                        <JFXButton onAction="#chooseConfig" styleClass="round-button" minHeight="30">
+                        <JFXButton onAction="#chooseConfig" styleClass="round-button" minHeight="30" fx:id="chooseConfigButton">
                             <tooltip>
                                 <Tooltip text="%chooseConfig"/>
                             </tooltip>
@@ -33,7 +33,7 @@
                     <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="30">
                         <Label text="%sapSettings"/>
                         <JFXComboBox fx:id="sapSettingsChooser" minWidth="450" maxWidth="900"/>
-                        <JFXButton onAction="#chooseSapSettings" styleClass="round-button" minHeight="30">
+                        <JFXButton onAction="#chooseSapSettings" styleClass="round-button" minHeight="30" fx:id="chooseSapSettingsButton">
                             <tooltip>
                                 <Tooltip text="%chooseSapSettings"/>
                             </tooltip>
@@ -45,8 +45,7 @@
                 </VBox>
                 <Separator/>
                 <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT">
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <JFXButton fx:id="runAnalysisButton" text="%runAnalysis" onAction="#openLoginDialog">
+                    <JFXButton fx:id="runAnalysisButton" text="%runAnalysis" onAction="#openLoginDialog" minWidth="160">
                         <graphic>
                             <MaterialDesignIconView glyphName="PLAY"/>
                         </graphic>
@@ -56,7 +55,7 @@
             <VBox fx:id="spinner" alignment="CENTER" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" visible="false"
                   spacing="20">
                 <JFXSpinner maxWidth="50"/>
-                <Label text="%analysisInProgress"/>
+                <Label text="%analysisInProgress" textAlignment="CENTER"/>
                 <JFXProgressBar fx:id="progressBar"/>
                 <Label fx:id="progressLabel" visible="false"/>
                 <Label fx:id="connectionLabel" />

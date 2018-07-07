@@ -2,126 +2,276 @@ package io.msoffice.word;
 
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
+import data.entities.Whitelist;
+
+import extensions.Utf8Control;
 
 import io.msoffice.IReportExportHelper;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.DateFormat;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+
+import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 
 import javax.imageio.ImageIO;
 
 import org.apache.poi.util.Units;
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBookmark;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRow;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl;
+
+import settings.UserSettingsHelper;
 
 
 public abstract class ReportExportHelperBase implements IReportExportHelper {
 
-    // TODO: check if this also works on english machines etc.
-    private static final Font STANDARD_FONT = new Font("Calibri (Textkörper)", 0, 11);
+    // =========================================
+    //                CONSTANTS
+    // =========================================
+
+    private static final String BOOKMARK_QUERY_SETTINGS_CREATOR = "QuerySettings_Creator";
+    private static final String BOOKMARK_QUERY_SETTINGS_END_OF_QUERY = "QuerySettings_EndOfQuery";
+    private static final String BOOKMARK_QUERY_SETTINGS_PATTERNS = "QuerySettings_Patterns";
+    private static final String BOOKMARK_QUERY_SETTINGS_WHITELIST = "QuerySettings_Whitelist";
+
+    private static final String BOOKMARK_CONNECTION_SETTINGS_DESCRIPTION = "ConnectionSettings_Description";
+    private static final String BOOKMARK_CONNECTION_SETTINGS_SERVER_DESTINATION = "ConnectionSettings_ServerDestination";
+    private static final String BOOKMARK_CONNECTION_SETTINGS_SYSTEM_NUMBER = "ConnectionSettings_SystemNumber";
+    private static final String BOOKMARK_CONNECTION_SETTINGS_CLIENT = "ConnectionSettings_Client";
+    private static final String BOOKMARK_CONNECTION_SETTINGS_LANGUAGE = "ConnectionSettings_Language";
+    private static final String BOOKMARK_CONNECTION_SETTINGS_POOL_CAPACITY = "ConnectionSettings_PoolCapacity";
+
+    // =========================================
+    //                 METHODS
+    // =========================================
 
     protected XWPFDocument prepareDocument(CriticalAccessQuery query, Locale language) throws Exception {
 
         XWPFDocument document;
+
+        // determine the resource path of the word template according to the selected report language
         String templatePath = language.equals(Locale.GERMAN) ? "word-templates/ExportReport_Template_DE.docx" : "word-templates/ExportReport_Template_EN.docx";
 
-        // load word template as resource
+        // load the word template as a resource
         try (InputStream stream = getClass().getClassLoader().getResourceAsStream(templatePath)) {
 
-            // init word document with template from resources
+            // init the word document with the template from resources
             document = new XWPFDocument(stream);
+        }
 
-            // write tables
-            List<CriticalAccessEntry> sortedEntries =
-                query.getEntries().stream().sorted((x, y) -> {
+        // write bookmark content
+        writeBookmarkContentToDocument(document, query, language);
 
-                    // compare by username
-                    int cmp = x.getUsername().compareTo(y.getUsername());
+        // write the critical access entries table
+        writeCriticalAccessEntriesToDocument(document, query);
 
-                    // if usernames match compare by usecase id of the violated access pattern
-                    cmp = cmp != 0 ? cmp : x.getAccessPattern().getUsecaseId().compareTo(y.getAccessPattern().getUsecaseId());
+        // write the overloaded charts to the document
 
-                    return cmp;
-
-                }).collect(Collectors.toList());
-
-            writeCriticalAccessEntriesToDocument(document, sortedEntries);
-
-            // replace bookmarks
-            replaceBookmark(document, "ServerDestination", query.getSapConfig().getServerDestination());
-            replaceBookmark(document, "SysNr", query.getSapConfig().getSysNr());
-            replaceBookmark(document, "Client", query.getSapConfig().getClient());
-            replaceBookmark(document, "Language", query.getSapConfig().getLanguage());
-            replaceBookmark(document, "PoolCapacity", query.getSapConfig().getPoolCapacity());
-            replaceBookmark(document, "CreatedBy", query.getCreatedBy());
-            replaceBookmark(document, "CreatedAt", getDateAsString(query.getCreatedAt(), language));
-            replaceBookmark(document, "SapDescription", query.getSapConfig().getDescription());
-
-            // write Blog chart
-            document.createParagraph().setPageBreak(true);
-            writeImageToDocument(document, getBlockChart(sortedEntries, BlockChartType.AccessPattern));
-            writeImageToDocument(document, getBlockChart(sortedEntries, BlockChartType.User));
+        // only add the charts if there is more than one usecase
+        if (query.getConfig().getPatterns().size() > 1) {
+            writeChartsToDocument(document, query, language);
         }
 
         return document;
     }
 
-    private String getDateAsString(ZonedDateTime dateTime, Locale language) {
+    private void writeBookmarkContentToDocument(XWPFDocument document, CriticalAccessQuery query, Locale language) {
 
-        //Locale country = language.equals(Locale.GERMAN) ? Locale.GERMANY : Locale.US;
-        Date date = Date.from(dateTime.toLocalDate().atStartOfDay(ZoneId.of("UTC")).toInstant());
-        return DateFormat.getDateInstance(DateFormat.MEDIUM, language).format(date);
+        // format usecase ids of patterns
+        final String patternsContent =
+            query.getConfig().getPatterns().stream()
+                .map(x -> x.getUsecaseId()).distinct().sorted()
+                .collect(Collectors.joining(", "));
+
+        // format whitelist name
+        final Whitelist whitelist = query.getConfig().getWhitelist();
+        final String whitelistNoneContent = language == Locale.GERMAN ? "keine" : "none";
+        final String whitelistContent = whitelist != null ? whitelist.getName() + " - " + whitelist.getDescription() : whitelistNoneContent;
+
+        // replace bookmarks of query settings
+        replaceBookmark(document, BOOKMARK_QUERY_SETTINGS_CREATOR, query.getCreatedBy());
+        replaceBookmark(document, BOOKMARK_QUERY_SETTINGS_END_OF_QUERY, getDateTimeAsString(query.getCreatedAt(), language));
+        replaceBookmark(document, BOOKMARK_QUERY_SETTINGS_PATTERNS, patternsContent);
+        replaceBookmark(document, BOOKMARK_QUERY_SETTINGS_WHITELIST, whitelistContent);
+
+        // replace bookmarks of sap connection settings
+        replaceBookmark(document, BOOKMARK_CONNECTION_SETTINGS_DESCRIPTION, query.getSapConfig().getDescription());
+        replaceBookmark(document, BOOKMARK_CONNECTION_SETTINGS_SERVER_DESTINATION, query.getSapConfig().getServerDestination());
+        replaceBookmark(document, BOOKMARK_CONNECTION_SETTINGS_SYSTEM_NUMBER, query.getSapConfig().getSysNr());
+        replaceBookmark(document, BOOKMARK_CONNECTION_SETTINGS_CLIENT, query.getSapConfig().getClient());
+        replaceBookmark(document, BOOKMARK_CONNECTION_SETTINGS_LANGUAGE, query.getSapConfig().getLanguage());
+        replaceBookmark(document, BOOKMARK_CONNECTION_SETTINGS_POOL_CAPACITY, query.getSapConfig().getPoolCapacity());
     }
 
-    private void writeCriticalAccessEntriesToDocument(XWPFDocument document, java.util.List<CriticalAccessEntry> entries) {
+    private void writeCriticalAccessEntriesToDocument(XWPFDocument document, CriticalAccessQuery query) {
+
+        // prepare the critical access entries (sorting by usecase id, then by critical username)
+        List<CriticalAccessEntry> sortedEntries =
+            query.getEntries().stream()
+            .sorted(
+                Comparator.comparing((CriticalAccessEntry x) -> x.getAccessPattern().getUsecaseId())
+                .thenComparing(CriticalAccessEntry::getUsername)
+            )
+            .collect(Collectors.toList());
+
+        XWPFTable originalTable = document.getTables().get(2);
+        writeEntriesToTable(originalTable, sortedEntries);
+
+        // tried to add the table header at the new page start
+        // this did not work for pdf export unfortunately
+
+        /*// define max entries of tables
+        final int maxEntriesFirstPage = 19;
+        final int maxEntriesNextPage = 42;
+
+        XWPFTable originalTable = document.getTables().get(2);
+        boolean isTablePageBreakRequired = sortedEntries.size() > maxEntriesFirstPage;
+
+        // manage the page break manually because the pdf export does not support the table page break feature from MS Word
+        if (isTablePageBreakRequired) {
+
+            // retrieve the remaining entries (without entries from first page)
+            List<CriticalAccessEntry> remainingEntries = new ArrayList<>(sortedEntries.subList(maxEntriesFirstPage, sortedEntries.size()));
+
+            while (remainingEntries.size() > 0) {
+
+                // start a new page and clone the table there
+                XWPFTable clone = cloneTableAndWriteItToNewPage(document, originalTable);
+
+                // retrieve the remaining entries and write them to the cloned table
+                int itemsCount = remainingEntries.size() > maxEntriesNextPage ? maxEntriesNextPage : remainingEntries.size();
+                List<CriticalAccessEntry> entriesToWrite = new ArrayList<>(remainingEntries.subList(0, itemsCount));
+                writeEntriesToTable(clone, entriesToWrite);
+                remainingEntries.removeAll(entriesToWrite);
+            }
+        }
+
+        // write all entries to the table on the first page
+        writeEntriesToTable(originalTable, isTablePageBreakRequired ? sortedEntries.subList(0, maxEntriesFirstPage) : sortedEntries);*/
+    }
+
+    /*private XWPFTable cloneTableAndWriteItToNewPage(XWPFDocument document, XWPFTable table) {
+
+        // insert page break into document
+        document.createParagraph().setPageBreak(true);
+
+        // clone the existing table
+        CTTbl tbl = document.getDocument().getBody().insertNewTbl(document.getTables().size());
+        tbl.set(table.getCTTbl());
+        XWPFTable clone = new XWPFTable(tbl, document);
+
+        return clone;
+    }*/
+
+    private void writeEntriesToTable(XWPFTable table, List<CriticalAccessEntry> entries) {
+
+        final int dataTemplateRowIndex = 2;
+        XWPFTableRow dataTemplateRow = table.getRow(dataTemplateRowIndex);
 
         // write critical access entries
-        XWPFTable table = document.getTables().get(0);
-
         for (CriticalAccessEntry entry : entries) {
 
             // clone empty data template row
-            XWPFTableRow row = table.getRow(1);
             CTRow ctRow = CTRow.Factory.newInstance();
-            ctRow.set(row.getCtRow());
-            XWPFTableRow row2 = new XWPFTableRow(ctRow, table);
+            ctRow.set(dataTemplateRow.getCtRow());
+            XWPFTableRow dataRow = new XWPFTableRow(ctRow, table);
 
             // set content of cloned data row
-            row2.getCell(0).setText(entry.getUsername());
-            row2.getCell(1).setText(entry.getAccessPattern().getUsecaseId());
+            writeTextToCell(dataRow.getCell(0), entry.getAccessPattern().getUsecaseId());
+            writeTextToCell(dataRow.getCell(1), entry.getUsername());
 
-            // apply data row to table
-            table.addRow(row2);
+            // apply data row to table at the bottom
+            table.addRow(dataRow);
         }
 
-        // remove empty data template row
-        table.removeRow(1);
+        table.removeRow(dataTemplateRowIndex);
+    }
+
+    private void writeChartsToDocument(XWPFDocument document, CriticalAccessQuery query, Locale language) throws Exception {
+
+        for (BufferedImage image : getExportedCharts(query, language)) {
+
+            if (image != null) {
+
+                // start a new page and insert the chart there
+                document.createParagraph().setPageBreak(true);
+                writeImageToDocument(document, image);
+            }
+        }
+    }
+
+    private void writeImageToDocument(XWPFDocument document, BufferedImage image) throws Exception {
+
+        // get image as stream
+        ByteArrayOutputStream imageOut = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", imageOut);
+        InputStream imageIn = new ByteArrayInputStream(imageOut.toByteArray());
+
+        // write image to document
+        XWPFParagraph paragraph = document.createParagraph();
+        paragraph.setAlignment(ParagraphAlignment.CENTER);
+        XWPFRun run = paragraph.createRun();
+
+        // calculate the width / height of the image (image has 133% scaling factor, but no idea why ...)
+        int newWidth = (int) ((double) image.getWidth() / ((double) 4 / 3));
+        int newHeight = (int) ((double) image.getHeight() / ((double) 4 / 3));
+
+        run.addPicture(imageIn, document.PICTURE_TYPE_PNG, null, Units.toEMU(newWidth), Units.toEMU(newHeight));
+    }
+
+    // =========================================
+    //                  HELPERS
+    // =========================================
+
+    private String getDateTimeAsString(ZonedDateTime dateTime, Locale language) {
+
+        // source: https://docs.oracle.com/javase/tutorial/i18n/format/dateFormat.html
+
+        Date date = Date.from(Instant.from(dateTime));
+
+        DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.MEDIUM, language);
+        DateFormat timeFormatter = DateFormat.getTimeInstance(DateFormat.MEDIUM, language);
+
+        return dateFormatter.format(date) + " " + timeFormatter.format(date);
     }
 
     private void replaceBookmark(XWPFDocument document, String key, String value) {
 
-        List<XWPFParagraph> paragraphs = document.getParagraphs();
-
-        for (XWPFParagraph paragraph : paragraphs) {
+        // replace bookmarks in plain text
+        for (XWPFParagraph paragraph : document.getParagraphs()) {
 
             CTP ctp = paragraph.getCTP();
             List<CTBookmark> bookmarks = ctp.getBookmarkStartList();
@@ -136,146 +286,247 @@ public abstract class ReportExportHelperBase implements IReportExportHelper {
                 }
             }
         }
+
+        // replace bookmarks in tables
+        for (XWPFTable table : document.getTables()) {
+
+            for (XWPFTableRow row : table.getRows()) {
+
+                for (XWPFTableCell cell : row.getTableCells()) {
+
+                    for (XWPFParagraph paragraph : cell.getParagraphs()) {
+
+                        CTP ctp = paragraph.getCTP();
+                        List<CTBookmark> bookmarks = ctp.getBookmarkStartList();
+
+                        for (CTBookmark bookmark : bookmarks) {
+
+                            if (bookmark.getName().equals(key)) {
+
+                                XWPFRun run = paragraph.createRun();
+                                run.setText(value);
+                                ctp.getDomNode().insertBefore(run.getCTR().getDomNode(), bookmark.getDomNode());
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    private void writeImageToDocument(XWPFDocument document, BufferedImage image) throws Exception {
+    private void writeTextToCell(XWPFTableCell cell, String text) {
 
-        // get image as stream
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", os);
-        InputStream chartInputStream = new ByteArrayInputStream(os.toByteArray());
+        // this code is required due to pdf conversion issues when using the more standard cell.setText() method
 
-        // write image to document
-        XWPFParagraph paragraph = document.createParagraph();
+        XWPFParagraph paragraph = cell.getParagraphs().get(0);
         XWPFRun run = paragraph.createRun();
-        run.addPicture(chartInputStream, document.PICTURE_TYPE_PNG, null, Units.toEMU(image.getWidth()), Units.toEMU(image.getHeight()));
+        run.setText(text);
     }
 
-    private enum BlockChartType {
-        AccessPattern,
-        User
+    /**
+     * Returns the charts to export as a list of BufferedImages.
+     */
+    public List<BufferedImage> getExportedCharts(CriticalAccessQuery query, Locale language) throws Exception {
+
+        List<BufferedImage> images = new ArrayList<>();
+
+        images.add(exportUsecaseChart(query, language));
+        images.add(exportUsernameChart(query, language));
+
+        return images;
     }
 
-    private BufferedImage getBlockChart(List<CriticalAccessEntry> entries, BlockChartType type) {
+    /**
+     * Exports the UsecaseChart as a BufferedImage (snapshot).
+     */
+    private BufferedImage exportUsecaseChart(CriticalAccessQuery query, Locale language) throws Exception {
 
-        // define width and height
-        final int width = 450;
-        final int height = 320;
+        // y axis properties
+        NumberAxis numberAxis = new NumberAxis();
+        numberAxis.setAutoRanging(false);
+        numberAxis.setLowerBound(0);
+        numberAxis.setTickUnit(5);
+        numberAxis.setAnimated(false);
+
+        // x axis properties
+        CategoryAxis categoryAxis = new CategoryAxis();
+        categoryAxis.setAutoRanging(true);
+        categoryAxis.setAnimated(false);
+
+        BarChart<String, Number> chart = new BarChart<>(categoryAxis, numberAxis);
+
+        chart.setLegendVisible(false);
 
         Map<String, Integer> itemsXCount;
 
-        if (type == BlockChartType.AccessPattern) {
-
-            // group by usecase id
-            itemsXCount =
-                entries.stream().map(x -> x.getAccessPattern().getUsecaseId())
-                    .collect(Collectors.toMap(x -> x, x -> 1, Integer::sum));
-
-        } else if (type == BlockChartType.User) {
-
-            // group by username
-            itemsXCount =
-                entries.stream().map(x -> x.getUsername())
+        // group by usecase id
+        itemsXCount =
+            query.getEntries().stream().map(x -> x.getAccessPattern().getUsecaseId())
                 .collect(Collectors.toMap(x -> x, x -> 1, Integer::sum));
 
-        } else {
-            throw new IllegalArgumentException("unknown block chart type");
-        }
+        // get the correct string from the chosen locale
+        ResourceBundle bundle = ResourceBundle.getBundle("lang", language, new Utf8Control());
+        chart.setTitle(bundle.getString("usecaseIdViolations"));
 
-        return createBlockChart(itemsXCount, width, height, type);
-    }
+        XYChart.Series<String, Number> mainSeries = new XYChart.Series<>();
 
-    private BufferedImage createBlockChart(Map<String, Integer> itemsXCount, int width, int height, BlockChartType type) {
+        // calculate maximum of entries for upper bound (round up to nearest 10)
+        int maximum = itemsXCount.values().stream().max(Integer::compareTo).get();
+        int upperBound = 5 * ((maximum + 4) / 5);
+        numberAxis.setUpperBound(upperBound);
 
-        // TODO: create chart using apache poi cells: https://stackoverflow.com/questions/38913412/create-bar-chart-in-excel-with-apache-poi
-
-        // construct a BufferedImage of one of the predefined image types.
-        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-
-        // create a graphics which can be used to draw into the buffered image
-        Graphics2D g2d = bufferedImage.createGraphics();
-
-        // TODO: check if this call is obsolete
-        g2d.setColor(Color.white);
-
-        g2d.fillRect(0, 0, width, height);
-        g2d.setColor(Color.lightGray);
-
-        int y = 270;
-
-        // draw lines
-        // TODO: why always 10 lines?
-        for (int i = 1; i < 10; i++) {
-
-            g2d.drawLine(40, y, 440, y);
-            y = y - 27;
-        }
-
-        // determine the maximal number of users
-        int maxUser = itemsXCount.values().stream().mapToInt(x -> x).max().getAsInt();
-
-        // calculating y range per user
-        // TODO: wouldn't double type fit better?!
-        int yrange = 216 / maxUser;
-
-        // draw charts + x text
-        // TODO: wouldn't double type fit better?!
-        int x = 400 / itemsXCount.size() / 2 + 40;
-
+        int all = 0;
         for (Map.Entry<String, Integer> entry : itemsXCount.entrySet()) {
-
-            y = 54 + ((maxUser - entry.getValue()) * yrange);
-
-            g2d.setColor(Color.red);
-            g2d.fillRect(x, y, 10, (entry.getValue() * yrange));
-            g2d.setColor(Color.darkGray);
-            g2d.setFont(STANDARD_FONT);
-            g2d.drawString(entry.getKey(), x, 290);
-
-            x = x + 400 / itemsXCount.size();
+            all += entry.getValue();
         }
 
-        // draw text for axis
-        if (type == BlockChartType.AccessPattern) {
+        // compute average
+        int average = all / itemsXCount.size();
 
-            g2d.drawString("Access", 390, 310);
-            g2d.drawString("Pattern IDs", 390, 320);
-            g2d.drawString("Numbers ", 0, 20);
-            g2d.drawString("of violated ", 0, 30);
-            g2d.drawString("users", 0, 40);
+        for (Map.Entry<String, Integer> entry : itemsXCount.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
+            XYChart.Data<String, Number> data = createData(entry.getKey(), entry.getValue(), average);
 
-        } else if (type == BlockChartType.User) {
-
-            g2d.drawString("User IDs", 403, 310);
-            g2d.drawString("Numbers ", 0, 20);
-            g2d.drawString("of violated ", 0, 30);
-            g2d.drawString("Access Patterns", 0, 40);
+            mainSeries.getData().add(data);
         }
 
-        //----------------------------------------------------------------------
+        // add the main series to the chart
+        chart.getData().add(mainSeries);
 
-        y = 270;
-        x = 10;
-        g2d.drawString(" " + 0, x, y);
+        // cap max chart size
+        chart.setMaxWidth(1000);
 
-        int yadd = 216 / 4;
-        y = y - yadd;
-
-        double result = (double)maxUser / 4;
-        double result1 = result;
-
-        // TODO: why always 5 iterations?
-        for (int i = 0; i < 5; i++) {
-
-            // System.out.println("y " + y);
-            // System.out.println("result " + result);
-
-            g2d.drawString(" " + result, x, y);
-            y = y - yadd;
-            result = result + result1;
-        }
-
-        return bufferedImage;
+        return chartToBufferedImage(chart);
     }
 
+    /**
+     * Exports the UsernameChart as a BufferedImage (snapshot).
+     */
+    private BufferedImage exportUsernameChart(CriticalAccessQuery query, Locale language) throws Exception {
+
+        // y axis properties
+        NumberAxis numberAxis = new NumberAxis();
+        numberAxis.setAutoRanging(false);
+        numberAxis.setLowerBound(0);
+        numberAxis.setTickUnit(5);
+        numberAxis.setAnimated(false);
+
+        // x axis properties
+        CategoryAxis categoryAxis = new CategoryAxis();
+        categoryAxis.setAutoRanging(true);
+        categoryAxis.setAnimated(false);
+
+        BarChart<Number, String> chart = new BarChart<>(numberAxis, categoryAxis);
+
+        chart.setLegendVisible(false);
+
+        Map<String, Integer> itemsXCount;
+
+        // group by username
+        itemsXCount =
+            query.getEntries().stream().map(x -> x.getUsername())
+                .collect(Collectors.toMap(x -> x, x -> 1, Integer::sum));
+
+        // get the correct string from the chosen locale
+        ResourceBundle bundle = ResourceBundle.getBundle("lang", language, new Utf8Control());
+        chart.setTitle(bundle.getString("usernameViolations"));
+
+        // calculate maximum of entries for upper bound (round up to nearest 10)
+        int maximum = itemsXCount.values().stream().max(Integer::compareTo).get();
+        int upperBound = 5 * ((maximum + 4) / 5);
+        numberAxis.setUpperBound(upperBound);
+
+        int all = 0;
+        for (Map.Entry<String, Integer> entry : itemsXCount.entrySet()) {
+            all += entry.getValue();
+        }
+
+        XYChart.Series<Number, String> mainSeries = new XYChart.Series<>();
+
+        // compute average
+        int average = all / itemsXCount.size();
+
+        for (Map.Entry<String, Integer> entry : itemsXCount.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
+            XYChart.Data<Number, String> data = createDataInverted(entry.getKey(), entry.getValue(), average);
+
+            mainSeries.getData().add(data);
+        }
+
+        // add the main series to the chart
+        chart.getData().add(mainSeries);
+
+        // cap max chart size
+        chart.setMinHeight(itemsXCount.size() * 40);
+        chart.setMaxHeight(1200);
+        chart.setMaxWidth(1100);
+
+        return chartToBufferedImage(chart);
+    }
+
+    /**
+     * Creates the data and adds a label with the value.
+     */
+    private XYChart.Data<String, Number> createData(String key, int value, int average) {
+
+        Label label = new Label("" + value);
+        label.getStyleClass().add("bar-value");
+        Group group = new Group(label);
+        StackPane.setAlignment(group, Pos.BOTTOM_CENTER);
+        StackPane.setMargin(group, new Insets(0, 0, 5, 0));
+
+        StackPane node = new StackPane();
+        node.getChildren().add(group);
+
+        // color the nodes that are above the average
+        if (value > average) {
+            node.getStyleClass().add("warning-bar");
+        }
+
+        XYChart.Data<String, Number> data = new XYChart.Data<>(key, value);
+        data.setNode(node);
+
+        return data;
+    }
+
+    /**
+     * Creates the data and adds a label with the value.
+     */
+    private XYChart.Data<Number, String> createDataInverted(String key, int value, int average) {
+
+        Label label = new Label("" + value);
+        label.getStyleClass().add("bar-value");
+        Group group = new Group(label);
+        StackPane.setAlignment(group, Pos.CENTER_RIGHT);
+        StackPane.setMargin(group, new Insets(0, 5, 0, 0));
+
+        StackPane node = new StackPane();
+        node.getChildren().add(group);
+
+        // color the nodes that are above the average
+        if (value > average) {
+            node.getStyleClass().add("warning-bar");
+        }
+
+        XYChart.Data<Number, String> data = new XYChart.Data<>(value, key);
+        data.setNode(node);
+
+        return data;
+    }
+
+    /**
+     * Makes a snapshot of the given chart and returns a BufferedImage of it.
+     */
+    private BufferedImage chartToBufferedImage(BarChart chart) throws Exception {
+        Scene scene = new Scene(new AnchorPane(chart));
+
+        // add styles to the scene
+        scene.getRoot().setStyle(new UserSettingsHelper().loadUserSettings().getDarkThemeCss());
+        scene.getStylesheets().add("css/bar-export.css");
+
+        // add main-root to the root so tooltip styling is not affected
+        scene.getRoot().getStyleClass().add("main-root");
+
+        WritableImage image = scene.snapshot(null);
+
+        return SwingFXUtils.fromFXImage(image, null);
+    }
 }

@@ -2,7 +2,9 @@ package io.msoffice;
 
 import data.entities.CriticalAccessQuery;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.List;
 import java.util.Locale;
 
 public interface IReportExportHelper {

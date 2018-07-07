@@ -16,7 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -28,17 +30,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import sap.ISapConnector;
 import sap.SapConnector;
 
+import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.AutoCompleteComboBoxListener;
 import ui.custom.controls.CustomAlert;
 import ui.main.sapqueries.SapQueriesController;
 import ui.main.sapqueries.modal.choosers.ConfigChooserController;
 import ui.main.sapqueries.modal.choosers.SapConfigChooserController;
+import ui.main.sapqueries.modal.results.AnalysisResultController;
 
 
 public class NewSapQueryController {
@@ -67,8 +73,19 @@ public class NewSapQueryController {
     @FXML
     private Label connectionLabel;
 
+    @FXML
+    private JFXButton chooseSapSettingsButton;
+
+    @FXML
+    private JFXButton chooseConfigButton;
+
+
     private ResourceBundle bundle;
     private SapQueriesController parentController;
+
+    private boolean rerun = false;
+
+    public static SimpleIntegerProperty analysisRunning = new SimpleIntegerProperty(0);
 
     /**
      * Initializes the view.
@@ -171,6 +188,9 @@ public class NewSapQueryController {
 
                 FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/SapLoginView.fxml", "sapLogin");
 
+                // disable all inputs
+                setInputsDisable(true);
+
                 SapLoginController loginController = loader.getController();
                 loginController.setParentController(this);
                 loginController.giveSapConfig(sapSettingsChooser.getValue());
@@ -254,6 +274,12 @@ public class NewSapQueryController {
                         this.updateProgress(percentage, 1);
                     });
 
+                    // increase the counter by one
+                    Platform.runLater(() -> analysisRunning.setValue(analysisRunning.getValue() + 1));
+
+                    // dont allow inputs
+                    setInputsDisable(true);
+
                     return connector.runAnalysis(query.getConfig());
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -271,10 +297,13 @@ public class NewSapQueryController {
 
                     parentController.updateTable();
 
-                    FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/AnalysisResultView.fxml", "analysisResultTitle");
+                    FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/results/AnalysisResultView.fxml", "analysisResultTitle",  Modality.NONE);
 
                     AnalysisResultController resultController = loader.getController();
                     resultController.giveResultQuery(runQueryTask.getValue());
+
+                    // decrease the counter by one
+                    Platform.runLater(() -> analysisRunning.setValue(analysisRunning.getValue() - 1));
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -290,7 +319,7 @@ public class NewSapQueryController {
         progressLabel.visibleProperty().bind(runQueryTask.progressProperty().greaterThan(0));
         connectionLabel.visibleProperty().bind(Bindings.not(progressLabel.visibleProperty()));
         connectionLabel.managedProperty().bind(connectionLabel.visibleProperty());
-        progressLabel.textProperty().bind(runQueryTask.progressProperty().multiply(100).asString("Analyse läuft... Fortschritt %.0f%%"));
+        progressLabel.textProperty().bind(runQueryTask.progressProperty().multiply(100).asString(bundle.getString("analysisProgress") + " %.0f%%"));
 
         // start a new thread with the task
         Thread thread = new Thread(runQueryTask);
@@ -317,7 +346,7 @@ public class NewSapQueryController {
     public void setSapConfig(SapConfiguration sapConfig) {
 
         if (sapConfig != null) {
-            this.sapSettingsChooser.getItems().add(sapConfig);
+            this.sapSettingsChooser.setValue(sapConfig);
         }
     }
 
@@ -382,5 +411,22 @@ public class NewSapQueryController {
 
     public void setParentController(SapQueriesController controller) {
         this.parentController = controller;
+    }
+
+    /**
+     * Disables all inputs according to the given boolean and rerun.
+     */
+    public void setInputsDisable(boolean disabled) {
+        configChooser.setDisable(disabled || rerun);
+        sapSettingsChooser.setDisable(disabled || rerun);
+
+        chooseConfigButton.setDisable(disabled || rerun);
+        chooseSapSettingsButton.setDisable(disabled || rerun);
+
+        runAnalysisButton.setDisable(disabled);
+    }
+
+    public void setRerun(boolean rerun) {
+        this.rerun = rerun;
     }
 }

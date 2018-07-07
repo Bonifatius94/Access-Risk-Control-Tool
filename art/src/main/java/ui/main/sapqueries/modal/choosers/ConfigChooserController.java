@@ -7,10 +7,13 @@ import data.entities.AccessCondition;
 import data.entities.AccessPattern;
 import data.entities.Configuration;
 
+import data.entities.CriticalAccessQuery;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import extensions.ResourceBundleHelper;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -63,9 +66,13 @@ public class ConfigChooserController {
     public TableColumn<Configuration, JFXButton> viewDetailsColumn;
 
     @FXML
+    public TableColumn<CriticalAccessQuery, ZonedDateTime> createdAtColumn;
+
+    @FXML
     public FilterController filterController;
 
     private NewSapQueryController parentController;
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
 
     /**
@@ -125,6 +132,17 @@ public class ConfigChooserController {
 
         // sets the icon of the condition to pattern or profile
         conditionTypeColumn.setCellFactory(new ConditionTypeCellFactory());
+
+        // overwrite the column in which the date is displayed for formatting
+        createdAtColumn.setCellFactory(col -> new TableCell<CriticalAccessQuery, ZonedDateTime>() {
+
+            @Override
+            protected void updateItem(ZonedDateTime time, boolean empty) {
+
+                // display nothing if the row is empty, otherwise the item count
+                setText((empty || time == null) ? "" : "" + time.format(DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")));
+            }
+        });
     }
 
     /**
@@ -150,9 +168,15 @@ public class ConfigChooserController {
     private void showDetails(Configuration config) {
 
         if (config != null) {
-            // fill whitelist text fields
-            this.whitelistName.setText(config.getWhitelist().getName());
-            this.whitelistDescription.setText(config.getWhitelist().getDescription());
+
+            if (config.getWhitelist() != null) {
+                // fill whitelist text fields
+                this.whitelistName.setText(config.getWhitelist().getName());
+                this.whitelistDescription.setText(config.getWhitelist().getDescription());
+            } else {
+                this.whitelistName.setText(bundle.getString("noWhitelist"));
+                this.whitelistDescription.clear();
+            }
 
             // fill patterns table
             this.patternsTable.setItems(FXCollections.observableList(new ArrayList<>(config.getPatterns())));

@@ -20,12 +20,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 
 public class WordExportTest {
 
     @Test
+    @Disabled
     public void testWordExport() {
 
         boolean ret = false;

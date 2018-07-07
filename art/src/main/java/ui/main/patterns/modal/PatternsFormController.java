@@ -30,7 +30,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
@@ -41,6 +43,7 @@ import javafx.scene.layout.VBox;
 
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
+import ui.custom.controls.CustomAlert;
 import ui.custom.controls.PTableColumn;
 import ui.main.patterns.PatternsController;
 
@@ -114,11 +117,13 @@ public class PatternsFormController {
     private JFXButton copyPropertyButton;
 
     @FXML
-    private Label atLeastOneCondWarning;
+    private Label atLeastTwoCondsWarning;
+
 
     private PatternsController parentController;
-
     private AccessPattern accessPattern;
+
+    private boolean editable = true;
 
     private List<TableViewWithAccessCondition> conditionTables;
     private TableView<AccessPatternConditionProperty> selectedTable;
@@ -141,7 +146,7 @@ public class PatternsFormController {
         this.deleteColumns = new ArrayList<>();
 
         // set condition input items
-        this.conditionTypeInput.getItems().setAll("Condition", "Profile");
+        this.conditionTypeInput.getItems().setAll(bundle.getString("pattern"), bundle.getString("profile"));
 
         // set visibility of certain components according to user input
         this.profileInput.managedProperty().bind(this.profileInput.visibleProperty());
@@ -167,7 +172,9 @@ public class PatternsFormController {
 
         // don't allow less than 1 tab
         deleteSelectedTableTabButton.disableProperty().bind(Bindings.size(conditionTabs.getTabs()).isEqualTo(1));
-        atLeastOneCondWarning.visibleProperty().bind(Bindings.and(Bindings.size(conditionTabs.getTabs()).isEqualTo(1), Bindings.not(editConditionBox.disableProperty())));
+
+        // // don't allow less than 2 tabs
+        atLeastTwoCondsWarning.visibleProperty().bind(Bindings.and(Bindings.size(conditionTabs.getTabs()).isEqualTo(2), Bindings.not(editConditionBox.disableProperty())));
 
         // initialize condition type combo box component
         initializeConditionTypeComboBox();
@@ -198,6 +205,13 @@ public class PatternsFormController {
                 this.editConditionBox.setDisable(true);
             } else {
                 this.editConditionBox.disableProperty().bind(this.conditionBox.disableProperty());
+
+                if (conditionTabs.getTabs().size() == 1) {
+                    addConditionTableTab(new AccessCondition());
+                }
+
+                // don't allow less than 2 tabs
+                deleteSelectedTableTabButton.disableProperty().bind(Bindings.size(conditionTabs.getTabs()).isEqualTo(2));
             }
         });
     }
@@ -210,30 +224,26 @@ public class PatternsFormController {
         this.conditionTypeInput.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (selected, oldValue, newValue) -> {
 
             if (oldValue != null) {
-                switch (oldValue) {
-                    case "Condition":
-                        conditionBox.setDisable(true);
-                        break;
-                    case "Profile":
-                        profileInput.setVisible(false);
-                        break;
-                    default:
-                        profileInput.setVisible(false);
-                        conditionBox.setVisible(false);
-                        break;
+                if (oldValue.equals(bundle.getString("pattern"))) {
+                    conditionBox.setDisable(true);
+                } else if (oldValue.equals(bundle.getString("profile"))) {
+                    profileInput.setVisible(false);
+                } else {
+                    profileInput.setVisible(false);
+                    conditionBox.setVisible(false);
                 }
             }
-            switch (newValue) {
-                case "Condition":
-                    conditionBox.setDisable(false);
-                    break;
-                case "Profile":
-                    profileInput.setVisible(true);
-                    break;
-                default:
-                    profileInput.setVisible(true);
-                    conditionBox.setVisible(true);
-                    break;
+
+            if (newValue.equals(bundle.getString("pattern"))) {
+                conditionBox.setDisable(false);
+
+                // automatically select the linkage
+                this.linkageInput.getSelectionModel().select(ConditionLinkage.None);
+            } else if (newValue.equals(bundle.getString("profile"))) {
+                profileInput.setVisible(true);
+            } else {
+                profileInput.setVisible(true);
+                conditionBox.setVisible(true);
             }
         });
     }
@@ -244,37 +254,37 @@ public class PatternsFormController {
     private void initializeValidation() {
 
         useCaseIdInput.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 useCaseIdInput.validate();
             }
         });
 
         descriptionInput.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 descriptionInput.validate();
             }
         });
 
         profileInput.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 profileInput.validate();
             }
         });
 
         authObjectInput.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 authObjectInput.validate();
             }
         });
 
         authFieldInput.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 authFieldInput.validate();
             }
         });
 
         authFieldValue1Input.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 authFieldValue1Input.validate();
             }
         });
@@ -306,7 +316,7 @@ public class PatternsFormController {
 
             // Fill choose box
             if (pattern.getConditions().stream().findFirst().get().getProfileCondition() == null) {
-                this.conditionTypeInput.getSelectionModel().select("Condition");
+                this.conditionTypeInput.getSelectionModel().select(bundle.getString("pattern"));
 
                 for (AccessCondition condition : pattern.getConditions().stream().sorted(Comparator.comparing(AccessCondition::getId)).collect(Collectors.toList())) {
                     addConditionTableTab(condition);
@@ -314,11 +324,10 @@ public class PatternsFormController {
 
                 this.selectedTable = conditionTables.get(0).getTableView();
 
-
                 // preselect correct linkage
                 this.linkageInput.getSelectionModel().select(pattern.getLinkage());
             } else {
-                this.conditionTypeInput.getSelectionModel().select("Profile");
+                this.conditionTypeInput.getSelectionModel().select(bundle.getString("profile"));
 
                 // add one tab for correct display
                 addConditionTableTab(new AccessCondition());
@@ -336,8 +345,28 @@ public class PatternsFormController {
      *
      * @param event the given ActionEvent
      */
-    public void close(ActionEvent event) {
+    private void close(ActionEvent event) throws Exception {
         (((Button) event.getSource()).getScene().getWindow()).hide();
+
+        // refresh the patternsTable in the parentController
+        if (parentController != null) {
+            parentController.updateTable();
+        }
+    }
+
+    /**
+     * Shows a dialog to confirm to discard unsaved changes.
+     */
+    public void confirmClose(ActionEvent event) throws Exception {
+        if (saveButton.isVisible()) {
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"),
+                bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                (((Button) event.getSource()).getScene().getWindow()).hide();
+            }
+        } else {
+            close(event);
+        }
     }
 
     /**
@@ -415,7 +444,7 @@ public class PatternsFormController {
             this.accessPattern.setLinkage(linkageInput.getValue());
 
             // execute only if the pattern is no profile
-            if (this.conditionTypeInput.getSelectionModel().getSelectedItem().equals("Condition")) {
+            if (this.conditionTypeInput.getSelectionModel().getSelectedItem().equals(bundle.getString("pattern"))) {
 
                 // copy conditions to the list
                 for (TableViewWithAccessCondition tableViewWithAccessCondition : conditionTables) {
@@ -452,8 +481,7 @@ public class PatternsFormController {
                             AccessCondition accessCondition = tableViewWithAccessCondition.getAccessCondition();
                             AccessPatternCondition patternCondition = tableViewWithAccessCondition.getAccessCondition().getPatternCondition();
 
-                            List<AccessPatternConditionProperty> properties = new ArrayList<>();
-                            properties.addAll(items);
+                            List<AccessPatternConditionProperty> properties = new ArrayList<>(items);
 
                             patternCondition.setProperties(properties);
                             accessCondition.setPatternCondition(patternCondition);
@@ -491,8 +519,6 @@ public class PatternsFormController {
                 AppComponents.getInstance().getDbContext().updatePattern(accessPattern);
             }
 
-            // refresh the patternsTable in the parentController
-            parentController.updateTable();
             close(event);
         }
     }
@@ -505,15 +531,20 @@ public class PatternsFormController {
         boolean result = useCaseIdInput.validate() && descriptionInput.validate() && conditionTypeInput.getValue() != null;
 
         // profile validation
-        if (conditionTypeInput.getValue() != null && this.conditionTypeInput.getValue().equals("Profile")) {
+        if (conditionTypeInput.getValue() != null && this.conditionTypeInput.getValue().equals(bundle.getString("profile"))) {
             return result && profileInput.validate();
         } else {
             // pattern validation
             // at least one table with one item
-            boolean tableEmpty = conditionTables.get(0) != null
-                && !conditionTables.get(0).getTableView().getItems().stream().filter(x -> x.getAuthObject() != null).collect(Collectors.toList()).isEmpty();
+            boolean tableEmpty = conditionTables.stream().map(x -> x.getTableView()).anyMatch(x -> x.getItems().size() == 0);
 
-            return result && linkageInput.getValue() != null && tableEmpty;
+            if (tableEmpty) {
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("emptyTableTitle"),
+                    bundle.getString("emptyTableMessage"));
+                customAlert.showAndWait();
+            }
+
+            return result && linkageInput.getValue() != null && !tableEmpty;
         }
     }
 
@@ -522,7 +553,7 @@ public class PatternsFormController {
      *
      * @param condition the condition which items are displayed in the tableView
      */
-    @SuppressWarnings("unchecked") // TODO: remove this annotation if possible
+    @SuppressWarnings("unchecked")
     public void addConditionTableTab(AccessCondition condition) {
 
         // AuthObject Column
@@ -638,10 +669,10 @@ public class PatternsFormController {
             // bind copyPropertyButton
             this.copyPropertyButton.disableProperty().bind(
                 Bindings.or(Bindings.isNull(selectedTable.getSelectionModel().selectedItemProperty()),
-                Bindings.or(Bindings.size(selectedTable.getItems()).isEqualTo(maxEntries),
-                    Bindings.or(Bindings.isEmpty(authObjectInput.textProperty()),
-                        Bindings.or(Bindings.isEmpty(authFieldInput.textProperty()),
-                            Bindings.isEmpty(authFieldValue1Input.textProperty()))))));
+                    Bindings.or(Bindings.size(selectedTable.getItems()).isEqualTo(maxEntries),
+                        Bindings.or(Bindings.isEmpty(authObjectInput.textProperty()),
+                            Bindings.or(Bindings.isEmpty(authFieldInput.textProperty()),
+                                Bindings.isEmpty(authFieldValue1Input.textProperty()))))));
 
             // bind applyPropertyButton
             this.applyPopertyChangesButton.disableProperty().bind(
@@ -670,6 +701,7 @@ public class PatternsFormController {
             selectedProperty.setValue4(authFieldValue4Input.getText());
 
             selectedTable.getSelectionModel().clearSelection();
+            selectedTable.refresh();
             resetDetails();
         }
     }
@@ -738,6 +770,8 @@ public class PatternsFormController {
      */
     public void setEditable(boolean editable) {
 
+        this.editable = editable;
+
         // disable everything
         if (!editable) {
 
@@ -764,6 +798,10 @@ public class PatternsFormController {
             applyPopertyChangesButton.setVisible(false);
             addPropertyButton.setVisible(false);
             copyPropertyButton.setVisible(false);
+
+            // remove label
+            atLeastTwoCondsWarning.visibleProperty().unbind();
+            atLeastTwoCondsWarning.setVisible(false);
 
             // remove delete column
             for (PTableColumn column : deleteColumns) {

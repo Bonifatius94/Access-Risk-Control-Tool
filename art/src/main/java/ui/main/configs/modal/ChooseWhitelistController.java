@@ -2,9 +2,12 @@ package ui.main.configs.modal;
 
 import com.jfoenix.controls.JFXTextField;
 
+import data.entities.CriticalAccessQuery;
 import data.entities.Whitelist;
 import data.entities.WhitelistEntry;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +45,9 @@ public class ChooseWhitelistController {
 
     @FXML
     public FilterController filterController;
+
+    @FXML
+    public TableColumn<CriticalAccessQuery, ZonedDateTime> createdAtColumn;
 
     @FXML
     public Label noWhitelistChosenLabel;
@@ -102,6 +108,17 @@ public class ChooseWhitelistController {
         whitelistTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 showWhitelistDetails(newValue);
+            }
+        });
+
+        // overwrite the column in which the date is displayed for formatting
+        createdAtColumn.setCellFactory(col -> new TableCell<CriticalAccessQuery, ZonedDateTime>() {
+
+            @Override
+            protected void updateItem(ZonedDateTime time, boolean empty) {
+
+                // display nothing if the row is empty, otherwise the item count
+                setText((empty || time == null) ? "" : "" + time.format(DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")));
             }
         });
     }

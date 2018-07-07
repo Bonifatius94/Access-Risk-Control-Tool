@@ -32,9 +32,8 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        // TODO: change trace level to error for release version
         // init logging tool
-        TraceOut.enable("log.trc.txt", TraceMode.Overwrite, TraceLevel.All);
+        TraceOut.enable("log.trc.txt", TraceMode.Overwrite, TraceLevel.Error);
         TraceOut.enter();
 
         try {
@@ -166,5 +165,8 @@ public class App extends Application {
 
         // close database
         AppComponents.getInstance().getDbContext().close();
+
+        // close all windows
+        System.exit(0);
     }
 }

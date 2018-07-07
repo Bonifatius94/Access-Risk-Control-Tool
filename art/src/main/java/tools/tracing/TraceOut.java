@@ -25,7 +25,7 @@ public class TraceOut {
      * @param filePath the file path of the log file
      * @param mode the log file mode (file per day, append, overwrite)
      * @param level the level of log detail (All > Verbose > Info > Error). Usually test with all / verbose and release with info / error.
-     * @throws Exception caused by file writing issues, TODO: remove this exception to avoid crashes
+     * @throws Exception caused by file writing issues
      */
     public static void enable(String filePath, TraceMode mode, TraceLevel level) throws Exception {
 

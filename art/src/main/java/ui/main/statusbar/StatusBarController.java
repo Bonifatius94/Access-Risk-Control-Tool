@@ -1,29 +1,36 @@
 package ui.main.statusbar;
 
+import static ui.main.sapqueries.modal.newquery.NewSapQueryController.analysisRunning;
+
 import data.entities.DbUser;
 
 import extensions.ResourceBundleHelper;
 
 import java.util.ResourceBundle;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.scene.layout.HBox;
 
-import ui.App;
 import ui.AppComponents;
-import ui.custom.controls.CustomWindow;
-
 
 public class StatusBarController {
 
     @FXML
     private Label loggedInUserLabel;
 
-    ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
+    @FXML
+    private HBox copyrightBox;
+
+    @FXML
+    private Label analysisProgressLabel;
+
+    @FXML
+    private HBox analysisProgressBox;
+
+
+    private ResourceBundle bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
 
     /**
      * Initializes the view.
@@ -37,6 +44,15 @@ public class StatusBarController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        // bind analysis progress box to the analysisRunning property of NewSapQueryController
+        analysisProgressBox.visibleProperty().bind(analysisRunning.greaterThan(0));
+        analysisProgressLabel.textProperty().bind(Bindings.convert(analysisRunning).concat(" " + bundle.getString("inProgress")));
+        analysisProgressBox.managedProperty().bind(analysisProgressBox.visibleProperty());
+
+        // bind the standard copyright label
+        copyrightBox.visibleProperty().bind(Bindings.not(analysisProgressBox.visibleProperty()));
+        copyrightBox.managedProperty().bind(copyrightBox.visibleProperty());
     }
 
     /**

@@ -4,10 +4,13 @@ import com.jfoenix.controls.JFXButton;
 
 import data.entities.Configuration;
 
+import data.entities.CriticalAccessQuery;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import extensions.ResourceBundleHelper;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -21,6 +24,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -48,6 +52,9 @@ public class ConfigsController implements IUpdateTable {
 
     @FXML
     public TableColumn<Configuration, JFXButton> editColumn;
+
+    @FXML
+    public TableColumn<CriticalAccessQuery, ZonedDateTime> createdAtColumn;
 
     @FXML
     public FilterController filterController;
@@ -81,6 +88,9 @@ public class ConfigsController implements IUpdateTable {
                 }
             }
         });
+
+        // enable archived filter
+        filterController.enableArchivedFilter();
     }
 
     /**
@@ -117,7 +127,9 @@ public class ConfigsController implements IUpdateTable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Configuration configuration = row.getItem();
-                    if (!configuration.isArchived()) {
+                    if (configuration.isArchived()) {
+                        viewConfigDetails(configuration);
+                    } else {
                         openConfigurationForm(configuration);
                     }
                 }
@@ -168,6 +180,16 @@ public class ConfigsController implements IUpdateTable {
             return configuration;
         }));
 
+        // overwrite the column in which the date is displayed for formatting
+        createdAtColumn.setCellFactory(col -> new TableCell<CriticalAccessQuery, ZonedDateTime>() {
+
+            @Override
+            protected void updateItem(ZonedDateTime time, boolean empty) {
+
+                // display nothing if the row is empty, otherwise the item count
+                setText((empty || time == null) ? "" : "" + time.format(DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")));
+            }
+        });
     }
 
 
@@ -195,15 +217,6 @@ public class ConfigsController implements IUpdateTable {
     }
 
     /**
-     * Opens the edit dialog with the selected item.
-     */
-    public void editAction() {
-        if (configsTable.getSelectionModel().getSelectedItems() != null && configsTable.getSelectionModel().getSelectedItems().size() != 0) {
-            openConfigurationForm(configsTable.getSelectionModel().getSelectedItem());
-        }
-    }
-
-    /**
      * Deletes the item from the table.
      */
     public void deleteAction() throws Exception {
@@ -221,6 +234,11 @@ public class ConfigsController implements IUpdateTable {
                 // remove all selected items
                 for (Configuration config : configsTable.getSelectionModel().getSelectedItems()) {
                     AppComponents.getInstance().getDbContext().deleteConfig(config);
+                }
+
+                if (configsTable.getSelectionModel().getSelectedItems().stream().anyMatch(x -> x.isArchived())) {
+                    customAlert = new CustomAlert(Alert.AlertType.INFORMATION, bundle.getString("alreadyArchivedTitle"), bundle.getString("alreadyArchivedMessage"));
+                    customAlert.showAndWait();
                 }
 
                 updateTable();
@@ -247,7 +265,7 @@ public class ConfigsController implements IUpdateTable {
             FXMLLoader loader;
 
             loader = AppComponents.getInstance()
-                .showScene("ui/main/configs/modal/ConfigsFormView.fxml", configuration == null ? "newConfigTitle" : "editConfigTitle", 800, 800);
+                .showScene("ui/main/configs/modal/ConfigsFormView.fxml", configuration == null ? "newConfigTitle" : "editConfigTitle");
 
             // give the dialog the sapConfiguration
             ConfigsFormController configForm = loader.getController();

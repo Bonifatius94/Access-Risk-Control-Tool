@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXButton;
 import data.entities.Configuration;
 import data.entities.CriticalAccessEntry;
 import data.entities.CriticalAccessQuery;
+import data.entities.DbUserRole;
 import data.entities.SapConfiguration;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
@@ -32,6 +33,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
+import javafx.stage.Modality;
 import ui.AppComponents;
 import ui.IUpdateTable;
 import ui.custom.controls.ButtonCell;
@@ -72,7 +74,6 @@ public class SapQueriesController implements IUpdateTable {
     @FXML
     public FilterController filterController;
 
-
     private ResourceBundle bundle;
     private SimpleIntegerProperty numberOfItems = new SimpleIntegerProperty();
 
@@ -80,7 +81,7 @@ public class SapQueriesController implements IUpdateTable {
      * Initializes the controller.
      */
     @FXML
-    public void initialize() throws Exception {
+    public void initialize() {
 
         // load the ResourceBundle
         bundle = ResourceBundleHelper.getInstance().getLanguageBundle();
@@ -98,6 +99,9 @@ public class SapQueriesController implements IUpdateTable {
                 }
             }
         });
+
+        // enable archived filter
+        filterController.enableArchivedFilter();
     }
 
     /**
@@ -159,6 +163,7 @@ public class SapQueriesController implements IUpdateTable {
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 try {
                     archiveQuery(query);
+                    updateTable();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -229,21 +234,14 @@ public class SapQueriesController implements IUpdateTable {
     }
 
     /**
-     * Opens the edit dialog with the selected item.
-     */
-    public void editAction() {
-        if (queriesTable.getSelectionModel().getSelectedItem() != null) {
-            openQuery(queriesTable.getSelectionModel().getSelectedItem());
-        }
-    }
-
-    /**
      * Archives all selected items.
      */
     public void archiveAction() throws Exception {
-        if (queriesTable.getSelectionModel().getSelectedItems() != null && queriesTable.getSelectionModel().getSelectedItems().size() != 0) {
+        List<CriticalAccessQuery> selectedItems = queriesTable.getSelectionModel().getSelectedItems();
+
+        if (selectedItems != null && !selectedItems.isEmpty()) {
             CustomAlert customAlert;
-            if (queriesTable.getSelectionModel().getSelectedItems().size() == 1) {
+            if (selectedItems.size() == 1) {
                 customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("archiveConfirmTitle"),
                     bundle.getString("archiveConfirmMessage"), "Ok", "Cancel");
             } else {
@@ -252,12 +250,14 @@ public class SapQueriesController implements IUpdateTable {
             }
 
             if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+
                 // archive all selected items
-                for (CriticalAccessQuery query : queriesTable.getSelectionModel().getSelectedItems()) {
+                for (CriticalAccessQuery query : selectedItems) {
                     archiveQuery(query);
                 }
+
+                updateTable();
             }
-            updateTable();
         }
     }
 
@@ -277,13 +277,11 @@ public class SapQueriesController implements IUpdateTable {
         }
     }
 
-    private void archiveQuery(CriticalAccessQuery query) throws Exception {
+    private void archiveQuery(CriticalAccessQuery query) {
         if (query != null) {
 
             query.setArchived(true);
             AppComponents.getInstance().getDbContext().updateRecord(query);
-
-            updateTable();
         }
     }
 }

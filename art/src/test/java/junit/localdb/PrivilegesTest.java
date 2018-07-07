@@ -38,8 +38,6 @@ public class PrivilegesTest {
     @Test
     public void testPrivileges() {
 
-        // TODO: Check if privileges should be as they are, since they probably aren't
-
         // ============================================
         //                 C R E A T E
         // ============================================

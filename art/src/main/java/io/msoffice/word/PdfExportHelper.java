@@ -2,11 +2,10 @@ package io.msoffice.word;
 
 import data.entities.CriticalAccessQuery;
 
-import io.msoffice.ReportExportType;
-
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.poi.xwpf.converter.pdf.PdfConverter;
@@ -34,7 +33,6 @@ public class PdfExportHelper extends ReportExportHelperBase {
             try (FileOutputStream out = new FileOutputStream(file)) {
 
                 // write document as pdf
-                // TODO: check if this also works on linux
                 PdfOptions options = PdfOptions.create().fontEncoding("windows-1250");
                 PdfConverter.getInstance().convert(document, out, options);
             }

@@ -80,8 +80,12 @@ public class WhitelistFormController {
     private WhitelistsController whitelistsController;
     private ConfigsFormController configsFormController;
 
+    private boolean editable = true;
+
     /**
      * Automatically called by FXML loader, starts initialize Columns.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void initialize() {
 
@@ -116,7 +120,9 @@ public class WhitelistFormController {
     }
 
     /**
-     * Initializes delete and edit Column with Buttons.
+     * Initializes delete Column with Buttons.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     private void initializeTableColumns() {
         deleteWhitelistEntryColumn.setCellFactory(ButtonCell.forTableColumn(MaterialDesignIcon.DELETE, (WhitelistEntry whitelistEntry) -> {
@@ -131,8 +137,10 @@ public class WhitelistFormController {
 
     /**
      * Is called if an Whitelist edit is started by the WhitelistController class.
+     * if whitelist is null
      *
      * @param whitelist the whitelist that is loaded to edit dialog.
+     * @author Franz Schulze/Merlin Albes
      */
     public void giveSelectedWhitelist(Whitelist whitelist) {
 
@@ -154,9 +162,10 @@ public class WhitelistFormController {
 
 
     /**
-     * Loads use case and username from the selected entry to the textfield.
+     * Loads use case and username from the selected entry to the textfields.
      *
      * @param whitelistEntry is the by call given whitelist entry.
+     * @author Franz Schulze/Merlin Albes
      */
     private void editWhitelistEntry(WhitelistEntry whitelistEntry) {
         if (whitelistEntry != null) {
@@ -173,6 +182,8 @@ public class WhitelistFormController {
 
     /**
      * Creates a new Whitelist Entry.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void addWhitelistEntry() {
         WhitelistEntry entry = new WhitelistEntry(tfUsecaseId.getText(), tfUserName.getText());
@@ -186,7 +197,9 @@ public class WhitelistFormController {
     }
 
     /**
-     * Creates a new Whitelist Entry.
+     * Creates a copy of a selected Whitelist entry .
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void copyWhitelistEntry() {
         if (whitelistEditTable.getSelectionModel().getSelectedItem() != null) {
@@ -203,6 +216,8 @@ public class WhitelistFormController {
 
     /**
      * Applies the changes from the detail view to the table.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     @FXML
     public void applyChanges() {
@@ -226,39 +241,36 @@ public class WhitelistFormController {
     }
 
     /**
-     * Save edited Whitelist.
+     * Save changes in edited Whitelist.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     @FXML
     private void saveEditWhitelist() throws Exception {
         if (checkNameAndDescription()) {
-            if (!whitelist.isArchived()) {
 
-                if (!whitelistEditTable.getItems().isEmpty()) {
-                    whitelist.getEntries().addAll(whitelistEditTable.getItems().stream().filter(x -> x.getUsecaseId() != null).collect(Collectors.toList()));
-                    whitelist.setName(tfWhitelistName.getText());
-                    whitelist.setDescription(tfDescription.getText());
+            if (!whitelistEditTable.getItems().isEmpty()) {
+                whitelist.getEntries().addAll(whitelistEditTable.getItems().stream().filter(x -> x.getUsecaseId() != null).collect(Collectors.toList()));
+                whitelist.setName(tfWhitelistName.getText());
+                whitelist.setDescription(tfDescription.getText());
 
-                    // dialog was called from WhitelistsView
-                    if (whitelistsController != null) {
+                // dialog was called from WhitelistsView
+                if (whitelistsController != null) {
 
-                        if (whitelist.getId() == null) {
-                            whitelistDatabase.createWhitelist(whitelist);
-                            whitelistsController.updateTable();
-                        } else {
-                            whitelistDatabase.updateWhitelist(whitelist);
-                            whitelistsController.updateTable();
-                        }
-                    } else if (configsFormController != null) { // dialog was called from ConfigsFormController
-                        configsFormController.setWhitelist(whitelist);
+                    if (whitelist.getId() == null) {
+                        whitelistDatabase.createWhitelist(whitelist);
+                        whitelistsController.updateTable();
+                    } else {
+                        whitelistDatabase.updateWhitelist(whitelist);
+                        whitelistsController.updateTable();
                     }
-
-                    ((Stage) whitelistEditTable.getScene().getWindow()).close();
-                } else {
-                    CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("whitelistEmptyAlertTitle"), bundle.getString("whitelistEmptyAlertMessage"), "Ok", "Ok");
-                    customAlert.showAndWait();
+                } else if (configsFormController != null) { // dialog was called from ConfigsFormController
+                    configsFormController.setWhitelist(whitelist);
                 }
+
+                ((Stage) whitelistEditTable.getScene().getWindow()).close();
             } else {
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("alreadyArchived"), "", "Ok", "Ok");
+                CustomAlert customAlert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("whitelistEmptyAlertTitle"), bundle.getString("whitelistEmptyAlertMessage"));
                 customAlert.showAndWait();
             }
         }
@@ -266,25 +278,23 @@ public class WhitelistFormController {
 
     /**
      * Cancels the edit process of a whitelist.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     @FXML
     private void cancelEditWhitelist() {
-        if (!whitelist.equals(whitelistOld)) {
-            //whitelist.getEntries().containsAll(whitelistOld.getEntries()) && whitelist.getDescription()
 
-            // check if dialog is in edit mode
-            if (applyButton.isVisible()) {
-                CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"), bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
-                if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
-                    ((Stage) whitelistEditTable.getScene().getWindow()).close();
-                    try {
-                        whitelistsController.updateTable();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            } else {
+        // check if dialog is in edit mode
+        if (applyButton.isVisible()) {
+            CustomAlert customAlert = new CustomAlert(Alert.AlertType.CONFIRMATION, bundle.getString("cancelWithoutSavingTitle"),
+                bundle.getString("cancelWithoutSavingMessage"), "Ok", "Cancel");
+            if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                 ((Stage) whitelistEditTable.getScene().getWindow()).close();
+                try {
+                    whitelistsController.updateTable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             ((Stage) whitelistEditTable.getScene().getWindow()).close();
@@ -293,25 +303,27 @@ public class WhitelistFormController {
 
     /**
      * Initializes all validation of text fields.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     private void initializeValidation() {
         tfUserName.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 tfUserName.validate();
             }
         });
         tfUsecaseId.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 tfUsecaseId.validate();
             }
         });
         tfDescription.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 tfDescription.validate();
             }
         });
         tfWhitelistName.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
+            if (!newVal && editable) {
                 tfWhitelistName.validate();
             }
         });
@@ -321,6 +333,7 @@ public class WhitelistFormController {
      * Sets the parent controller.
      *
      * @param whitelistsController the parent controller
+     * @author Franz Schulze/Merlin Albes
      */
     public void setWhitelistsController(WhitelistsController whitelistsController) {
         this.whitelistsController = whitelistsController;
@@ -335,6 +348,7 @@ public class WhitelistFormController {
      * Checks if Whitelist name and whitelist Description is empty.
      *
      * @return true if name or description is empty.
+     * @author Franz Schulze/Merlin Albes
      */
     private boolean checkNameAndDescription() {
         return tfDescription.validate() && tfWhitelistName.validate();
@@ -342,8 +356,12 @@ public class WhitelistFormController {
 
     /**
      * Sets the editable attribute of all textfields and visibility of saveButton.
+     *
+     * @author Franz Schulze/Merlin Albes
      */
     public void setEditable(boolean editable) {
+        this.editable = editable;
+
         if (!editable) {
             tfWhitelistName.setEditable(false);
             tfDescription.setEditable(false);

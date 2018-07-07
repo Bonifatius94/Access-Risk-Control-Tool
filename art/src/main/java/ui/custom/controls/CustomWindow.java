@@ -10,6 +10,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,17 +21,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import ui.AppComponents;
 
 /*
  * sources:
  * ========
  * dragging undecorated JavaFX window: https://stackoverflow.com/questions/18173956/how-to-drag-undecorated-window
  */
-
-// TODO: add support for a custom app icon at the left
 
 /**
  * <p>
@@ -73,6 +74,10 @@ public class CustomWindow extends VBox {
 
     private double horizontalOffset = 0;
     private double verticalOffset = 0;
+
+    private boolean snapped;
+    private double oldHeight;
+    private double oldWidth;
 
     /**
      * CanResize: Everything is working. Resizing is fully allowed.
@@ -148,13 +153,13 @@ public class CustomWindow extends VBox {
         // init application icon
         Image img = new Image(getClass().getResourceAsStream("/icons/art_64.png"));
         ImageView icon = new ImageView(img);
-        icon.setFitWidth(20);
-        icon.setFitHeight(20);
+        icon.setFitWidth(25);
+        icon.setFitHeight(25);
 
         // init label for headline
         lblHeadline = new Label();
-        lblHeadline.getStyleClass().addAll("windowLabel");
-        lblHeadline.setPadding(new Insets(2, 0, 0, 4));
+        lblHeadline.getStyleClass().addAll("window-label");
+        lblHeadline.setPadding(new Insets(2, 0, 0, 6));
 
         // init region filler to render headline bound to the left and buttons bound to the right
         final Region regFiller = new Region();
@@ -163,26 +168,27 @@ public class CustomWindow extends VBox {
         // init minimize button
         btnMinimize = new JFXButton(null, new MaterialDesignIconView(MaterialDesignIcon.WINDOW_MINIMIZE));
         btnMinimize.setMnemonicParsing(false);
-        btnMinimize.getStyleClass().addAll("windowButton");
+        btnMinimize.getStyleClass().addAll("window-button");
         btnMinimize.setPrefWidth(20);
         btnMinimize.setFocusTraversable(false);
 
         // init maximize button
         btnMaximize = new JFXButton(null, new MaterialDesignIconView(MaterialDesignIcon.WINDOW_MAXIMIZE));
         btnMaximize.setMnemonicParsing(false);
-        btnMaximize.getStyleClass().addAll("windowButton");
+        btnMaximize.getStyleClass().addAll("window-button");
         btnMaximize.setPrefWidth(20);
         btnMaximize.setFocusTraversable(false);
 
         // init close button
         btnClose = new JFXButton(null, new MaterialDesignIconView(MaterialDesignIcon.CLOSE));
         btnClose.setMnemonicParsing(false);
-        btnClose.getStyleClass().addAll("windowButton", "closeWindowButton");
+        btnClose.getStyleClass().addAll("window-button", "close-window-button");
         btnClose.setPrefWidth(20);
         btnClose.setFocusTraversable(false);
 
         // init container with horizontal orientation and apply children to it
         hbHeaderContainer = new HBox();
+        hbHeaderContainer.setAlignment(Pos.CENTER_LEFT);
         hbHeaderContainer.getChildren().addAll(icon, lblHeadline, regFiller, btnMinimize, btnMaximize, btnClose);
     }
 
@@ -229,9 +235,8 @@ public class CustomWindow extends VBox {
             @Override
             public void handle(ActionEvent event) {
 
-                // maximize / resize the current stage
-                stage.setMaximized(!stage.isMaximized());
-                updateMaximizeButton(stage);
+                handleMaximization();
+
             }
         });
 
@@ -248,9 +253,12 @@ public class CustomWindow extends VBox {
             @Override
             public void handle(MouseEvent event) {
 
-                // manage horizontal / vertical offset while dragging
-                horizontalOffset = stage.getX() - event.getScreenX();
-                verticalOffset = stage.getY() - event.getScreenY();
+                if (!snapped) {
+
+                    // manage horizontal / vertical offset while dragging
+                    horizontalOffset = stage.getX() - event.getScreenX();
+                    verticalOffset = stage.getY() - event.getScreenY();
+                }
             }
         });
 
@@ -258,9 +266,74 @@ public class CustomWindow extends VBox {
             @Override
             public void handle(MouseEvent event) {
 
-                // apply the new location (offset)
-                stage.setX(event.getScreenX() + horizontalOffset);
-                stage.setY(event.getScreenY() + verticalOffset);
+                // take care of window snapping
+                if (getWindowState() != WindowState.NoResize) {
+                    for (Screen screen : Screen.getScreens()) {
+                        Rectangle2D screenBounds = screen.getVisualBounds();
+
+                        if (screenBounds.contains(new Point2D(event.getScreenX(), event.getScreenY()))) {
+
+                            if (event.getScreenX() < screenBounds.getMinX() + 5) {
+
+                                // snap to left
+                                stage.setX(screenBounds.getMinX());
+                                stage.setY(screenBounds.getMinY());
+                                stage.setWidth(screenBounds.getWidth() / 2);
+                                stage.setHeight(screenBounds.getHeight());
+
+                                snapped = true;
+                            } else if (event.getScreenX() > screenBounds.getMaxX() - 5 && event.getScreenX() <= screenBounds.getMaxX()) {
+
+                                // snap to right
+                                stage.setX(screenBounds.getMinX() + screenBounds.getWidth() / 2);
+                                stage.setY(screenBounds.getMinY());
+                                stage.setWidth(screenBounds.getWidth() / 2);
+                                stage.setHeight(screenBounds.getHeight());
+
+                                snapped = true;
+                            } else if (event.getScreenY() < 5) {
+
+                                // snap to top
+                                stage.setX(screenBounds.getMinX());
+                                stage.setY(screenBounds.getMinY());
+                                stage.setWidth(screenBounds.getWidth());
+                                stage.setHeight(screenBounds.getHeight());
+
+                                // maximize the stage
+                                stage.setMaximized(true);
+                                updateMaximizeButton(stage);
+
+                                snapped = true;
+                            } else {
+                                if (snapped) {
+                                    stage.setWidth(oldWidth);
+                                    stage.setHeight(oldHeight);
+
+                                    horizontalOffset = -(oldWidth / 2);
+                                    verticalOffset = -5;
+
+                                    // revert stage maximize
+                                    stage.setMaximized(false);
+                                    updateMaximizeButton(stage);
+
+                                    snapped = false;
+                                } else {
+                                    oldWidth = stage.getWidth();
+                                    oldHeight = stage.getHeight();
+
+                                    // apply the new location (offset)
+                                    stage.setX(event.getScreenX() + horizontalOffset);
+                                    stage.setY(event.getScreenY() + verticalOffset);
+                                }
+                            }
+                        }
+                    }
+                } else {
+
+                    // apply the new location (offset)
+                    stage.setX(event.getScreenX() + horizontalOffset);
+                    stage.setY(event.getScreenY() + verticalOffset);
+                }
             }
         });
 
@@ -269,11 +342,47 @@ public class CustomWindow extends VBox {
             public void handle(MouseEvent event) {
 
                 if (getWindowState() == WindowState.CanResize && event.getClickCount() == 2) {
-                    stage.setMaximized(!stage.isMaximized());
-                    updateMaximizeButton(stage);
+
+                    handleMaximization();
+
                 }
             }
         });
+    }
+
+    /**
+     * Handles the maximization including stage resizing after maximizing.
+     */
+    private void handleMaximization() {
+
+        if (stage.isMaximized()) {
+            snapped = false;
+            stage.setWidth(oldWidth);
+            stage.setHeight(oldHeight);
+
+            stage.setMaximized(false);
+        } else {
+            oldWidth = stage.getWidth();
+            oldHeight = stage.getHeight();
+
+            stage.setMaximized(true);
+            correctStageSize();
+        }
+
+        updateMaximizeButton(stage);
+    }
+
+    /**
+     * Corrects the stage size to exclude the TaskBar.
+     */
+    private void correctStageSize() {
+        for (Screen screen : Screen.getScreens()) {
+            Rectangle2D screenBounds = screen.getVisualBounds();
+
+            if (screenBounds.contains(new Point2D(stage.getX(), stage.getY()))) {
+                stage.setHeight(screenBounds.getMaxY());
+            }
+        }
     }
 
     private void updateMaximizeButton(Stage stage) {

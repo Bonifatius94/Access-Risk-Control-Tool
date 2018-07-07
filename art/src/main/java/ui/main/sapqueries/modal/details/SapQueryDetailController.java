@@ -15,18 +15,14 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
-import ui.App;
+import javafx.stage.Modality;
 import ui.AppComponents;
-import ui.custom.controls.CustomWindow;
 import ui.main.sapqueries.SapQueriesController;
-import ui.main.sapqueries.modal.newquery.AnalysisResultController;
 import ui.main.sapqueries.modal.newquery.NewSapQueryController;
+import ui.main.sapqueries.modal.results.AnalysisResultController;
 import ui.main.sapsettings.modal.SapSettingsFormController;
 
 
@@ -63,7 +59,6 @@ public class SapQueryDetailController {
 
     @FXML
     public void initialize() {
-
     }
 
     /**
@@ -114,7 +109,7 @@ public class SapQueryDetailController {
      */
     public void openResultDetails() throws Exception {
 
-        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/AnalysisResultView.fxml", "analysisResultTitle");
+        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/results/AnalysisResultView.fxml", "analysisResultTitle", Modality.NONE);
 
         AnalysisResultController resultController = loader.getController();
         resultController.giveResultQuery(query);
@@ -146,6 +141,10 @@ public class SapQueryDetailController {
             NewSapQueryController newQuery = loader.getController();
             newQuery.giveQuery(query);
             newQuery.setParentController(parentController);
+
+            newQuery.setRerun(true);
+            newQuery.setInputsDisable(true);
+            newQuery.openLoginDialog();
         } catch (Exception e) {
             e.printStackTrace();
         }
