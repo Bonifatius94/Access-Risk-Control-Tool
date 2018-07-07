@@ -33,8 +33,8 @@ public class CsvExportHelper implements IReportExportHelper {
             char separator = language.equals(Locale.GERMAN) ? ';' : ',';
 
             String[] headers = language.equals(Locale.GERMAN)
-                ? new String[] {"Verletztes Pattern", "Kritischer Benutzer", "Beschreibung", "Query Id: " + criticalAccessQuery.getId()}
-                : new String[] {"Violated Pattern", "Critical Username", "Description", "Query Id: " + criticalAccessQuery.getId()};
+                ? new String[] {"Verletztes Pattern", "Kritischer Benutzer", "Beschreibung", "Author: " + criticalAccessQuery.getCreatedBy(), "Erstellt am: " + criticalAccessQuery.getCreatedAt()}
+                : new String[] {"Violated Pattern", "Critical Username", "Description", "Author: " + criticalAccessQuery.getCreatedBy(), "Created at: " + criticalAccessQuery.getCreatedAt()};
 
             CSVFormat format = CSVFormat.DEFAULT.withDelimiter(separator).withHeader(headers);
 
