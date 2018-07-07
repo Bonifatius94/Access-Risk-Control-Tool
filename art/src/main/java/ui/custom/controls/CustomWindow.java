@@ -24,9 +24,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import ui.AppComponents;
-
-import java.util.List;
 
 /*
  * sources:
@@ -240,13 +237,8 @@ public class CustomWindow extends VBox {
             @Override
             public void handle(ActionEvent event) {
 
-                // maximize / resize the current stage
-                stage.setMaximized(!stage.isMaximized());
-                updateMaximizeButton(stage);
+                handleMaximization();
 
-                if (!stage.isMaximized()) {
-                    snapped = false;
-                }
             }
         });
 
@@ -276,11 +268,9 @@ public class CustomWindow extends VBox {
             @Override
             public void handle(MouseEvent event) {
 
-                List<Screen> screens = Screen.getScreens();
-
-
+                // take care of window snapping
                 if (getWindowState() != WindowState.NoResize) {
-                    for (Screen screen : screens) {
+                    for (Screen screen : Screen.getScreens()) {
                         Rectangle2D screenBounds = screen.getVisualBounds();
 
                         if (screenBounds.contains(new Point2D(event.getScreenX(), event.getScreenY()))) {
@@ -354,15 +344,47 @@ public class CustomWindow extends VBox {
             public void handle(MouseEvent event) {
 
                 if (getWindowState() == WindowState.CanResize && event.getClickCount() == 2) {
-                    stage.setMaximized(!stage.isMaximized());
-                    updateMaximizeButton(stage);
 
-                    if (!stage.isMaximized()) {
-                        snapped = false;
-                    }
+                    handleMaximization();
+
                 }
             }
         });
+    }
+
+    /**
+     * Handles the maximization including stage resizing after maximizing.
+     */
+    private void handleMaximization() {
+
+        if (stage.isMaximized()) {
+            snapped = false;
+            stage.setWidth(oldWidth);
+            stage.setHeight(oldHeight);
+
+            stage.setMaximized(false);
+        } else {
+            oldWidth = stage.getWidth();
+            oldHeight = stage.getHeight();
+
+            stage.setMaximized(true);
+            correctStageSize();
+        }
+
+        updateMaximizeButton(stage);
+    }
+
+    /**
+     * Corrects the stage size to exclude the TaskBar.
+     */
+    private void correctStageSize() {
+        for (Screen screen : Screen.getScreens()) {
+            Rectangle2D screenBounds = screen.getVisualBounds();
+
+            if (screenBounds.contains(new Point2D(stage.getX(), stage.getY()))) {
+                stage.setHeight(screenBounds.getMaxY());
+            }
+        }
     }
 
     private void updateMaximizeButton(Stage stage) {
