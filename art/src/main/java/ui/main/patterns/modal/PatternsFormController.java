@@ -198,10 +198,14 @@ public class PatternsFormController {
                 if (oldValue != null && oldValue != ConditionLinkage.None) {
                     conditionTabs.getTabs().clear();
                     this.conditionTables.clear();
-                    List<AccessCondition> newConds = new ArrayList<>();
-                    newConds.add(this.accessPattern.getConditions().stream().filter(x -> x.getPatternCondition() != null).findFirst().get());
 
-                    accessPattern.setConditions(newConds);
+                    if (this.accessPattern.getConditions().stream().anyMatch(x -> x.getPatternCondition() != null)) {
+
+                        List<AccessCondition> newConds = new ArrayList<>();
+                        newConds.add(this.accessPattern.getConditions().stream().filter(x -> x.getPatternCondition() != null).findFirst().get());
+
+                        accessPattern.setConditions(newConds);
+                    }
 
                     if (accessPattern.getConditions().size() != 0 && accessPattern.getConditions().stream().findFirst().get().getProfileCondition() == null) {
                         addConditionTableTab(accessPattern.getConditions().stream().sorted(Comparator.comparing(AccessCondition::getId)).findFirst().get());
@@ -264,9 +268,11 @@ public class PatternsFormController {
                     this.linkageInput.getSelectionModel().select(ConditionLinkage.None);
                 } else if (newValue.equals(bundle.getString("profile"))) {
                     profileInput.setVisible(true);
-                    conditionTabs.getTabs().clear();
-                    this.conditionTables.clear();
-                    addEmptyConditionTableTab();
+                    if (oldValue != null) {
+                        conditionTabs.getTabs().clear();
+                        this.conditionTables.clear();
+                        addEmptyConditionTableTab();
+                    }
                 } else {
                     profileInput.setVisible(true);
                     conditionBox.setVisible(true);
@@ -443,7 +449,9 @@ public class PatternsFormController {
         this.conditionTables.remove(temp);
 
         if (temp.getAccessCondition() != null) {
-            accessPattern.getConditions().remove(this.accessPattern.getConditions().stream().filter(x -> x.getId().equals(temp.getAccessCondition().getId())).findFirst().get());
+            if (this.accessPattern.getConditions().stream().anyMatch(x -> x.getId().equals(temp.getAccessCondition().getId()))) {
+                accessPattern.getConditions().remove(this.accessPattern.getConditions().stream().filter(x -> x.getId().equals(temp.getAccessCondition().getId())).findFirst().get());
+            }
         }
 
         // remove the tab from the conditionTabs
