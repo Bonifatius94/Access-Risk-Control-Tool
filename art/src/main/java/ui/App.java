@@ -166,5 +166,8 @@ public class App extends Application {
 
         // close database
         AppComponents.getInstance().getDbContext().close();
+
+        // close all windows
+        System.exit(0);
     }
 }
