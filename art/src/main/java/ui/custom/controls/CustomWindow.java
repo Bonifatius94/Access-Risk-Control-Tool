@@ -10,7 +10,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,9 +21,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import ui.AppComponents;
+
+import java.util.List;
 
 /*
  * sources:
@@ -74,6 +79,10 @@ public class CustomWindow extends VBox {
 
     private double horizontalOffset = 0;
     private double verticalOffset = 0;
+
+    private boolean snapped;
+    private double oldHeight;
+    private double oldWidth;
 
     /**
      * CanResize: Everything is working. Resizing is fully allowed.
@@ -234,6 +243,10 @@ public class CustomWindow extends VBox {
                 // maximize / resize the current stage
                 stage.setMaximized(!stage.isMaximized());
                 updateMaximizeButton(stage);
+
+                if (!stage.isMaximized()) {
+                    snapped = false;
+                }
             }
         });
 
@@ -250,9 +263,12 @@ public class CustomWindow extends VBox {
             @Override
             public void handle(MouseEvent event) {
 
-                // manage horizontal / vertical offset while dragging
-                horizontalOffset = stage.getX() - event.getScreenX();
-                verticalOffset = stage.getY() - event.getScreenY();
+                if (!snapped) {
+
+                    // manage horizontal / vertical offset while dragging
+                    horizontalOffset = stage.getX() - event.getScreenX();
+                    verticalOffset = stage.getY() - event.getScreenY();
+                }
             }
         });
 
@@ -260,9 +276,76 @@ public class CustomWindow extends VBox {
             @Override
             public void handle(MouseEvent event) {
 
-                // apply the new location (offset)
-                stage.setX(event.getScreenX() + horizontalOffset);
-                stage.setY(event.getScreenY() + verticalOffset);
+                List<Screen> screens = Screen.getScreens();
+
+
+                if (getWindowState() != WindowState.NoResize) {
+                    for (Screen screen : screens) {
+                        Rectangle2D screenBounds = screen.getVisualBounds();
+
+                        if (screenBounds.contains(new Point2D(event.getScreenX(), event.getScreenY()))) {
+
+                            if (event.getScreenX() < screenBounds.getMinX() + 5) {
+
+                                // snap to left
+                                stage.setX(screenBounds.getMinX());
+                                stage.setY(screenBounds.getMinY());
+                                stage.setWidth(screenBounds.getWidth() / 2);
+                                stage.setHeight(screenBounds.getHeight());
+
+                                snapped = true;
+                            } else if (event.getScreenX() > screenBounds.getMaxX() - 5 && event.getScreenX() <= screenBounds.getMaxX()) {
+
+                                // snap to right
+                                stage.setX(screenBounds.getMinX() + screenBounds.getWidth() / 2);
+                                stage.setY(screenBounds.getMinY());
+                                stage.setWidth(screenBounds.getWidth() / 2);
+                                stage.setHeight(screenBounds.getHeight());
+
+                                snapped = true;
+                            } else if (event.getScreenY() < 5) {
+
+                                // snap to top
+                                stage.setX(screenBounds.getMinX());
+                                stage.setY(screenBounds.getMinY());
+                                stage.setWidth(screenBounds.getWidth());
+                                stage.setHeight(screenBounds.getHeight());
+
+                                // maximize the stage
+                                stage.setMaximized(true);
+                                updateMaximizeButton(stage);
+
+                                snapped = true;
+                            } else {
+                                if (snapped) {
+                                    stage.setWidth(oldWidth);
+                                    stage.setHeight(oldHeight);
+
+                                    horizontalOffset = -(oldWidth / 2);
+                                    verticalOffset = -5;
+
+                                    // revert stage maximize
+                                    stage.setMaximized(false);
+                                    updateMaximizeButton(stage);
+
+                                    snapped = false;
+                                } else {
+                                    oldWidth = stage.getWidth();
+                                    oldHeight = stage.getHeight();
+
+                                    // apply the new location (offset)
+                                    stage.setX(event.getScreenX() + horizontalOffset);
+                                    stage.setY(event.getScreenY() + verticalOffset);
+                                }
+                            }
+                        }
+                    }
+                } else {
+
+                    // apply the new location (offset)
+                    stage.setX(event.getScreenX() + horizontalOffset);
+                    stage.setY(event.getScreenY() + verticalOffset);
+                }
             }
         });
 
@@ -273,6 +356,10 @@ public class CustomWindow extends VBox {
                 if (getWindowState() == WindowState.CanResize && event.getClickCount() == 2) {
                     stage.setMaximized(!stage.isMaximized());
                     updateMaximizeButton(stage);
+
+                    if (!stage.isMaximized()) {
+                        snapped = false;
+                    }
                 }
             }
         });
