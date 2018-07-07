@@ -4,14 +4,18 @@ import extensions.ResourceBundleHelper;
 
 import java.util.ResourceBundle;
 
+import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
 import javafx.scene.control.Label;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import settings.UserSettingsHelper;
+import ui.App;
 
 public class CustomAlert extends Alert {
 
@@ -111,10 +115,16 @@ public class CustomAlert extends Alert {
         getDialogPane().getStylesheets().add("/css/main.css");
         getDialogPane().getStylesheets().add("/css/custom-dialog.css");
 
+        Stage stage = (Stage) getDialogPane().getScene().getWindow();
+
+        stage.setOnShown((event -> {
+            updatePosition(stage);
+        }));
+
         // add custom window as header
         window = new CustomWindow();
         window.setWindowState(CustomWindow.WindowState.NoButtons);
-        window.initStage((Stage) getDialogPane().getScene().getWindow());
+        window.initStage(stage);
 
         // set window title
         window.setTitle(this.title);
@@ -126,6 +136,21 @@ public class CustomAlert extends Alert {
 
         // initialize the buttons
         initButtons();
+    }
+
+    /**
+     * Sets the correct position for the stage (center of owner).
+     */
+    private void updatePosition(Stage stage) {
+        for (Screen screen : Screen.getScreens()) {
+            Rectangle2D screenBounds = screen.getVisualBounds();
+
+            if (screenBounds.contains(new Point2D(App.primaryStage.getX(), App.primaryStage.getY()))) {
+                stage.setX(App.primaryStage.getX() + (App.primaryStage.getWidth() / 2) - (stage.getWidth() / 2));
+                stage.setY(App.primaryStage.getY() + (App.primaryStage.getHeight() / 2) - (stage.getHeight() / 2));
+            }
+
+        }
     }
 
     /**
