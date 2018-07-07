@@ -9,6 +9,7 @@ import extensions.ResourceBundleHelper;
 
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,7 +19,6 @@ import javafx.scene.control.Button;
 import ui.App;
 import ui.AppComponents;
 import ui.custom.controls.CustomAlert;
-
 
 
 public class FirstLoginController {
@@ -56,6 +56,13 @@ public class FirstLoginController {
         confirmPasswordInputPlain.managedProperty().bind(confirmPasswordInputPlain.visibleProperty());
         confirmPasswordInputPlain.visibleProperty().bind(Bindings.not(confirmPasswordInput.visibleProperty()));
         confirmPasswordInput.textProperty().bindBidirectional(confirmPasswordInputPlain.textProperty());
+
+        Platform.runLater(() ->
+            passwordInput.getScene().getWindow().setOnHiding((e -> {
+                // close the database
+                AppComponents.getInstance().getDbContext().close();
+            }))
+        );
 
         initializeValidation();
     }
@@ -127,7 +134,7 @@ public class FirstLoginController {
         try {
 
             AppComponents.getInstance()
-                .showScene("ui/main/MainView.fxml","art", App.primaryStage, null, null, 1050, 720);
+                .showScene("ui/main/MainView.fxml", "art", App.primaryStage, null, null, 1050, 720);
 
             close(event);
         } catch (Exception e) {

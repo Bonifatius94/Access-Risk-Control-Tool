@@ -218,6 +218,10 @@ public class AdminController implements IUpdateTable {
                     // delete the user
                     if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                         database.deleteDatabaseUser(user.getUsername());
+
+                        tfDbUserPassword.clear();
+                        tfDbUserName.clear();
+                        
                         updateTable();
                     }
                 }
@@ -358,8 +362,8 @@ public class AdminController implements IUpdateTable {
 
         // enable user table
         newUserMode.setValue(false);
-        tfDbUserPassword.setText("");
-        tfDbUserName.setText("");
+        tfDbUserPassword.clear();
+        tfDbUserName.clear();
         initializeCheckboxes();
 
         this.copiedToClipboard = false;
@@ -457,9 +461,9 @@ public class AdminController implements IUpdateTable {
         newUserMode.setValue(false);
 
         // reset all inputs
-        tfDbUserName.setText("");
+        tfDbUserName.clear();
         tfDbUserName.resetValidation();
-        tfDbUserPassword.setText("");
+        tfDbUserPassword.clear();
         tfDbUserPassword.resetValidation();
         initializeCheckboxes();
 

@@ -9,6 +9,7 @@ import data.entities.DbUser;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -82,6 +83,13 @@ public class FirstUseWizardController {
             change.setText(change.getText().toUpperCase());
             return change;
         }));
+
+        Platform.runLater(() ->
+            finishBox.getScene().getWindow().setOnHiding((e -> {
+                // close the database
+                AppComponents.getInstance().getDbContext().close();
+            }))
+        );
 
         initializeValidation();
     }
