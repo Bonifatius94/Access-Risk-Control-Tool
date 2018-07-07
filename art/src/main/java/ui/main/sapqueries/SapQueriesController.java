@@ -33,6 +33,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
+import javafx.stage.Modality;
 import ui.AppComponents;
 import ui.IUpdateTable;
 import ui.custom.controls.ButtonCell;
@@ -221,7 +222,7 @@ public class SapQueriesController implements IUpdateTable {
     private void openQuery(CriticalAccessQuery query) {
         try {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/details/SapQueryDetailView.fxml", "queryDetails");
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/details/SapQueryDetailView.fxml", "queryDetails", Modality.NONE);
 
             // give the dialog the query
             SapQueryDetailController queryDetail = loader.getController();

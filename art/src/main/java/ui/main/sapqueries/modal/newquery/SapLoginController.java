@@ -100,6 +100,7 @@ public class SapLoginController {
      * @param event the given ActionEvent
      */
     public void close(ActionEvent event) {
+        parentController.setInputsDisable(false);
         (((Button) event.getSource()).getScene().getWindow()).hide();
     }
 

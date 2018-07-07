@@ -12,8 +12,8 @@
 <?import com.jfoenix.controls.JFXComboBox?>
 <HBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="ui.main.sapqueries.modal.results.views.AnalysisGraphsController" spacing="20">
-    <BarChart fx:id="barChart" HBox.hgrow="ALWAYS">
+      fx:controller="ui.main.sapqueries.modal.results.views.AnalysisGraphsController" VBox.vgrow="ALWAYS" spacing="20">
+    <BarChart fx:id="barChart" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
         <xAxis>
             <CategoryAxis fx:id="chartX"/>
         </xAxis>
@@ -21,7 +21,7 @@
             <NumberAxis fx:id="chartY"/>
         </yAxis>
     </BarChart>
-    <VBox alignment="BOTTOM_CENTER" minWidth="150" style="-fx-padding: 0 0 10 0">
+    <VBox alignment="BOTTOM_CENTER" minWidth="150" style="-fx-padding: 0 0 10 0" VBox.vgrow="ALWAYS">
         <VBox spacing="10">
             <Label text="%xAxis" style="-fx-font-size: 1.1em"/>
             <JFXComboBox fx:id="chartDataChooser"/>

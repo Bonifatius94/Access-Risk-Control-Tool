@@ -73,8 +73,17 @@ public class NewSapQueryController {
     @FXML
     private Label connectionLabel;
 
+    @FXML
+    private JFXButton chooseSapSettingsButton;
+
+    @FXML
+    private JFXButton chooseConfigButton;
+
+
     private ResourceBundle bundle;
     private SapQueriesController parentController;
+
+    private boolean rerun = false;
 
     public static SimpleIntegerProperty analysisRunning = new SimpleIntegerProperty(0);
 
@@ -179,6 +188,9 @@ public class NewSapQueryController {
 
                 FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/newquery/SapLoginView.fxml", "sapLogin");
 
+                // disable all inputs
+                setInputsDisable(true);
+
                 SapLoginController loginController = loader.getController();
                 loginController.setParentController(this);
                 loginController.giveSapConfig(sapSettingsChooser.getValue());
@@ -265,6 +277,9 @@ public class NewSapQueryController {
                     // increase the counter by one
                     Platform.runLater(() -> analysisRunning.setValue(analysisRunning.getValue() + 1));
 
+                    // dont allow inputs
+                    setInputsDisable(true);
+
                     return connector.runAnalysis(query.getConfig());
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -282,10 +297,7 @@ public class NewSapQueryController {
 
                     parentController.updateTable();
 
-                    Stage stage = new Stage();
-                    FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/results/AnalysisResultView.fxml", "analysisResultTitle",
-                        stage, App.primaryStage, Modality.WINDOW_MODAL);
-                    stage.toFront();
+                    FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/results/AnalysisResultView.fxml", "analysisResultTitle",  Modality.NONE);
 
                     AnalysisResultController resultController = loader.getController();
                     resultController.giveResultQuery(runQueryTask.getValue());
@@ -399,5 +411,22 @@ public class NewSapQueryController {
 
     public void setParentController(SapQueriesController controller) {
         this.parentController = controller;
+    }
+
+    /**
+     * Disables all inputs according to the given boolean and rerun.
+     */
+    public void setInputsDisable(boolean disabled) {
+        configChooser.setDisable(disabled || rerun);
+        sapSettingsChooser.setDisable(disabled || rerun);
+
+        chooseConfigButton.setDisable(disabled || rerun);
+        chooseSapSettingsButton.setDisable(disabled || rerun);
+
+        runAnalysisButton.setDisable(disabled);
+    }
+
+    public void setRerun(boolean rerun) {
+        this.rerun = rerun;
     }
 }
