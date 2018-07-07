@@ -222,7 +222,7 @@ public class SapQueriesController implements IUpdateTable {
     private void openQuery(CriticalAccessQuery query) {
         try {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/details/SapQueryDetailView.fxml", "queryDetails", Modality.NONE);
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/details/SapQueryDetailView.fxml", "queryDetails");
 
             // give the dialog the query
             SapQueryDetailController queryDetail = loader.getController();

@@ -23,6 +23,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import ui.AppComponents;
 import ui.custom.controls.ButtonCell;
@@ -141,7 +143,9 @@ public class AnalysisTableController {
     public void viewAccessPatternDetails(AccessPattern accessPattern) {
         try {
 
-            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternsFormView.fxml", "patternDetails", 1200, 700);
+            Stage stage = new Stage();
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternsFormView.fxml", "patternDetails",
+                stage, (Stage) resultTable.getScene().getWindow(), Modality.WINDOW_MODAL, 1200, 700);
 
             // give the dialog the sapConfiguration
             PatternsFormController patternView = loader.getController();
