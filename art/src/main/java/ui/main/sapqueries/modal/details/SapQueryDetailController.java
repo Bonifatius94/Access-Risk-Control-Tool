@@ -19,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 import javafx.stage.Modality;
+import javafx.stage.Stage;
 import ui.AppComponents;
 import ui.main.sapqueries.SapQueriesController;
 import ui.main.sapqueries.modal.newquery.NewSapQueryController;
@@ -109,7 +110,7 @@ public class SapQueryDetailController {
      */
     public void openResultDetails() throws Exception {
 
-        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/results/AnalysisResultView.fxml", "analysisResultTitle", Modality.NONE);
+        FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/results/AnalysisResultView.fxml", "analysisResultTitle", new Stage(), null, Modality.NONE);
 
         AnalysisResultController resultController = loader.getController();
         resultController.giveResultQuery(query);

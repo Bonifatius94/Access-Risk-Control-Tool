@@ -55,7 +55,7 @@
                     </graphic>
                 </JFXButton>
             </HBox>
-            <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable" maxHeight="350" minWidth="800">
+            <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable" maxHeight="350" minWidth="700">
                 <columns>
                     <PTableColumn text="?" fx:id="conditionTypeColumn" percentageWidth="0.06" resizable="false">
                         <cellValueFactory>
@@ -86,7 +86,7 @@
         <HBox alignment="BASELINE_LEFT" spacing="40">
             <HBox alignment="BASELINE_LEFT" spacing="20">
                 <Label text="%whitelist"/>
-                <JFXComboBox fx:id="whitelistChooser" minWidth="250"/>
+                <JFXComboBox fx:id="whitelistChooser" minWidth="250" maxWidth="500"/>
                 <JFXButton onAction="#chooseWhitelist" styleClass="round-button" minHeight="30">
                     <tooltip>
                         <Tooltip text="%chooseWhitelist"/>
