@@ -98,6 +98,9 @@ public class SapQueriesController implements IUpdateTable {
                 }
             }
         });
+
+        // enable archived filter
+        filterController.enableArchivedFilter();
     }
 
     /**

@@ -119,6 +119,9 @@ public class WhitelistsController implements IUpdateTable {
                 }
             }
         });
+
+        // enable archived filter
+        filterController.enableArchivedFilter();
     }
 
     /**

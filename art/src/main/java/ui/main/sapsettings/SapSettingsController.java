@@ -112,6 +112,9 @@ public class SapSettingsController implements IUpdateTable {
         // show an item count (+ selected)
         itemCount.textProperty().bind(Bindings.concat(Bindings.size(sapConnectionTable.getSelectionModel().getSelectedItems()).asString("%s / "),
             numberOfItems.asString("%s " + bundle.getString("selected"))));
+
+        // enable archived filter
+        filterController.enableArchivedFilter();
     }
 
     /**

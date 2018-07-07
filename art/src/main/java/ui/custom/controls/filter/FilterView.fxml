@@ -14,7 +14,7 @@
     <JFXTextField fx:id="searchStringInput" promptText="%search" minWidth="150" maxWidth="250"/>
     <JFXDatePicker fx:id="startDatePicker" promptText="%startDate" maxWidth="130"/>
     <JFXDatePicker fx:id="endDatePicker" promptText="%endDate" maxWidth="130" />
-    <JFXToggleButton fx:id="showArchivedToggle" text="%showArchived" />
+    <JFXToggleButton fx:id="showArchivedToggle" text="%showArchived" visible="false"/>
     <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT" spacing="10">
         <JFXButton styleClass="round-button" onAction="#resetFilter" minHeight="30">
             <graphic>

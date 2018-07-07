@@ -98,6 +98,9 @@ public class PatternsController implements IUpdateTable {
                 }
             }
         });
+
+        // enable archived filter
+        filterController.enableArchivedFilter();
     }
 
     /**

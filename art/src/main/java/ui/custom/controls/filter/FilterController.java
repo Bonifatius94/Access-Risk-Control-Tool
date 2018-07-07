@@ -102,4 +102,11 @@ public class FilterController {
         shouldFilterProperty.setValue(false);
         shouldFilterProperty.bind(applyFilterButton.pressedProperty());
     }
+
+    /**
+     * Enables the archived filter.
+     */
+    public void enableArchivedFilter() {
+        showArchivedToggle.setVisible(true);
+    }
 }
