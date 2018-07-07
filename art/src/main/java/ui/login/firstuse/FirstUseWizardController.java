@@ -89,7 +89,7 @@ public class FirstUseWizardController {
         Platform.runLater(() ->
             finishBox.getScene().getWindow().setOnHiding((e -> {
                 // close the database
-                if (!normalFirstUse) {
+                if (!normalFirstUse && AppComponents.getInstance().getDbContext() != null) {
                     AppComponents.getInstance().getDbContext().close();
                 }
             }))
