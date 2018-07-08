@@ -134,7 +134,7 @@ Success
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
-error("The attempt to load the accesspattern failed")</panel_attributes>
+dialog("The attempt to load the accesspattern failed")</panel_attributes>
     <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
   </element>
   <element>
@@ -146,7 +146,7 @@ error("The attempt to load the accesspattern failed")</panel_attributes>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
-load accesspattern</panel_attributes>
+show accessPatternView with imported patterns</panel_attributes>
     <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
   </element>
   <element>

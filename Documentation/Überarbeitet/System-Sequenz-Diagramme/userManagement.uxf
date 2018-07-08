@@ -168,7 +168,7 @@ opt
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;
-error("Username allready exists")</panel_attributes>
+dialog("Username allready exists")</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
@@ -204,7 +204,7 @@ switch to createUserView</panel_attributes>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;
-create user(firstPassword), open dialog to warn to save firstPassword</panel_attributes>
+show new user(firstPassword), open dialog to warn to save firstPassword</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
@@ -288,7 +288,7 @@ Success
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;
-error("Attempt failed")</panel_attributes>
+dialog("Attempt failed")</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
@@ -374,7 +374,7 @@ cancel</panel_attributes>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;
-delete user</panel_attributes>
+return to userManagmentView without the deleted user</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
@@ -386,7 +386,7 @@ delete user</panel_attributes>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;
-cancelAction</panel_attributes>
+return to normal userManagmentView</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
