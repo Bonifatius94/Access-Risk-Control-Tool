@@ -327,8 +327,7 @@ public class PatternsController implements IUpdateTable {
     public void importAction() throws Exception {
         FileChooser chooser = new FileChooser();
         chooser.setTitle(bundle.getString("choosePatternFile"));
-        //chooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Pattern Files (*.xlsx)", "*.xlsx"));
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(bundle.getString("excelFiles"), bundle.getString("excelFileEnding")));
         File selectedFile = chooser.showOpenDialog(App.primaryStage);
 
         if (selectedFile != null) {

@@ -313,8 +313,8 @@ public class WhitelistsController implements IUpdateTable {
      */
     public void importWhitelist() {
         FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Excel files (*.xlsx)", "*.xlsx");
-        fileChooser.getExtensionFilters().add(extensionFilter);
+        fileChooser.setTitle(bundle.getString("chooseWhitelistFile"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(bundle.getString("excelFiles"), bundle.getString("excelFileEnding")));
         File file = fileChooser.showOpenDialog(App.primaryStage);
         if (file != null) {
             try {

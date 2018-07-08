@@ -29,6 +29,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
@@ -38,6 +39,9 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 
@@ -99,6 +103,9 @@ public class ConfigsFormController {
 
         initializeWhitelistChooser();
 
+        Platform.runLater(() -> {
+            initializeDragAndDrop();
+        });
     }
 
     /**
@@ -287,7 +294,6 @@ public class ConfigsFormController {
         }
     }
 
-
     /**
      * Opens a modal window where patterns can be selected.
      */
@@ -326,60 +332,73 @@ public class ConfigsFormController {
         whitelistChooser.setValue(whitelist);
     }
 
-
     /**
-     * Opens a dialog which lets you choose a Whitelist file to import and imports that into the application.
+     * Imports the whitelist from the given file into the application.
      */
-    public void importWhitelist() {
-        FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Excel files (*.xlsx)", "*.xlsx");
-        fileChooser.getExtensionFilters().add(extensionFilter);
-        File file = fileChooser.showOpenDialog(App.primaryStage);
+    private void importWhitelist(File file) throws Exception {
+
         if (file != null) {
-            String path = file.getPath();
-            try {
-                Whitelist importedWhitelist = new WhitelistImportHelper().importWhitelist(file.getPath());
+            Whitelist importedWhitelist = new WhitelistImportHelper().importWhitelist(file.getPath());
 
-                FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "importWhitelist", 900, 650);
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/whitelists/modal/WhitelistFormView.fxml", "importWhitelist", 900, 650);
 
-                WhitelistFormController editDialogController = loader.getController();
-                editDialogController.giveSelectedWhitelist(importedWhitelist);
-                editDialogController.setConfigsFormController(this);
-            } catch (Exception e) {
-                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"), bundle.getString("wrongFileMessage"));
-                alert.showAndWait();
-            }
+            WhitelistFormController editDialogController = loader.getController();
+            editDialogController.giveSelectedWhitelist(importedWhitelist);
+            editDialogController.setConfigsFormController(this);
         }
     }
 
     /**
-     * Opens a dialog which lets you choose an AccessPattern file to import and imports that into the application.
+     * Opens a dialog which lets you choose a Whitelist file to import and imports the whitelist into the application.
      */
-    public void importPatterns() throws Exception {
+    public void importWhitelist() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle(bundle.getString("chooseWhitelistFile"));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(bundle.getString("excelFiles"), bundle.getString("excelFileEnding")));
+            File file = fileChooser.showOpenDialog(App.primaryStage);
 
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle(bundle.getString("choosePatternFile"));
-        //chooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Pattern Files (*.xlsx)", "*.xlsx"));
-        File selectedFile = chooser.showOpenDialog(App.primaryStage);
+            importWhitelist(file);
+        } catch (Exception e) {
+            CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"), bundle.getString("wrongFileMessage"));
+            alert.showAndWait();
+        }
+    }
 
-        if (selectedFile != null) {
+    /**
+     * Imports the patterns from the given file into the application.
+     */
+    private void importPatterns(File file) throws Exception {
+
+        if (file != null) {
 
             // import patterns with the AccessPatternImportHelper
-            try {
-                List<AccessPattern> importedPatterns = new AccessPatternImportHelper().importAccessPatterns(selectedFile.getAbsolutePath());
+            List<AccessPattern> importedPatterns = new AccessPatternImportHelper().importAccessPatterns(file.getAbsolutePath());
 
-                // open a modal import window
-                FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternImportView.fxml", "importPatterns");
+            // open a modal import window
+            FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/patterns/modal/PatternImportView.fxml", "importPatterns");
 
-                // give the dialog the controller and the patterns
-                PatternImportController importController = loader.getController();
-                importController.giveImportedPatterns(importedPatterns);
-                importController.setConfigsFormController(this);
-            } catch (Exception e) {
-                CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"), bundle.getString("wrongFileMessage"));
-                alert.showAndWait();
-            }
+            // give the dialog the controller and the patterns
+            PatternImportController importController = loader.getController();
+            importController.giveImportedPatterns(importedPatterns);
+            importController.setConfigsFormController(this);
+        }
+    }
+
+    /**
+     * Opens a dialog which lets you choose an AccessPattern file to import and imports the patterns into the application.
+     */
+    public void importPatterns() {
+        try {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle(bundle.getString("choosePatternFile"));
+            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(bundle.getString("excelFiles"), bundle.getString("excelFileEnding")));
+            File file = chooser.showOpenDialog(App.primaryStage);
+
+            importPatterns(file);
+        } catch (Exception e) {
+            CustomAlert alert = new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"), bundle.getString("wrongFileMessage"));
+            alert.showAndWait();
         }
     }
 
@@ -540,5 +559,59 @@ public class ConfigsFormController {
 
         // add the items to the table
         patternsTable.getItems().addAll(patternsToAdd);
+    }
+
+    private void initializeDragAndDrop() {
+        patternsTable.getScene().setOnDragOver(new EventHandler<DragEvent>() {
+
+            @Override
+            public void handle(DragEvent event) {
+                if (event.getGestureSource() != patternsTable.getScene()
+                    && event.getDragboard().hasFiles()
+                    && event.getDragboard().getFiles().get(0).getAbsolutePath().endsWith(".xlsx")) {
+                    /* allow for both copying and moving, whatever user chooses */
+                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                }
+                event.consume();
+            }
+        });
+
+        // on drag drop, start the import dialogs
+        patternsTable.getScene().setOnDragDropped(new EventHandler<DragEvent>() {
+
+            @Override
+            public void handle(DragEvent event) {
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+                if (db.hasFiles()) {
+                    File file = db.getFiles().get(0);
+
+                    // file is a file that can be imported
+                    if (file.getAbsolutePath().endsWith(".xlsx")) {
+                        try {
+
+                            // if importWhitelist throws an error, try importPatterns
+                            importWhitelist(file);
+                            success = true;
+                        } catch (Exception e) {
+                            try {
+                                importPatterns(file);
+                                success = true;
+                            } catch (Exception ex) {
+
+                                // show wrong format exception
+                                new CustomAlert(Alert.AlertType.WARNING, bundle.getString("wrongFileTitle"),
+                                    bundle.getString("wrongFileMessage")).showAndWait();
+                            }
+                        }
+                    }
+                }
+                /* let the source know whether the string was successfully
+                 * transferred and used */
+                event.setDropCompleted(success);
+
+                event.consume();
+            }
+        });
     }
 }
