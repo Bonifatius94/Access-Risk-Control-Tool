@@ -125,7 +125,7 @@ LoginController (Username, password)
       <w>560</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-
+    <panel_attributes>lt=&lt;.
 startApplication (event)</panel_attributes>
     <additional_attributes>10.0;20.0;540.0;20.0</additional_attributes>
   </element>
@@ -168,7 +168,7 @@ if login data is invalid
       <w>560</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-
+    <panel_attributes>lt=&lt;.
 throw exception(remaining attempt counter = 3, set errorLabel)</panel_attributes>
     <additional_attributes>10.0;20.0;540.0;20.0</additional_attributes>
   </element>
@@ -180,7 +180,7 @@ throw exception(remaining attempt counter = 3, set errorLabel)</panel_attributes
       <w>560</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-
+    <panel_attributes>lt=&lt;.
 throw exception(wait one minitue then try again, set errorLabel)</panel_attributes>
     <additional_attributes>10.0;20.0;540.0;20.0</additional_attributes>
   </element>
@@ -192,7 +192,7 @@ throw exception(wait one minitue then try again, set errorLabel)</panel_attribut
       <w>560</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=-
 startApllication or throw exception</panel_attributes>
     <additional_attributes>540.0;20.0;10.0;20.0</additional_attributes>
   </element>
@@ -231,7 +231,7 @@ if login data is valid</panel_attributes>
       <w>560</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-
+    <panel_attributes>lt=&lt;.
 startApplication (event)</panel_attributes>
     <additional_attributes>10.0;20.0;540.0;20.0</additional_attributes>
   </element>
@@ -256,7 +256,7 @@ Wrong Input
       <w>560</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-
+    <panel_attributes>lt=&lt;.
 throw exception(remaining attempt counter = 3, set errorLabel)</panel_attributes>
     <additional_attributes>10.0;20.0;540.0;20.0</additional_attributes>
   </element>

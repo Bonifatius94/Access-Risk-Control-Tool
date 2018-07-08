@@ -167,7 +167,7 @@ opt
       <w>470</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 dialog("Username allready exists")</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
@@ -191,7 +191,7 @@ select createUserOption</panel_attributes>
       <w>470</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 switch to createUserView</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
@@ -203,7 +203,7 @@ switch to createUserView</panel_attributes>
       <w>470</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 show new user(firstPassword), open dialog to warn to save firstPassword</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
@@ -254,7 +254,7 @@ opt
       <w>470</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 switch to specificUserView</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
@@ -287,7 +287,7 @@ Success
       <w>470</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 dialog("Attempt failed")</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
@@ -299,7 +299,7 @@ dialog("Attempt failed")</panel_attributes>
       <w>470</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 update user</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
@@ -373,7 +373,7 @@ cancel</panel_attributes>
       <w>470</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 return to userManagmentView without the deleted user</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
@@ -385,7 +385,7 @@ return to userManagmentView without the deleted user</panel_attributes>
       <w>470</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 return to normal userManagmentView</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
@@ -420,7 +420,7 @@ Confirm
       <w>470</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 error("The user could not be deletet.")</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
@@ -432,7 +432,7 @@ error("The user could not be deletet.")</panel_attributes>
       <w>470</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 opensDialog(Confim - delete entry)</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>

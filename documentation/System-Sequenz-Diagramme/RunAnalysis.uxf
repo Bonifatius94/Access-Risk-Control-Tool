@@ -124,7 +124,7 @@ Button(neue Analyse)</panel_attributes>
       <w>560</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 opensDialog(neue Analyse)</panel_attributes>
     <additional_attributes>540.0;20.0;10.0;20.0</additional_attributes>
   </element>
@@ -149,7 +149,7 @@ add(configurations, SAP-System), Button (analyse durchführen)
       <w>560</w>
       <h>50</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 throw exception (enter SAP - Login again)
 </panel_attributes>
     <additional_attributes>540.0;20.0;10.0;20.0</additional_attributes>
@@ -162,7 +162,7 @@ throw exception (enter SAP - Login again)
       <w>560</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 opensDialog(SAP - Login)</panel_attributes>
     <additional_attributes>540.0;20.0;10.0;20.0</additional_attributes>
   </element>
@@ -203,7 +203,7 @@ if login data
       <w>560</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 establish a connection to SAP System, opensDialog(loading animation)</panel_attributes>
     <additional_attributes>540.0;20.0;10.0;20.0</additional_attributes>
   </element>
@@ -215,7 +215,7 @@ establish a connection to SAP System, opensDialog(loading animation)</panel_attr
       <w>560</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;&gt;&gt;
+    <panel_attributes>lt=.&gt;
 opensDialog(Analyse - Ergebnisse)</panel_attributes>
     <additional_attributes>540.0;20.0;10.0;20.0</additional_attributes>
   </element>
