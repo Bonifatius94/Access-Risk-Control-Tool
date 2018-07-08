@@ -11,7 +11,7 @@
 <HBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="ui.custom.controls.filter.FilterController" HBox.hgrow="ALWAYS" spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 0 10 0 10">
-    <JFXTextField fx:id="searchStringInput" promptText="%search" minWidth="150" maxWidth="250"/>
+    <JFXTextField fx:id="searchStringInput" onAction="#applyFiltersOnEnter" promptText="%search" minWidth="150" maxWidth="250"/>
     <JFXDatePicker fx:id="startDatePicker" promptText="%startDate" maxWidth="130"/>
     <JFXDatePicker fx:id="endDatePicker" promptText="%endDate" maxWidth="130" />
     <JFXToggleButton fx:id="showArchivedToggle" text="%showArchived" visible="false"/>

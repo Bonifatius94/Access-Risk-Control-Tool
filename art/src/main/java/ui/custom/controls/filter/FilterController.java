@@ -69,6 +69,9 @@ public class FilterController {
             if (startDatePicker.getValue() != null) {
                 startDateProperty.setValue(startDatePicker.getValue().atStartOfDay(ZoneOffset.UTC));
             }
+            if (newValue == null) {
+                startDateProperty.setValue(null);
+            }
         });
         startDatePicker.setEditable(false);
 
@@ -84,6 +87,9 @@ public class FilterController {
             if (endDatePicker.getValue() != null) {
                 endDateProperty.setValue(endDatePicker.getValue().atStartOfDay(ZoneOffset.UTC));
             }
+            if (newValue == null) {
+                endDateProperty.setValue(null);
+            }
         });
         endDatePicker.setEditable(false);
     }
@@ -92,11 +98,21 @@ public class FilterController {
      * Resets the filters completely and lets the parent know that it should filter.
      */
     public void resetFilter() {
-        searchStringInput.setText("");
+        searchStringInput.clear();
         startDatePicker.setValue(null);
         endDatePicker.setValue(null);
         showArchivedToggle.selectedProperty().set(false);
 
+        shouldFilterProperty.unbind();
+        shouldFilterProperty.setValue(true);
+        shouldFilterProperty.setValue(false);
+        shouldFilterProperty.bind(applyFilterButton.pressedProperty());
+    }
+
+    /**
+     * Applies the filter on hitting enter in the searchstring textfield.
+     */
+    public void applyFiltersOnEnter() {
         shouldFilterProperty.unbind();
         shouldFilterProperty.setValue(true);
         shouldFilterProperty.setValue(false);
