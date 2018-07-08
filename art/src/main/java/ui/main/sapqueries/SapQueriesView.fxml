@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+
+<?import ui.custom.controls.PTableColumn?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ui.main.sapqueries.SapQueriesController"
+      spacing="10">
+    <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
+    <TableView VBox.vgrow="ALWAYS" fx:id="queriesTable">
+        <columns>
+            <PTableColumn text="?" fx:id="queryStatusColumn" percentageWidth="0.08">
+                <cellValueFactory>
+                    <PropertyValueFactory property="entries"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%configuration" percentageWidth="0.3" fx:id="configurationColumn"
+                          styleClass="align-left">
+                <cellValueFactory>
+                    <PropertyValueFactory property="config"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%sapSettings" percentageWidth="0.3" fx:id="sapConfigurationColumn"
+                          styleClass="align-left">
+                <cellValueFactory>
+                    <PropertyValueFactory property="sapConfig"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%createdAt" percentageWidth="0.2" fx:id="createdAtColumn">
+                <cellValueFactory>
+                    <PropertyValueFactory property="createdAt"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.06" fx:id="editColumn" resizable="false" sortable="false">
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.06" fx:id="archiveColumn" resizable="false" sortable="false">
+            </PTableColumn>
+        </columns>
+    </TableView>
+
+    <HBox alignment="BOTTOM_RIGHT" spacing="10">
+        <Label fx:id="itemCount"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <JFXButton text="%newAnalysis" onAction="#addAction" prefWidth="130">
+            <graphic>
+                <MaterialDesignIconView glyphName="PLUS"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton text="%archive" onAction="#archiveAction" prefWidth="130">
+            <graphic>
+                <MaterialDesignIconView glyphName="ARCHIVE"/>
+            </graphic>
+        </JFXButton>
+    </HBox>
+</VBox>

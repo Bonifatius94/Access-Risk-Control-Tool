@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ui.main.sapqueries.modal.results.views.AnalysisGraphsController" VBox.vgrow="ALWAYS" spacing="20">
+    <BarChart fx:id="barChart" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+        <xAxis>
+            <CategoryAxis fx:id="chartX"/>
+        </xAxis>
+        <yAxis>
+            <NumberAxis fx:id="chartY"/>
+        </yAxis>
+    </BarChart>
+    <VBox alignment="BOTTOM_CENTER" minWidth="150" style="-fx-padding: 0 0 10 0" VBox.vgrow="ALWAYS">
+        <VBox spacing="10">
+            <Label text="%xAxis" style="-fx-font-size: 1.1em"/>
+            <JFXComboBox fx:id="chartDataChooser"/>
+        </VBox>
+    </VBox>
+</HBox>

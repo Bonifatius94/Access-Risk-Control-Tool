@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.validation.RequiredFieldValidator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import ui.custom.controls.CustomWindow?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.control.Separator?>
+<CustomWindow windowState="NoResize" xmlns="http://javafx.com/javafx/8.0.121"
+              xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.sapsettings.modal.SapSettingsFormController">
+    <VBox spacing="20" style="-fx-padding: 20">
+        <VBox alignment="BASELINE_CENTER" spacing="40" style="-fx-padding: 0 0 20 0">
+            <JFXTextField fx:id="descriptionField" prefWidth="300" promptText="%description">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+            <JFXTextField fx:id="hostServerField" prefWidth="300" promptText="%hostServer">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+
+            <JFXTextField fx:id="sysNrField" prefWidth="100" promptText="%sysNR">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+
+            <JFXTextField fx:id="jcoClientField" prefWidth="75" promptText="%jcoClient">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+            <JFXTextField fx:id="tfLanguage" prefWidth="200" promptText="%language">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+            <JFXTextField fx:id="tfPoolCapacity" prefWidth="200" promptText="%poolCapacity">
+                <validators>
+                    <RequiredFieldValidator message="%required">
+                        <MaterialDesignIconView glyphName="ALERT"/>
+                    </RequiredFieldValidator>
+                </validators>
+            </JFXTextField>
+        </VBox>
+        <Separator/>
+        <HBox spacing="20" alignment="BASELINE_CENTER">
+            <JFXButton onAction="#connect" fx:id="connectButton" prefWidth="100" text="%testConnect">
+                <graphic>
+                    <MaterialDesignIconView glyphName="ACCESS_POINT"/>
+                </graphic>
+            </JFXButton>
+            <JFXButton onAction="#saveConnection" fx:id="saveButton" prefWidth="100" text="%save">
+                <graphic>
+                    <MaterialDesignIconView glyphName="CONTENT_SAVE"/>
+                </graphic>
+            </JFXButton>
+            <JFXButton onAction="#confirmClose" prefWidth="100" text="%cancel">
+                <graphic>
+                    <MaterialDesignIconView glyphName="CLOSE"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
+    </VBox>
+</CustomWindow>

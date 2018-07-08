@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.*?>
+
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import ui.custom.controls.PTableColumn?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.control.Label?>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ui.main.patterns.PatternsController"
+      spacing="10">
+    <fx:include source="../../custom/controls/filter/FilterView.fxml" fx:id="filter"/>
+    <TableView VBox.vgrow="ALWAYS" fx:id="patternsTable">
+        <columns>
+            <PTableColumn text="?" fx:id="conditionTypeColumn" percentageWidth="0.06" resizable="false">
+                <cellValueFactory>
+                    <PropertyValueFactory property="conditions"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%useCaseID" percentageWidth="0.15">
+                <cellValueFactory>
+                    <PropertyValueFactory property="usecaseId"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%description" percentageWidth="0.39" styleClass="align-left">
+                <cellValueFactory>
+                    <PropertyValueFactory property="description"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%createdAt" percentageWidth="0.2" fx:id="createdAtColumn">
+                <cellValueFactory>
+                    <PropertyValueFactory property="createdAt"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="#" fx:id="conditionCountColumn" percentageWidth="0.08" resizable="false">
+                <cellValueFactory>
+                    <PropertyValueFactory property="conditions"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.06" fx:id="editColumn" resizable="false" sortable="false">
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.06" fx:id="deleteColumn" resizable="false" sortable="false">
+            </PTableColumn>
+        </columns>
+    </TableView>
+
+    <HBox alignment="BOTTOM_RIGHT" spacing="10">
+        <Label fx:id="itemCount"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <JFXButton text="%import" onAction="#importAction" prefWidth="130">
+            <graphic>
+                <MaterialDesignIconView glyphName="IMPORT"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton text="%clone" onAction="#cloneAction" prefWidth="130">
+            <graphic>
+                <MaterialDesignIconView glyphName="CONTENT_COPY"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton text="%newEntry" onAction="#addAction" prefWidth="130">
+            <graphic>
+                <MaterialDesignIconView glyphName="PLUS"/>
+            </graphic>
+        </JFXButton>
+        <JFXButton text="%delete" onAction="#deleteAction" prefWidth="130" styleClass="warning-button">
+            <graphic>
+                <MaterialDesignIconView glyphName="DELETE"/>
+            </graphic>
+        </JFXButton>
+    </HBox>
+</VBox>

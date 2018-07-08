@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXDatePicker?>
+<?import com.jfoenix.controls.JFXToggleButton?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ui.custom.controls.filter.FilterController" HBox.hgrow="ALWAYS" spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 0 10 0 10">
+    <JFXTextField fx:id="searchStringInput" onAction="#applyFiltersOnEnter" promptText="%search" minWidth="150" maxWidth="250"/>
+    <JFXDatePicker fx:id="startDatePicker" promptText="%startDate" maxWidth="130"/>
+    <JFXDatePicker fx:id="endDatePicker" promptText="%endDate" maxWidth="130" />
+    <JFXToggleButton fx:id="showArchivedToggle" text="%showArchived" visible="false"/>
+    <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT" spacing="10">
+        <JFXButton styleClass="round-button" onAction="#resetFilter" minHeight="30">
+            <graphic>
+                <MaterialDesignIconView glyphName="CLOSE" />
+            </graphic>
+            <tooltip>
+                <Tooltip text="%resetFilter"/>
+            </tooltip>
+        </JFXButton>
+        <JFXButton styleClass="round-button" fx:id="applyFilterButton" minHeight="30">
+            <graphic>
+                <MaterialDesignIconView glyphName="CHECK" />
+            </graphic>
+            <tooltip>
+                <Tooltip text="%applyFilter"/>
+            </tooltip>
+        </JFXButton>
+    </HBox>
+</HBox>

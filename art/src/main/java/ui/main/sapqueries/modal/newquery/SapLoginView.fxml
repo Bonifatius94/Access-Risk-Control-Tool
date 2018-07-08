@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import ui.custom.controls.CustomWindow?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXPasswordField?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXSpinner?>
+<?import com.jfoenix.validation.RequiredFieldValidator?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<CustomWindow xmlns="http://javafx.com/javafx"
+              xmlns:fx="http://javafx.com/fxml"
+              fx:controller="ui.main.sapqueries.modal.newquery.SapLoginController" windowState="NoResize">
+    <!-- login credentials input -->
+    <VBox HBox.hgrow="ALWAYS" style="-fx-padding: 20" spacing="20" alignment="CENTER" styleClass="login-window">
+        <!--<ImageView fitWidth="180" fitHeight="180">-->
+            <!--<image>-->
+                <!--<Image url="@/icons/art_512.png"/>-->
+            <!--</image>-->
+        <!--</ImageView>-->
+        <!--<Separator/>-->
+        <VBox HBox.hgrow="ALWAYS" maxWidth="300" spacing="10" style="-fx-padding: 10 0 0 0">
+            <VBox spacing="35">
+                <HBox alignment="BASELINE_LEFT" spacing="10">
+                    <MaterialDesignIconView style="-fx-font-size: 1.6em" glyphName="ACCOUNT"/>
+                    <JFXTextField fx:id="usernameInput" prefWidth="240" promptText="%username">
+                        <validators>
+                            <RequiredFieldValidator message="%required">
+                                <MaterialDesignIconView glyphName="ALERT"/>
+                            </RequiredFieldValidator>
+                        </validators>
+                    </JFXTextField>
+                </HBox>
+                <HBox alignment="BASELINE_LEFT" spacing="10">
+                    <MaterialDesignIconView style="-fx-font-size: 1.6em" glyphName="KEY"/>
+                    <JFXPasswordField fx:id="passwordInput" prefWidth="240" promptText="%password">
+                        <validators>
+                            <RequiredFieldValidator message="%required">
+                                <MaterialDesignIconView glyphName="ALERT"/>
+                            </RequiredFieldValidator>
+                        </validators>
+                    </JFXPasswordField>
+                    <JFXTextField fx:id="passwordInputPlain" prefWidth="240" promptText="%password">
+                        <validators>
+                            <RequiredFieldValidator message="%required">
+                                <MaterialDesignIconView glyphName="ALERT"/>
+                            </RequiredFieldValidator>
+                        </validators>
+                    </JFXTextField>
+                    <MaterialDesignIconView fx:id="showPasswordIconView" glyphName="EYE_OFF"
+                                            onMouseClicked="#togglePasswordDisplay" size="20"/>
+                </HBox>
+            </VBox>
+            <Label visible="false" fx:id="errorLabel" text="%loginError" wrapText="true"
+                   style="-fx-padding: 10 0 0 0">
+                <graphic>
+                    <MaterialDesignIconView glyphName="ALERT"/>
+                </graphic>
+            </Label>
+            <Separator/>
+            <HBox alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS" style="-fx-padding: 10 0 0 0">
+                <JFXButton onAction="#close" text="%cancel">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="CLOSE"/>
+                    </graphic>
+                </JFXButton>
+                <Region HBox.hgrow="ALWAYS"/>
+                <JFXButton onAction="#login" text="%login" defaultButton="true">
+                    <graphic>
+                        <MaterialDesignIconView glyphName="LOGIN"/>
+                    </graphic>
+                </JFXButton>
+            </HBox>
+        </VBox>
+    </VBox>
+</CustomWindow>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import com.jfoenix.controls.JFXSpinner?>
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ui.main.statusbar.StatusBarController" styleClass="status-bar" alignment="CENTER">
+    <HBox alignment="CENTER_LEFT" prefWidth="350">
+        <Label fx:id="loggedInUserLabel"/>
+    </HBox>
+    <HBox alignment="CENTER" fx:id="analysisProgressBox" spacing="10" HBox.hgrow="ALWAYS">
+        <JFXSpinner maxHeight="20" maxWidth="20"/>
+        <Label fx:id="analysisProgressLabel"/>
+    </HBox>
+    <HBox alignment="CENTER" fx:id="copyrightBox" HBox.hgrow="ALWAYS">
+        <Label text="%copyright" HBox.hgrow="ALWAYS" />
+    </HBox>
+    <HBox alignment="CENTER_RIGHT" spacing="20" prefWidth="350">
+        <Label>
+            <tooltip>
+                <Tooltip text="%databaseConnectionActive"/>
+            </tooltip>
+            <graphic>
+                <MaterialDesignIconView glyphName="ACCESS_POINT" size="20" styleClass="database-icon"/>
+            </graphic>
+        </Label>
+        <Label onMouseClicked="#openSettingsView" style="-fx-cursor: hand">
+            <tooltip>
+                <Tooltip text="%settings"/>
+            </tooltip>
+            <graphic>
+                <MaterialDesignIconView glyphName="SETTINGS" size="20"/>
+            </graphic>
+        </Label>
+        <Label onMouseClicked="#openAboutView" style="-fx-cursor: hand">
+            <tooltip>
+                <Tooltip text="%about"/>
+            </tooltip>
+            <graphic>
+                <MaterialDesignIconView glyphName="HELP_CIRCLE" size="20"/>
+            </graphic>
+        </Label>
+    </HBox>
+</HBox>
