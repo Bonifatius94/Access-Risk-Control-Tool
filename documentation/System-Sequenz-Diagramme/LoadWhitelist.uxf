@@ -134,7 +134,7 @@ Success
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
-dialog("The attempt to load a whitelists failed")</panel_attributes>
+dialog("Wrong file Format")</panel_attributes>
     <additional_attributes>10.0;20.0;450.0;20.0</additional_attributes>
   </element>
   <element>
