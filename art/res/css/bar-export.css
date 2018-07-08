@@ -5,6 +5,7 @@
  ******************************************************************************/
 
 * {
+    -fx-primary: #484848; /* overwrite primary with a dark gray color so the export always looks the same */
     -fx-text: ladder(-fx-primary, white 0%, white 65%, black 66%, black 100%);
     -fx-error: #c82d49;
 }

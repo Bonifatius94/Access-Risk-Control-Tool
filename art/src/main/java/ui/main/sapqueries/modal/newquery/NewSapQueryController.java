@@ -297,7 +297,13 @@ public class NewSapQueryController {
 
                     parentController.updateTable();
 
-                    FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/results/AnalysisResultView.fxml", "analysisResultTitle",  Modality.NONE);
+                    Stage stage = new Stage();
+                    FXMLLoader loader = AppComponents.getInstance().showScene("ui/main/sapqueries/modal/results/AnalysisResultView.fxml", "analysisResultTitle",
+                        stage, null, Modality.APPLICATION_MODAL);
+
+                    // let result stage pop up
+                    stage.setAlwaysOnTop(true);
+                    stage.setAlwaysOnTop(false);
 
                     AnalysisResultController resultController = loader.getController();
                     resultController.giveResultQuery(runQueryTask.getValue());

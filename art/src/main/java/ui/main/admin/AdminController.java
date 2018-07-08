@@ -8,6 +8,9 @@ import data.entities.DbUserRole;
 import data.localdb.ArtDbContext;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.List;
@@ -27,8 +30,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 
 import javafx.scene.control.TextFormatter;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
 import ui.AppComponents;
 import ui.IUpdateTable;
@@ -217,6 +218,10 @@ public class AdminController implements IUpdateTable {
                     // delete the user
                     if (customAlert.showAndWait().get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
                         database.deleteDatabaseUser(user.getUsername());
+
+                        tfDbUserPassword.clear();
+                        tfDbUserName.clear();
+                        
                         updateTable();
                     }
                 }
@@ -357,8 +362,8 @@ public class AdminController implements IUpdateTable {
 
         // enable user table
         newUserMode.setValue(false);
-        tfDbUserPassword.setText("");
-        tfDbUserName.setText("");
+        tfDbUserPassword.clear();
+        tfDbUserName.clear();
         initializeCheckboxes();
 
         this.copiedToClipboard = false;
@@ -414,9 +419,9 @@ public class AdminController implements IUpdateTable {
      * @author Franz Schulze/Merlin Albes
      */
     public void copyPasswordToClipboard() {
-        final ClipboardContent clipboardContent = new ClipboardContent();
-        clipboardContent.putString(tfDbUserPassword.getText());
-        Clipboard.getSystemClipboard().setContent(clipboardContent);
+        StringSelection stringSelection = new StringSelection(tfDbUserPassword.getText());
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, null);
         this.copiedToClipboard = true;
     }
 
@@ -456,9 +461,9 @@ public class AdminController implements IUpdateTable {
         newUserMode.setValue(false);
 
         // reset all inputs
-        tfDbUserName.setText("");
+        tfDbUserName.clear();
         tfDbUserName.resetValidation();
-        tfDbUserPassword.setText("");
+        tfDbUserPassword.clear();
         tfDbUserPassword.resetValidation();
         initializeCheckboxes();
 

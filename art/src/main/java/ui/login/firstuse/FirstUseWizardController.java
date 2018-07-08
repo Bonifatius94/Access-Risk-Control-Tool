@@ -9,6 +9,7 @@ import data.entities.DbUser;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -55,6 +56,8 @@ public class FirstUseWizardController {
     @FXML
     private HBox usernameValidationBox;
 
+    private boolean normalFirstUse;
+
     /**
      * Initializes the view with all needed bindings.
      */
@@ -82,6 +85,15 @@ public class FirstUseWizardController {
             change.setText(change.getText().toUpperCase());
             return change;
         }));
+
+        Platform.runLater(() ->
+            finishBox.getScene().getWindow().setOnHiding((e -> {
+                // close the database
+                if (!normalFirstUse && AppComponents.getInstance().getDbContext() != null) {
+                    AppComponents.getInstance().getDbContext().close();
+                }
+            }))
+        );
 
         initializeValidation();
     }
@@ -207,6 +219,7 @@ public class FirstUseWizardController {
      * @param event the given ActionEvent
      */
     public void close(ActionEvent event) {
+        normalFirstUse = true;
         (((Button) event.getSource()).getScene().getWindow()).hide();
     }
 

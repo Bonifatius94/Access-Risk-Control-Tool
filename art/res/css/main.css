@@ -374,6 +374,10 @@
     -fx-background-color: -fx-primary-lighter;
 }
 
+.jfx-date-picker .jfx-button {
+    -fx-pref-width: 20;
+}
+
 /*
 .jfx-date-picker .date-picker-popup {
     -fx-background-color: -fx-background;
