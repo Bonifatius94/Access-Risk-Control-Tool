@@ -421,7 +421,7 @@ Confirm
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=.&gt;
-error("The user could not be deletet.")</panel_attributes>
+error("The user could not be deleted.")</panel_attributes>
     <additional_attributes>450.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
