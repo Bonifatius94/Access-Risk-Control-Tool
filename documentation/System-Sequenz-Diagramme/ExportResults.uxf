@@ -4,10 +4,10 @@
   <element>
     <id>UMLFrame</id>
     <coordinates>
-      <x>720</x>
-      <y>400</y>
+      <x>280</x>
+      <y>100</y>
       <w>800</w>
-      <h>370</h>
+      <h>780</h>
     </coordinates>
     <panel_attributes>Export results</panel_attributes>
     <additional_attributes/>
@@ -15,8 +15,8 @@
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>790</x>
-      <y>430</y>
+      <x>360</x>
+      <y>140</y>
       <w>100</w>
       <h>30</h>
     </coordinates>
@@ -27,8 +27,8 @@ bg=orange</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>1340</x>
-      <y>430</y>
+      <x>910</x>
+      <y>140</y>
       <w>100</w>
       <h>30</h>
     </coordinates>
@@ -39,10 +39,10 @@ bg=red</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>830</x>
-      <y>490</y>
+      <x>400</x>
+      <y>200</y>
       <w>20</w>
-      <h>220</h>
+      <h>590</h>
     </coordinates>
     <panel_attributes>
 bg=yellow</panel_attributes>
@@ -51,10 +51,10 @@ bg=yellow</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>1380</x>
-      <y>500</y>
+      <x>950</x>
+      <y>210</y>
       <w>20</w>
-      <h>210</h>
+      <h>570</h>
     </coordinates>
     <panel_attributes>
 bg=red</panel_attributes>
@@ -63,8 +63,8 @@ bg=red</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>830</x>
-      <y>450</y>
+      <x>400</x>
+      <y>160</y>
       <w>30</w>
       <h>60</h>
     </coordinates>
@@ -74,8 +74,8 @@ bg=red</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1380</x>
-      <y>450</y>
+      <x>950</x>
+      <y>160</y>
       <w>30</w>
       <h>70</h>
     </coordinates>
@@ -85,46 +85,161 @@ bg=red</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>840</x>
-      <y>560</y>
+      <x>410</x>
+      <y>270</y>
       <w>560</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;
-exportResults(U.userName, U.password, U.destination, U.fileName, U.fileType)</panel_attributes>
+exportResults (Word, PDF, CSV, Whitelist, Acces Patterns)</panel_attributes>
     <additional_attributes>10.0;20.0;540.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>830</x>
-      <y>700</y>
+      <x>400</x>
+      <y>780</y>
       <w>30</w>
-      <h>60</h>
+      <h>100</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1380</x>
-      <y>700</y>
+      <x>950</x>
+      <y>770</y>
       <w>30</w>
-      <h>60</h>
+      <h>110</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>300</x>
+      <y>320</y>
+      <w>730</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>optional</panel_attributes>
+    <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>840</x>
-      <y>610</y>
+      <x>410</x>
+      <y>340</y>
       <w>560</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=&lt;.
+    <panel_attributes>lt=-&gt;&gt;&gt;
+WordExportHelper(Sap-Configurations, CriticalUserName, CriticalAccesPatterns)</panel_attributes>
+    <additional_attributes>540.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>300</x>
+      <y>400</y>
+      <w>730</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>optional</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>420</y>
+      <w>560</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+PdfExportHelper(Sap-Configurations, CriticalUserName, CriticalAccesPatterns)</panel_attributes>
+    <additional_attributes>540.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>300</x>
+      <y>480</y>
+      <w>730</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>optional</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>500</y>
+      <w>560</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+CsvExportHelper(CriticalUserName, CriticalAccesPatterns)</panel_attributes>
+    <additional_attributes>540.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>300</x>
+      <y>560</y>
+      <w>730</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>optional</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>580</y>
+      <w>560</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+Excel(WhitellistExportHelper)</panel_attributes>
+    <additional_attributes>540.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>660</y>
+      <w>560</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+Excel(AccesPatternExportHelper)</panel_attributes>
+    <additional_attributes>540.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>300</x>
+      <y>640</y>
+      <w>730</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>optional</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>730</y>
+      <w>560</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
 error, ok</panel_attributes>
     <additional_attributes>10.0;20.0;540.0;20.0</additional_attributes>
   </element>
