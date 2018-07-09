@@ -91,8 +91,6 @@ public class MainController {
         initTableUpdates();
 
         updateAllTables();
-
-        initializeDragAndDrop();
     }
 
     /**
@@ -116,6 +114,7 @@ public class MainController {
             mainTabs.getTabs().add(sapQueriesTab);
         }
         if (analyst) {
+            initializeDragAndDrop();
             mainTabs.getTabs().addAll(sapSettingsTab, configurationsTab, patternsTab, whitelistsTab);
         }
         if (admin) {
