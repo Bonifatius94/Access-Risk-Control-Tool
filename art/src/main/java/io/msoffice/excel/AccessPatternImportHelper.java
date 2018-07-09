@@ -53,10 +53,10 @@ public class AccessPatternImportHelper {
             Cell patternNameCell = row.getCell(0);
 
             // check if new pattern begins
-            if (!isFirstRow && patternNameCell != null) {
+            if (!isFirstRow && patternNameCell != null && !patternNameCell.getStringCellValue().trim().isEmpty()) {
                 String patternName = patternNameCell.getStringCellValue();
 
-                if (patternName != null && !patternName.isEmpty()) {
+                if (patternName != null && !patternName.trim().isEmpty()) {
                     // parse pattern from rows before and add pattern to list
                     list.add(getAuthPattern(tempRows));
                     tempRows = new ArrayList<>();
@@ -92,15 +92,15 @@ public class AccessPatternImportHelper {
     private AccessPattern getAuthPattern(List<Row> rows) {
 
         AccessPattern pattern;
-        String patternName = rows.get(0).getCell(0).getStringCellValue();
-        String patternDescription = rows.get(0).getCell(3).getStringCellValue();
+        String patternName = rows.get(0).getCell(0).getStringCellValue().trim();
+        String patternDescription = rows.get(0).getCell(3).getStringCellValue().trim();
         String patternTypeIndicator = rows.get(1).getCell(1).getStringCellValue();
 
-        if (patternTypeIndicator == null || patternTypeIndicator.isEmpty()) {
+        if (patternTypeIndicator == null || patternTypeIndicator.trim().isEmpty()) {
 
             throw new IllegalArgumentException("Pattern type not set. Needs to be COND, AND or OR.");
 
-        } else if (patternTypeIndicator.toUpperCase().equals("COND")) {
+        } else if (patternTypeIndicator.trim().toUpperCase().equals("COND")) {
 
             pattern = getSimpleAuthPattern(rows);
 
@@ -144,7 +144,7 @@ public class AccessPatternImportHelper {
         List<AccessCondition> conditions = new ArrayList<>();
 
         String linkageAsString = rows.get(1).getCell(1).getStringCellValue();
-        ConditionLinkage linkage = linkageAsString.toUpperCase().equals("OR") ? ConditionLinkage.Or : ConditionLinkage.And;
+        ConditionLinkage linkage = linkageAsString.trim().toUpperCase().equals("OR") ? ConditionLinkage.Or : ConditionLinkage.And;
 
         int counter = 0;
         boolean isFirstRow = true;
@@ -163,7 +163,7 @@ public class AccessPatternImportHelper {
 
                 String condIndicator = condIndicatorCell.getStringCellValue();
 
-                if (!isFirstRow && (condIndicator != null && condIndicator.toUpperCase().equals("COND"))) {
+                if (!isFirstRow && (condIndicator != null && condIndicator.trim().toUpperCase().equals("COND"))) {
 
                     // parse pattern from rows before and add pattern to list
                     conditions.add(getCondition(tempRows, true));
@@ -198,10 +198,10 @@ public class AccessPatternImportHelper {
         AccessCondition condition = new AccessCondition();
         Cell temp = rows.get(0).getCell(isComplex ? 9 : 8);
 
-        if (temp != null && temp.getStringCellValue() != null && !temp.getStringCellValue().isEmpty()) {
+        if (temp != null && temp.getStringCellValue() != null && !temp.getStringCellValue().trim().isEmpty()) {
 
             // case: profile condition
-            String profile = temp.getStringCellValue();
+            String profile = temp.getStringCellValue().trim();
             condition.setProfileCondition(new AccessProfileCondition(profile));
 
         } else {
@@ -214,18 +214,18 @@ public class AccessPatternImportHelper {
 
                 // parse auth object and property name
                 int index = startIndex;
-                final String authorizationObject = row.getCell(index).getStringCellValue();
-                final String propertyName = row.getCell(++index).getStringCellValue();
+                final String authorizationObject = row.getCell(index).getStringCellValue().trim();
+                final String propertyName = row.getCell(++index).getStringCellValue().trim();
 
                 // parse values
                 temp = row.getCell(++index);
-                final String value1 = (temp != null) ? temp.getStringCellValue() : null;
+                final String value1 = (temp != null) ? temp.getStringCellValue().trim() : null;
                 temp = row.getCell(++index);
-                final String value2 = (temp != null) ? temp.getStringCellValue() : null;
+                final String value2 = (temp != null) ? temp.getStringCellValue().trim() : null;
                 temp = row.getCell(++index);
-                final String value3 = (temp != null) ? temp.getStringCellValue() : null;
+                final String value3 = (temp != null) ? temp.getStringCellValue().trim() : null;
                 temp = row.getCell(++index);
-                final String value4 = (temp != null) ? temp.getStringCellValue() : null;
+                final String value4 = (temp != null) ? temp.getStringCellValue().trim() : null;
 
                 properties.add(new AccessPatternConditionProperty(authorizationObject, propertyName, value1, value2, value3, value4));
             }
