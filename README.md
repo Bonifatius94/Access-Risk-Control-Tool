@@ -1,4 +1,4 @@
-# HOW TO BUILD THIS PROJECT:
+# HOW TO BUILD THIS PROJECT
 
 ## Development Machine Setup:
 - install IntelliJ Idea Community Edition 2018.1 (including maven)
@@ -13,13 +13,25 @@
 
 ## Compiling the Project:
 - load maven side bar: View -> Tool Windows -> Maven Projects (if the side bar is empty, click it, or if that does not help, click the refresh button at the top of the side bar)
-- open to the 'Lifecycle' region -> execute 'clean' -> execute 'compile'
+- open the 'Lifecycle' region
+- execute 'clean'
+- execute 'compile'
 
 ## Running the Unit Tests:
+- open the 'Lifecycle' region
 - execute 'clean' (this should not be required but is good measure)
 - execute 'test'
 
 ## Making a Release:
-- execute 'clean' -> execute 'package'
+- open the 'Lifecycle' region
+- execute 'clean'
+- execute 'package'
 - go to the 'target' folder (inside 'art') -> copy 'AccessRiskTool.jar' and the entire 'lib' folder
-- make sure that the lib folder does not contain any file except *.jar files and also not the file 'sapjco3.jar'
+- make sure that the lib folder does not contain any files except *.jar files and also not the file 'sapjco3.jar'
+- add the README.txt file from a former build
+- zip the folder and release it
+
+## Notes:
+This procedure was only tested on a Windows 10 machine. Please feel free to report any issues with your deveploment environment setup.
+
+Technical documentation was made by Marco Tröster (marco.troester@student.uni-augsburg.de)
