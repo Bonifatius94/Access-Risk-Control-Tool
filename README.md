@@ -1,9 +1,9 @@
 # HOW TO BUILD THIS PROJECT
 
 ## Development Machine Setup:
-- install IntelliJ Idea 2018.1 including Maven (at least the free Community Edition)
-- install JDK 8 Update 172 (this should also include JRE 8 Update 172)
-- install VC++ 2005 runtime (for sapjco3.jar; only required on Windows, see sap jco documentation inside zip file in resources)
+- install IntelliJ Idea 2018.1 including Maven (at least the free Community Edition), see: [Jetbrains IntelliJ Idea Downloads](https://www.jetbrains.com/idea/download/)
+- install JDK 8 Update 172 (this should also include JRE 8 Update 172), see: [JDK 8 Downloads](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+- install VC++ 2005 runtime (for sapjco3.jar; only required on Windows, see sap jco documentation inside zip file in resources), see: [Microsoft VC++ 2005 Downloads](https://www.microsoft.com/en-US/download/details.aspx?id=21254)
 
 ## Project Build Setup:
 - open IntelliJ Idea
@@ -34,7 +34,7 @@
 ## Test Environment Notes:
 - install only JRE 8 Update 172 and uninstall all other JREs on the machine (it was very difficult to find a JRE version that works best with all dependencies)
 - on Windows: execute the JRE setup and follow the installation wizard
-- on linux: install JRE 8 Update 172 using following commands
+- on linux: install the JRE using following commands ([source](https://wiki.ubuntuusers.de/Java/Installation/Oracle_Java/Java_8/))
 
 ```sh
 #!/bin/bash
@@ -59,6 +59,7 @@ sudo update-alternatives --set "java" "$JAVA_ROOT/$JAVA8_INSTALLATION_FOLDER/bin
 sudo update-alternatives --set "javaws" "$JAVA_ROOT/$JAVA8_INSTALLATION_FOLDER/bin/javaws"
 
 # note: this script was tested on linux ubuntu 16.04 LTS
+# see: https://wiki.ubuntuusers.de/Java/Installation/Oracle_Java/Java_8/
 
 # ========================================================
 #                Marco Tröster, 12.07.2018
@@ -66,6 +67,8 @@ sudo update-alternatives --set "javaws" "$JAVA_ROOT/$JAVA8_INSTALLATION_FOLDER/b
 ```
 
 ## Notes:
-This development setup procedure was only tested on a Windows 10 machine. Please feel free to report any issues with your deveploment or test environment setup.
+The development setup procedure was only tested on a Windows 10 machine.
+
+Please feel free to report any issues with your deveploment or test environment setup.
 
 Technical documentation was made by Marco Tröster (marco.troester@student.uni-augsburg.de)
