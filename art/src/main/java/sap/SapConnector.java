@@ -10,6 +10,7 @@ import data.entities.AccessCondition;
 import data.entities.AccessConditionType;
 import data.entities.AccessPattern;
 import data.entities.AccessPatternConditionProperty;
+import data.entities.AccessProfileCondition;
 import data.entities.ConditionLinkage;
 import data.entities.Configuration;
 import data.entities.CriticalAccessEntry;
@@ -21,11 +22,18 @@ import extensions.progess.ProgressableBase;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import javafx.concurrent.Task;
 import tools.tracing.TraceOut;
 
 @SuppressWarnings("WeakerAccess")
@@ -53,6 +61,11 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
         // overwrite the JCo SAP DestinationDataProvider so we don't need to create a file
         sessionKey = CustomDestinationDataProvider.getInstance().openSession(sapConfig, username, password);
 
+        // make sure the connection is initialized (to avoid long queries)
+        if (canPingServer()) {
+            runTestConditionQuery();
+        }
+
         TraceOut.leave();
     }
 
@@ -72,26 +85,16 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
      * @return a boolean value that indicates whether the ping was successful
      * @throws JCoException if the ping fails
      */
-    public boolean canPingServer() throws JCoException {
+    public synchronized boolean canPingServer() throws JCoException {
 
         TraceOut.enter();
 
-        //boolean ret = true;
-        boolean ret = false;
-        //try {
-
-        // try to ping the sap server (if the ping fails an exception is thrown -> program enters catch block and returns false)
+        // try to ping the sap server (if the ping fails an exception is thrown)
         JCoDestination destination = JCoDestinationManager.getDestination(sessionKey);
         destination.ping();
 
-        //} catch (JCoException ex) {
-
-        //    TraceOut.writeException(ex);
-        ret = true;
-        // }
-
         TraceOut.leave();
-        return ret;
+        return true;
     }
 
     // =============================
@@ -105,7 +108,7 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
      * @return the results of the query (including all configuration settings used for the query)
      * @throws Exception caused by network errors during sap query
      */
-    public CriticalAccessQuery runAnalysis(Configuration config) throws Exception {
+    public synchronized CriticalAccessQuery runAnalysis(Configuration config) throws Exception {
 
         TraceOut.enter();
 
@@ -113,23 +116,36 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
 
         if (canPingServer()) {
 
-            setTotalProgressSteps(config.getPatterns().stream().mapToInt(x -> x.getConditions().size()).sum());
+            setTotalProgressSteps(config.getPatterns().stream().mapToInt(x -> x.getConditions().size()).sum() + 1);
             Set<CriticalAccessEntry> entries = new LinkedHashSet<>();
 
-            for (AccessPattern pattern : config.getPatterns()) {
+            runTestConditionQuery();
+
+            // execute analysis for each pattern parallel
+            ExecutorService executor = Executors.newFixedThreadPool(config.getPatterns().size());
+            List<Future<Set<CriticalAccessEntry>>> taskCallbacks
+                = executor.invokeAll(config.getPatterns().stream()
+                .map(pattern -> (Callable<Set<CriticalAccessEntry>>) () -> runPatternAnalysis(pattern, config.getWhitelist()))
+                .collect(Collectors.toList()));
+
+            // evaluate query results
+            for (Future<Set<CriticalAccessEntry>> callback : taskCallbacks) {
+                entries.addAll(callback.get());
+            }
+
+            /*for (AccessPattern pattern : config.getPatterns()) {
 
                 // executing query for pattern
                 Set<CriticalAccessEntry> resultsOfPattern = runPatternAnalysis(pattern, config.getWhitelist());
                 entries.addAll(resultsOfPattern);
 
                 TraceOut.writeInfo("Pattern: " + pattern.getUsecaseId() + ", results count: " + resultsOfPattern.size());
-            }
+            }*/
 
             // write results to critical access query (ready for insertion into database)
             query = new CriticalAccessQuery(config, sapConfig, entries);
 
             resetProgress();
-
         }
 
         TraceOut.leave();
@@ -147,39 +163,17 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
 
         TraceOut.enter();
 
-        JCoDestination destination = JCoDestinationManager.getDestination(sessionKey);
-        JCoFunction function = destination.getRepository().getFunction("SUSR_SUIM_API_RSUSR002");
+        ExecutorService executor = Executors.newFixedThreadPool(pattern.getConditions().size());
+        List<Future<Set<String>>> taskCallbacks =
+            executor.invokeAll(pattern.getConditions().stream().map(condition -> prepareSapConditionQueryTask(condition)).collect(Collectors.toSet()));
 
-        JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");
-        JCoTable profileTable = function.getImportParameterList().getTable("IT_PROF1");
-
+        // evaluate query results
         Set<String> usernames = new LinkedHashSet<>();
 
-        for (AccessCondition condition : pattern.getConditions()) {
+        for (Future<Set<String>> callback : taskCallbacks) {
 
-            // apply condition to sap query
-            prepareJcoTablesForQuery(condition, inputTable, profileTable);
-
-            JCoTable conditionQueryResultTable = sapQuerySingleCondition(function);
-            Set<String> usernamesOfCondition = parseQueryResults(conditionQueryResultTable);
-
-            if (pattern.getLinkage() == ConditionLinkage.And) {
-
-                // intersect lists
-                usernames = usernames.isEmpty() ? usernamesOfCondition : usernames.stream().filter(x -> usernamesOfCondition.contains(x)).collect(Collectors.toSet());
-
-            } else if (pattern.getLinkage() == ConditionLinkage.Or || pattern.getLinkage() == ConditionLinkage.None) {
-
-                // union lists
-                usernames.addAll(usernamesOfCondition);
-            }
-
-            // clear sap input tables
-            inputTable.clear();
-            profileTable.clear();
-
-            // notify progress
-            stepProgress();
+            Set<String> usernamesOfCondition = callback.get();
+            applyNewUsernames(usernames, pattern.getLinkage(), usernamesOfCondition);
         }
 
         if (whitelist != null) {
@@ -197,6 +191,63 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
 
         TraceOut.leave();
         return entries;
+    }
+
+    private void runTestConditionQuery() throws Exception {
+
+        AccessCondition condition = new AccessCondition(null, new AccessProfileCondition("test"));
+        Callable<Set<String>> queryTask = prepareSapConditionQueryTask(condition);
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.invokeAll(Arrays.asList(queryTask));
+    }
+
+    private Callable<Set<String>> prepareSapConditionQueryTask(AccessCondition condition) {
+
+        return () -> {
+
+            System.out.println("task " + Thread.currentThread().getName() + " started");
+
+            // prepare the sap condition query
+            JCoDestination destination = JCoDestinationManager.getDestination(sessionKey);
+            JCoFunction function = destination.getRepository().getFunction("SUSR_SUIM_API_RSUSR002");
+            JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");
+            JCoTable profileTable = function.getImportParameterList().getTable("IT_PROF1");
+            prepareJcoTablesForQuery(condition, inputTable, profileTable);
+
+            // run the query and apply the results to the list
+            JCoTable conditionQueryResultTable = sapQuerySingleCondition(function);
+            Set<String> usernamesOfCondition = parseQueryResults(conditionQueryResultTable);
+
+            // TODO: check if clear() is even required
+            /*// clear sap input tables
+            inputTable.clear();
+            profileTable.clear();*/
+
+            // notify progress
+            stepProgress();
+
+            System.out.println("task " + Thread.currentThread().getName() + " finished");
+
+            return usernamesOfCondition;
+        };
+    }
+
+    private void applyNewUsernames(Set<String> usernames, ConditionLinkage linkage, Set<String> newUsernames) {
+
+        if (linkage == ConditionLinkage.And) {
+
+            // intersect lists
+            usernames = usernames.isEmpty() ? newUsernames : usernames.stream().filter(x -> newUsernames.contains(x)).collect(Collectors.toSet());
+
+        } else if (linkage == ConditionLinkage.Or || linkage == ConditionLinkage.None) {
+
+            // union lists
+            usernames.addAll(newUsernames);
+
+        } else {
+            throw new IllegalArgumentException("unknow linkage");
+        }
     }
 
     /**
