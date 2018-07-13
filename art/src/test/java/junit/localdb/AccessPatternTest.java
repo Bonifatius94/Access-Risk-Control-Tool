@@ -66,21 +66,21 @@ public class AccessPatternTest {
                 new AccessCondition(
                     pattern,
                     new AccessPatternCondition(Arrays.asList(
-                        new AccessPatternConditionProperty("S_TCODE", "TCD", "SCCL", null, null, null),
-                        new AccessPatternConditionProperty("S_ADMI_FCD", "S_ADMI_FCD", "T000", null, null, null),
-                        new AccessPatternConditionProperty("S_TABU_DIS", "ACTVT", "02", null, null, null),
-                        new AccessPatternConditionProperty("S_TABU_DIS", "DICBERCLS", "\"*\"", null, null, null),
-                        new AccessPatternConditionProperty("S_TABU_CLI", "CLIIDMAINT", "X", null, null, null)
+                        new AccessPatternConditionProperty("S_TCODE", "TCD", "SCCL", null, null, null, 0),
+                        new AccessPatternConditionProperty("S_ADMI_FCD", "S_ADMI_FCD", "T000", null, null, null, 1),
+                        new AccessPatternConditionProperty("S_TABU_DIS", "ACTVT", "02", null, null, null, 2),
+                        new AccessPatternConditionProperty("S_TABU_DIS", "DICBERCLS", "\"*\"", null, null, null, 3),
+                        new AccessPatternConditionProperty("S_TABU_CLI", "CLIIDMAINT", "X", null, null, null, 3)
                     ))
                 ),
                 new AccessCondition(
                     pattern,
                     new AccessPatternCondition(Arrays.asList(
-                        new AccessPatternConditionProperty("S_TCODE", "TCD", "SCCL", null, null, null),
-                        new AccessPatternConditionProperty("S_ADMI_FCD", "S_ADMI_FCD", "T000", null, null, null),
-                        new AccessPatternConditionProperty("S_TABU_DIS", "ACTVT", "02", null, null, null),
-                        new AccessPatternConditionProperty("S_TABU_DIS", "DICBERCLS", "\"*\"", null, null, null),
-                        new AccessPatternConditionProperty("S_TABU_CLI", "CLIIDMAINT", "X", null, null, null)
+                        new AccessPatternConditionProperty("S_TCODE", "TCD", "SCCL", null, null, null, 0),
+                        new AccessPatternConditionProperty("S_ADMI_FCD", "S_ADMI_FCD", "T000", null, null, null, 1),
+                        new AccessPatternConditionProperty("S_TABU_DIS", "ACTVT", "02", null, null, null, 2),
+                        new AccessPatternConditionProperty("S_TABU_DIS", "DICBERCLS", "\"*\"", null, null, null, 3),
+                        new AccessPatternConditionProperty("S_TABU_CLI", "CLIIDMAINT", "X", null, null, null, 4)
                     ))
                 )
             ));

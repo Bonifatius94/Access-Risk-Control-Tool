@@ -2,7 +2,7 @@ package data.entities;
 
 import java.time.ZonedDateTime;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -73,7 +73,7 @@ public class Configuration implements IReferenceAware, IDataEntity {
         joinColumns = { @JoinColumn(name = "ConfigId") },
         inverseJoinColumns = { @JoinColumn(name = "AccessPatternId") }
     )
-    private Set<AccessPattern> patterns = new HashSet<>();
+    private Set<AccessPattern> patterns = new LinkedHashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "WhitelistId")
@@ -127,7 +127,7 @@ public class Configuration implements IReferenceAware, IDataEntity {
     }
 
     public void setPatterns(List<AccessPattern> patterns) {
-        setPatterns(new HashSet<>(patterns));
+        setPatterns(new LinkedHashSet<>(patterns));
     }
 
     /**

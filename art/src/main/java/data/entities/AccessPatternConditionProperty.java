@@ -35,8 +35,9 @@ public class AccessPatternConditionProperty {
      * @param value2             the new second value of this instance
      * @param value3             the new third value of this instance
      * @param value4             the new fourth value of this instance
+     * @param index              the new index of this instance
      */
-    public AccessPatternConditionProperty(String authObject, String authObjectProperty, String value1, String value2, String value3, String value4) {
+    public AccessPatternConditionProperty(String authObject, String authObjectProperty, String value1, String value2, String value3, String value4, Integer index) {
 
         setAuthObject(authObject);
         setAuthObjectProperty(authObjectProperty);
@@ -44,6 +45,7 @@ public class AccessPatternConditionProperty {
         setValue2(value2);
         setValue3(value3);
         setValue4(value4);
+        setIndex(index);
     }
 
     /**
@@ -59,6 +61,7 @@ public class AccessPatternConditionProperty {
         this.setValue2(original.getValue2());
         this.setValue3(original.getValue3());
         this.setValue4(original.getValue4());
+        this.setIndex(original.getIndex());
     }
 
     // =============================
@@ -79,12 +82,17 @@ public class AccessPatternConditionProperty {
     @Column(nullable = false)
     private String authObjectProperty;
 
+    // TODO: create a new 1-n relationship between property and attached value sets
+
     @Column(nullable = false)
     private String value1;
 
     private String value2;
     private String value3;
     private String value4;
+
+    @Column(nullable = false)
+    private Integer index = 0;
 
     // =============================
     //      getters / setters
@@ -154,6 +162,14 @@ public class AccessPatternConditionProperty {
         this.value4 = value4;
     }
 
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
+    }
+
     // =============================
     //          overrides
     // =============================
@@ -171,7 +187,8 @@ public class AccessPatternConditionProperty {
                 + ", value1='" + getValue1() + "'"
                 + ", value2='" + getValue2() + "'"
                 + ", value3='" + getValue3() + "'"
-                + ", value4='" + getValue4() + "'";
+                + ", value4='" + getValue4() + "'"
+                + ", index=" + getIndex();
     }
 
 }

@@ -1,7 +1,7 @@
 package data.entities;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,7 +63,7 @@ public class AccessPatternCondition implements IReferenceAware {
     private AccessCondition condition;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AccessPatternConditionProperty> properties = new HashSet<>();
+    private Set<AccessPatternConditionProperty> properties = new LinkedHashSet<>();
 
     // =============================
     //       getters / setters
@@ -90,7 +90,7 @@ public class AccessPatternCondition implements IReferenceAware {
     }
 
     public void setProperties(List<AccessPatternConditionProperty> properties) {
-        setProperties(new HashSet<>(properties));
+        setProperties(new LinkedHashSet<>(properties));
     }
 
     /**

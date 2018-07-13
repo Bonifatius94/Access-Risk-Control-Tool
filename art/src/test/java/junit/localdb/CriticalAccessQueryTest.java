@@ -5,7 +5,7 @@ import data.localdb.ArtDbContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -53,7 +53,7 @@ public class CriticalAccessQueryTest {
 
             // prepare query entries
             AccessPattern violatedPattern = config.getPatterns().stream().filter(x -> x.getId().equals(3)).findFirst().get();
-            Set entries = new HashSet();
+            Set entries = new LinkedHashSet();
             final String criticalUser = "raboof";
             CriticalAccessEntry entry = new CriticalAccessEntry(violatedPattern, criticalUser);
             entries.add(entry);

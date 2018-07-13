@@ -1,6 +1,6 @@
 package data.entities;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class DbUser {
@@ -53,7 +53,7 @@ public class DbUser {
     // =============================
 
     private String username;
-    private Set<DbUserRole> roles = new HashSet<>();
+    private Set<DbUserRole> roles = new LinkedHashSet<>();
     private boolean isFirstLogin = true;
 
     // =============================

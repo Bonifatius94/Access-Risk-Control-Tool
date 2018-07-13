@@ -1,6 +1,6 @@
 package extensions.progess;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @SuppressWarnings("unused")
@@ -10,7 +10,7 @@ public abstract class ProgressableBase implements IProgressable {
     //           members
     // =============================
 
-    private Set<IProgressListener> listeners = new HashSet<>();
+    private Set<IProgressListener> listeners = new LinkedHashSet<>();
 
     private double currentProgress = 0;
 

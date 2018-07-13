@@ -15,7 +15,7 @@ import java.io.File;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -42,7 +42,7 @@ public class CsvExportTest {
 
             // create critical access query
             CriticalAccessQuery query = new CriticalAccessQuery(config, sapConfig,
-                new HashSet<>(Arrays.asList(
+                new LinkedHashSet<>(Arrays.asList(
                     new CriticalAccessEntry(patterns.get(0), "Test User"),
                     new CriticalAccessEntry(patterns.get(1), "Test User 2")
                 ))

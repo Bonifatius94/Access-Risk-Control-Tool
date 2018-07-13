@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -912,7 +912,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
             // correct references (original -> archived)
             if (originalConfig.isArchived()) {
 
-                Set<AccessPattern> patterns = new HashSet<>(originalConfig.getPatterns());
+                Set<AccessPattern> patterns = new LinkedHashSet<>(originalConfig.getPatterns());
                 patterns.stream().filter(x -> x.getId().equals(pattern.getId())).collect(Collectors.toSet()).forEach(x -> patterns.remove(x));
                 patterns.add(archived);
                 originalConfig.setPatterns(patterns);
@@ -920,7 +920,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
 
             } else {
 
-                Set<AccessPattern> patterns = new HashSet<>(originalConfig.getPatterns());
+                Set<AccessPattern> patterns = new LinkedHashSet<>(originalConfig.getPatterns());
                 patterns.stream().filter(x -> x.getId().equals(pattern.getId())).collect(Collectors.toSet()).forEach(x -> patterns.remove(x));
                 patterns.add(archived);
 
@@ -1190,7 +1190,7 @@ public class ArtDbContext extends H2ContextBase implements IArtDbContext {
                 // remove pattern from active configs referencing it and archive those configs
                 for (Configuration config : configsToArchive) {
 
-                    Set<AccessPattern> patterns = new HashSet<>(config.getPatterns());
+                    Set<AccessPattern> patterns = new LinkedHashSet<>(config.getPatterns());
                     patterns.stream().filter(x -> x.getId().equals(pattern.getId())).collect(Collectors.toList()).forEach(x -> patterns.remove(x));
                     config.setPatterns(patterns);
                     config.adjustReferences();

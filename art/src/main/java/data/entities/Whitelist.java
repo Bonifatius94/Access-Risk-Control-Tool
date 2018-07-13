@@ -1,7 +1,7 @@
 package data.entities;
 
 import java.time.ZonedDateTime;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -69,7 +69,7 @@ public class Whitelist implements IReferenceAware, IDataEntity {
     private String description;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "whitelist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<WhitelistEntry> entries = new HashSet<>();
+    private Set<WhitelistEntry> entries = new LinkedHashSet<>();
 
     @Column(nullable = false)
     private boolean isArchived;
@@ -113,7 +113,7 @@ public class Whitelist implements IReferenceAware, IDataEntity {
     }
 
     public void setEntries(List<WhitelistEntry> entries) {
-        setEntries(new HashSet<>(entries));
+        setEntries(new LinkedHashSet<>(entries));
     }
 
     /**

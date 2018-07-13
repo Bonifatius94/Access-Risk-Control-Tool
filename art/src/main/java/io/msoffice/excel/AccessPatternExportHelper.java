@@ -11,7 +11,9 @@ import data.entities.ConditionLinkage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -156,7 +158,10 @@ public class AccessPatternExportHelper {
         int startRowIndex = sheet.getPhysicalNumberOfRows();
         int rowIndex = startRowIndex;
 
-        for (AccessPatternConditionProperty property : condition.getProperties()) {
+        List<AccessPatternConditionProperty> sortedProperties =
+            condition.getProperties().stream().sorted(Comparator.comparing(AccessPatternConditionProperty::getIndex)).collect(Collectors.toList());
+
+        for (AccessPatternConditionProperty property : sortedProperties) {
 
             // create new row
             int columnIndex = isComplex ? 3 : 2;

@@ -207,6 +207,7 @@ public class AccessPatternImportHelper {
         } else {
 
             // case: auth pattern condition
+            int i = 0;
             int startIndex = isComplex ? 3 : 2;
             List<AccessPatternConditionProperty> properties = new ArrayList<>();
 
@@ -227,7 +228,8 @@ public class AccessPatternImportHelper {
                 temp = row.getCell(++index);
                 final String value4 = (temp != null) ? temp.getStringCellValue().trim() : null;
 
-                properties.add(new AccessPatternConditionProperty(authorizationObject, propertyName, value1, value2, value3, value4));
+                properties.add(new AccessPatternConditionProperty(authorizationObject, propertyName, value1, value2, value3, value4, i));
+                i++;
             }
 
             condition.setPatternCondition(new AccessPatternCondition(properties));

@@ -2,7 +2,7 @@ package data.entities;
 
 import java.time.ZonedDateTime;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -61,7 +61,7 @@ public class CriticalAccessQuery implements IReferenceAware, IDataEntity {
     private SapConfiguration sapConfig;
 
     @OneToMany(mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<CriticalAccessEntry> entries = new HashSet<>();
+    private Set<CriticalAccessEntry> entries = new LinkedHashSet<>();
 
     @Column(nullable = false)
     private boolean isArchived;
@@ -105,7 +105,7 @@ public class CriticalAccessQuery implements IReferenceAware, IDataEntity {
     }
 
     public void setEntries(List<CriticalAccessEntry> entries) {
-        setEntries(new HashSet<>(entries));
+        setEntries(new LinkedHashSet<>(entries));
     }
 
     /**

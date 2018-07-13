@@ -3,16 +3,18 @@ package ui.main.admin;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXTextField;
+
 import data.entities.DbUser;
 import data.entities.DbUserRole;
 import data.localdb.ArtDbContext;
+
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.security.SecureRandom;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -28,9 +30,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
-
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.HBox;
+
 import ui.AppComponents;
 import ui.IUpdateTable;
 import ui.custom.controls.ButtonCell;
@@ -82,7 +84,7 @@ public class AdminController implements IUpdateTable {
     private ArtDbContext database = AppComponents.getInstance().getDbContext();
     private ResourceBundle bundle = ResourceBundle.getBundle("lang");
     private DbUser editDbUser;
-    private Set<DbUserRole> dbUserRoleSet = new HashSet<>();
+    private Set<DbUserRole> dbUserRoleSet = new LinkedHashSet<>();
 
     // stores if a new user is currently added
     private SimpleBooleanProperty newUserMode = new SimpleBooleanProperty();
@@ -299,7 +301,7 @@ public class AdminController implements IUpdateTable {
         initializeCheckboxes();
 
         // create a new user with random password and add him to the table
-        DbUser newDbUser = new DbUser("", new HashSet<>());
+        DbUser newDbUser = new DbUser("", new LinkedHashSet<>());
         tfDbUserPassword.setText(generateFirstPassword(15));
         userTable.getItems().add(newDbUser);
 

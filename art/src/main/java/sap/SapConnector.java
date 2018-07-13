@@ -22,7 +22,7 @@ import extensions.progess.ProgressableBase;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -114,7 +114,7 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
         if (canPingServer()) {
 
             setTotalProgressSteps(config.getPatterns().stream().mapToInt(x -> x.getConditions().size()).sum());
-            Set<CriticalAccessEntry> entries = new HashSet<>();
+            Set<CriticalAccessEntry> entries = new LinkedHashSet<>();
 
             for (AccessPattern pattern : config.getPatterns()) {
 
@@ -153,7 +153,7 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
         JCoTable inputTable = function.getImportParameterList().getTable("IT_VALUES");
         JCoTable profileTable = function.getImportParameterList().getTable("IT_PROF1");
 
-        Set<String> usernames = new HashSet<>();
+        Set<String> usernames = new LinkedHashSet<>();
 
         for (AccessCondition condition : pattern.getConditions()) {
 
@@ -285,7 +285,7 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
 
         TraceOut.enter();
 
-        Set<String> usernames = new HashSet<>();
+        Set<String> usernames = new LinkedHashSet<>();
 
         for (int i = 0; i < table.getNumRows(); i++) {
 

@@ -67,35 +67,35 @@ INSERT INTO AccessProfileConditions (condition_id, profile) VALUES (1, 'SAP_ALL'
 INSERT INTO AccessPatterns (id, isArchived, createdAt, createdBy, usecaseId, description, linkage) VALUES (2, 0, '2018-06-08T15:09:15', 'test', '1.A', 'Unexpected users are authorized to copy a client (local copy wo user/profiles)', 'And');
 INSERT INTO AccessConditions (id, type, patternId) VALUES (2, 'Pattern', 2);
 INSERT INTO AccessPatternConditions (condition_id) VALUES (2);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (1, 'S_TCODE',    'TCD',        'SCCL', 'SCC9', NULL, NULL, 2);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (2, 'S_ADMI_FCD', 'S_ADMI_FCD', 'T000',  NULL,  NULL, NULL, 2);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (3, 'S_TABU_DIS', 'ACTVT',      '02',    NULL,  NULL, NULL, 2);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (4, 'S_TABU_DIS', 'DICBERCLS',  '"*"',   NULL,  NULL, NULL, 2);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (5, 'S_TABU_CLI', 'CLIIDMAINT', 'X',     NULL,  NULL, NULL, 2);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (1, 'S_TCODE',    'TCD',        'SCCL', 'SCC9', NULL, NULL, 0, 2);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (2, 'S_ADMI_FCD', 'S_ADMI_FCD', 'T000',  NULL,  NULL, NULL, 1, 2);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (3, 'S_TABU_DIS', 'ACTVT',      '02',    NULL,  NULL, NULL, 2, 2);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (4, 'S_TABU_DIS', 'DICBERCLS',  '"*"',   NULL,  NULL, NULL, 3, 2);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (5, 'S_TABU_CLI', 'CLIIDMAINT', 'X',     NULL,  NULL, NULL, 4, 2);
 INSERT INTO AccessConditions (id, type, patternId) VALUES (3, 'Pattern', 2);
 INSERT INTO AccessPatternConditions (condition_id) VALUES (3);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (6,  'S_TCODE',    'TCD',      'SCCL', 'SCC9', NULL, NULL, 3);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (7,  'S_DATASET',  'PROGRAM',  '"*"',   NULL,  NULL, NULL, 3);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (8,  'S_DATASET',  'ACTVT',    '"*"',   NULL,  NULL, NULL, 3);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (9,  'S_DATASET',  'FILENAME', '"*"',   NULL,  NULL, NULL, 3);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (10, 'S_CLNT_IMP', 'ACTVT',    '60',    NULL,  NULL, NULL, 3);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (6,  'S_TCODE',    'TCD',      'SCCL', 'SCC9', NULL, NULL, 0, 3);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (7,  'S_DATASET',  'PROGRAM',  '"*"',   NULL,  NULL, NULL, 1, 3);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (8,  'S_DATASET',  'ACTVT',    '"*"',   NULL,  NULL, NULL, 2, 3);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (9,  'S_DATASET',  'FILENAME', '"*"',   NULL,  NULL, NULL, 3, 3);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (10, 'S_CLNT_IMP', 'ACTVT',    '60',    NULL,  NULL, NULL, 4, 3);
 
 -- use case with pattern condition (OR linkage, use case 2.B from examples)
 INSERT INTO AccessPatterns (id, isArchived, createdAt, createdBy, usecaseId, description, linkage) VALUES (3, 0, '2018-06-08T15:09:15', 'test', '2.B', 'Unexpected users with unrestricted access to workbench components', 'Or');
 INSERT INTO AccessConditions (id, type, patternId) VALUES (4, 'Pattern', 3);
 INSERT INTO AccessPatternConditions (condition_id) VALUES (4);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (11, 'S_DEVELOP', 'DEVCLASS', '"*"', NULL, NULL, NULL, 4);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (12, 'S_DEVELOP', 'OBJTYPE',  '"*"', NULL, NULL, NULL, 4);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (13, 'S_DEVELOP', 'OBJNAME',  '"*"', NULL, NULL, NULL, 4);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (14, 'S_DEVELOP', 'P_GROUP',  '"*"', NULL, NULL, NULL, 4);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (15, 'S_DEVELOP', 'ACTVT',    '"*"', NULL, NULL, NULL, 4);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (11, 'S_DEVELOP', 'DEVCLASS', '"*"', NULL, NULL, NULL, 0, 4);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (12, 'S_DEVELOP', 'OBJTYPE',  '"*"', NULL, NULL, NULL, 1, 4);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (13, 'S_DEVELOP', 'OBJNAME',  '"*"', NULL, NULL, NULL, 2, 4);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (14, 'S_DEVELOP', 'P_GROUP',  '"*"', NULL, NULL, NULL, 3, 4);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (15, 'S_DEVELOP', 'ACTVT',    '"*"', NULL, NULL, NULL, 4, 4);
 INSERT INTO AccessConditions (id, type, patternId) VALUES (5, 'Pattern', 3);
 INSERT INTO AccessPatternConditions (condition_id) VALUES (5);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (16, 'S_DEVELOP', 'DEVCLASS', '*',     NULL,   NULL, NULL, 5);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (17, 'S_DEVELOP', 'OBJTYPE',  'DEBUG', 'PROG', NULL, NULL, 5);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (18, 'S_DEVELOP', 'OBJNAME',  '*',     NULL,   NULL, NULL, 5);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (19, 'S_DEVELOP', 'P_GROUP',  '*',     NULL,   NULL, NULL, 5);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (20, 'S_DEVELOP', 'ACTVT',    '01',    '02',   NULL, NULL, 5);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (16, 'S_DEVELOP', 'DEVCLASS', '*',     NULL,   NULL, NULL, 0, 5);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (17, 'S_DEVELOP', 'OBJTYPE',  'DEBUG', 'PROG', NULL, NULL, 1, 5);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (18, 'S_DEVELOP', 'OBJNAME',  '*',     NULL,   NULL, NULL, 2, 5);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (19, 'S_DEVELOP', 'P_GROUP',  '*',     NULL,   NULL, NULL, 3, 5);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (20, 'S_DEVELOP', 'ACTVT',    '01',    '02',   NULL, NULL, 4, 5);
 
 -- ==============================
 --      use cases (archived)
@@ -110,35 +110,35 @@ INSERT INTO AccessProfileConditions (condition_id, profile) VALUES (6, 'SAP_ALL'
 INSERT INTO AccessPatterns (id, isArchived, createdAt, createdBy, usecaseId, description, linkage) VALUES (5, 1, '2018-06-08T15:09:15', 'test', '1.A', 'Unexpected users are authorized to copy a client (local copy wo user/profiles)', 'And');
 INSERT INTO AccessConditions (id, type, patternId) VALUES (7, 'Pattern', 5);
 INSERT INTO AccessPatternConditions (condition_id) VALUES (7);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (21, 'S_TCODE',    'TCD',        'SCCL', 'SCC9', NULL, NULL, 7);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (22, 'S_ADMI_FCD', 'S_ADMI_FCD', 'T000',  NULL,  NULL, NULL, 7);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (23, 'S_TABU_DIS', 'ACTVT',      '02',    NULL,  NULL, NULL, 7);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (24, 'S_TABU_DIS', 'DICBERCLS',  '"*"',   NULL,  NULL, NULL, 7);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (25, 'S_TABU_CLI', 'CLIIDMAINT', 'X',     NULL,  NULL, NULL, 7);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (21, 'S_TCODE',    'TCD',        'SCCL', 'SCC9', NULL, NULL, 0, 7);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (22, 'S_ADMI_FCD', 'S_ADMI_FCD', 'T000',  NULL,  NULL, NULL, 1, 7);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (23, 'S_TABU_DIS', 'ACTVT',      '02',    NULL,  NULL, NULL, 2, 7);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (24, 'S_TABU_DIS', 'DICBERCLS',  '"*"',   NULL,  NULL, NULL, 3, 7);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (25, 'S_TABU_CLI', 'CLIIDMAINT', 'X',     NULL,  NULL, NULL, 4, 7);
 INSERT INTO AccessConditions (id, type, patternId) VALUES (8, 'Pattern', 5);
 INSERT INTO AccessPatternConditions (condition_id) VALUES (8);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (26,  'S_TCODE',    'TCD',      'SCCL', 'SCC9', NULL, NULL, 8);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (27,  'S_DATASET',  'PROGRAM',  '"*"',   NULL,  NULL, NULL, 8);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (28,  'S_DATASET',  'ACTVT',    '"*"',   NULL,  NULL, NULL, 8);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (29,  'S_DATASET',  'FILENAME', '"*"',   NULL,  NULL, NULL, 8);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (30,  'S_CLNT_IMP', 'ACTVT',    '60',    NULL,  NULL, NULL, 8);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (26,  'S_TCODE',    'TCD',      'SCCL', 'SCC9', NULL, NULL, 0, 8);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (27,  'S_DATASET',  'PROGRAM',  '"*"',   NULL,  NULL, NULL, 1, 8);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (28,  'S_DATASET',  'ACTVT',    '"*"',   NULL,  NULL, NULL, 2, 8);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (29,  'S_DATASET',  'FILENAME', '"*"',   NULL,  NULL, NULL, 3, 8);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (30,  'S_CLNT_IMP', 'ACTVT',    '60',    NULL,  NULL, NULL, 4, 8);
 
 -- use case with pattern condition (OR linkage, use case 2.B from examples)
 INSERT INTO AccessPatterns (id, isArchived, createdAt, createdBy, usecaseId, description, linkage) VALUES (6, 1, '2018-06-08T15:09:15', 'test', '2.B', 'Unexpected users with unrestricted access to workbench components', 'Or');
 INSERT INTO AccessConditions (id, type, patternId) VALUES (9, 'Pattern', 6);
 INSERT INTO AccessPatternConditions (condition_id) VALUES (9);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (31, 'S_DEVELOP', 'DEVCLASS', '"*"', NULL, NULL, NULL, 9);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (32, 'S_DEVELOP', 'OBJTYPE',  '"*"', NULL, NULL, NULL, 9);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (33, 'S_DEVELOP', 'OBJNAME',  '"*"', NULL, NULL, NULL, 9);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (34, 'S_DEVELOP', 'P_GROUP',  '"*"', NULL, NULL, NULL, 9);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (35, 'S_DEVELOP', 'ACTVT',    '"*"', NULL, NULL, NULL, 9);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (31, 'S_DEVELOP', 'DEVCLASS', '"*"', NULL, NULL, NULL, 0, 9);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (32, 'S_DEVELOP', 'OBJTYPE',  '"*"', NULL, NULL, NULL, 1, 9);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (33, 'S_DEVELOP', 'OBJNAME',  '"*"', NULL, NULL, NULL, 2, 9);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (34, 'S_DEVELOP', 'P_GROUP',  '"*"', NULL, NULL, NULL, 3, 9);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (35, 'S_DEVELOP', 'ACTVT',    '"*"', NULL, NULL, NULL, 4, 9);
 INSERT INTO AccessConditions (id, type, patternId) VALUES (10, 'Pattern', 6);
 INSERT INTO AccessPatternConditions (condition_id) VALUES (10);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (36, 'S_DEVELOP', 'DEVCLASS', '*',     NULL,   NULL, NULL, 10);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (37, 'S_DEVELOP', 'OBJTYPE',  'DEBUG', 'PROG', NULL, NULL, 10);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (38, 'S_DEVELOP', 'OBJNAME',  '*',     NULL,   NULL, NULL, 10);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (39, 'S_DEVELOP', 'P_GROUP',  '*',     NULL,   NULL, NULL, 10);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (40, 'S_DEVELOP', 'ACTVT',    '01',    '02',   NULL, NULL, 10);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (36, 'S_DEVELOP', 'DEVCLASS', '*',     NULL,   NULL, NULL, 0, 10);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (37, 'S_DEVELOP', 'OBJTYPE',  'DEBUG', 'PROG', NULL, NULL, 1, 10);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (38, 'S_DEVELOP', 'OBJNAME',  '*',     NULL,   NULL, NULL, 2, 10);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (39, 'S_DEVELOP', 'P_GROUP',  '*',     NULL,   NULL, NULL, 3, 10);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (40, 'S_DEVELOP', 'ACTVT',    '01',    '02',   NULL, NULL, 4, 10);
 
 -- ==============================
 --      use cases (active) (that are not referenced by a query)
@@ -152,18 +152,18 @@ INSERT INTO AccessProfileConditions (condition_id, profile) VALUES (11, 'SAP_NEW
 INSERT INTO AccessPatterns (id, isArchived, createdAt, createdBy, usecaseId, description, linkage) VALUES (8, 0, '2018-06-08T15:09:15', 'test', '1.A', 'Unexpected users are authorized to copy a client (local copy wo user/profiles)', 'And');
 INSERT INTO AccessConditions (id, type, patternId) VALUES (12, 'Pattern', 8);
 INSERT INTO AccessPatternConditions (condition_id) VALUES (12);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (41, 'S_TCODE',    'TCD',        'SCCL', 'SCC9', NULL, NULL, 12);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (42, 'S_ADMI_FCD', 'S_ADMI_FCD', 'T000',  NULL,  NULL, NULL, 12);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (43, 'S_TABU_DIS', 'ACTVT',      '02',    NULL,  NULL, NULL, 12);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (44, 'S_TABU_DIS', 'DICBERCLS',  '"*"',   NULL,  NULL, NULL, 12);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (45, 'S_TABU_CLI', 'CLIIDMAINT', 'X',     NULL,  NULL, NULL, 12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (41, 'S_TCODE',    'TCD',        'SCCL', 'SCC9', NULL, NULL, 0, 12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (42, 'S_ADMI_FCD', 'S_ADMI_FCD', 'T000',  NULL,  NULL, NULL, 1, 12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (43, 'S_TABU_DIS', 'ACTVT',      '02',    NULL,  NULL, NULL, 2, 12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (44, 'S_TABU_DIS', 'DICBERCLS',  '"*"',   NULL,  NULL, NULL, 3, 12);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (45, 'S_TABU_CLI', 'CLIIDMAINT', 'X',     NULL,  NULL, NULL, 4, 12);
 INSERT INTO AccessConditions (id, type, patternId) VALUES (13, 'Pattern',8);
 INSERT INTO AccessPatternConditions (condition_id) VALUES (13);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (46,  'S_TCODE',    'TCD',      'SCCL', 'SCC9', NULL, NULL, 13);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (47,  'S_DATASET',  'PROGRAM',  '"*"',   NULL,  NULL, NULL, 13);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (48,  'S_DATASET',  'ACTVT',    '"*"',   NULL,  NULL, NULL, 13);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (49,  'S_DATASET',  'FILENAME', '"*"',   NULL,  NULL, NULL, 13);
-INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, conditionId) VALUES (50,  'S_CLNT_IMP', 'ACTVT',    '60',    NULL,  NULL, NULL, 13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (46,  'S_TCODE',    'TCD',      'SCCL', 'SCC9', NULL, NULL, 0, 13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (47,  'S_DATASET',  'PROGRAM',  '"*"',   NULL,  NULL, NULL, 1, 13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (48,  'S_DATASET',  'ACTVT',    '"*"',   NULL,  NULL, NULL, 2, 13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (49,  'S_DATASET',  'FILENAME', '"*"',   NULL,  NULL, NULL, 3, 13);
+INSERT INTO AccessPatternConditionProperties (id, authObject, authObjectProperty, value1, value2, value3, value4, index, conditionId) VALUES (50,  'S_CLNT_IMP', 'ACTVT',    '60',    NULL,  NULL, NULL, 4, 13);
 
 -- ==============================
 --         sap settings

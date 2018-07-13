@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -231,7 +231,7 @@ public class PrivilegesTest {
 
             // prepare query entries
             AccessPattern violatedPattern = config.getPatterns().stream().filter(x -> x.getId().equals(3)).findFirst().get();
-            Set entries = new HashSet();
+            Set entries = new LinkedHashSet();
             final String criticalUser = "raboof";
             CriticalAccessEntry entry = new CriticalAccessEntry(violatedPattern, criticalUser);
             entries.add(entry);
@@ -300,21 +300,21 @@ public class PrivilegesTest {
                 new AccessCondition(
                     pattern,
                     new AccessPatternCondition(Arrays.asList(
-                        new AccessPatternConditionProperty("S_TCODE", "TCD", "SCCL", null, null, null),
-                        new AccessPatternConditionProperty("S_ADMI_FCD", "S_ADMI_FCD", "T000", null, null, null),
-                        new AccessPatternConditionProperty("S_TABU_DIS", "ACTVT", "02", null, null, null),
-                        new AccessPatternConditionProperty("S_TABU_DIS", "DICBERCLS", "\"*\"", null, null, null),
-                        new AccessPatternConditionProperty("S_TABU_CLI", "CLIIDMAINT", "X", null, null, null)
+                        new AccessPatternConditionProperty("S_TCODE", "TCD", "SCCL", null, null, null, 0),
+                        new AccessPatternConditionProperty("S_ADMI_FCD", "S_ADMI_FCD", "T000", null, null, null, 1),
+                        new AccessPatternConditionProperty("S_TABU_DIS", "ACTVT", "02", null, null, null, 2),
+                        new AccessPatternConditionProperty("S_TABU_DIS", "DICBERCLS", "\"*\"", null, null, null, 3),
+                        new AccessPatternConditionProperty("S_TABU_CLI", "CLIIDMAINT", "X", null, null, null, 4)
                     ))
                 ),
                 new AccessCondition(
                     pattern,
                     new AccessPatternCondition(Arrays.asList(
-                        new AccessPatternConditionProperty("S_TCODE", "TCD", "SCCL", null, null, null),
-                        new AccessPatternConditionProperty("S_ADMI_FCD", "S_ADMI_FCD", "T000", null, null, null),
-                        new AccessPatternConditionProperty("S_TABU_DIS", "ACTVT", "02", null, null, null),
-                        new AccessPatternConditionProperty("S_TABU_DIS", "DICBERCLS", "\"*\"", null, null, null),
-                        new AccessPatternConditionProperty("S_TABU_CLI", "CLIIDMAINT", "X", null, null, null)
+                        new AccessPatternConditionProperty("S_TCODE", "TCD", "SCCL", null, null, null, 0),
+                        new AccessPatternConditionProperty("S_ADMI_FCD", "S_ADMI_FCD", "T000", null, null, null, 1),
+                        new AccessPatternConditionProperty("S_TABU_DIS", "ACTVT", "02", null, null, null, 2),
+                        new AccessPatternConditionProperty("S_TABU_DIS", "DICBERCLS", "\"*\"", null, null, null, 3),
+                        new AccessPatternConditionProperty("S_TABU_CLI", "CLIIDMAINT", "X", null, null, null, 4)
                     ))
                 )
             ));
@@ -836,7 +836,7 @@ public class PrivilegesTest {
         try (ArtDbContext context = new ArtDbContext(username, password)) {
 
             // test switch user
-            context.createDatabaseUser(new DbUser("tset", new HashSet<DbUserRole>()), "tset");
+            context.createDatabaseUser(new DbUser("tset", new LinkedHashSet<DbUserRole>()), "tset");
             ret = true;
 
         } catch (Exception ex) {
@@ -926,7 +926,7 @@ public class PrivilegesTest {
         try (ArtDbContext context = new ArtDbContext(username, password)) {
 
             // test switch user
-            context.setFirstLoginOfCurrentUser(new DbUser("tset", new HashSet<DbUserRole>()), true);
+            context.setFirstLoginOfCurrentUser(new DbUser("tset", new LinkedHashSet<DbUserRole>()), true);
             ret = true;
 
         } catch (Exception ex) {

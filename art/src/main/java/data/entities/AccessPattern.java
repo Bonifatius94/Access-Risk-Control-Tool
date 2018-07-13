@@ -3,7 +3,7 @@ package data.entities;
 import java.time.ZonedDateTime;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -135,10 +135,10 @@ public class AccessPattern implements IReferenceAware, IDataEntity {
     private ConditionLinkage linkage = ConditionLinkage.None;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "pattern", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AccessCondition> conditions = new HashSet<>();
+    private Set<AccessCondition> conditions = new LinkedHashSet<>();
 
     @ManyToMany(mappedBy = "patterns", fetch = FetchType.EAGER)
-    private Set<Configuration> configurations = new HashSet<>();
+    private Set<Configuration> configurations = new LinkedHashSet<>();
 
     @Column(nullable = false)
     private boolean isArchived;
@@ -182,7 +182,7 @@ public class AccessPattern implements IReferenceAware, IDataEntity {
     }
 
     public void setConditions(List<AccessCondition> conditions) {
-        setConditions(new HashSet<>(conditions));
+        setConditions(new LinkedHashSet<>(conditions));
     }
 
     /**
@@ -211,7 +211,7 @@ public class AccessPattern implements IReferenceAware, IDataEntity {
     }
 
     public void setConfigurations(List<Configuration> configurations) {
-        setConfigurations(new HashSet<>(configurations));
+        setConfigurations(new LinkedHashSet<>(configurations));
     }
 
     /**
