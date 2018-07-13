@@ -33,7 +33,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import javafx.concurrent.Task;
 import tools.tracing.TraceOut;
 
 @SuppressWarnings("WeakerAccess")
@@ -61,10 +60,10 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
         // overwrite the JCo SAP DestinationDataProvider so we don't need to create a file
         sessionKey = CustomDestinationDataProvider.getInstance().openSession(sapConfig, username, password);
 
-        // make sure the connection is initialized (to avoid long queries)
+        /*// make sure the connection is initialized (to avoid long queries)
         if (canPingServer()) {
             runTestConditionQuery();
-        }
+        }*/
 
         TraceOut.leave();
     }
@@ -123,6 +122,7 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
 
             // execute analysis for each pattern parallel
             ExecutorService executor = Executors.newFixedThreadPool(config.getPatterns().size());
+
             List<Future<Set<CriticalAccessEntry>>> taskCallbacks
                 = executor.invokeAll(config.getPatterns().stream()
                 .map(pattern -> (Callable<Set<CriticalAccessEntry>>) () -> runPatternAnalysis(pattern, config.getWhitelist()))
@@ -132,15 +132,6 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
             for (Future<Set<CriticalAccessEntry>> callback : taskCallbacks) {
                 entries.addAll(callback.get());
             }
-
-            /*for (AccessPattern pattern : config.getPatterns()) {
-
-                // executing query for pattern
-                Set<CriticalAccessEntry> resultsOfPattern = runPatternAnalysis(pattern, config.getWhitelist());
-                entries.addAll(resultsOfPattern);
-
-                TraceOut.writeInfo("Pattern: " + pattern.getUsecaseId() + ", results count: " + resultsOfPattern.size());
-            }*/
 
             // write results to critical access query (ready for insertion into database)
             query = new CriticalAccessQuery(config, sapConfig, entries);
@@ -172,8 +163,18 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
 
         for (Future<Set<String>> callback : taskCallbacks) {
 
-            Set<String> usernamesOfCondition = callback.get();
-            applyNewUsernames(usernames, pattern.getLinkage(), usernamesOfCondition);
+            Set<String> usernamesToAdd = callback.get();
+
+            if (pattern.getLinkage() == ConditionLinkage.And) {
+
+                // intersect lists
+                usernames = usernames.isEmpty() ? usernamesToAdd : usernames.stream().filter(x -> usernamesToAdd.contains(x)).collect(Collectors.toSet());
+
+            } else if (pattern.getLinkage() == ConditionLinkage.Or || pattern.getLinkage() == ConditionLinkage.None) {
+
+                // union lists
+                usernames.addAll(usernamesToAdd);
+            }
         }
 
         if (whitelist != null) {
@@ -219,11 +220,6 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
             JCoTable conditionQueryResultTable = sapQuerySingleCondition(function);
             Set<String> usernamesOfCondition = parseQueryResults(conditionQueryResultTable);
 
-            // TODO: check if clear() is even required
-            /*// clear sap input tables
-            inputTable.clear();
-            profileTable.clear();*/
-
             // notify progress
             stepProgress();
 
@@ -231,23 +227,6 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
 
             return usernamesOfCondition;
         };
-    }
-
-    private void applyNewUsernames(Set<String> usernames, ConditionLinkage linkage, Set<String> newUsernames) {
-
-        if (linkage == ConditionLinkage.And) {
-
-            // intersect lists
-            usernames = usernames.isEmpty() ? newUsernames : usernames.stream().filter(x -> newUsernames.contains(x)).collect(Collectors.toSet());
-
-        } else if (linkage == ConditionLinkage.Or || linkage == ConditionLinkage.None) {
-
-            // union lists
-            usernames.addAll(newUsernames);
-
-        } else {
-            throw new IllegalArgumentException("unknow linkage");
-        }
     }
 
     /**
@@ -271,7 +250,7 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
         } else if (condition.getType() == AccessConditionType.Pattern) {
 
             for (AccessPatternConditionProperty property : condition.getPatternCondition().getProperties()
-                .stream().sorted(Comparator.comparing(AccessPatternConditionProperty::getAuthObject)).collect(Collectors.toList())) {
+                .stream().sorted(Comparator.comparing(AccessPatternConditionProperty::getIndex)).collect(Collectors.toList())) {
 
                 inputTable.appendRow();
                 inputTable.setValue("OBJCT", property.getAuthObject());

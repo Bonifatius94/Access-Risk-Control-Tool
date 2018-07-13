@@ -11,6 +11,9 @@ import extensions.progess.IProgressListener;
 import io.msoffice.excel.AccessPatternImportHelper;
 import io.msoffice.excel.WhitelistImportHelper;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 
 import org.junit.jupiter.api.Disabled;
@@ -151,5 +154,82 @@ public class SapTest {
      * ViolatedUseCaseID: 3.B, Username: ZT2112_P
      * ViolatedUseCaseID: 3.B, Username: ZT2113_1_F
      */
+
+    @Test
+    @Disabled
+    public void testQueryPerformace() {
+
+        boolean ret = true;
+
+        // init user credentials
+        String username = "GROUP_11";
+        String password = "Wir sind das beste Team!";
+
+        // init sap settings (here: test server data)
+        SapConfiguration sapConfig = new SapConfiguration("ec2-54-209-137-85.compute-1.amazonaws.com", "some description", "00", "001", "EN", "0");
+
+        try {
+
+            // parsing test patterns from excel file
+            List<AccessPattern> patterns = new AccessPatternImportHelper().importAccessPatterns("Example - Zugriffsmuster.xlsx");
+
+            // parsing test whitelist from excel file
+            Whitelist whitelist = new WhitelistImportHelper().importWhitelist("Example - Whitelist.xlsx");
+
+            // init a new config with the whitelist and access patterns
+            Configuration config = new Configuration();
+            config.setWhitelist(whitelist);
+            config.setPatterns(patterns);
+
+            // write config to console
+            System.out.println(config);
+
+            // run sap query with config and sap settings
+            try (SapConnector connector = new SapConnector(sapConfig, username, password)) {
+
+                connector.register(new IProgressListener() {
+                    @Override
+                    public void onProgressChanged(double percentage) {
+                        System.out.println("Progress at " + (int)(percentage * 100) + "%");
+                    }
+                });
+
+                LocalDateTime startTime = LocalDateTime.now();
+                LocalDateTime startTimeLastRun = startTime;
+
+                // run same query 100 times
+                for (int i = 0; i < 100; i++) {
+
+                    System.out.println("=============================");
+                    System.out.println("           run " + (i + 1));
+                    System.out.println("=============================");
+
+                    CriticalAccessQuery query = connector.runAnalysis(config);
+                    System.out.println("SAP query results (" + query.getEntries().size() + "):");
+                    query.getEntries().forEach(x -> System.out.println(x));
+
+                    ret = ret &&
+                        query.getSapConfig().equals(sapConfig)
+                            && query.getConfig().equals(config)
+                            && query.getConfig().getWhitelist().equals(whitelist)
+                            && query.getConfig().getPatterns().containsAll(patterns)
+                            && query.getEntries().size() == 24;
+
+                    System.out.println("=============================");
+                    System.out.println(" time elapsed: " + Duration.between(startTimeLastRun, LocalDateTime.now()).getSeconds() + " sec");
+                    System.out.println("=============================");
+                    System.out.println();
+
+                    startTimeLastRun = LocalDateTime.now();
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            ret = false;
+        }
+
+        assert(ret);
+    }
 
 }
