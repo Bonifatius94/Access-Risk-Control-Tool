@@ -212,6 +212,8 @@ public class NewSapQueryController {
             return true;
         } catch (Exception e) {
 
+            // TODO: rework this logic and handle errors in SapConnector
+
             // if exception contains error code 103, connection was successful
             if (e.getCause().toString().contains("103")) {
                 return true;

@@ -59,6 +59,7 @@ public class SapLoginController {
                 SapConnector connector = new SapConnector(configuration, usernameInput.getText(), passwordInput.getText());
 
                 try {
+                    // TODO: the ping is obsolete as it is also executed during runAnalysis() method
                     connector.canPingServer();
                     close(event);
                     parentController.runAnalysis(usernameInput.getText(), passwordInput.getText());
