@@ -11,11 +11,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 
@@ -38,58 +41,72 @@ public class AccessPatternImportHelper {
 
         // open excel file
         FileInputStream excelFile = new FileInputStream(new File(filePath));
-        Workbook workbook = new XSSFWorkbook(excelFile);
-        Sheet sheet = workbook.getSheetAt(0);
+        XSSFWorkbook workbook = new XSSFWorkbook(excelFile);
+        XSSFSheet sheet = workbook.getSheetAt(0);
 
         // init empty list and row index counter
-        List<AccessPattern> list = new ArrayList<>();
-        List<Row> tempRows = new ArrayList<>();
-        boolean isFirstRow = true;
-
-        // go through excel rows
-        for (Row row : sheet) {
-
-            // parse pattern name
-            Cell patternNameCell = row.getCell(0);
-
-            // check if new pattern begins
-            if (!isFirstRow && patternNameCell != null && !patternNameCell.getStringCellValue().trim().isEmpty()) {
-                String patternName = patternNameCell.getStringCellValue();
-
-                if (patternName != null && !patternName.trim().isEmpty()) {
-                    // parse pattern from rows before and add pattern to list
-                    list.add(getAuthPattern(tempRows));
-                    tempRows = new ArrayList<>();
-                }
-            }
-
-            tempRows.add(row);
-            isFirstRow = false;
-        }
-
-        // parse remaining rows
-        if (tempRows.size() >= 2) {
-            list.add(getAuthPattern(tempRows));
-        }
+        List<List<XSSFRow>> rowsPerPattern = getRowsPerPattern(sheet);
+        List<AccessPattern> patterns = rowsPerPattern.parallelStream().map(rows -> getAccessPattern(rows)).collect(Collectors.toList());
 
         // dispose file handle
         workbook.close();
         excelFile.close();
 
-        return list;
+        return patterns;
+    }
+
+    private List<List<XSSFRow>> getRowsPerPattern(XSSFSheet sheet) {
+
+        List<List<XSSFRow>> rowsPerPattern = new ArrayList<>();
+        List<XSSFRow> tempRows = new ArrayList<>();
+        boolean isFirstRow = true;
+
+        // go through excel rows
+        for (Row abstractRow : sheet) {
+
+            if (abstractRow instanceof XSSFRow) {
+
+                XSSFRow row = (XSSFRow) abstractRow;
+
+                // parse pattern name
+                Cell patternNameCell = row.getCell(0);
+
+                // check if new pattern begins
+                if (!isFirstRow && patternNameCell != null && !patternNameCell.getStringCellValue().trim().isEmpty()) {
+
+                    String patternName = patternNameCell.getStringCellValue();
+
+                    if (patternName != null && !patternName.trim().isEmpty()) {
+
+                        // parse pattern from rows before and add pattern to list
+                        rowsPerPattern.add(tempRows);
+                        tempRows = new ArrayList<>();
+                    }
+                }
+
+                tempRows.add(row);
+                isFirstRow = false;
+            }
+        }
+
+        // parse remaining rows
+        if (tempRows.size() >= 2) {
+            rowsPerPattern.add(tempRows);
+        }
+
+        return rowsPerPattern;
     }
 
     /**
-     * This method parses the auth pattern from the overloaded rows.
-     * It therefore finds out whether the auth pattern is of simple or complex type
-     * and then calls a method to parse the specific pattern data. It also parses
-     * the pattern name and description.
+     * This method parses the access pattern from the overloaded rows.
+     * It therefore finds out whether the access pattern contains exactly one or more conditions
+     * and then calls a method to parse the specific pattern data. It also parses the pattern name and description.
      *
-     * @param rows the rows containing auth pattern data
-     * @return the auth pattern parsed from the overloaded rows
+     * @param rows the rows containing access pattern data
+     * @return the access pattern parsed from the overloaded rows
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    private AccessPattern getAuthPattern(List<Row> rows) {
+    private AccessPattern getAccessPattern(List<XSSFRow> rows) {
 
         AccessPattern pattern;
         String patternName = rows.get(0).getCell(0).getStringCellValue().trim();
@@ -98,15 +115,15 @@ public class AccessPatternImportHelper {
 
         if (patternTypeIndicator == null || patternTypeIndicator.trim().isEmpty()) {
 
-            throw new IllegalArgumentException("Pattern type not set. Needs to be COND, AND or OR.");
+            throw new IllegalArgumentException("the pattern type is not set (e.g. COND, AND or OR)");
 
         } else if (patternTypeIndicator.trim().toUpperCase().equals("COND")) {
 
-            pattern = getSimpleAuthPattern(rows);
+            pattern = getSingleConditionAccessPattern(rows);
 
         } else /*if (patternTypeIndicator.toUpperCase().equals("OR") || patternTypeIndicator.toUpperCase().equals("AND"))*/ {
 
-            pattern = getComplexAuthPattern(rows);
+            pattern = getMultiConditionAccessPattern(rows);
         }
 
         // set name and description
@@ -117,43 +134,51 @@ public class AccessPatternImportHelper {
     }
 
     /**
-     * This method parses a simple auth pattern from the rows overloaded. It therefore parses
+     * This method parses a single-condition access pattern from the rows overloaded. It therefore parses
      * the only condition and applies it to a new instance of an auth pattern.
      *
-     * @param rows the rows containing auth pattern data
-     * @return an auth pattern of simple type
+     * @param rows the rows containing access pattern data
+     * @return an access pattern of simple type
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    private AccessPattern getSimpleAuthPattern(List<Row> rows) {
+    private AccessPattern getSingleConditionAccessPattern(List<XSSFRow> rows) {
 
         AccessCondition condition = getCondition(rows.subList(1, rows.size()), false);
         return new AccessPattern(condition);
     }
 
     /**
-     * This method parses a complex auth pattern from the rows overloaded. It therefore parses
-     * the condition linkage and all condition.
+     * This method parses a multi-condition access pattern from the rows overloaded. It therefore parses
+     * the condition linkage and all conditions.
      *
-     * @param rows the rows containing auth pattern data
-     * @return an auth pattern of complex type
+     * @param rows the rows containing access pattern data
+     * @return an access pattern of complex type
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    private AccessPattern getComplexAuthPattern(List<Row> rows) {
-
-        List<Row> tempRows = new ArrayList<>();
-        List<AccessCondition> conditions = new ArrayList<>();
+    private AccessPattern getMultiConditionAccessPattern(List<XSSFRow> rows) {
 
         String linkageAsString = rows.get(1).getCell(1).getStringCellValue();
         ConditionLinkage linkage = linkageAsString.trim().toUpperCase().equals("OR") ? ConditionLinkage.Or : ConditionLinkage.And;
 
-        int counter = 0;
+        List<List<XSSFRow>> rowsPerCondition = getRowsPerCondition(rows);
+        List<AccessCondition> conditions = rowsPerCondition.parallelStream().map(x -> getCondition(x, true)).collect(Collectors.toList());
+
+        return new AccessPattern(conditions, linkage);
+    }
+
+    private List<List<XSSFRow>> getRowsPerCondition(List<XSSFRow> rows) {
+
+        List<List<XSSFRow>> rowsPerCondition = new ArrayList<>();
+        List<XSSFRow> tempRows = new ArrayList<>();
+
+        int count = 0;
         boolean isFirstRow = true;
 
         // go through conditions
-        for (Row row : rows.subList(2, rows.size())) {
+        for (XSSFRow row : rows.subList(2, rows.size())) {
 
-            if (counter > 10) {
-                throw new IllegalArgumentException("Too many conditions detected in complex pattern");
+            if (count > 10) {
+                throw new IllegalArgumentException("too many conditions detected in multi-condition pattern");
             }
 
             // parse conditions
@@ -165,10 +190,10 @@ public class AccessPatternImportHelper {
 
                 if (!isFirstRow && (condIndicator != null && condIndicator.trim().toUpperCase().equals("COND"))) {
 
-                    // parse pattern from rows before and add pattern to list
-                    conditions.add(getCondition(tempRows, true));
+                    // get the rows that contain the condition
+                    rowsPerCondition.add(tempRows);
                     tempRows = new ArrayList<>();
-                    counter++;
+                    count++;
                 }
             }
 
@@ -178,10 +203,10 @@ public class AccessPatternImportHelper {
 
         // parse remaining rows
         if (tempRows.size() > 0) {
-            conditions.add(getCondition(tempRows, true));
+            rowsPerCondition.add(tempRows);
         }
 
-        return new AccessPattern(conditions, linkage);
+        return rowsPerCondition;
     }
 
     /**
@@ -189,46 +214,46 @@ public class AccessPatternImportHelper {
      * and then parses the condition data accordingly.
      *
      * @param rows      the rows containing condition data
-     * @param isComplex a boolean value that indicates where the COND markup starts
+     * @param isMultiCondition a boolean value that indicates where the COND markup starts
      * @return a condition that is either an instance of an auth profile condition or an auth pattern condition
      * @author Marco Tröster (marco.troester@student.uni-augsburg.de)
      */
-    private AccessCondition getCondition(List<Row> rows, boolean isComplex) {
+    private AccessCondition getCondition(List<XSSFRow> rows, boolean isMultiCondition) {
 
         AccessCondition condition = new AccessCondition();
-        Cell temp = rows.get(0).getCell(isComplex ? 9 : 8);
+        Cell profileCell = rows.get(0).getCell(isMultiCondition ? 9 : 8);
 
-        if (temp != null && temp.getStringCellValue() != null && !temp.getStringCellValue().trim().isEmpty()) {
+        if (profileCell != null && profileCell.getStringCellValue() != null && !profileCell.getStringCellValue().trim().isEmpty()) {
 
             // case: profile condition
-            String profile = temp.getStringCellValue().trim();
+            String profile = profileCell.getStringCellValue().trim();
             condition.setProfileCondition(new AccessProfileCondition(profile));
 
         } else {
 
-            // case: auth pattern condition
+            // case: access pattern condition
             int i = 0;
-            int startIndex = isComplex ? 3 : 2;
+            int startIndex = isMultiCondition ? 3 : 2;
             List<AccessPatternConditionProperty> properties = new ArrayList<>();
 
-            for (Row row : rows) {
+            for (XSSFRow row : rows) {
 
                 // parse auth object and property name
                 int index = startIndex;
-                final String authorizationObject = row.getCell(index).getStringCellValue().trim();
-                final String propertyName = row.getCell(++index).getStringCellValue().trim();
+                final String authObject = row.getCell(index).getStringCellValue().trim();
+                final String authObjectProperty = row.getCell(++index).getStringCellValue().trim();
 
                 // parse values
-                temp = row.getCell(++index);
-                final String value1 = (temp != null) ? temp.getStringCellValue().trim() : null;
-                temp = row.getCell(++index);
-                final String value2 = (temp != null) ? temp.getStringCellValue().trim() : null;
-                temp = row.getCell(++index);
-                final String value3 = (temp != null) ? temp.getStringCellValue().trim() : null;
-                temp = row.getCell(++index);
-                final String value4 = (temp != null) ? temp.getStringCellValue().trim() : null;
+                XSSFCell valueCell = row.getCell(++index);
+                final String value1 = (valueCell != null) ? getValueFromCell(valueCell) : null;
+                valueCell = row.getCell(++index);
+                final String value2 = (valueCell != null) ? getValueFromCell(valueCell) : null;
+                valueCell = row.getCell(++index);
+                final String value3 = (valueCell != null) ? getValueFromCell(valueCell) : null;
+                valueCell = row.getCell(++index);
+                final String value4 = (valueCell != null) ? getValueFromCell(valueCell) : null;
 
-                properties.add(new AccessPatternConditionProperty(authorizationObject, propertyName, value1, value2, value3, value4, i));
+                properties.add(new AccessPatternConditionProperty(authObject, authObjectProperty, value1, value2, value3, value4, i));
                 i++;
             }
 
@@ -236,6 +261,41 @@ public class AccessPatternImportHelper {
         }
 
         return condition;
+    }
+
+    /**
+     * This method helps parsing the content from an excel cell as a string.
+     *
+     * @param cell the cell to be parsed
+     * @return the value of the cell as string
+     */
+    private String getValueFromCell(XSSFCell cell) {
+
+        String value = null;
+
+        if (cell != null) {
+
+            // INFO: the deprecated functions had to be used because there was no function equally replacing the deprecated ones
+            // TODO: check if there is a function replacing the deprecated ones
+            CellType type = cell.getCellTypeEnum() == CellType.FORMULA ? cell.getCachedFormulaResultTypeEnum() : cell.getCellTypeEnum();
+
+            switch (type) {
+                case STRING:
+                    value = cell.getStringCellValue();
+                    break;
+                default:
+                    // TODO: FORMULA type may not be supported. If the FORMULA type is required, apply changes here.
+                    // get the raw value as string
+                    value = cell.getRawValue();
+                    break;
+            }
+        }
+
+        if (value != null) {
+            value = value.trim();
+        }
+
+        return value;
     }
 
 }

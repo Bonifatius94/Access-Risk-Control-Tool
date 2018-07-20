@@ -111,9 +111,9 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
 
         TraceOut.enter();
 
-        CriticalAccessQuery query = null;
+        CriticalAccessQuery query;
 
-        if (canPingServer()) {
+        if (config.getPatterns().size() > 0 && canPingServer()) {
 
             setTotalProgressSteps(config.getPatterns().stream().mapToInt(x -> x.getConditions().size()).sum() + 1);
             Set<CriticalAccessEntry> entries = new LinkedHashSet<>();
@@ -137,6 +137,9 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
             query = new CriticalAccessQuery(config, sapConfig, entries);
 
             resetProgress();
+
+        } else {
+            throw new IllegalArgumentException("invalid configuration or server unavailable");
         }
 
         TraceOut.leave();
@@ -188,7 +191,7 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
         }
 
         // create critical access entries from remaining usernames + pattern
-        Set<CriticalAccessEntry> entries = usernames.stream().map(x -> new CriticalAccessEntry(pattern, x)).collect(Collectors.toSet());
+        Set<CriticalAccessEntry> entries = usernames.stream().map(username -> new CriticalAccessEntry(pattern, username)).collect(Collectors.toSet());
 
         TraceOut.leave();
         return entries;
@@ -207,7 +210,7 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
 
         return () -> {
 
-            System.out.println("task " + Thread.currentThread().getName() + " started");
+            //System.out.println("task " + Thread.currentThread().getName() + " started");
 
             // prepare the sap condition query
             JCoDestination destination = JCoDestinationManager.getDestination(sessionKey);
@@ -223,7 +226,7 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
             // notify progress
             stepProgress();
 
-            System.out.println("task " + Thread.currentThread().getName() + " finished");
+            //System.out.println("task " + Thread.currentThread().getName() + " finished");
 
             return usernamesOfCondition;
         };
@@ -314,6 +317,8 @@ public class SapConnector extends ProgressableBase implements ISapConnector, Clo
     private Set<String> parseQueryResults(JCoTable table) {
 
         TraceOut.enter();
+
+        // TODO: parse more data columns
 
         Set<String> usernames = new LinkedHashSet<>();
 
