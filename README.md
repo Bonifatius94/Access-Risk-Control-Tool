@@ -1,4 +1,4 @@
-# HOW TO BUILD THIS PROJECT
+# Access Risk Control Tool (ART)
 
 ## Development Machine Setup:
 - install IntelliJ Idea 2018.1 including Maven (at least the free Community Edition), see: [Jetbrains IntelliJ Idea Downloads](https://www.jetbrains.com/idea/download/)
@@ -43,6 +43,9 @@
 #              JAVA 8 SETUP INSTRUCTIONS
 # ========================================================
 
+# note: this script was tested on linux ubuntu 16.04 LTS
+# see: https://wiki.ubuntuusers.de/Java/Installation/Oracle_Java/Java_8/
+
 # preparation
 # ===========
 # unzip and copy your desired java JRE package into the folder /opt/Oracle_Java
@@ -58,17 +61,11 @@ sudo update-alternatives --install "/usr/bin/javaws" "javaws" "$JAVA_ROOT/$JAVA8
 sudo update-alternatives --set "java" "$JAVA_ROOT/$JAVA8_INSTALLATION_FOLDER/bin/java"
 sudo update-alternatives --set "javaws" "$JAVA_ROOT/$JAVA8_INSTALLATION_FOLDER/bin/javaws"
 
-# note: this script was tested on linux ubuntu 16.04 LTS
-# see: https://wiki.ubuntuusers.de/Java/Installation/Oracle_Java/Java_8/
-
 # ========================================================
-#                Marco Tröster, 12.07.2018
+#                        2018-07-12
 # ========================================================
 ```
 
 ## Notes:
 The development setup procedure was only tested on a Windows 10 machine.
-
 Please feel free to report any issues with your deveploment or test environment setup.
-
-Technical documentation was made by Marco Tröster (marco.troester@student.uni-augsburg.de)
