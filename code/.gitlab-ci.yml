@@ -1,0 +1,20 @@
+image: kaiwinter/docker-java8-maven
+
+variables:
+  MAVEN_CLI_OPTS: "-s art/.m2/settings.xml -f art/pom.xml --batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=art/.m2/repository"
+
+cache:
+  paths:
+    - art/.m2/repository/
+    - art/target/
+
+build:
+  stage: build
+  script:
+    - mvn $MAVEN_CLI_OPTS compile
+
+test:
+  stage: test
+  script:
+    - mvn $MAVEN_CLI_OPTS test

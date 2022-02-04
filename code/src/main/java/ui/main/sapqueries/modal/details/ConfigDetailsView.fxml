@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import ui.custom.controls.CustomWindow?>
+
+<?import ui.custom.controls.PTableColumn?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<CustomWindow xmlns="http://javafx.com/javafx"
+              xmlns:fx="http://javafx.com/fxml"
+              fx:controller="ui.main.sapqueries.modal.details.ConfigDetailsController" windowState="NoResize">
+    <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-padding: 20" spacing="20">
+        <HBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="30">
+            <VBox spacing="20">
+                <Label text="%usedWhitelist" style="-fx-font-size: 150%; -fx-padding: 0 0 10 0"/>
+                <VBox HBox.hgrow="ALWAYS" spacing="30">
+                    <JFXTextField fx:id="whitelistNameField" promptText="%name" maxWidth="500" editable="false"/>
+                    <JFXTextField fx:id="whitelistDescriptionField" promptText="%description" maxWidth="500" editable="false"/>
+                </VBox>
+                <Separator/>
+                <Label text="%whitelistEntryTitle" style="-fx-font-size: 130%;"/>
+                <TableView VBox.vgrow="ALWAYS" fx:id="whitelistEntries" minWidth="300">
+                    <columns>
+                        <PTableColumn text="%useCaseID" percentageWidth="0.4">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="usecaseId"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn text="%username" percentageWidth="0.6">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="username"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                    </columns>
+                </TableView>
+            </VBox>
+            <Separator orientation="VERTICAL"/>
+            <VBox spacing="20" HBox.hgrow="ALWAYS">
+                <Label text="%usedPatterns" style="-fx-font-size: 150%; -fx-padding: 0 0 10 0"/>
+                <TableView VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" fx:id="patternsTable">
+                    <columns>
+                        <PTableColumn text="UsecaseID" percentageWidth="0.18">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="usecaseId"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn text="Description" percentageWidth="0.65" styleClass="align-left">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="description"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn text="#" fx:id="useCaseCountColumn" percentageWidth="0.1" resizable="false">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="conditions"/>
+                            </cellValueFactory>
+                        </PTableColumn>
+                        <PTableColumn fx:id="viewDetailsColumn" percentageWidth="0.07" resizable="false" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </HBox>
+        <HBox HBox.hgrow="ALWAYS" alignment="BASELINE_RIGHT" spacing="10">
+            <JFXButton text="%back" onAction="#close">
+                <graphic>
+                    <MaterialDesignIconView glyphName="ARROW_LEFT"/>
+                </graphic>
+            </JFXButton>
+        </HBox>
+    </VBox>
+</CustomWindow>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import ui.custom.controls.PTableColumn?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ui.main.sapqueries.modal.results.views.AnalysisTableController" HBox.hgrow="ALWAYS"
+      VBox.vgrow="ALWAYS" spacing="20">
+    <TableView fx:id="resultTable" minWidth="700" VBox.vgrow="ALWAYS">
+        <columns>
+            <PTableColumn text="?" fx:id="conditionTypeColumn" percentageWidth="0.06" resizable="false">
+                <cellValueFactory>
+                    <PropertyValueFactory property="accessPattern"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%violatedUseCaseID" fx:id="usecaseIdColumn" percentageWidth="0.2">
+                <cellValueFactory>
+                    <PropertyValueFactory property="accessPattern"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%description" fx:id="descriptionColumn" percentageWidth="0.4"
+                          styleClass="align-left">
+                <cellValueFactory>
+                    <PropertyValueFactory property="accessPattern"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn text="%username" percentageWidth="0.24">
+                <cellValueFactory>
+                    <PropertyValueFactory property="username"/>
+                </cellValueFactory>
+            </PTableColumn>
+            <PTableColumn percentageWidth="0.1" fx:id="viewPatternDetailsColumn"/>
+        </columns>
+    </TableView>
+</VBox>
