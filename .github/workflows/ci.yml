@@ -13,7 +13,7 @@ env:
 
 jobs:
   build_and_test:
-    #runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
     container: maven:3.8.4-jdk-8
 
     steps:
