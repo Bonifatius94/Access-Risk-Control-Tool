@@ -1,0 +1,27 @@
+name: Build + Test
+
+on:
+  push:
+    branches: [ master ]
+
+  pull_request:
+    branches: [ master ]
+
+env:
+  MAVEN_CLI_OPTS: "-s art/.m2/settings.xml -f art/pom.xml --batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=art/.m2/repository"
+
+jobs:
+  build_and_test:
+    #runs-on: ubuntu-latest
+    container: maven:3.8.4-jdk-8
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: build and test
+        run: |
+          cd code
+          mvn $MAVEN_CLI_OPTS compile
+          mvn $MAVEN_CLI_OPTS test
